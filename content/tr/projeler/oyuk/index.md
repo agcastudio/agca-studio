@@ -34,7 +34,7 @@ images:
     alt: "Caddeden giriş: kepenkli beyaz cephe, zemin katta caddeye açılan aydınlık festival avlusu"
     caption: "Caddeden avluya açılan giriş"
   - file: "r-camii-giris.jpg"
-    alt: "Kurşunlu Camii yönünden giriş cephesi; ağaç, basamaklar ve iki kat yüksekliğinde kapı boşluğu"
+    alt: "Kurşunlu Camii yönünden giriş cephesi; ağaç, kepenkli pencereler ve iki kat yüksekliğinde kapı boşluğu"
     caption: "Kurşunlu Camii yönünden giriş"
   - file: "r-drone.jpg"
     alt: "Havadan görünüş: tarihi doku içinde, ortasında avlu boşluğu bulunan beyaz kütle ve Kurşunlu Camii"
@@ -49,10 +49,10 @@ images:
     alt: "Kütüphanenin iç bahçesi: çakıl zemin, oturma grubu ve tek ağaç"
     caption: "Kütüphane iç bahçesi"
   - file: "r-7kutup.jpg"
-    alt: "Kütüphane: cam bölmeli bireysel çalışma odaları ve pencereden Kurşunlu Camii"
+    alt: "Kütüphane: cam bölmeli bireysel çalışma odaları ve arka pencerelerden süzülen gün ışığı"
     caption: "Bireysel çalışma odaları"
   - file: "r-8kutupmasa.jpg"
-    alt: "Kütüphane: uzun ahşap çalışma masası ve avluya bakan cam cephe"
+    alt: "Kütüphane: uzun ahşap çalışma masası ve cam bölmeli yan odalar"
     caption: "Ortak çalışma"
   - file: "r-6kutp.jpg"
     alt: "Kütüphane galerisi: avluya bakan çalışma masası ve üstten gelen doğal ışık"
@@ -89,13 +89,13 @@ drawings:
     alt: "BB kesiti: Kurşunlu Camii ve okul arasında yapının kent siluetindeki yeri"
     caption: "BB kesiti"
   - file: "c-k-cc.jpg"
-    alt: "CC kesiti: festival avlusu, esnek salon ve üst katlar"
+    alt: "CC kesiti: esnek alan ve esnek salon; üstte atölyeler, kütüphane, iç bahçe ve idare katı"
     caption: "CC kesiti"
   - file: "c-g-g.jpg"
     alt: "Güney cephesi: beyaz sıva ve düşey pencere dizileri"
     caption: "Güney cephesi"
   - file: "c-g-k.jpg"
-    alt: "Kuzey cephesi: Kurşunlu Caddesi boyunca kepenkli cephe"
+    alt: "Kuzey cephesi: Koca Mustafa Efendi Caddesi'ne bakan kepenkli cephe ve idari giriş"
     caption: "Kuzey cephesi"
   - file: "c-22.jpg"
     alt: "Katların izometrik açılımı: ışık kuyusu boyunca üst üste dizilen kat planları"
@@ -108,7 +108,7 @@ diagrams:
     alt: "Kent rotası: arasta, han, cami avlusu, Oyuk ve meydan; çizgi çizim"
     caption: "Nefes alan cadde: kent rotasını tamamlamak"
   - file: "d-23.jpg"
-    alt: "Dört tasarım kararı: doldur, oy, yar, ört"
+    alt: "Dört tasarım kararının şeması: doldur, oy, yar, ört; kütlenin adım adım biçimlenişi"
     caption: "Doldur · Oy · Yar · Ört"
   - file: "d-17.jpg"
     alt: "Program ilişki şeması: merkezde festival avlusu; kütüphane, idare, işlik, sahne ve kafe çevresinde"
@@ -128,8 +128,8 @@ diagrams:
 ---
 Yapı, dolu bir taş bloktur; kamusallık ondan eksiltilerek kazınır. Oyuk, hem boşluk hem de kente açılan bir davettir.
 
-Muğla'nın kamusal hayatı tarih boyunca oyulmuş boşluklarda birikmiştir: arasta, han avlusu, cami avlusu, Cumhuriyet Meydanı. Kurşunlu Caddesi üzerindeki bu kültür merkezi önerisi, kentin kültür rotasındaki eksik halkayı tamamlar. Caddeden avluya oyulan kamusal boşluk, atölyeleri ve kafesiyle her saat açık bir festival avlusudur; sahne, işlik ve kütüphane bu avlunun çevresinde kümelenir.
+Muğla'nın kamusal hayatı tarih boyunca oyulmuş boşluklarda birikmiştir: arasta, han avlusu, cami avlusu, Cumhuriyet Meydanı. Kurşunlu Caddesi üzerindeki bu kültür merkezi önerisi, kentin kültür rotasındaki eksik halkayı tamamlar. Caddeden avluya oyulan kamusal boşluk, atölyeleri ve kafesiyle her saat açık bir festival avlusudur; sahne, atölyeler ve kütüphane bu avlunun çevresinde kümelenir.
 
-Kütle, Menteşe'nin badanalı evleri gibi beyaz ve sessizdir. Cephenin tek hareketli öğesi, güneşe ve kullanıma göre açılıp kapanan ahşap kepenklerdir: avlu açıkken cephe caddeye açılır, gece kapandığında ışık yalnız kepenk aralıklarından süzülür. Dört karar kütleyi biçimlendirir: yitirilmiş binanın izi yeniden **doldurulur**, gövde tepeden zemine **oyularak** avlu kazanılır, sokaktan avluya bir **yarık** açılır ve yapı kepenklerle **örtülür**.
+Kütle, Menteşe'nin badanalı evleri gibi beyaz ve sessizdir. Cephenin tek hareketli öğesi, güneşe ve kullanıma göre açılıp kapanan ahşap kepenklerdir: Avlu açıkken cephe caddeye açılır, gece kapandığında ışık yalnız kepenk aralıklarından süzülür. Dört karar kütleyi biçimlendirir: Yitirilmiş binanın izi yeniden **doldurulur**, gövde tepeden zemine **oyularak** avlu kazanılır, sokaktan avluya bir **yarık** açılır ve yapı kepenklerle **örtülür**.
 
 Kat kurgusu sokağın sesinden resmiyetin sessizliğine doğru yükselir. Zemin ve birinci kat en kamusal olanlardır: festival avlusu, esnek salon, atölyeler, sergi ve satış birimleri. İkinci kat kütüphanedir; bireysel odalar, grup çalışma alanları ve dijital kütüphane bir iç bahçenin çevresine dizilir. Üçüncü kat idare birimlerini ve Cumhuriyet Meydanı'na bakan terası taşır. Toplam inşaat alanı 4.130 m²'dir.

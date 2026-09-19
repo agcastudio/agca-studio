@@ -15,7 +15,7 @@
       {{- $fb := $img.Fill "960x640 jpg" -}}
       <picture>
         <source type="image/webp" srcset="{{ delimit $set ", " }}" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw">
-        <img src="{{ $fb.RelPermalink }}" width="960" height="640" alt="{{ $p.Params.card_alt | default (printf "%s — %s" $p.Title $p.Params.kunye.yer) }}" loading="lazy" decoding="async">
+        <img src="{{ $fb.RelPermalink }}" width="960" height="640" alt="" loading="lazy" decoding="async">
       </picture>
       {{- end }}
     </div>

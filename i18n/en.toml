@@ -20,6 +20,10 @@ other = "Türkçe sürüm"
 other = "All"
 [filter_label]
 other = "Filter by type"
+[gallery]
+other = "Images"
+[contact_social]
+other = "Social"
 [projects_meta_title]
 other = "Projects"
 [tur_konut]
@@ -41,7 +45,7 @@ other = "Location"
 [kunye_isveren]
 other = "Client"
 [kunye_proje_yili]
-other = "Design Year"
+other = "Design year"
 [kunye_bitis_yili]
 other = "Completion"
 [kunye_program]
@@ -49,9 +53,9 @@ other = "Programme"
 [kunye_durum]
 other = "Status"
 [kunye_insaat_alani]
-other = "Built Area"
+other = "Built area"
 [kunye_arsa_alani]
-other = "Site Area"
+other = "Site area"
 [kunye_ekip]
 other = "Team"
 [kunye_rol]
@@ -83,7 +87,7 @@ other = "Privacy"
 [rights]
 other = "All rights reserved."
 [founders]
-other = "Founding Partners"
+other = "Founding partners"
 [contact_email]
 other = "Email"
 [contact_phone]

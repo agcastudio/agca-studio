@@ -7,6 +7,7 @@
   "alternateName" (slice "agca studio" "agca.studio" "Ağca Studio")
   "url" site.BaseURL
   "logo" (printf "%simg/logo-og.png" site.BaseURL)
+  "image" (printf "%simg/og-default.jpg" site.BaseURL)
   "email" site.Params.email
   "address" (dict "@type" "PostalAddress" "addressLocality" site.Params.district "addressRegion" site.Params.city "addressCountry" "TR")
   "areaServed" (slice "TR")
@@ -20,8 +21,12 @@
 {{- $graph := slice -}}
 {{- if $p.IsHome -}}
   {{- $graph = $graph | append $org -}}
-  {{- $graph = $graph | append (dict "@type" "WebSite" "url" site.BaseURL "name" $brand "inLanguage" $p.Language.Lang "publisher" (dict "@id" (printf "%s#org" site.BaseURL))) -}}
+  {{- $graph = $graph | append (dict "@type" "WebSite" "url" site.BaseURL "name" $brand "alternateName" (slice "agca studio" "agca.studio") "inLanguage" $p.Language.Lang "publisher" (dict "@id" (printf "%s#org" site.BaseURL))) -}}
 {{- else -}}
+  {{- /* Diğer sayfalarda @id referansı çözülsün diye kısa kuruluş düğümü */ -}}
+  {{- if ne $p.Params.pagekind "contact" -}}
+    {{- $graph = $graph | append (dict "@type" "Organization" "@id" (printf "%s#org" site.BaseURL) "name" $brand "url" site.BaseURL "logo" (printf "%simg/logo-og.png" site.BaseURL)) -}}
+  {{- end -}}
   {{- /* Ekmek kırıntısı */ -}}
   {{- $items := slice (dict "@type" "ListItem" "position" 1 "name" $brand "item" site.Home.Permalink) -}}
   {{- $pos := 2 -}}
@@ -55,7 +60,7 @@
       "url" $p.Permalink
       "inLanguage" $p.Language.Lang
       "provider" (dict "@id" (printf "%s#org" site.BaseURL))
-      "areaServed" (slice (dict "@type" "City" "name" "İstanbul") (dict "@type" "Country" "name" "Türkiye"))
+      "areaServed" (slice (dict "@type" "City" "name" site.Params.city) (dict "@type" "Country" "name" (cond (eq $p.Language.Lang "tr") "Türkiye" "Turkey")))
     -}}
     {{- $graph = $graph | append $svc -}}
     {{- with $p.Params.faq -}}

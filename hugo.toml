@@ -10,18 +10,20 @@ capitalizeListTitles = false
 [languages]
   [languages.tr]
     label = "Türkçe"
-    locale = "tr-TR"
+    locale = "tr"
     contentDir = "content/tr"
     weight = 1
     [languages.tr.params]
       siteDescription = "agca·studio, İstanbul merkezli bir mimarlık stüdyosu. Kentsel dönüşüm, Revit ile mimari projelendirme, görselleştirme ve sanal tur."
+      city = "İstanbul"
   [languages.en]
     label = "English"
     locale = "en"
     contentDir = "content/en"
     weight = 2
     [languages.en.params]
-      siteDescription = "agca·studio is an architecture studio based in Istanbul. Urban regeneration, architectural design with Revit, visualisation and virtual tours."
+      siteDescription = "agca·studio is an architecture studio based in Istanbul. Urban regeneration, architectural design in Revit, visualisation and virtual tours."
+      city = "Istanbul"
 
 [params]
   brand = "agca·studio"

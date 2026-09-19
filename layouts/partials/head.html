@@ -1,17 +1,25 @@
 {{- /* Sayfa başlığı ve açıklama */ -}}
 {{- $brand := site.Params.brand -}}
-{{- $title := cond .IsHome (printf "%s · %s" $brand (cond (eq .Language.Lang "tr") "Mimarlık Stüdyosu, İstanbul" "Architecture Studio, Istanbul")) (printf "%s · %s" .Title $brand) -}}
+{{- $is404 := eq .Kind "404" -}}
+{{- $lang := .Language.Lang -}}
+{{- $city := cond (eq $lang "tr") "İstanbul" "Istanbul" -}}
+{{- $title := cond .IsHome (printf "%s · %s" $brand (cond (eq $lang "tr") "Mimarlık Stüdyosu, İstanbul" "Architecture Studio, Istanbul")) (printf "%s · %s" .Title $brand) -}}
+{{- if $is404 }}{{ $title = printf "%s · %s" (i18n "not_found_title") $brand }}{{ end -}}
 {{- if and (eq .Type "proje") (not .IsSection) -}}
   {{- $tur := "" -}}
   {{- with .Params.tur }}{{ $tur = i18n (printf "tur_%s" (index . 0)) }}{{ end -}}
   {{- $yer := .Params.kunye.yer -}}
   {{- $title = printf "%s · %s · %s" .Title (delimit (slice $tur $yer | complement (slice "")) ", ") $brand -}}
 {{- end -}}
-{{- $desc := .Description | default .Params.description | default .Summary | default site.Params.siteDescription | plainify | truncate 158 -}}
+{{- if and (eq .Type "hizmet") (not .IsSection) -}}
+  {{- $title = printf "%s, %s · %s" .Title $city $brand -}}
+{{- end -}}
+{{- $desc := .Description | default .Params.description | default .Summary | default site.Params.siteDescription | plainify | truncate 160 -}}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ $title }}</title>
 <meta name="description" content="{{ $desc }}">
+{{- if not $is404 }}
 <link rel="canonical" href="{{ .Permalink }}">
 {{- /* Dil sürümleri */ -}}
 {{- if .IsTranslated }}
@@ -24,27 +32,39 @@
 {{- else }}
 <link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}">
 {{- end }}
-<meta name="robots" content="index, follow, max-image-preview:large">
+{{- end }}
+<meta name="robots" content="{{ if $is404 }}noindex, nofollow{{ else }}index, follow, max-image-preview:large{{ end }}">
 <meta name="theme-color" content="#ffffff">
 <link rel="icon" href="/img/mark.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+{{- if eq $lang "tr" }}
+<link rel="preload" href="/fonts/inter-turkish.woff2" as="font" type="font/woff2" crossorigin>
+{{- end }}
 {{- /* CSS */ -}}
 {{- $css := resources.Get "css/site.css" | resources.Minify | resources.Fingerprint }}
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
-{{- /* Kapak görseli ön yükleme (LCP) */ -}}
+{{- /* Kapak görseli ön yükleme (LCP). imagesrcset, Go şablonunun URL kaçışından (boşluk→%20) korunmak için safeHTMLAttr ile basılır. */ -}}
 {{- $hero := partial "hero-image.html" . -}}
 {{- with $hero }}
-<link rel="preload" as="image" href="{{ .fallback.RelPermalink }}" imagesrcset="{{ .srcset }}" imagesizes="100vw" fetchpriority="high">
+{{- if .srcsetWide }}
+<link rel="preload" as="image" media="(min-width: 900px)" href="{{ .fallback.RelPermalink }}" {{ printf "imagesrcset=\"%s\"" .srcsetWide | safeHTMLAttr }} imagesizes="100vw" fetchpriority="high">
+<link rel="preload" as="image" media="(max-width: 899px)" href="{{ .fallback.RelPermalink }}" {{ printf "imagesrcset=\"%s\"" .srcset | safeHTMLAttr }} imagesizes="100vw" fetchpriority="high">
+{{- else }}
+<link rel="preload" as="image" href="{{ .fallback.RelPermalink }}" {{ printf "imagesrcset=\"%s\"" .srcset | safeHTMLAttr }} imagesizes="100vw" fetchpriority="high">
 {{- end }}
+{{- end }}
+{{- if not $is404 }}
 {{- /* Paylaşım kartı */ -}}
 {{- $og := "" -}}
 {{- with $hero }}{{ $og = (.image.Fill "1200x630 q80 jpg").Permalink }}{{ end -}}
 {{- if not $og }}{{ with resources.Get site.Params.ogImage }}{{ $og = .Permalink }}{{ end }}{{ end -}}
-<meta property="og:type" content="{{ if .IsHome }}website{{ else }}article{{ end }}">
+{{- $ogAlt := .Params.hero_alt | default .Params.cover_alt | default $brand -}}
+<meta property="og:type" content="{{ if and (eq .Type "proje") (not .IsSection) }}article{{ else }}website{{ end }}">
 <meta property="og:site_name" content="{{ $brand }}">
-<meta property="og:locale" content="{{ if eq .Language.Lang "tr" }}tr_TR{{ else }}en_GB{{ end }}">
+<meta property="og:locale" content="{{ if eq $lang "tr" }}tr_TR{{ else }}en_GB{{ end }}">
+<meta property="og:locale:alternate" content="{{ if eq $lang "tr" }}en_GB{{ else }}tr_TR{{ end }}">
 <meta property="og:title" content="{{ $title }}">
 <meta property="og:description" content="{{ $desc }}">
 <meta property="og:url" content="{{ .Permalink }}">
@@ -52,7 +72,9 @@
 <meta property="og:image" content="{{ . }}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ $ogAlt }}">
 <meta name="twitter:card" content="summary_large_image">
 {{- end }}
 {{- /* Yapısal veri */ -}}
 {{ partial "jsonld.html" (dict "page" . "title" $title "desc" $desc "og" $og) }}
+{{- end }}

@@ -1,12 +1,20 @@
 {{- /*
-  Duyarlı görsel: <picture> (webp + jpg yedek), genişlik/yükseklik, isteğe bağlı lightbox.
+  Duyarlı görsel: <picture> (webp + jpg yedek), genişlik/yükseklik, isteğe bağlı büyütme.
   Parametreler: img (resource), alt, caption, sizes, widths (slice), loading, class, lightbox (bool), gallery (string)
+  Dikey görseller (kart olmayan) sayfada %62 genişlikte durduğu için daha küçük adaylar alır.
 */ -}}
 {{- $img := .img -}}
 {{- $alt := .alt | default "" -}}
-{{- $sizes := .sizes | default "(min-width: 1200px) 1400px, 100vw" -}}
+{{- $portrait := gt $img.Height $img.Width -}}
+{{- $isCard := in (.class | default "") "fig-card" -}}
+{{- $sizes := .sizes | default "(min-width: 1500px) 1400px, 100vw" -}}
 {{- $widths := .widths | default (slice 640 960 1440 1920) -}}
-{{- $loading := .loading | default "lazy" -}}
+{{- $fbw := 1440 -}}
+{{- if and $portrait (not $isCard) -}}
+  {{- $sizes = "(min-width: 1500px) 868px, (min-width: 641px) 62vw, 100vw" -}}
+  {{- $widths = slice 480 640 960 1200 -}}
+  {{- $fbw = 960 -}}
+{{- end -}}
 {{- $set := slice -}}
 {{- range $w := $widths -}}
   {{- if le $w $img.Width -}}
@@ -18,18 +26,20 @@
   {{- $r := $img.Resize (printf "%dx webp" $img.Width) -}}
   {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $img.Width) -}}
 {{- end -}}
-{{- $fbw := 1440 -}}{{ if lt $img.Width $fbw }}{{ $fbw = $img.Width }}{{ end -}}
+{{- if lt $img.Width $fbw }}{{ $fbw = $img.Width }}{{ end -}}
 {{- $fb := $img.Resize (printf "%dx jpg" $fbw) -}}
-{{- $full := $img -}}{{ if gt $img.Width 2560 }}{{ $full = $img.Resize "2560x jpg" }}{{ end -}}
-{{- $portrait := gt $img.Height $img.Width -}}
+{{- /* Büyütme hedefi: en çok 2048 px, webp — özgün JPEG yayınlanmaz */ -}}
+{{- $full := $img -}}
+{{- if $portrait }}{{ if gt $img.Height 2048 }}{{ $full = $img.Resize "x2048 webp q80" }}{{ else }}{{ $full = $img.Resize (printf "x%d webp q80" $img.Height) }}{{ end }}
+{{- else }}{{ if gt $img.Width 2048 }}{{ $full = $img.Resize "2048x webp q80" }}{{ else }}{{ $full = $img.Resize (printf "%dx webp q80" $img.Width) }}{{ end }}{{ end -}}
 <figure class="fig{{ if $portrait }} fig-portrait{{ end }}{{ with .class }} {{ . }}{{ end }}">
   {{- if .lightbox }}
-  <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="{{ .gallery | default "g" }}" data-width="{{ $full.Width }}" data-height="{{ $full.Height }}"{{ with .caption }} data-description="{{ . | plainify }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $alt }}">
+  <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="{{ .gallery | default "g" }}" data-width="{{ $full.Width }}" data-height="{{ $full.Height }}"{{ with .caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $alt }}">
   {{- end }}
   <picture>
     <source type="image/webp" srcset="{{ delimit $set ", " }}" sizes="{{ $sizes }}">
-    <img src="{{ $fb.RelPermalink }}" width="{{ $fb.Width }}" height="{{ $fb.Height }}" alt="{{ $alt }}" loading="{{ $loading }}" decoding="async">
+    <img src="{{ $fb.RelPermalink }}" width="{{ $fb.Width }}" height="{{ $fb.Height }}" alt="{{ $alt }}" loading="{{ .loading | default "lazy" }}" decoding="async">
   </picture>
   {{- if .lightbox }}</a>{{ end }}
-  {{- with .caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
+  {{- with .caption }}<figcaption>{{ . }}</figcaption>{{ end }}
 </figure>

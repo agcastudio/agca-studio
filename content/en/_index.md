@@ -1,9 +1,10 @@
 ---
 title: "agca·studio"
-description: "agca·studio is an architecture studio based in Istanbul. Urban regeneration, architectural design with Revit, visualisation and virtual tours."
+description: "agca·studio is an architecture studio in Üsküdar, Istanbul: urban regeneration, architectural design in Revit, visualisation and virtual tours."
 hero: "projeler/oyuk/r-1-huzmeli.jpg"
-hero_alt: "The daylit festival courtyard of the Oyuk project, with galleries, timber shutters and potted trees"
+hero_alt: "The daylit festival courtyard of the Oyuk project, with galleries, timber screens and potted trees"
 hero_caption: "Oyuk · Menteşe, Muğla"
 hero_link: "/en/projects/oyuk/"
-tagline: "An architecture studio based in Istanbul, working on urban regeneration, building design in Revit, visualisation and virtual tours."
+tagline: "An architecture studio based in Istanbul, working on urban regeneration, architectural design in Revit, visualisation and virtual tours."
 ---
+agca·studio is an architecture studio run by two founding partners in Üsküdar, Istanbul. In [urban regeneration projects](/en/services/urban-regeneration/) we start by reading the existing fabric; we carry out [architectural design in Revit](/en/services/revit-architectural-design/) within a single building information model; and we use [architectural visualisation](/en/services/architectural-visualisation/) and [virtual tours](/en/services/virtual-tours/) as tools for experiencing a design before it is built. [Studio](/en/studio/) · [Contact](/en/contact/)

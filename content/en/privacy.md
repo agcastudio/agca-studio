@@ -13,11 +13,11 @@ The site does not use cookies and writes no identifiers to your browser. Visits 
 
 ## Personal data
 
-There are no forms on the site and no personal data is collected. When you write to us by email, your name, email address and message are used only to reply to you, under Articles 5/2-c and 5/2-f of the Turkish Personal Data Protection Law (No. 6698). They are not shared with third parties and are kept on our email provider's servers for a reasonable period after the correspondence ends.
+There are no forms on the site, and the site itself collects no personal data. When you write to us by email, your name, email address and message are used only to reply to you, on the basis of Article 5(2)(c) and (f) of the Turkish Law on the Protection of Personal Data No. 6698 (KVKK): processing directly related to the establishment or performance of a contract, and the legitimate interest of the data controller. They are not shared with third parties other than the email provider through which the correspondence is handled, and are kept on that provider's servers for a reasonable period after the correspondence ends.
 
 ## Your rights
 
-Under Article 11 of the Law you may ask whether your personal data is processed, request information, and ask for correction or deletion. Send requests to **info@agca.studio**.
+Under Article 11 of Law No. 6698 you may ask whether your personal data has been processed, request information about that processing, and ask for it to be corrected or deleted. Send requests to **info@agca.studio**.
 
 ## Data controller
 

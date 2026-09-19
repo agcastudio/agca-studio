@@ -22,7 +22,7 @@
         {{- $url := printf "%s%s/" $home .path -}}
         {{- with $p }}{{ $url = .RelPermalink }}{{ end -}}
         {{- $active := false -}}
-        {{- with $p }}{{ if or (eq $.RelPermalink .RelPermalink) (and (eq $.Type "proje") (eq .Type "proje")) }}{{ $active = true }}{{ end }}{{ end -}}
+        {{- with $p }}{{ if or (eq $.RelPermalink .RelPermalink) (and $.Section (eq $.Section .Section)) }}{{ $active = true }}{{ end }}{{ end -}}
         <li><a href="{{ $url }}"{{ if $active }} aria-current="page"{{ end }}>{{ i18n .key }}</a></li>
         {{- end }}
         <li class="nav-lang">

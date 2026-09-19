@@ -2,7 +2,7 @@
 title: "Revit ile Mimari Projelendirme"
 translationKey: "hizmet-revit"
 weight: 20
-description: "Revit ve BIM ile mimari projelendirme: konsept, avan ve uygulama projesi tek bilgi modelinden; plan, kesit, detay, metraj ve disiplin koordinasyonu. İstanbul."
+description: "Revit ve BIM ile mimari projelendirme, İstanbul: konsept, avan ve uygulama projesi tek bilgi modelinden; plan, kesit, detay ve metraj."
 lede: "Konseptten uygulama projesine kadar tüm çizimler tek bir Revit modelinden üretilir: tutarlı, ölçülebilir ve koordine bir proje seti."
 faq:
   - q: "BIM ile klasik çizim arasındaki fark nedir?"
@@ -12,7 +12,7 @@ faq:
   - q: "Modeli işverenle paylaşıyor musunuz?"
     a: "Evet. Model, PDF ve DWG çıktılarının yanı sıra Revit ve IFC formatında teslim edilebilir; işveren ve yükleniciler görselleştirme ve sanal tur üzerinden de projeyi inceleyebilir."
 ---
-Mimari projelendirmeyi Revit üzerinde, tek ve tutarlı bir yapı bilgi modelinde (BIM) yürütüyoruz. Planlar, kesitler, görünüşler, detaylar ve metrajlar aynı modelden üretilir; bir karar değiştiğinde çizimlerin tamamı aynı anda güncellenir. Bu, uygulama aşamasında en sık karşılaşılan sorunun, birbirini tutmayan paftaların, önüne geçer.
+Mimari projelendirmeyi Revit üzerinde, tek ve tutarlı bir yapı bilgi modelinde (BIM) yürütüyoruz. Planlar, kesitler, görünüşler, detaylar ve metrajlar aynı modelden üretilir; bir karar değiştiğinde çizimlerin tamamı aynı anda güncellenir. Bu, uygulama aşamasında en sık karşılaşılan sorunun, yani birbirini tutmayan paftaların önüne geçer.
 
 ## Kapsam
 
@@ -24,6 +24,6 @@ Mimari projelendirmeyi Revit üzerinde, tek ve tutarlı bir yapı bilgi modelind
 
 ## Neden Revit
 
-Revit'te yapının her öğesi bilgi taşır: duvar kalınlığı, malzeme, kat yüksekliği, kapı tipi. Bu bilgi, uygulama projesinde tutarlılık, metrajda doğruluk ve görselleştirmede hız sağlar. Aynı modelden sanal tur ve render üretilebildiği için tasarım kararları işverenle erken aşamada, yapılmadan önce sınanır.
+Revit'te yapının her öğesi bilgi taşır: duvar kalınlığı, malzeme, kat yüksekliği, kapı tipi. Bu bilgi, uygulama projesinde tutarlılık, metrajda doğruluk ve görselleştirmede hız sağlar. Aynı modelden [sanal tur](/hizmetler/sanal-tur/) ve [render](/hizmetler/mimari-gorsellestirme/) üretilebildiği için tasarım kararları işverenle erken aşamada, yapılmadan önce sınanır.
 
-Konut, ticari yapı, kentsel dönüşüm ve yarışma projelerinde aynı yöntemi kullanıyoruz. Stüdyomuz İstanbul Üsküdar'da; projeler Türkiye'nin her yerinden uzaktan yürütülebilir.
+Konut, ticari yapı, [kentsel dönüşüm](/hizmetler/kentsel-donusum/) ve yarışma projelerinde aynı yöntemi kullanıyoruz. Stüdyomuz İstanbul Üsküdar'da; projeler Türkiye'nin her yerinden uzaktan yürütülebilir.

@@ -2,7 +2,7 @@
 title: "Kentsel Dönüşüm Projeleri"
 translationKey: "hizmet-kentsel"
 weight: 10
-description: "İstanbul'da parsel ve ada ölçeğinde kentsel dönüşüm mimari projeleri: mevcut durum analizi, yerleşim ve emsal etüdü, avan proje, ruhsata esas uygulama projesi."
+description: "İstanbul'da parsel ve ada ölçeğinde kentsel dönüşüm projeleri: mevcut durum analizi, yerleşim ve emsal etüdü, avan proje, ruhsata esas uygulama projesi."
 lede: "Parsel ve ada ölçeğinde kentsel dönüşüm projeleri: mevcut durumun okunmasından ruhsata esas uygulama projesine kadar tek elden."
 related_tur: "konut"
 faq:
@@ -13,15 +13,15 @@ faq:
   - q: "Hak sahiplerine sunum yapıyor musunuz?"
     a: "Evet. Kütle alternatifleri, daire planları ve görselleştirmeler hak sahiplerinin anlayacağı dille sunulur; kararlar bu sunumlar üzerinden olgunlaştırılır."
 ---
-İstanbul'un konut stokunun önemli bir bölümü yenilenme sürecinde. Kentsel dönüşüm bir yapının yerine yenisini koymaktan fazlasıdır: parselin imar hakkını doğru okumak, mevcut hak sahiplerinin beklentilerini bir plana çevirmek ve sokakla ilişkisi kurulmuş, kullanışlı daireler tasarlamak gerekir. Stüdyomuz bu süreci mimari tarafta tek elden yürütür.
+İstanbul'un konut stokunun önemli bir bölümü yenilenme sürecinde. Kentsel dönüşüm bir yapının yerine yenisini koymaktan fazlasıdır: Parselin imar hakkını doğru okumak, mevcut hak sahiplerinin beklentilerini bir plana çevirmek ve sokakla ilişkisi kurulmuş, kullanışlı daireler tasarlamak gerekir. Stüdyomuz bu süreci mimari tarafta tek elden yürütür.
 
 ## Neler yapıyoruz
 
 - **Mevcut durum ve imar analizi:** yapının ve parselin ölçümü, imar durumu, çekme mesafeleri, emsal ve yükseklik hakları.
 - **Yerleşim ve emsal etütleri:** parsele oturacak kütle alternatifleri, daire sayısı ve büyüklükleri, otopark ve ortak alan çözümleri.
 - **Avan proje:** hak sahipleriyle paylaşılacak plan, kesit ve görselleştirmeler; kararların olgunlaştırılması.
-- **Ruhsata esas uygulama projesi:** Revit üzerinde hazırlanan, statik, mekanik ve elektrik projeleriyle koordine edilmiş mimari proje seti.
-- **Görselleştirme ve sanal tur:** hak sahipleri ve yükleniciler için dairelerin ve ortak alanların yapılmadan önce deneyimlenmesi.
+- **Ruhsata esas uygulama projesi:** [Revit üzerinde](/hizmetler/revit-mimari-projelendirme/) hazırlanan, statik, mekanik ve elektrik projeleriyle koordine edilmiş mimari proje seti.
+- **[Görselleştirme](/hizmetler/mimari-gorsellestirme/) ve [sanal tur](/hizmetler/sanal-tur/):** hak sahipleri ve yükleniciler için dairelerin ve ortak alanların yapılmadan önce deneyimlenmesi.
 
 ## Nasıl çalışıyoruz
 

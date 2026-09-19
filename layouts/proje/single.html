@@ -12,10 +12,7 @@
 
   {{- with $hero }}
   <div class="project-cover">
-    <picture>
-      <source type="image/webp" srcset="{{ .srcset }}" sizes="100vw">
-      <img src="{{ .fallback.RelPermalink }}" width="{{ .fallback.Width }}" height="{{ .fallback.Height }}" alt="{{ $.Params.cover_alt | default $.Title }}" fetchpriority="high" decoding="async">
-    </picture>
+    {{ partial "hero-picture.html" (dict "hero" . "alt" ($.Params.cover_alt | default $.Title)) }}
   </div>
   {{- end }}
 
@@ -24,8 +21,9 @@
       <dl>
         {{- $rows := slice "yer" "isveren" "proje_yili" "bitis_yili" "program" "durum" "insaat_alani" "arsa_alani" "rol" "derece" "ekip" -}}
         {{- range $rows }}
-          {{- with index $k . }}
-          <div class="kunye-row"><dt>{{ i18n (printf "kunye_%s" $) }}</dt><dd>{{ . }}</dd></div>
+          {{- $key := . -}}
+          {{- with index $k $key }}
+          <div class="kunye-row"><dt>{{ i18n (printf "kunye_%s" $key) }}</dt><dd>{{ . }}</dd></div>
           {{- end }}
         {{- end }}
         {{- with .Params.tur }}
@@ -42,7 +40,7 @@
   </div>
 
   {{- with .Params.images }}
-  <section class="wrap gallery" aria-label="{{ $.Title }}">
+  <section class="wrap gallery" aria-label="{{ i18n "gallery" }}">
     {{- range . }}
       {{- $it := . -}}
       {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
@@ -61,7 +59,7 @@
     {{- range . }}
       {{- $it := . -}}
       {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
-        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "cizimler" "class" "fig-card" "sizes" "(min-width: 900px) 50vw, 100vw" "widths" (slice 640 960 1440 1920)) }}
+        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "cizimler" "class" "fig-card" "sizes" "(min-width: 861px) 50vw, 100vw" "widths" (slice 640 960 1440 1920)) }}
       {{- else }}
         {{- warnf "Çizim bulunamadı: projeler/%s/%s" $slug $it.file -}}
       {{- end }}
@@ -77,7 +75,7 @@
     {{- range . }}
       {{- $it := . -}}
       {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
-        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "diyagramlar" "class" "fig-card" "sizes" "(min-width: 900px) 50vw, 100vw" "widths" (slice 640 960 1440 1920)) }}
+        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "diyagramlar" "class" "fig-card" "sizes" "(min-width: 861px) 50vw, 100vw" "widths" (slice 640 960 1440 1920)) }}
       {{- else }}
         {{- warnf "Diyagram bulunamadı: projeler/%s/%s" $slug $it.file -}}
       {{- end }}

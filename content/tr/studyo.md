@@ -13,7 +13,7 @@ people:
     photo: "sb.jpg"
     bio: ""
 ---
-Mimarlığı, yapının kendisinden çok onun sardığı boşluk üzerinden düşünüyoruz: insanların toplandığı, ürettiği ve hatırladığı yerler. Konut ölçeğinden kamusal yapıya kadar her projeye aynı soruyla başlıyoruz: bu boşluk kente ne verecek?
+Mimarlığı, yapının kendisinden çok onun sardığı boşluk üzerinden düşünüyoruz: insanların toplandığı, ürettiği ve hatırladığı yerler. Konut ölçeğinden kamusal yapıya kadar her projeye aynı soruyla başlıyoruz: Bu boşluk kente ne verecek?
 
 Projelendirmeyi Revit üzerinde, tek ve tutarlı bir bilgi modelinde yürütüyoruz. Konsept aşamasından uygulama projesine kadar planlar, kesitler, metrajlar ve görselleştirmeler aynı modelden üretilir; böylece her karar çizimlerin tamamına aynı anda işler.
 

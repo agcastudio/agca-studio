@@ -1,19 +1,19 @@
 ---
 title: "Gizlilik ve KVKK"
 translationKey: "gizlilik"
-description: "agca.studio gizlilik bildirimi: çerez kullanılmaz, kişisel veri toplanmaz; e-posta yazışmalarında veri işleme ve KVKK hakları."
+description: "agca·studio gizlilik bildirimi: çerez kullanılmaz, kişisel veri toplanmaz; e-posta yazışmalarında veri işleme ve KVKK hakları."
 sitemap:
   priority: 0.1
 ---
-Bu site, **agca·studio** tarafından yalnızca stüdyoyu ve projelerini tanıtmak amacıyla yayınlanmaktadır.
+Bu site, **agca·studio** tarafından yalnızca stüdyoyu ve projelerini tanıtmak amacıyla yayımlanmaktadır.
 
 ## Çerezler
 
-Site çerez kullanmaz; tarayıcınıza hiçbir tanımlayıcı yazılmaz. Ziyaret sayıları, kişisel veri toplamayan ve çerez bırakmayan bir ölçüm hizmetiyle (Cloudflare Web Analytics) toplu olarak izlenir. Bu ölçüm sizi kişi olarak tanımlamaz.
+Site çerez kullanmaz; tarayıcınıza hiçbir tanımlayıcı yazılmaz. Ziyaret sayıları, kişisel veri toplamayan ve çerez bırakmayan bir ölçüm hizmetiyle (Cloudflare Web Analytics) toplu olarak izlenebilir. Bu ölçüm sizi kişi olarak tanımlamaz.
 
 ## Kişisel veriler
 
-Sitede form yoktur; hiçbir kişisel veri toplanmaz. Bize e-posta ile yazdığınızda ad, e-posta adresi ve mesaj içeriği yalnızca yazışmanızı yanıtlamak amacıyla, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun 5/2-c maddesi (bir sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması) ve 5/2-f maddesi (meşru menfaat) kapsamında işlenir. Bu veriler üçüncü kişilerle paylaşılmaz; e-posta hizmeti sağlayıcısının sunucularında, yazışma sona erdikten sonra makul bir süre saklanır.
+Sitede form yoktur; hiçbir kişisel veri toplanmaz. Bize e-posta ile yazdığınızda ad, e-posta adresi ve mesaj içeriği yalnızca yazışmanızı yanıtlamak amacıyla, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun 5/2-c maddesi (bir sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması) ve 5/2-f maddesi (meşru menfaat) kapsamında işlenir. Bu veriler, yazışmanın yürütüldüğü e-posta hizmeti sağlayıcısı dışında üçüncü kişilerle paylaşılmaz; sağlayıcının sunucularında, yazışma sona erdikten sonra makul bir süre saklanır.
 
 ## Haklarınız
 

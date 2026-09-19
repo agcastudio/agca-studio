@@ -19,7 +19,11 @@ other = "English version"
 [all]
 other = "Tümü"
 [filter_label]
-other = "Türe göre süz"
+other = "Türe göre filtrele"
+[gallery]
+other = "Görseller"
+[contact_social]
+other = "Sosyal medya"
 [projects_meta_title]
 other = "Projeler"
 [tur_konut]
@@ -65,7 +69,7 @@ other = "Çizimler"
 [diagrams]
 other = "Diyagramlar"
 [credits]
-other = "Krediler"
+other = "Katkılar"
 [virtual_tour]
 other = "Sanal turu aç"
 [prev_project]
@@ -75,7 +79,7 @@ other = "Sonraki proje"
 [all_projects]
 other = "Tüm projeler"
 [selected_projects]
-other = "Seçili projeler"
+other = "Seçilmiş projeler"
 [open_image]
 other = "Görseli büyüt"
 [privacy]
@@ -83,7 +87,7 @@ other = "Gizlilik ve KVKK"
 [rights]
 other = "Tüm hakları saklıdır."
 [founders]
-other = "Kurucu Ortaklar"
+other = "Kurucu ortaklar"
 [contact_email]
 other = "E-posta"
 [contact_phone]

@@ -1,11 +1,9 @@
 {{ define "main" }}
 {{- $hero := partial "hero-image.html" . -}}
+{{- $lang := .Language.Lang -}}
 {{- with $hero }}
-<section class="hero" aria-label="{{ $.Params.hero_alt }}">
-  <picture>
-    <source type="image/webp" srcset="{{ .srcset }}" sizes="100vw">
-    <img src="{{ .fallback.RelPermalink }}" width="{{ .fallback.Width }}" height="{{ .fallback.Height }}" alt="{{ $.Params.hero_alt }}" fetchpriority="high" decoding="async">
-  </picture>
+<section class="hero">
+  {{ partial "hero-picture.html" (dict "hero" . "alt" $.Params.hero_alt) }}
   {{- with $.Params.hero_link }}
   <a class="hero-caption" href="{{ . }}">{{ $.Params.hero_caption }}</a>
   {{- else }}{{ with $.Params.hero_caption }}<p class="hero-caption">{{ . }}</p>{{ end }}{{ end }}
@@ -13,8 +11,15 @@
 {{- end }}
 
 <section class="wrap intro">
-  <p class="tagline">{{ .Params.tagline }}</p>
+  <h1 class="tagline">{{ .Params.tagline }}</h1>
   {{ with .Content }}<div class="intro-text">{{ . }}</div>{{ end }}
+  {{- with site.GetPage (cond (eq $lang "tr") "/hizmetler" "/services") }}
+  <ul class="intro-services" aria-label="{{ .Title }}">
+    {{- range .Pages.ByWeight }}
+    <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+    {{- end }}
+  </ul>
+  {{- end }}
 </section>
 
 {{- $projects := where site.RegularPages "Type" "proje" -}}
@@ -23,7 +28,7 @@
 <section class="wrap section">
   <div class="section-head">
     <h2 class="section-title">{{ i18n "selected_projects" }}</h2>
-    {{- with site.GetPage (cond (eq $.Language.Lang "tr") "/projeler" "/projects") }}
+    {{- with site.GetPage (cond (eq $lang "tr") "/projeler" "/projects") }}
     <a class="more" href="{{ .RelPermalink }}">{{ i18n "all_projects" }} →</a>
     {{- end }}
   </div>

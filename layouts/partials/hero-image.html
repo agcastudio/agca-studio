@@ -1,9 +1,9 @@
 {{- /*
   Sayfanın kapak görselini bulur ve srcset üretir.
-  Döner: dict (image, srcset, fallback) ya da boş.
-  - Ana sayfa: .Params.hero (assets içi yol)
+  Döner: dict (image, srcset, srcsetWide, fallback) ya da boş.
+  - Ana sayfa / düz sayfa: .Params.hero (assets içi yol)
   - Proje: .Params.cover (assets/projeler/<slug>/ içinde dosya adı)
-  - Diğer sayfalar: .Params.hero varsa
+  srcset: özgün oranda adaylar (dar ekranlar). srcsetWide: kaynak 3:2'den daha dikse (ör. kare kapak) geniş ekranlar için 3:2 kırpım — masaüstünde kırpılıp atılacak pikseller indirilmez.
 */ -}}
 {{- $path := "" -}}
 {{- if and (eq .Type "proje") (not .IsSection) -}}
@@ -16,18 +16,31 @@
   {{- with resources.Get . -}}
     {{- $img := . -}}
     {{- $set := slice -}}
-    {{- range $w := slice 720 1080 1440 1920 2560 -}}
+    {{- range $w := slice 480 720 1080 1440 -}}
       {{- if le $w $img.Width -}}
         {{- $r := $img.Resize (printf "%dx webp" $w) -}}
         {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $w) -}}
       {{- end -}}
     {{- end -}}
-    {{- if lt $img.Width 2560 -}}
-      {{- $r := $img.Resize (printf "%dx webp" $img.Width) -}}
-      {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $img.Width) -}}
+    {{- $wide := slice -}}
+    {{- if gt (mul $img.Height 3) (mul $img.Width 2) -}}
+      {{- range $w := slice 1080 1440 1920 2560 -}}
+        {{- if le $w $img.Width -}}
+          {{- $r := $img.Fill (printf "%dx%d webp" $w (div (mul $w 2) 3)) -}}
+          {{- $wide = $wide | append (printf "%s %dw" $r.RelPermalink $w) -}}
+        {{- end -}}
+      {{- end -}}
+    {{- else -}}
+      {{- range $w := slice 1920 2560 -}}
+        {{- if le $w $img.Width -}}
+          {{- $r := $img.Resize (printf "%dx webp" $w) -}}
+          {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $w) -}}
+        {{- end -}}
+      {{- end -}}
     {{- end -}}
-    {{- $fb := $img.Resize "1600x jpg" -}}
-    {{- $out = dict "image" $img "srcset" (delimit $set ", ") "fallback" $fb -}}
+    {{- $fbw := 1440 -}}{{ if lt $img.Width $fbw }}{{ $fbw = $img.Width }}{{ end -}}
+    {{- $fb := $img.Resize (printf "%dx jpg" $fbw) -}}
+    {{- $out = dict "image" $img "srcset" (delimit $set ", ") "srcsetWide" (delimit $wide ", ") "fallback" $fb -}}
   {{- end -}}
 {{- end -}}
 {{- return $out -}}

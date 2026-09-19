@@ -2,17 +2,17 @@
 title: "Sanal Tur"
 translationKey: "hizmet-sanal"
 weight: 40
-description: "Mimari sanal tur ve 360° panorama hizmeti: yapılmadan önce gezilebilen projeler, tarayıcıda açılan turlar; işveren sunumları, satış ofisleri ve tasarım kararlarının sınanması. İstanbul."
+description: "Mimari sanal tur ve 360° panorama hizmeti, İstanbul: yapılmadan önce tarayıcıda gezilebilen projeler; işveren ve hak sahibi sunumları, satış ofisleri."
 lede: "Yapılmadan önce gezilebilen projeler: 360° panoramalar ve tarayıcıda açılan sanal turlar."
 faq:
   - q: "Sanal tur için özel bir cihaz gerekir mi?"
-    a: "Hayır. Turlar bağlantı üzerinden bilgisayar, tablet ve telefonda tarayıcıda açılır. İstenirse VR gözlükle de gezilebilir."
+    a: "Hayır. Turlar bağlantı üzerinden bilgisayar, tablet ve telefonda tarayıcı üzerinden açılır. İstenirse VR gözlükle de gezilebilir."
   - q: "Sanal tur ile animasyon arasındaki fark nedir?"
     a: "Animasyon sabit bir kamera yolunu izler; sanal turda kullanıcı mekânda durup çevresine bakar, noktalar arasında kendi seçtiği sırayla gezer. Karar vermek için sanal tur, anlatmak için animasyon daha uygundur."
   - q: "Mevcut projemin modeli yoksa?"
     a: "Plan, kesit ve görünüşlerden modeli biz kurarız; malzeme ve mobilya kararlarını birlikte veririz."
 ---
-Bir mekânı plandan okumak deneyim ister; sanal tur bu deneyimi herkes için mümkün kılar. İşveren daireyi yapılmadan önce gezer, hak sahipleri ortak alanı görür, satış ofisi projeyi anlatmak için bir bağlantı paylaşır. Tasarım kararları da henüz ucuzken, yapım başlamadan sınanır.
+Bir mekânı plandan okumak deneyim ister; sanal tur bu deneyimi herkes için mümkün kılar. İşveren daireyi yapılmadan önce gezer, hak sahipleri ortak alanı görür, satış ofisi projeyi anlatmak için bir bağlantı paylaşır. Tasarım kararları da, değiştirmenin henüz ucuz olduğu aşamada, yapım başlamadan sınanır.
 
 ## Ne sunuyoruz
 
@@ -25,4 +25,4 @@ Bir mekânı plandan okumak deneyim ister; sanal tur bu deneyimi herkes için m�
 
 Kentsel dönüşüm projelerinde hak sahipleri sunumu, konut ve ofis projelerinde satış ve pazarlama, yarışma ve konsept çalışmalarında jüri ve işveren sunumu, iç mekân projelerinde malzeme ve mobilya kararlarının erken sınanması.
 
-Turlar projelendirme için kullandığımız Revit modelinden üretilir; tasarım değiştiğinde tur da güncellenir.
+Turlar, İstanbul Üsküdar'daki stüdyomuzda projelendirme için kullandığımız [Revit modelinden](/hizmetler/revit-mimari-projelendirme/) üretilir; tasarım değiştiğinde tur da güncellenir. [Mimari görselleştirme](/hizmetler/mimari-gorsellestirme/) ile birlikte sunulabilir.

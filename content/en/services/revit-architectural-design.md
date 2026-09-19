@@ -2,7 +2,7 @@
 title: "Architectural Design in Revit"
 translationKey: "hizmet-revit"
 weight: 20
-description: "Architectural design in Revit and BIM: concept, schematic and construction documents from a single building information model; plans, sections, details, quantities and coordination. Istanbul."
+description: "Architectural design in Revit (BIM), Istanbul: concept, schematic design and permit-ready construction documents from a single building information model."
 lede: "From concept to construction documents, every drawing comes from a single Revit model: a consistent, measurable and coordinated set."
 faq:
   - q: "What is the difference between BIM and conventional drafting?"
@@ -20,10 +20,10 @@ We design in Revit, within a single, consistent building information model (BIM)
 - **Permit-ready construction documents:** an architectural set that meets the requirements of the relevant municipality and regulations.
 - **Detail sheets:** facade, stair, wet-area and joinery details.
 - **Quantities and room schedules:** amounts read from the model and updated with every revision.
-- **Discipline coordination:** clash checking against structural, mechanical and electrical models.
+- **Discipline coordination:** clash detection against structural, mechanical and electrical models.
 
 ## Why Revit
 
-In Revit every element of the building carries information: wall thickness, material, floor height, door type. That information gives consistency in construction documents, accuracy in quantities and speed in visualisation. Because renderings and virtual tours are produced from the same model, design decisions are tested with the client early, before anything is built.
+In Revit every element of the building carries information: wall thickness, material, storey height, door type. That information gives consistency in construction documents, accuracy in quantities and speed in visualisation. Because [renderings](/en/services/architectural-visualisation/) and [virtual tours](/en/services/virtual-tours/) are produced from the same model, design decisions are tested with the client early, before anything is built.
 
-We use the same method for housing, commercial buildings, urban regeneration and competitions. The studio is in Üsküdar, Istanbul; projects can be run remotely from anywhere.
+We use the same method for housing, commercial buildings, [urban regeneration](/en/services/urban-regeneration/) and competitions. The studio is in Üsküdar, Istanbul; projects can be run remotely from anywhere.

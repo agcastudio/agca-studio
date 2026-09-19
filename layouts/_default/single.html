@@ -7,10 +7,7 @@
   </header>
   {{- with $hero }}
   <div class="project-cover">
-    <picture>
-      <source type="image/webp" srcset="{{ .srcset }}" sizes="100vw">
-      <img src="{{ .fallback.RelPermalink }}" width="{{ .fallback.Width }}" height="{{ .fallback.Height }}" alt="{{ $.Params.hero_alt }}" fetchpriority="high" decoding="async">
-    </picture>
+    {{ partial "hero-picture.html" (dict "hero" . "alt" $.Params.hero_alt) }}
   </div>
   {{- end }}
   <div class="wrap page-body{{ if eq .Params.pagekind "contact" }} contact{{ end }}">
@@ -22,7 +19,7 @@
         {{- with site.Params.phone }}<div><dt>{{ i18n "contact_phone" }}</dt><dd><a href="tel:{{ replace . " " "" }}">{{ . }}</a></dd></div>{{ end }}
         <div><dt>{{ i18n "contact_address" }}</dt><dd>{{ site.Params.district }}, {{ site.Params.city }}</dd></div>
         {{- if or site.Params.instagram site.Params.linkedin }}
-        <div><dt>Sosyal</dt><dd>
+        <div><dt>{{ i18n "contact_social" }}</dt><dd>
           {{- with site.Params.instagram }}<a href="{{ . }}" rel="me noopener" target="_blank">Instagram</a>{{ end }}
           {{- if and site.Params.instagram site.Params.linkedin }} · {{ end }}
           {{- with site.Params.linkedin }}<a href="{{ . }}" rel="me noopener" target="_blank">LinkedIn</a>{{ end }}

@@ -24,7 +24,7 @@
   --line: #e7e7e7;
   --soft: #f4f4f4;
   --accent: #F4A888;
-  --accent-ink: #c96f4a;
+  --accent-ink: #b35a36; /* somon ailesi, beyazda 4,7:1 (metin için yeterli) */
   --wrap: 1440px;
   --gutter: 24px;
   --header-h: 64px;
@@ -53,7 +53,10 @@ body {
 img, picture, svg { display: block; max-width: 100%; height: auto; }
 a { color: inherit; text-decoration: none; }
 a:hover { color: var(--accent-ink); }
-a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; border-radius: 2px; }
+.prose, .project-text, .kunye dd, .lede, .card-text, .faq-a { overflow-wrap: anywhere; }
+.prose table { display: block; overflow-x: auto; }
+pre { overflow-x: auto; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 h1, h2, h3, h4 { font-weight: 500; line-height: 1.2; margin: 0; letter-spacing: -0.01em; }
 p { margin: 0 0 1em; }
@@ -89,13 +92,18 @@ main:focus { outline: none; }
 /* --- kapak --- */
 .hero { position: relative; margin-top: 0; }
 .hero img { width: 100%; height: min(82vh, 900px); object-fit: cover; background: var(--soft); }
-.hero-caption { position: absolute; left: var(--gutter); bottom: 18px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 12px rgba(0,0,0,.35); opacity: .9; }
-.hero-caption:hover { color: #fff; opacity: 1; }
+.hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 140px; background: linear-gradient(transparent, rgba(0,0,0,.5)); pointer-events: none; }
+.hero-caption { position: absolute; z-index: 1; left: var(--gutter); bottom: 18px; padding: 6px 0; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #fff; }
+.hero-caption:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
 @media (max-width: 640px) { .hero img { height: 62vh; } }
 
 .intro { padding: 56px 0 24px; }
 .tagline { font-size: clamp(22px, 2.6vw, 34px); line-height: 1.25; font-weight: 400; letter-spacing: -0.015em; max-width: 22em; margin: 0; }
 .intro-text { max-width: 44em; color: var(--muted); margin-top: 20px; }
+.intro-text a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent); }
+.intro-services { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.intro-services a { font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; display: inline-block; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.intro-services a:hover { border-bottom-color: var(--accent); color: var(--fg); }
 
 /* --- bölüm başlıkları --- */
 .section { padding: 40px 0 72px; }
@@ -217,6 +225,7 @@ main:focus { outline: none; }
 .footer-brand img { height: 16px; width: auto; margin-bottom: 10px; }
 .footer-brand p { font-size: 13px; margin: 0; }
 .footer-contact { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; justify-self: end; text-align: right; }
+.footer-contact a, .footer-legal a, .nav-lang a { display: inline-block; padding: 4px 6px; margin: -4px -6px; }
 .footer-legal { grid-column: 1 / -1; font-size: 12px; margin: 8px 0 0; }
 @media (max-width: 640px) { .footer-grid { grid-template-columns: 1fr; } .footer-contact { justify-self: start; text-align: left; } }
 

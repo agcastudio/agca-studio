@@ -7,7 +7,7 @@ date: 2026-05-01
 weight: 10
 draft: false
 tur: ["yarisma"]
-description: "A cultural centre competition entry on Kurşunlu Street in Menteşe, Muğla: a festival courtyard carved from the street into the block, with workshops, a library and offices."
+description: "Cultural centre competition entry on Kurşunlu Street, Menteşe, Muğla: a festival courtyard carved from the street into the block, with workshops."
 kunye:
   yer: "Menteşe, Muğla"
   isveren: ""
@@ -105,10 +105,10 @@ diagrams:
     alt: "Five states of the void: gathering, producing, sheltering, generous and remembering"
     caption: "Five states of the void"
   - file: "d-12.jpg"
-    alt: "Urban route: bazaar, inn, mosque courtyard, Oyuk and the square; line drawing"
+    alt: "Urban route: bazaar, han, mosque courtyard, Oyuk and the square; line drawing"
     caption: "A breathing street: completing the urban route"
   - file: "d-23.jpg"
-    alt: "Four design moves: fill, carve, cut, cover"
+    alt: "Four design moves that shape the block: fill, carve, cut, cover"
     caption: "Fill · Carve · Cut · Cover"
   - file: "d-17.jpg"
     alt: "Programme diagram: the festival courtyard at the centre; library, administration, workshops, stage and café around it"
@@ -128,8 +128,8 @@ diagrams:
 ---
 A building is a solid block of stone; public life is carved out of it. The void, *oyuk* in Turkish, is both an emptiness and an invitation to the city.
 
-Public life in Muğla has always gathered in carved-out voids: the bazaar, the courtyard of the inn, the courtyard of the mosque, Cumhuriyet Square. This proposal for a cultural centre on Kurşunlu Street completes the missing link in that route. A public void carved from the street into the block becomes a festival courtyard that stays open at every hour, with its workshops and café; the stage, the studios and the library gather around it.
+Public life in Muğla has always gathered in carved-out voids: the bazaar, the courtyard of the han (caravanserai), the courtyard of the mosque, Cumhuriyet Square. This proposal for a cultural centre on Kurşunlu Street completes the missing link in the city's cultural route. A public void carved from the street into the block becomes a festival courtyard that stays open at all hours, with its workshops and café; the stage, the workshops and the library gather around it.
 
-The volume is white and quiet, like the limewashed houses of Menteşe. The only moving element of the facade is a set of timber shutters that open and close with the sun and with use: when the courtyard is open the facade opens to the street, and at night light filters out only through the gaps of the shutters. Four moves shape the block: the footprint of the lost building is **filled** again, the body is **carved** from roof to ground to gain the courtyard, a **cut** opens the courtyard to the street, and the building is **covered** with shutters.
+The volume is white and quiet, like the limewashed houses of Menteşe. The only moving element of the facade is a set of timber shutters that open and close with the sun and with use: when the courtyard is open the facade opens to the street, and at night light filters out only through the gaps between the shutters. Four moves shape the block: the footprint of the lost building is **filled** again, the body is **carved** from roof to ground to gain the courtyard, a **cut** opens the courtyard to the street, and the building is **covered** with shutters.
 
 The floors rise from the sound of the street to the quiet of the offices. The ground and first floors are the most public: the festival courtyard, a flexible hall, workshops, exhibition and sales units. The second floor is the library, where individual rooms, group study areas and a digital library are arranged around an inner garden. The third floor holds the administration and a terrace facing Cumhuriyet Square. The total built area is 4,130 m².
