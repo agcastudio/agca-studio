@@ -1,0 +1,35 @@
+{{- /*
+  Duyarlı görsel: <picture> (webp + jpg yedek), genişlik/yükseklik, isteğe bağlı lightbox.
+  Parametreler: img (resource), alt, caption, sizes, widths (slice), loading, class, lightbox (bool), gallery (string)
+*/ -}}
+{{- $img := .img -}}
+{{- $alt := .alt | default "" -}}
+{{- $sizes := .sizes | default "(min-width: 1200px) 1400px, 100vw" -}}
+{{- $widths := .widths | default (slice 640 960 1440 1920) -}}
+{{- $loading := .loading | default "lazy" -}}
+{{- $set := slice -}}
+{{- range $w := $widths -}}
+  {{- if le $w $img.Width -}}
+    {{- $r := $img.Resize (printf "%dx webp" $w) -}}
+    {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $w) -}}
+  {{- end -}}
+{{- end -}}
+{{- if lt $img.Width (index $widths (sub (len $widths) 1)) -}}
+  {{- $r := $img.Resize (printf "%dx webp" $img.Width) -}}
+  {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $img.Width) -}}
+{{- end -}}
+{{- $fbw := 1440 -}}{{ if lt $img.Width $fbw }}{{ $fbw = $img.Width }}{{ end -}}
+{{- $fb := $img.Resize (printf "%dx jpg" $fbw) -}}
+{{- $full := $img -}}{{ if gt $img.Width 2560 }}{{ $full = $img.Resize "2560x jpg" }}{{ end -}}
+{{- $portrait := gt $img.Height $img.Width -}}
+<figure class="fig{{ if $portrait }} fig-portrait{{ end }}{{ with .class }} {{ . }}{{ end }}">
+  {{- if .lightbox }}
+  <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="{{ .gallery | default "g" }}" data-width="{{ $full.Width }}" data-height="{{ $full.Height }}"{{ with .caption }} data-description="{{ . | plainify }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $alt }}">
+  {{- end }}
+  <picture>
+    <source type="image/webp" srcset="{{ delimit $set ", " }}" sizes="{{ $sizes }}">
+    <img src="{{ $fb.RelPermalink }}" width="{{ $fb.Width }}" height="{{ $fb.Height }}" alt="{{ $alt }}" loading="{{ $loading }}" decoding="async">
+  </picture>
+  {{- if .lightbox }}</a>{{ end }}
+  {{- with .caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
+</figure>

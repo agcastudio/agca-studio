@@ -1,0 +1,13 @@
+{{ define "main" }}
+<section class="wrap page-head">
+  <h1 class="page-title">{{ .Title }}</h1>
+  {{ .Content }}
+</section>
+<section class="wrap">
+  <ul class="grid">
+    {{- range .Pages }}
+    <li class="card"><a href="{{ .RelPermalink }}"><div class="card-text"><span class="card-title">{{ .Title }}</span></div></a></li>
+    {{- end }}
+  </ul>
+</section>
+{{ end }}

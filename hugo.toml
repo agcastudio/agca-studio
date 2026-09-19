@@ -1,0 +1,68 @@
+baseURL = "https://agca.studio/"
+title = "agca·studio"
+defaultContentLanguage = "tr"
+defaultContentLanguageInSubdir = false
+timeZone = "Europe/Istanbul"
+enableRobotsTXT = true
+disableKinds = ["taxonomy", "term", "rss"]
+capitalizeListTitles = false
+
+[languages]
+  [languages.tr]
+    label = "Türkçe"
+    locale = "tr-TR"
+    contentDir = "content/tr"
+    weight = 1
+    [languages.tr.params]
+      siteDescription = "agca·studio, İstanbul merkezli bir mimarlık stüdyosu. Kentsel dönüşüm, Revit ile mimari projelendirme, görselleştirme ve sanal tur."
+  [languages.en]
+    label = "English"
+    locale = "en"
+    contentDir = "content/en"
+    weight = 2
+    [languages.en.params]
+      siteDescription = "agca·studio is an architecture studio based in Istanbul. Urban regeneration, architectural design with Revit, visualisation and virtual tours."
+
+[params]
+  brand = "agca·studio"
+  accent = "#F4A888"
+  email = "info@agca.studio"
+  phone = ""            # ör. "+90 5xx xxx xx xx" — boşsa gösterilmez
+  instagram = ""        # tam URL — boşsa gösterilmez
+  linkedin = ""         # tam URL — boşsa gösterilmez
+  city = "İstanbul"
+  district = "Üsküdar"
+  cfAnalyticsToken = "" # Cloudflare Web Analytics token — boşsa betik yüklenmez
+  ogImage = "img/og-default.jpg"
+  indexnowKey = "61519148285613e6e8c936fddbbb6411"  # static/<key>.txt dosyasıyla eşleşir
+
+[imaging]
+  resampleFilter = "Lanczos"
+  anchor = "Smart"
+  [imaging.jpeg]
+    quality = 85
+  [imaging.webp]
+    quality = 82
+  [imaging.exif]
+    disableDate = true
+    disableLatLong = true
+
+[caches]
+  [caches.images]
+    dir = ":cacheDir/images"
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true
+
+[minify]
+  minifyOutput = true
+
+[sitemap]
+  changefreq = "monthly"
+  priority = 0.5
+
+[outputs]
+  home = ["HTML"]
+  section = ["HTML"]
+  page = ["HTML"]

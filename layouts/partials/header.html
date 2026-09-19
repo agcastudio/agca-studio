@@ -1,0 +1,37 @@
+{{- $lang := .Language.Lang -}}
+{{- $home := site.Home.RelPermalink -}}
+{{- $nav := slice
+  (dict "key" "nav_projects" "path" (cond (eq $lang "tr") "projeler" "projects"))
+  (dict "key" "nav_studio" "path" (cond (eq $lang "tr") "studyo" "studio"))
+  (dict "key" "nav_services" "path" (cond (eq $lang "tr") "hizmetler" "services"))
+  (dict "key" "nav_contact" "path" (cond (eq $lang "tr") "iletisim" "contact"))
+-}}
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="{{ $home }}" aria-label="{{ site.Params.brand }} — {{ i18n "back_home" }}">
+      <img src="/img/logo.svg" alt="{{ site.Params.brand }}" width="1447" height="258" decoding="async">
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" data-nav-toggle>
+      <span class="nav-toggle-label" data-label-open>{{ i18n "nav_menu" }}</span>
+      <span class="nav-toggle-label" data-label-close hidden>{{ i18n "nav_close" }}</span>
+    </button>
+    <nav id="nav" class="nav" aria-label="{{ i18n "nav_menu" }}">
+      <ul>
+        {{- range $nav }}
+        {{- $p := site.GetPage (printf "/%s" .path) -}}
+        {{- $url := printf "%s%s/" $home .path -}}
+        {{- with $p }}{{ $url = .RelPermalink }}{{ end -}}
+        {{- $active := false -}}
+        {{- with $p }}{{ if or (eq $.RelPermalink .RelPermalink) (and (eq $.Type "proje") (eq .Type "proje")) }}{{ $active = true }}{{ end }}{{ end -}}
+        <li><a href="{{ $url }}"{{ if $active }} aria-current="page"{{ end }}>{{ i18n .key }}</a></li>
+        {{- end }}
+        <li class="nav-lang">
+          {{- $alt := "" -}}
+          {{- range .Translations }}{{ $alt = .RelPermalink }}{{ end -}}
+          {{- if not $alt }}{{ range site.Sites }}{{ if ne .Language.Lang $lang }}{{ $alt = .Home.RelPermalink }}{{ end }}{{ end }}{{ end -}}
+          <a href="{{ $alt }}" lang="{{ if eq $lang "tr" }}en{{ else }}tr{{ end }}" hreflang="{{ if eq $lang "tr" }}en{{ else }}tr{{ end }}" aria-label="{{ i18n "lang_switch_label" }}">{{ i18n "lang_switch" }}</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

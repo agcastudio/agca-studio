@@ -1,0 +1,60 @@
+{{ define "main" }}
+{{- $hero := partial "hero-image.html" . -}}
+<article class="page">
+  <header class="wrap page-head">
+    <h1 class="page-title">{{ .Title }}</h1>
+    {{- with .Params.lede }}<p class="lede">{{ . | markdownify }}</p>{{ end }}
+  </header>
+  {{- with $hero }}
+  <div class="project-cover">
+    <picture>
+      <source type="image/webp" srcset="{{ .srcset }}" sizes="100vw">
+      <img src="{{ .fallback.RelPermalink }}" width="{{ .fallback.Width }}" height="{{ .fallback.Height }}" alt="{{ $.Params.hero_alt }}" fetchpriority="high" decoding="async">
+    </picture>
+  </div>
+  {{- end }}
+  <div class="wrap page-body{{ if eq .Params.pagekind "contact" }} contact{{ end }}">
+    <div class="prose">
+      {{ .Content }}
+      {{- if eq .Params.pagekind "contact" }}
+      <dl class="contact-list">
+        <div><dt>{{ i18n "contact_email" }}</dt><dd><a href="mailto:{{ site.Params.email }}">{{ site.Params.email }}</a></dd></div>
+        {{- with site.Params.phone }}<div><dt>{{ i18n "contact_phone" }}</dt><dd><a href="tel:{{ replace . " " "" }}">{{ . }}</a></dd></div>{{ end }}
+        <div><dt>{{ i18n "contact_address" }}</dt><dd>{{ site.Params.district }}, {{ site.Params.city }}</dd></div>
+        {{- if or site.Params.instagram site.Params.linkedin }}
+        <div><dt>Sosyal</dt><dd>
+          {{- with site.Params.instagram }}<a href="{{ . }}" rel="me noopener" target="_blank">Instagram</a>{{ end }}
+          {{- if and site.Params.instagram site.Params.linkedin }} · {{ end }}
+          {{- with site.Params.linkedin }}<a href="{{ . }}" rel="me noopener" target="_blank">LinkedIn</a>{{ end }}
+        </dd></div>
+        {{- end }}
+      </dl>
+      {{- end }}
+    </div>
+  </div>
+
+  {{- with .Params.people }}
+  <section class="wrap people">
+    <h2 class="section-title">{{ i18n "founders" }}</h2>
+    <ul class="people-grid">
+      {{- range . }}
+      {{- $person := . -}}
+      <li class="person">
+        {{- with resources.Get (printf "img/%s" $person.photo) }}
+          {{- $sq := .Fill "800x800 webp" -}}
+          {{- $fb := .Fill "800x800 jpg" -}}
+          <picture>
+            <source type="image/webp" srcset="{{ (.Fill "480x480 webp").RelPermalink }} 480w, {{ $sq.RelPermalink }} 800w" sizes="(min-width: 900px) 33vw, 50vw">
+            <img src="{{ $fb.RelPermalink }}" width="800" height="800" alt="{{ $person.name }} — {{ $person.role }}" loading="lazy" decoding="async">
+          </picture>
+        {{- end }}
+        <h3 class="person-name">{{ $person.name }}</h3>
+        <p class="person-role muted">{{ $person.role }}</p>
+        {{- with $person.bio }}<p class="person-bio">{{ . | markdownify }}</p>{{ end }}
+      </li>
+      {{- end }}
+    </ul>
+  </section>
+  {{- end }}
+</article>
+{{ end }}

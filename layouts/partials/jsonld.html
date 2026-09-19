@@ -1,0 +1,70 @@
+{{- $p := .page -}}
+{{- $brand := site.Params.brand -}}
+{{- $org := dict
+  "@type" (slice "Organization" "ProfessionalService")
+  "@id" (printf "%s#org" site.BaseURL)
+  "name" $brand
+  "alternateName" (slice "agca studio" "agca.studio" "Ağca Studio")
+  "url" site.BaseURL
+  "logo" (printf "%simg/logo-og.png" site.BaseURL)
+  "email" site.Params.email
+  "address" (dict "@type" "PostalAddress" "addressLocality" site.Params.district "addressRegion" site.Params.city "addressCountry" "TR")
+  "areaServed" (slice "TR")
+-}}
+{{- with site.Params.phone }}{{ $org = merge $org (dict "telephone" .) }}{{ end -}}
+{{- $same := slice -}}
+{{- with site.Params.instagram }}{{ $same = $same | append . }}{{ end -}}
+{{- with site.Params.linkedin }}{{ $same = $same | append . }}{{ end -}}
+{{- with $same }}{{ $org = merge $org (dict "sameAs" .) }}{{ end -}}
+
+{{- $graph := slice -}}
+{{- if $p.IsHome -}}
+  {{- $graph = $graph | append $org -}}
+  {{- $graph = $graph | append (dict "@type" "WebSite" "url" site.BaseURL "name" $brand "inLanguage" $p.Language.Lang "publisher" (dict "@id" (printf "%s#org" site.BaseURL))) -}}
+{{- else -}}
+  {{- /* Ekmek kırıntısı */ -}}
+  {{- $items := slice (dict "@type" "ListItem" "position" 1 "name" $brand "item" site.Home.Permalink) -}}
+  {{- $pos := 2 -}}
+  {{- with $p.Parent }}{{ if not .IsHome }}
+    {{- $items = $items | append (dict "@type" "ListItem" "position" $pos "name" .Title "item" .Permalink) -}}
+    {{- $pos = add $pos 1 -}}
+  {{- end }}{{ end -}}
+  {{- $items = $items | append (dict "@type" "ListItem" "position" $pos "name" $p.Title "item" $p.Permalink) -}}
+  {{- $graph = $graph | append (dict "@type" "BreadcrumbList" "itemListElement" $items) -}}
+  {{- if and (eq $p.Type "proje") (not $p.IsSection) -}}
+    {{- $cw := dict
+      "@type" "CreativeWork"
+      "name" $p.Title
+      "headline" (printf "%s — %s" $p.Title ($p.Params.subtitle | default ""))
+      "description" .desc
+      "url" $p.Permalink
+      "inLanguage" $p.Language.Lang
+      "creator" (dict "@id" (printf "%s#org" site.BaseURL))
+      "copyrightHolder" (dict "@id" (printf "%s#org" site.BaseURL))
+      "locationCreated" (dict "@type" "Place" "name" $p.Params.kunye.yer)
+    -}}
+    {{- with $p.Params.kunye.proje_yili }}{{ $cw = merge $cw (dict "dateCreated" .) }}{{ end -}}
+    {{- with .og }}{{ $cw = merge $cw (dict "image" (dict "@type" "ImageObject" "contentUrl" . "creditText" $brand "copyrightNotice" (printf "© %s" $brand))) }}{{ end -}}
+    {{- $graph = $graph | append $cw -}}
+  {{- else if and (eq $p.Type "hizmet") (not $p.IsSection) -}}
+    {{- $svc := dict
+      "@type" "Service"
+      "name" $p.Title
+      "serviceType" $p.Title
+      "description" .desc
+      "url" $p.Permalink
+      "inLanguage" $p.Language.Lang
+      "provider" (dict "@id" (printf "%s#org" site.BaseURL))
+      "areaServed" (slice (dict "@type" "City" "name" "İstanbul") (dict "@type" "Country" "name" "Türkiye"))
+    -}}
+    {{- $graph = $graph | append $svc -}}
+    {{- with $p.Params.faq -}}
+      {{- $qs := slice -}}
+      {{- range . }}{{ $qs = $qs | append (dict "@type" "Question" "name" .q "acceptedAnswer" (dict "@type" "Answer" "text" (.a | markdownify | plainify))) }}{{ end -}}
+      {{- $graph = $graph | append (dict "@type" "FAQPage" "mainEntity" $qs) -}}
+    {{- end -}}
+  {{- else if eq $p.Params.pagekind "contact" -}}
+    {{- $graph = $graph | append $org -}}
+  {{- end -}}
+{{- end -}}
+<script type="application/ld+json">{{ (dict "@context" "https://schema.org" "@graph" $graph) | jsonify (dict "noHTMLEscape" true) | safeJS }}</script>

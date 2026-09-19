@@ -1,0 +1,20 @@
+{{- $lang := .Language.Lang -}}
+{{- $privacy := site.GetPage (cond (eq $lang "tr") "/gizlilik" "/privacy") -}}
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <img src="/img/logo.svg" alt="{{ site.Params.brand }}" width="1447" height="258" loading="lazy" decoding="async">
+      <p class="muted">{{ site.Params.district }}, {{ site.Params.city }}</p>
+    </div>
+    <ul class="footer-contact">
+      <li><a href="mailto:{{ site.Params.email }}">{{ site.Params.email }}</a></li>
+      {{- with site.Params.phone }}<li><a href="tel:{{ replace . " " "" }}">{{ . }}</a></li>{{ end }}
+      {{- with site.Params.instagram }}<li><a href="{{ . }}" rel="me noopener" target="_blank">Instagram</a></li>{{ end }}
+      {{- with site.Params.linkedin }}<li><a href="{{ . }}" rel="me noopener" target="_blank">LinkedIn</a></li>{{ end }}
+    </ul>
+    <p class="footer-legal muted">
+      © {{ now.Year }} {{ site.Params.brand }}. {{ i18n "rights" }}
+      {{- with $privacy }} · <a href="{{ .RelPermalink }}">{{ i18n "privacy" }}</a>{{ end }}
+    </p>
+  </div>
+</footer>

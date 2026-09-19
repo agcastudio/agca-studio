@@ -1,0 +1,35 @@
+{{ define "main" }}
+{{- $hero := partial "hero-image.html" . -}}
+{{- with $hero }}
+<section class="hero" aria-label="{{ $.Params.hero_alt }}">
+  <picture>
+    <source type="image/webp" srcset="{{ .srcset }}" sizes="100vw">
+    <img src="{{ .fallback.RelPermalink }}" width="{{ .fallback.Width }}" height="{{ .fallback.Height }}" alt="{{ $.Params.hero_alt }}" fetchpriority="high" decoding="async">
+  </picture>
+  {{- with $.Params.hero_link }}
+  <a class="hero-caption" href="{{ . }}">{{ $.Params.hero_caption }}</a>
+  {{- else }}{{ with $.Params.hero_caption }}<p class="hero-caption">{{ . }}</p>{{ end }}{{ end }}
+</section>
+{{- end }}
+
+<section class="wrap intro">
+  <p class="tagline">{{ .Params.tagline }}</p>
+  {{ with .Content }}<div class="intro-text">{{ . }}</div>{{ end }}
+</section>
+
+{{- $projects := where site.RegularPages "Type" "proje" -}}
+{{- $projects = $projects.ByWeight -}}
+{{- with $projects }}
+<section class="wrap section">
+  <div class="section-head">
+    <h2 class="section-title">{{ i18n "selected_projects" }}</h2>
+    {{- with site.GetPage (cond (eq $.Language.Lang "tr") "/projeler" "/projects") }}
+    <a class="more" href="{{ .RelPermalink }}">{{ i18n "all_projects" }} →</a>
+    {{- end }}
+  </div>
+  <ul class="grid">
+    {{- range first 6 . }}{{ partial "card.html" . }}{{ end }}
+  </ul>
+</section>
+{{- end }}
+{{ end }}

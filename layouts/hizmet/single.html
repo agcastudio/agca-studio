@@ -1,0 +1,39 @@
+{{ define "main" }}
+{{- $lang := .Language.Lang -}}
+{{- $contact := site.GetPage (cond (eq $lang "tr") "/iletisim" "/contact") -}}
+<article class="page service-page">
+  <header class="wrap page-head">
+    <p class="crumb"><a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a></p>
+    <h1 class="page-title">{{ .Title }}</h1>
+    {{- with .Params.lede }}<p class="lede">{{ . | markdownify }}</p>{{ end }}
+  </header>
+  <div class="wrap page-body">
+    <div class="prose">
+      {{ .Content }}
+      {{- with .Params.faq }}
+      <section class="faq" aria-label="{{ if eq $lang "tr" }}Sık sorulan sorular{{ else }}Frequently asked questions{{ end }}">
+        <h2>{{ if eq $lang "tr" }}Sık sorulan sorular{{ else }}Frequently asked questions{{ end }}</h2>
+        {{- range . }}
+        <details class="faq-item">
+          <summary>{{ .q }}</summary>
+          <div class="faq-a">{{ .a | markdownify }}</div>
+        </details>
+        {{- end }}
+      </section>
+      {{- end }}
+      {{- with $contact }}
+      <p class="cta"><a class="btn" href="{{ .RelPermalink }}">{{ if eq $lang "tr" }}Projeniz için yazın{{ else }}Write to us about your project{{ end }}</a></p>
+      {{- end }}
+    </div>
+  </div>
+  {{- with .Params.related_tur }}
+    {{- $rel := where (where site.RegularPages "Type" "proje") "Params.tur" "intersect" (slice .) -}}
+    {{- with $rel }}
+    <section class="wrap section">
+      <div class="section-head"><h2 class="section-title">{{ i18n "selected_projects" }}</h2></div>
+      <ul class="grid">{{ range first 3 . }}{{ partial "card.html" . }}{{ end }}</ul>
+    </section>
+    {{- end }}
+  {{- end }}
+</article>
+{{ end }}

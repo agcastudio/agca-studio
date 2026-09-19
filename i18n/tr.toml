@@ -1,0 +1,100 @@
+[nav_projects]
+other = "Projeler"
+[nav_studio]
+other = "Stüdyo"
+[nav_services]
+other = "Hizmetler"
+[nav_contact]
+other = "İletişim"
+[nav_menu]
+other = "Menü"
+[nav_close]
+other = "Kapat"
+[skip_to_content]
+other = "İçeriğe geç"
+[lang_switch]
+other = "EN"
+[lang_switch_label]
+other = "English version"
+[all]
+other = "Tümü"
+[filter_label]
+other = "Türe göre süz"
+[projects_meta_title]
+other = "Projeler"
+[tur_konut]
+other = "Konut"
+[tur_yarisma]
+other = "Yarışma"
+[tur_konsept]
+other = "Konsept"
+[tur_ticari]
+other = "Ticari"
+[tur_kentsel]
+other = "Kentsel"
+[tur_ic_mekan]
+other = "İç Mekân"
+[kunye]
+other = "Künye"
+[kunye_yer]
+other = "Yer"
+[kunye_isveren]
+other = "İşveren"
+[kunye_proje_yili]
+other = "Proje Yılı"
+[kunye_bitis_yili]
+other = "Bitiş Yılı"
+[kunye_program]
+other = "Program"
+[kunye_durum]
+other = "Durum"
+[kunye_insaat_alani]
+other = "İnşaat Alanı"
+[kunye_arsa_alani]
+other = "Arsa Alanı"
+[kunye_ekip]
+other = "Ekip"
+[kunye_rol]
+other = "Rol"
+[kunye_derece]
+other = "Derece"
+[kunye_tur]
+other = "Tür"
+[drawings]
+other = "Çizimler"
+[diagrams]
+other = "Diyagramlar"
+[credits]
+other = "Krediler"
+[virtual_tour]
+other = "Sanal turu aç"
+[prev_project]
+other = "Önceki proje"
+[next_project]
+other = "Sonraki proje"
+[all_projects]
+other = "Tüm projeler"
+[selected_projects]
+other = "Seçili projeler"
+[open_image]
+other = "Görseli büyüt"
+[privacy]
+other = "Gizlilik ve KVKK"
+[rights]
+other = "Tüm hakları saklıdır."
+[founders]
+other = "Kurucu Ortaklar"
+[contact_email]
+other = "E-posta"
+[contact_phone]
+other = "Telefon"
+[contact_address]
+other = "Adres"
+[not_found_title]
+other = "Sayfa bulunamadı"
+[not_found_text]
+other = "Aradığınız sayfa taşınmış ya da hiç var olmamış olabilir."
+[back_home]
+other = "Ana sayfaya dön"
+[read_more]
+other = "Devamı"

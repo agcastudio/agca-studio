@@ -1,0 +1,33 @@
+{{- /*
+  Sayfanın kapak görselini bulur ve srcset üretir.
+  Döner: dict (image, srcset, fallback) ya da boş.
+  - Ana sayfa: .Params.hero (assets içi yol)
+  - Proje: .Params.cover (assets/projeler/<slug>/ içinde dosya adı)
+  - Diğer sayfalar: .Params.hero varsa
+*/ -}}
+{{- $path := "" -}}
+{{- if and (eq .Type "proje") (not .IsSection) -}}
+  {{- with .Params.cover }}{{ $path = printf "projeler/%s/%s" $.Params.slug . }}{{ end -}}
+{{- else -}}
+  {{- with .Params.hero }}{{ $path = . }}{{ end -}}
+{{- end -}}
+{{- $out := dict -}}
+{{- with $path -}}
+  {{- with resources.Get . -}}
+    {{- $img := . -}}
+    {{- $set := slice -}}
+    {{- range $w := slice 720 1080 1440 1920 2560 -}}
+      {{- if le $w $img.Width -}}
+        {{- $r := $img.Resize (printf "%dx webp" $w) -}}
+        {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $w) -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if lt $img.Width 2560 -}}
+      {{- $r := $img.Resize (printf "%dx webp" $img.Width) -}}
+      {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $img.Width) -}}
+    {{- end -}}
+    {{- $fb := $img.Resize "1600x jpg" -}}
+    {{- $out = dict "image" $img "srcset" (delimit $set ", ") "fallback" $fb -}}
+  {{- end -}}
+{{- end -}}
+{{- return $out -}}

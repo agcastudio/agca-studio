@@ -1,0 +1,23 @@
+{{ define "main" }}
+{{- $projects := .RegularPages.ByWeight -}}
+{{- $turs := slice -}}
+{{- range $projects }}{{ range .Params.tur }}{{ $turs = $turs | append . }}{{ end }}{{ end -}}
+{{- $turs = $turs | uniq -}}
+<section class="wrap page-head">
+  <h1 class="page-title">{{ .Title }}</h1>
+  {{ with .Content }}<div class="lede">{{ . }}</div>{{ end }}
+  {{- if gt (len $turs) 1 }}
+  <div class="filter" role="group" aria-label="{{ i18n "filter_label" }}" data-filter>
+    <button type="button" class="filter-btn is-active" data-tur="" aria-pressed="true">{{ i18n "all" }}</button>
+    {{- range $turs }}
+    <button type="button" class="filter-btn" data-tur="{{ . }}" aria-pressed="false">{{ i18n (printf "tur_%s" .) }}</button>
+    {{- end }}
+  </div>
+  {{- end }}
+</section>
+<section class="wrap">
+  <ul class="grid" data-grid>
+    {{- range $projects }}{{ partial "card.html" . }}{{ end }}
+  </ul>
+</section>
+{{ end }}

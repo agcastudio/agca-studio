@@ -1,0 +1,100 @@
+[nav_projects]
+other = "Projects"
+[nav_studio]
+other = "Studio"
+[nav_services]
+other = "Services"
+[nav_contact]
+other = "Contact"
+[nav_menu]
+other = "Menu"
+[nav_close]
+other = "Close"
+[skip_to_content]
+other = "Skip to content"
+[lang_switch]
+other = "TR"
+[lang_switch_label]
+other = "Türkçe sürüm"
+[all]
+other = "All"
+[filter_label]
+other = "Filter by type"
+[projects_meta_title]
+other = "Projects"
+[tur_konut]
+other = "Residential"
+[tur_yarisma]
+other = "Competition"
+[tur_konsept]
+other = "Concept"
+[tur_ticari]
+other = "Commercial"
+[tur_kentsel]
+other = "Urban"
+[tur_ic_mekan]
+other = "Interior"
+[kunye]
+other = "Project data"
+[kunye_yer]
+other = "Location"
+[kunye_isveren]
+other = "Client"
+[kunye_proje_yili]
+other = "Design Year"
+[kunye_bitis_yili]
+other = "Completion"
+[kunye_program]
+other = "Programme"
+[kunye_durum]
+other = "Status"
+[kunye_insaat_alani]
+other = "Built Area"
+[kunye_arsa_alani]
+other = "Site Area"
+[kunye_ekip]
+other = "Team"
+[kunye_rol]
+other = "Role"
+[kunye_derece]
+other = "Award"
+[kunye_tur]
+other = "Type"
+[drawings]
+other = "Drawings"
+[diagrams]
+other = "Diagrams"
+[credits]
+other = "Credits"
+[virtual_tour]
+other = "Open virtual tour"
+[prev_project]
+other = "Previous project"
+[next_project]
+other = "Next project"
+[all_projects]
+other = "All projects"
+[selected_projects]
+other = "Selected projects"
+[open_image]
+other = "Enlarge image"
+[privacy]
+other = "Privacy"
+[rights]
+other = "All rights reserved."
+[founders]
+other = "Founding Partners"
+[contact_email]
+other = "Email"
+[contact_phone]
+other = "Phone"
+[contact_address]
+other = "Address"
+[not_found_title]
+other = "Page not found"
+[not_found_text]
+other = "The page you are looking for may have moved or never existed."
+[back_home]
+other = "Back to home"
+[read_more]
+other = "Read more"

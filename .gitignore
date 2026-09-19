@@ -1,0 +1,8 @@
+public/
+resources/_gen/
+.hugo_build.lock
+node_modules/
+assets/projeler/*/_manifest.txt
+.DS_Store
+Thumbs.db
+.wrangler/

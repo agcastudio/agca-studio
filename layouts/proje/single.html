@@ -1,0 +1,101 @@
+{{ define "main" }}
+{{- $slug := .Params.slug -}}
+{{- $k := .Params.kunye -}}
+{{- $hero := partial "hero-image.html" . -}}
+<article class="project">
+  <header class="wrap project-head">
+    <p class="crumb"><a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a></p>
+    <h1 class="project-title">{{ .Title }}</h1>
+    {{- with .Params.subtitle }}<p class="project-sub">{{ . }}</p>{{ end }}
+    <p class="project-meta">{{ with $k.yer }}{{ . }}{{ end }}{{ with $k.proje_yili }} · {{ . }}{{ end }}{{ with .Params.tur }} · {{ i18n (printf "tur_%s" (index . 0)) }}{{ end }}</p>
+  </header>
+
+  {{- with $hero }}
+  <div class="project-cover">
+    <picture>
+      <source type="image/webp" srcset="{{ .srcset }}" sizes="100vw">
+      <img src="{{ .fallback.RelPermalink }}" width="{{ .fallback.Width }}" height="{{ .fallback.Height }}" alt="{{ $.Params.cover_alt | default $.Title }}" fetchpriority="high" decoding="async">
+    </picture>
+  </div>
+  {{- end }}
+
+  <div class="wrap project-body">
+    <aside class="kunye" aria-label="{{ i18n "kunye" }}">
+      <dl>
+        {{- $rows := slice "yer" "isveren" "proje_yili" "bitis_yili" "program" "durum" "insaat_alani" "arsa_alani" "rol" "derece" "ekip" -}}
+        {{- range $rows }}
+          {{- with index $k . }}
+          <div class="kunye-row"><dt>{{ i18n (printf "kunye_%s" $) }}</dt><dd>{{ . }}</dd></div>
+          {{- end }}
+        {{- end }}
+        {{- with .Params.tur }}
+          <div class="kunye-row"><dt>{{ i18n "kunye_tur" }}</dt><dd>{{ range $i, $t := . }}{{ if $i }}, {{ end }}{{ i18n (printf "tur_%s" $t) }}{{ end }}</dd></div>
+        {{- end }}
+      </dl>
+      {{- with .Params.sanal_tur }}
+      <a class="btn" href="{{ . }}" target="_blank" rel="noopener">{{ i18n "virtual_tour" }} ↗</a>
+      {{- end }}
+    </aside>
+    <div class="project-text">
+      {{ .Content }}
+    </div>
+  </div>
+
+  {{- with .Params.images }}
+  <section class="wrap gallery" aria-label="{{ $.Title }}">
+    {{- range . }}
+      {{- $it := . -}}
+      {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
+        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "galeri" "sizes" "(min-width: 1500px) 1400px, 100vw") }}
+      {{- else }}
+        {{- warnf "Görsel bulunamadı: projeler/%s/%s" $slug $it.file -}}
+      {{- end }}
+    {{- end }}
+  </section>
+  {{- end }}
+
+  {{- with .Params.drawings }}
+  <section class="wrap drawings">
+    <h2 class="section-title">{{ i18n "drawings" }}</h2>
+    <div class="drawings-grid">
+    {{- range . }}
+      {{- $it := . -}}
+      {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
+        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "cizimler" "class" "fig-card" "sizes" "(min-width: 900px) 50vw, 100vw" "widths" (slice 640 960 1440 1920)) }}
+      {{- else }}
+        {{- warnf "Çizim bulunamadı: projeler/%s/%s" $slug $it.file -}}
+      {{- end }}
+    {{- end }}
+    </div>
+  </section>
+  {{- end }}
+
+  {{- with .Params.diagrams }}
+  <section class="wrap drawings">
+    <h2 class="section-title">{{ i18n "diagrams" }}</h2>
+    <div class="drawings-grid">
+    {{- range . }}
+      {{- $it := . -}}
+      {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
+        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "diyagramlar" "class" "fig-card" "sizes" "(min-width: 900px) 50vw, 100vw" "widths" (slice 640 960 1440 1920)) }}
+      {{- else }}
+        {{- warnf "Diyagram bulunamadı: projeler/%s/%s" $slug $it.file -}}
+      {{- end }}
+    {{- end }}
+    </div>
+  </section>
+  {{- end }}
+
+  {{- with .Params.credits }}
+  <section class="wrap credits">
+    <h2 class="section-title">{{ i18n "credits" }}</h2>
+    <p class="muted">{{ . | markdownify }}</p>
+  </section>
+  {{- end }}
+
+  <nav class="wrap project-nav" aria-label="{{ i18n "nav_projects" }}">
+    {{- with .NextInSection }}<a class="project-nav-link" href="{{ .RelPermalink }}"><span class="muted">{{ i18n "prev_project" }}</span><span>{{ .Title }}</span></a>{{ else }}<span></span>{{ end }}
+    {{- with .PrevInSection }}<a class="project-nav-link is-next" href="{{ .RelPermalink }}"><span class="muted">{{ i18n "next_project" }}</span><span>{{ .Title }}</span></a>{{ end }}
+  </nav>
+</article>
+{{ end }}
