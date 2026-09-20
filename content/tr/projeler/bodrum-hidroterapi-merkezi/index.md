@@ -1,21 +1,21 @@
 ---
 title: "Bodrum Hidroterapi Merkezi"
 seo_title: "Bodrum Hidroterapi Merkezi · Bodrum, Muğla · agca·studio"
-subtitle: "Fizyoterapi ve hidroterapi merkezi"
+subtitle: "Fizyoterapi ve hidroterapi merkezi yarışma projesi"
 translationKey: "proje-bodrum"
 slug: "bodrum-hidroterapi-merkezi"
 date: 2024-04-01
 weight: 70
 draft: false
-tur: ["saglik"]
-description: "Bodrum'da çamlar arasında fizyoterapi ve hidroterapi merkezi: beyaz prizmalar, kolon dizili kaset tavanlı havuz, üst katta fizyoterapi salonu, sauna ve avlular."
+tur: ["yarisma", "saglik"]
+description: "Bodrum'da çamlar arasında fizyoterapi ve hidroterapi merkezi yarışma projesi: beyaz prizmalar, kolon dizili havuz, fizyoterapi salonu ve avlular."
 kunye:
   yer: "Bodrum, Muğla"
   isveren: ""
   proje_yili: "2024"
   bitis_yili: ""
   program: "Hidroterapi havuzu, fizyoterapi salonu, tedavi odaları, sauna, kafe ve ofisler; bodrumda otopark; bodrum, zemin ve iki normal kat"
-  durum: "Proje"
+  durum: "Yarışma projesi"
   insaat_alani: ""
   arsa_alani: ""
   ekip: ""
@@ -28,7 +28,7 @@ card: "r-bsvfhm-perspektif-lightroom-sm10.jpg"
 card_alt: "Bodrum Hidroterapi Merkezi kuş bakışı: beyaz bloklar, avlular ve çamlar"
 credits: "Tasarım ve görselleştirme: agca·studio"
 ozet: |
-  Bodrum'da çam ağaçları arasında bir fizyoterapi ve hidroterapi merkezi. Yapı, beyaz prizmalardan oluşan alçak iki blok ve bunları birleştiren bir köprü katıyla kurulur; bloklar arasındaki avludan girilir. Zemin katta dört yanı kolon dizili hidroterapi havuzu, soyunma ve tedavi odaları, çakıl avlusuna açılan ahşap sauna ve ayrı kanatta kafe bulunur. Birinci katta üç yanı kolonlar arası camla çevrili fizyoterapi salonu ile iç avlu çevresine dizilen tedavi odaları ve ofisler yer alır; kısmi ikinci kat ofis ve toplantı odalarına ayrılır. Bodrum kat rampalı otoparkı ve teknik hacimleri taşır. Havuz ve salonların kaset tavanları, kolon dizileriyle birlikte yapının dilini kurar. İki asansör çekirdeği, havuza inen rampa ve kot farksız avlu girişiyle dolaşım tekerlekli sandalye kullanıcıları için düz ve geniş tutulur. Bodrum, zemin ve iki normal katın planları, kesitler ve görünüşler tek modelden üretildi.
+  Bodrum'da çam ağaçları arasında bir fizyoterapi ve hidroterapi merkezi için hazırlanan yarışma projesi. Yapı, beyaz prizmalardan oluşan alçak iki blok ve bunları birleştiren bir köprü katıyla kurulur; bloklar arasındaki avludan girilir. Zemin katta dört yanı kolon dizili hidroterapi havuzu, soyunma ve tedavi odaları, çakıl avlusuna açılan ahşap sauna ve ayrı kanatta kafe bulunur. Birinci katta üç yanı kolonlar arası camla çevrili fizyoterapi salonu ile iç avlu çevresine dizilen tedavi odaları ve ofisler yer alır; kısmi ikinci kat ofis ve toplantı odalarına ayrılır. Bodrum kat rampalı otoparkı ve teknik hacimleri taşır. Havuz ve salonların kaset tavanları, kolon dizileriyle birlikte yapının dilini kurar. İki asansör çekirdeği, havuza inen rampa ve kot farksız avlu girişiyle dolaşım tekerlekli sandalye kullanıcıları için düz ve geniş tutulur. Bodrum, zemin ve iki normal katın planları, kesitler ve görünüşler tek modelden üretildi.
 images:
   - file: "r-bsvfhm-kapak-duzeltilmis-lightroom-sm10.jpg"
     alt: "Ön cephe: üst katta kolon dizili fizyoterapi salonu ve altında düşey çıtalı perde, duvarda yapı adı yazısı, iki blok arasındaki geçit; önde taş döşeli avlu, solda çim ve çamlar"
