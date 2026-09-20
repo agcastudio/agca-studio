@@ -8,7 +8,7 @@ date: 2025-04-01
 weight: 40
 draft: false
 tur: ["ticari", "ic_mekan"]
-description: "Showroom and office for KC Yangın: yellow and black identity, curved display counters, meeting area, open and closed offices; facade and interior visualisations."
+description: "Showroom and office for KC Yangın: yellow and black identity, curved display counters, meeting area, open and closed offices; facade and interior views."
 kunye:
   yer: ""
   isveren: "KC Yangın"
