@@ -11,7 +11,7 @@
   {{- $path = .Params.hero -}}
 {{- else if .IsHome -}}
   {{- $projects := (where site.RegularPages "Type" "proje").ByWeight -}}
-  {{- with index $projects 0 }}{{ with .Params.cover }}{{ $path = printf "projeler/%s/%s" $.Params.slug . }}{{ end }}{{ end -}}
+  {{- with index $projects 0 }}{{ $first := . }}{{ with $first.Params.cover }}{{ $path = printf "projeler/%s/%s" $first.Params.slug . }}{{ end }}{{ end -}}
 {{- end -}}
 {{- $out := dict -}}
 {{- with $path }}{{ $out = partial "hero-src.html" . }}{{ end -}}
