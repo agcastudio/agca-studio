@@ -1,0 +1,78 @@
+---
+title: "Rölöveden BIM Modeline"
+subtitle: "Drone fotogrametrisi, nokta bulutu ve Revit as-built modeli"
+translationKey: "proje-rolove-bim"
+slug: "roloveden-bim-modeline"
+date: 2024-09-01
+weight: 30
+draft: false
+tur: ["bim", "kentsel"]
+description: "Mevcut bir konut sitesinin drone ile taranması, nokta bulutundan Revit as-built modeline dönüşümü ve bu modelden üretilen avan plan, kesit, görünüş ve çatı çizimleri."
+kunye:
+  yer: ""
+  isveren: ""
+  proje_yili: "2024"
+  bitis_yili: ""
+  program: "Mevcut konut sitesi: drone taraması, nokta bulutu, Revit as-built modeli, avan çizimler"
+  durum: "Tamamlandı"
+  insaat_alani: ""
+  arsa_alani: ""
+  ekip: ""
+  rol: "Rölöve ve BIM modelleme"
+  derece: ""
+sanal_tur: ""
+cover: "r-2402-drone-3d-gorsel.jpg"
+cover_alt: "Drone ile çekilmiş kiremit çatılı beş katlı apartman bloğu ve çevresindeki yollar"
+card: "d-2402-kapak.jpg"
+card_alt: "Aynı bloğun yarısı nokta bulutu, yarısı Revit modeli olarak gösterimi"
+credits: "Rölöve, modelleme ve çizimler: agca·studio"
+images:
+  - file: "d-2402-kapak.jpg"
+    alt: "Aynı apartman bloğu: sol yarısı drone nokta bulutu, sağ yarısı mavi pencereli Revit modeli"
+    caption: "Nokta bulutundan Revit modeline"
+  - file: "r-2402-drone-vaziyet.jpg"
+    alt: "Drone ortofotosu: kiremit çatılı bloklar, havuz, yollar ve otoparklarıyla konut sitesi"
+    caption: "Sitenin drone ortofotosu"
+  - file: "r-2402-nb-3d-vaziyet.jpg"
+    alt: "Tüm sitenin üç boyutlu nokta bulutu: bloklar, yollar ve ağaçlar kuş bakışı"
+    caption: "Sitenin nokta bulutu"
+  - file: "r-2402-nb-3d-kesit.jpg"
+    alt: "Nokta bulutundan alınmış uzun kesit şeridi: blokların kat yükseklikleri ve arazi eğimi"
+    caption: "Nokta bulutu kesiti"
+  - file: "r-2402-nb-calisma-vaziyet.jpg"
+    alt: "Site nokta bulutu üzerinde seçilen bloğun kırmızı daireyle işaretlenmiş büyütmesi ve kesiti"
+    caption: "Modellenecek bloğun seçimi"
+  - file: "r-2402-nb-3d-model.jpg"
+    alt: "Seçilen bloğun iç mekânlarıyla birlikte üç boyutlu nokta bulutu modeli, gri tonlarda"
+    caption: "Bloğun nokta bulutu"
+  - file: "r-2402-nb-calisma.jpg"
+    alt: "Nokta bulutundan türetilen çalışma: aksonometri, görünüş ve kat planı taslakları"
+    caption: "Nokta bulutundan çizime"
+  - file: "r-2402-revit-3d-vaziyet.jpg"
+    alt: "Sitenin Revit kütle modeli: havuz çevresine dizilmiş bloklar, kiremit çatılar ve mavi pencereler"
+    caption: "Sitenin Revit modeli"
+  - file: "r-2402-revit-model.jpg"
+    alt: "Seçilen bloğun Revit modeli: kırmızı çatı kenarları, mavi pencereler ve balkonlar"
+    caption: "Bloğun Revit modeli"
+  - file: "r-2402-revit-calisma.jpg"
+    alt: "Revit modelinden üretilen aksonometri, renkli kesit ve kat planı bir arada"
+    caption: "Modelden çizimlere"
+drawings:
+  - file: "c-2402-avan-plan.jpg"
+    alt: "Avan kat planı: iki daireli blokta odalar, ıslak hacimler ve merdiven çekirdeği"
+    caption: "Avan kat planı"
+  - file: "c-2402-avan-kesit.jpg"
+    alt: "Avan kesit: beş kat ve çatı boyunca merdiven, döşemeler ve oda etiketleri"
+    caption: "Avan kesit"
+  - file: "c-2402-avan-gorunus.jpg"
+    alt: "Avan görünüş: pencere dizileri, balkonlar ve kırma çatı"
+    caption: "Avan görünüş"
+  - file: "c-2402-avan-cati.jpg"
+    alt: "Çatı planı: kırma çatının mahyaları ve saçak hatları"
+    caption: "Çatı planı"
+---
+Mevcut bir yapıyı doğru okumak, onu dönüştürmenin ilk adımıdır. Bu çalışmada bir konut sitesinin tamamı drone ile tarandı; fotogrametriyle üretilen nokta bulutu, blokların, yolların ve arazinin ölçülebilir bir kopyasını verdi.
+
+Nokta bulutu üzerinden seçilen bir blok Revit'te yeniden kuruldu: döşemeler, duvarlar, pencereler, balkonlar ve çatı, ölçüleri buluttan alınarak modellendi. Sitenin tamamı için kütle modeli, seçilen blok için ise avan düzeyinde plan, kesit, görünüş ve çatı planı bu modelden üretildi.
+
+Sonuç, kâğıt üzerinde bir rölöve değil, yaşayan bir bilgi modelidir: yenileme, güçlendirme ya da dönüşüm kararları bu model üzerinde alınır; metrajlar ve revizyonlar aynı kaynaktan güncellenir.

@@ -93,8 +93,11 @@ main:focus { outline: none; }
 .hero { position: relative; margin-top: 0; }
 .hero img { width: 100%; height: min(82vh, 900px); object-fit: cover; background: var(--soft); }
 .hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 140px; background: linear-gradient(transparent, rgba(0,0,0,.5)); pointer-events: none; }
+.hero-link { display: block; color: #fff; }
+.hero-link:hover { color: #fff; }
+.hero-link:hover .hero-caption { text-decoration: underline; text-underline-offset: 4px; }
+.hero-link:focus-visible { outline-offset: -4px; }
 .hero-caption { position: absolute; z-index: 1; left: var(--gutter); bottom: 18px; padding: 6px 0; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #fff; }
-.hero-caption:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
 @media (max-width: 640px) { .hero img { height: 62vh; } }
 
 .intro { padding: 56px 0 24px; }

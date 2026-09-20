@@ -8,7 +8,7 @@ people:
     role: "Founding Partner · Architect"
     photo: "ka.jpg"
     linkedin: "https://www.linkedin.com/in/kutbeddinagca"
-    bio: "Works where construction meets technology. A graduate of the architecture programme at Yıldız Technical University, he has developed and led projects at different scales for close to ten years. An expert in BIM-standard project production and Revit modelling, he treats architectural presentation, virtual tours and visualisation as the language in which a design is explained. He is pursuing a master's degree on large language models in the construction industry. Competitions are where he tests the limits of his expertise."
+    bio: "Works where construction meets technology. A graduate of the architecture programme at Yıldız Technical University, he has developed and led projects at different scales for close to ten years. An expert in BIM-standard project production and Revit modelling, he treats architectural presentation, virtual tours and visualisation as the language in which a design is explained. He is pursuing a master's degree on large language models in the construction industry. He builds and develops the studio's digital production infrastructure. Competitions are where he tests the limits of his expertise."
   - name: "Selen Baş Ağca"
     role: "Founding Partner · Architect"
     photo: "sb.jpg"

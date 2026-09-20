@@ -3,10 +3,15 @@
 {{- $lang := .Language.Lang -}}
 {{- with $hero }}
 <section class="hero">
-  {{ partial "hero-picture.html" (dict "hero" . "alt" $.Params.hero_alt) }}
   {{- with $.Params.hero_link }}
-  <a class="hero-caption" href="{{ . }}">{{ $.Params.hero_caption }}</a>
-  {{- else }}{{ with $.Params.hero_caption }}<p class="hero-caption">{{ . }}</p>{{ end }}{{ end }}
+  <a class="hero-link" href="{{ . }}" aria-label="{{ $.Params.hero_caption }}">
+    {{ partial "hero-picture.html" (dict "hero" $hero "alt" $.Params.hero_alt) }}
+    <span class="hero-caption">{{ $.Params.hero_caption }}</span>
+  </a>
+  {{- else }}
+  {{ partial "hero-picture.html" (dict "hero" . "alt" $.Params.hero_alt) }}
+  {{- with $.Params.hero_caption }}<p class="hero-caption">{{ . }}</p>{{ end }}
+  {{- end }}
 </section>
 {{- end }}
 

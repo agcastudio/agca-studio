@@ -21,7 +21,10 @@
     </div>
     <div class="card-text">
       <span class="card-title">{{ $p.Title }}</span>
-      <span class="card-meta">{{ with $p.Params.kunye.yer }}{{ . }}{{ end }}{{ with $turs }} · {{ i18n (printf "tur_%s" (index . 0)) }}{{ end }}</span>
+      {{- $meta := slice -}}
+      {{- with $p.Params.kunye.yer }}{{ $meta = $meta | append . }}{{ end -}}
+      {{- with $turs }}{{ $meta = $meta | append (i18n (printf "tur_%s" (index . 0))) }}{{ end -}}
+      <span class="card-meta">{{ delimit $meta " · " }}</span>
     </div>
   </a>
 </li>

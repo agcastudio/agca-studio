@@ -33,7 +33,9 @@ other = "Konsept"
 [tur_ticari]
 other = "Ticari"
 [tur_kentsel]
-other = "Kentsel"
+other = "Kentsel Dönüşüm"
+[tur_bim]
+other = "Rölöve ve BIM"
 [tur_ic_mekan]
 other = "İç Mekân"
 [kunye]

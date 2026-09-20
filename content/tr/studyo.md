@@ -8,7 +8,7 @@ people:
     role: "Kurucu Ortak · Mimar"
     photo: "ka.jpg"
     linkedin: "https://www.linkedin.com/in/kutbeddinagca"
-    bio: "İnşaatla teknolojinin kesiştiği yerde çalışır. Yıldız Teknik Üniversitesi Mimarlık mezunu; on yıla yakın süredir farklı ölçeklerde projeler geliştirdi ve yürüttü. BIM standartlarıyla proje üretimi ve Revit modellemede uzman; mimari sunumu, sanal turu ve görselleştirmeyi tasarımın anlatım dili olarak kullanır. Büyük dil modellerinin inşaat sektöründeki rolü üzerine yüksek lisans çalışmasını sürdürüyor. Yarışmalar, uzmanlığının sınırlarını sınadığı alandır."
+    bio: "İnşaatla teknolojinin kesiştiği yerde çalışır. Yıldız Teknik Üniversitesi Mimarlık mezunu; on yıla yakın süredir farklı ölçeklerde projeler geliştirdi ve yürüttü. BIM standartlarıyla proje üretimi ve Revit modellemede uzman; mimari sunumu, sanal turu ve görselleştirmeyi tasarımın anlatım dili olarak kullanır. Büyük dil modellerinin inşaat sektöründeki rolü üzerine yüksek lisans çalışmasını sürdürüyor. Stüdyonun dijital üretim altyapısını kurar ve geliştirir. Yarışmalar, uzmanlığının sınırlarını sınadığı alandır."
   - name: "Selen Baş Ağca"
     role: "Kurucu Ortak · Mimar"
     photo: "sb.jpg"
