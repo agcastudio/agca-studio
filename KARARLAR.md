@@ -68,7 +68,20 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 | 2026-09-19 | 32 | Minimum uğraş: form ve çerez olmadığı için tek kısa "Gizlilik ve KVKK" sayfası (veri toplanmadığı, çerezsiz analitik beyanı, e-posta ile iletişimde veri işleme). Avukat turu yok; metin kısa ve olgusal. | ayrı aydınlatma + çerez politikası | Kullanıcı: "basit site, minimum uğraş" | — | hayır |
 | 2026-09-19 | 33 | Bakım: `BAKIM.md` kısa takvim (alan adı otomatik yenileme kontrolü, Search Console 3 ayda bir, Hugo sürümü yılda bir). | — | Önerim kabul | — | evet |
 
+## 2026-09-20 değişiklikleri (kullanıcı istekleri)
+
+| Tarih | Soru | Karar | Gerekçe |
+|---|---|---|---|
+| 2026-09-20 | 17 | Ana sayfa kapağı artık **slayt**: her projenin kapağı sırayla, 6 sn'de bir yumuşak geçiş; üzerine gelince ve klavye odağında durur; "hareketi azalt" ayarında otomatik ilerlemez; her kare kendi projesine bağlanır; sağ altta nokta düğmeleri. Ön yükleme yalnız ilk kare. | Kullanıcı isteği (17'deki "slayt yok" kararı geri alındı) |
+| 2026-09-20 | 10 | Ana sayfa metinlerinde "Revit" yerine **BIM**; Stüdyo ve proje metinlerinde Revit adı kalır. | Kullanıcı isteği |
+| 2026-09-20 | 26 | Telefon numarası sitede gösterilmez (altbilgi, iletişim, yapısal veri). WhatsApp bağlantısı kalır. Altbilgi ve iletişimde stüdyo LinkedIn bağlantısı için alan hazır (adres BEKLENİYOR). | Kullanıcı isteği |
+| 2026-09-20 | 26 | İletişim sayfasına **çerezsiz statik harita**: OpenStreetMap karolarından `tools/harita.py` ile üretilen gri tonlu görsel, tıklayınca Google Haritalar'da açılır. Şimdilik Üsküdar merkezine işaretli; tam adres gelince koordinat ve bağlantı güncellenir. Gömülü harita (iframe) çerez ve KVKK yükü getirdiği için kullanılmadı. | Kullanıcı isteği + çerezsiz site kararı |
+| 2026-09-20 | 6 | Stüdyo sayfasında sıra: Selen Baş Ağca, Kutbeddin Ağca. "Yurt dışı bağlantılı projelerde aktif görev alır." cümlesi kaldırıldı; iki biyografi eşit uzunlukta tutuldu. | Kullanıcı isteği |
+
 ## Bekleyen bilgiler (kullanıcıdan)
+
+- Stüdyonun LinkedIn sayfa adresi (altbilgi ve iletişim için).
+- Ofisin tam adresi ya da harita koordinatı (harita işareti ve bağlantısı için).
 
 - ~~Kurucu ortakların ad-soyad, unvan, biyografi~~ → 2026-09-20 alındı: Kutbeddin Ağca (ka.jpg) ve Selen Baş Ağca (sb.jpg), Kurucu Ortak · Mimar; metinler Stüdyo sayfasında, yapısal veride `founder`.
 - ~~Telefon numarası; Instagram ve LinkedIn adresleri~~ → 2026-09-20 alındı: WhatsApp/telefon +90 538 027 62 83, Instagram instagram.com/agcastudio, kişisel LinkedIn hesapları Stüdyo sayfasında (stüdyo LinkedIn sayfası yok).

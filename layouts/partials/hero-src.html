@@ -1,0 +1,35 @@
+{{- /*
+  Verilen assets yolundan kapak srcset'leri üretir. Döner: dict (image, srcset, srcsetWide, fallback) ya da boş.
+  srcset: özgün oranda adaylar (dar ekranlar). srcsetWide: kaynak 3:2'den daha dikse geniş ekranlar için 3:2 kırpım.
+*/ -}}
+{{- $out := dict -}}
+{{- with resources.Get . -}}
+  {{- $img := . -}}
+  {{- $set := slice -}}
+  {{- range $w := slice 480 720 1080 1440 -}}
+    {{- if le $w $img.Width -}}
+      {{- $r := $img.Resize (printf "%dx webp" $w) -}}
+      {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $w) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $wide := slice -}}
+  {{- if gt (mul $img.Height 3) (mul $img.Width 2) -}}
+    {{- range $w := slice 1080 1440 1920 2560 -}}
+      {{- if le $w $img.Width -}}
+        {{- $r := $img.Fill (printf "%dx%d webp" $w (div (mul $w 2) 3)) -}}
+        {{- $wide = $wide | append (printf "%s %dw" $r.RelPermalink $w) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- else -}}
+    {{- range $w := slice 1920 2560 -}}
+      {{- if le $w $img.Width -}}
+        {{- $r := $img.Resize (printf "%dx webp" $w) -}}
+        {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $w) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $fbw := 1440 -}}{{ if lt $img.Width $fbw }}{{ $fbw = $img.Width }}{{ end -}}
+  {{- $fb := $img.Resize (printf "%dx jpg" $fbw) -}}
+  {{- $out = dict "image" $img "srcset" (delimit $set ", ") "srcsetWide" (delimit $wide ", ") "fallback" $fb -}}
+{{- end -}}
+{{- return $out -}}

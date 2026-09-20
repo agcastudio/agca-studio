@@ -16,8 +16,7 @@
       {{- if eq .Params.pagekind "contact" }}
       <dl class="contact-list">
         <div><dt>{{ i18n "contact_email" }}</dt><dd><a href="mailto:{{ site.Params.email }}">{{ site.Params.email }}</a></dd></div>
-        {{- with site.Params.phone }}<div><dt>{{ i18n "contact_phone" }}</dt><dd><a href="tel:{{ replace . " " "" }}">{{ . }}</a></dd></div>{{ end }}
-        {{- with site.Params.whatsapp }}<div><dt>WhatsApp</dt><dd><a href="https://wa.me/{{ . }}" rel="noopener" target="_blank">{{ site.Params.phone | default "WhatsApp" }}</a></dd></div>{{ end }}
+        {{- with site.Params.whatsapp }}<div><dt>WhatsApp</dt><dd><a href="https://wa.me/{{ . }}" rel="noopener" target="_blank">{{ i18n "contact_whatsapp" }} ↗</a></dd></div>{{ end }}
         <div><dt>{{ i18n "contact_address" }}</dt><dd>{{ site.Params.district }}, {{ site.Params.city }}</dd></div>
         {{- if or site.Params.instagram site.Params.linkedin }}
         <div><dt>{{ i18n "contact_social" }}</dt><dd>
@@ -27,6 +26,18 @@
         </dd></div>
         {{- end }}
       </dl>
+      {{- with resources.Get "img/harita.jpg" }}
+      {{- $fb := .Resize "1200x jpg" -}}
+      <figure class="map">
+        <a href="{{ site.Params.mapLink }}" target="_blank" rel="noopener" aria-label="{{ i18n "map_open" }}">
+          <picture>
+            <source type="image/webp" srcset="{{ (.Resize "600x webp").RelPermalink }} 600w, {{ (.Resize "1200x webp").RelPermalink }} 1200w" sizes="(min-width: 900px) 704px, 100vw">
+            <img src="{{ $fb.RelPermalink }}" width="{{ $fb.Width }}" height="{{ $fb.Height }}" alt="{{ i18n "map_alt" }}" loading="lazy" decoding="async">
+          </picture>
+        </a>
+        <figcaption>{{ site.Params.district }}, {{ site.Params.city }} · {{ i18n "map_open" }} ↗ · © OpenStreetMap</figcaption>
+      </figure>
+      {{- end }}
       {{- end }}
     </div>
   </div>

@@ -1,46 +1,18 @@
 {{- /*
-  Sayfanın kapak görselini bulur ve srcset üretir.
-  Döner: dict (image, srcset, srcsetWide, fallback) ya da boş.
-  - Ana sayfa / düz sayfa: .Params.hero (assets içi yol)
-  - Proje: .Params.cover (assets/projeler/<slug>/ içinde dosya adı)
-  srcset: özgün oranda adaylar (dar ekranlar). srcsetWide: kaynak 3:2'den daha dikse (ör. kare kapak) geniş ekranlar için 3:2 kırpım — masaüstünde kırpılıp atılacak pikseller indirilmez.
+  Sayfanın kapak görselini bulur (head ön yükleme, og:image ve sayfa kapağı için).
+  - Proje: .Params.cover (assets/projeler/<slug>/ içinde)
+  - Ana sayfa: .Params.hero verilmemişse ilk projenin kapağı (slaytın ilk karesiyle aynı)
+  - Diğer sayfalar: .Params.hero varsa
 */ -}}
 {{- $path := "" -}}
 {{- if and (eq .Type "proje") (not .IsSection) -}}
   {{- with .Params.cover }}{{ $path = printf "projeler/%s/%s" $.Params.slug . }}{{ end -}}
-{{- else -}}
-  {{- with .Params.hero }}{{ $path = . }}{{ end -}}
+{{- else if .Params.hero -}}
+  {{- $path = .Params.hero -}}
+{{- else if .IsHome -}}
+  {{- $projects := (where site.RegularPages "Type" "proje").ByWeight -}}
+  {{- with index $projects 0 }}{{ with .Params.cover }}{{ $path = printf "projeler/%s/%s" $.Params.slug . }}{{ end }}{{ end -}}
 {{- end -}}
 {{- $out := dict -}}
-{{- with $path -}}
-  {{- with resources.Get . -}}
-    {{- $img := . -}}
-    {{- $set := slice -}}
-    {{- range $w := slice 480 720 1080 1440 -}}
-      {{- if le $w $img.Width -}}
-        {{- $r := $img.Resize (printf "%dx webp" $w) -}}
-        {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $w) -}}
-      {{- end -}}
-    {{- end -}}
-    {{- $wide := slice -}}
-    {{- if gt (mul $img.Height 3) (mul $img.Width 2) -}}
-      {{- range $w := slice 1080 1440 1920 2560 -}}
-        {{- if le $w $img.Width -}}
-          {{- $r := $img.Fill (printf "%dx%d webp" $w (div (mul $w 2) 3)) -}}
-          {{- $wide = $wide | append (printf "%s %dw" $r.RelPermalink $w) -}}
-        {{- end -}}
-      {{- end -}}
-    {{- else -}}
-      {{- range $w := slice 1920 2560 -}}
-        {{- if le $w $img.Width -}}
-          {{- $r := $img.Resize (printf "%dx webp" $w) -}}
-          {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $w) -}}
-        {{- end -}}
-      {{- end -}}
-    {{- end -}}
-    {{- $fbw := 1440 -}}{{ if lt $img.Width $fbw }}{{ $fbw = $img.Width }}{{ end -}}
-    {{- $fb := $img.Resize (printf "%dx jpg" $fbw) -}}
-    {{- $out = dict "image" $img "srcset" (delimit $set ", ") "srcsetWide" (delimit $wide ", ") "fallback" $fb -}}
-  {{- end -}}
-{{- end -}}
+{{- with $path }}{{ $out = partial "hero-src.html" . }}{{ end -}}
 {{- return $out -}}

@@ -26,6 +26,41 @@
     });
   }
 
+  /* Kapak slaytı (ana sayfa): yumuşak geçiş, üzerine gelince ve odaklanınca durur, hareket azaltmada otomatik ilerlemez */
+  var hero = document.querySelector("[data-hero]");
+  if (hero) {
+    var slides = Array.prototype.slice.call(hero.querySelectorAll(".hero-slide"));
+    var dots = Array.prototype.slice.call(hero.querySelectorAll(".hero-dot"));
+    if (slides.length > 1) {
+      var current = 0, timer = null;
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var show = function (n) {
+        current = (n + slides.length) % slides.length;
+        slides.forEach(function (s, i) {
+          var on = i === current;
+          s.classList.toggle("is-active", on);
+          s.setAttribute("aria-hidden", on ? "false" : "true");
+          if (on) s.removeAttribute("tabindex"); else s.setAttribute("tabindex", "-1");
+        });
+        dots.forEach(function (d, i) {
+          d.classList.toggle("is-active", i === current);
+          if (i === current) d.setAttribute("aria-current", "true"); else d.removeAttribute("aria-current");
+        });
+      };
+      var start = function () { if (!reduce && !timer) timer = setInterval(function () { show(current + 1); }, 6000); };
+      var stop = function () { if (timer) { clearInterval(timer); timer = null; } };
+      dots.forEach(function (d) {
+        d.addEventListener("click", function () { stop(); show(parseInt(d.getAttribute("data-slide"), 10) || 0); start(); });
+      });
+      hero.addEventListener("mouseenter", stop);
+      hero.addEventListener("mouseleave", start);
+      hero.addEventListener("focusin", stop);
+      hero.addEventListener("focusout", start);
+      document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); else start(); });
+      start();
+    }
+  }
+
   /* Tür süzgeci (proje dizini) */
   var filter = document.querySelector("[data-filter]");
   var grid = document.querySelector("[data-grid]");

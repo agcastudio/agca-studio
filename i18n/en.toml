@@ -22,6 +22,12 @@ other = "Filter by type"
 other = "Images"
 [contact_social]
 other = "Social"
+[contact_whatsapp]
+other = "Message on WhatsApp"
+[map_open]
+other = "Open in maps"
+[map_alt]
+other = "Map of Üsküdar, Istanbul: the area where agca·studio is based"
 [projects_meta_title]
 other = "Projects"
 [tur_konut]

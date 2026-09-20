@@ -1,16 +1,30 @@
 {{ define "main" }}
-{{- $hero := partial "hero-image.html" . -}}
 {{- $lang := .Language.Lang -}}
-{{- with $hero }}
-<section class="hero">
-  {{- with $.Params.hero_link }}
-  <a class="hero-link" href="{{ . }}" aria-label="{{ $.Params.hero_caption }}">
-    {{ partial "hero-picture.html" (dict "hero" $hero "alt" $.Params.hero_alt) }}
-    <span class="hero-caption">{{ $.Params.hero_caption }}</span>
+{{- $projects := (where site.RegularPages "Type" "proje").ByWeight -}}
+{{- /* Kapak slaytı: her projenin kapağı, sırayla */ -}}
+{{- $slides := slice -}}
+{{- range $p := $projects -}}
+  {{- with $p.Params.cover -}}
+    {{- $h := partial "hero-src.html" (printf "projeler/%s/%s" $p.Params.slug .) -}}
+    {{- with $h }}{{ $slides = $slides | append (dict "page" $p "hero" .) }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+{{- with $slides }}
+<section class="hero hero-slider" data-hero aria-roledescription="{{ if eq $lang "tr" }}slayt{{ else }}carousel{{ end }}" aria-label="{{ i18n "selected_projects" }}">
+  {{- range $i, $s := . }}
+  {{- $p := $s.page -}}
+  {{- $caption := $p.Title -}}{{ with $p.Params.kunye.yer }}{{ $caption = printf "%s · %s" $p.Title . }}{{ end }}
+  <a class="hero-slide{{ if eq $i 0 }} is-active{{ end }}" href="{{ $p.RelPermalink }}" aria-label="{{ $caption }}"{{ if gt $i 0 }} aria-hidden="true" tabindex="-1"{{ end }}>
+    {{ partial "hero-picture.html" (dict "hero" $s.hero "alt" ($p.Params.cover_alt | default $p.Title) "lazy" (gt $i 0)) }}
+    <span class="hero-caption">{{ $caption }}</span>
   </a>
-  {{- else }}
-  {{ partial "hero-picture.html" (dict "hero" . "alt" $.Params.hero_alt) }}
-  {{- with $.Params.hero_caption }}<p class="hero-caption">{{ . }}</p>{{ end }}
+  {{- end }}
+  {{- if gt (len .) 1 }}
+  <div class="hero-dots" role="group" aria-label="{{ i18n "nav_projects" }}">
+    {{- range $i, $s := . }}
+    <button type="button" class="hero-dot{{ if eq $i 0 }} is-active{{ end }}" data-slide="{{ $i }}" aria-label="{{ $s.page.Title }}"{{ if eq $i 0 }} aria-current="true"{{ end }}></button>
+    {{- end }}
+  </div>
   {{- end }}
 </section>
 {{- end }}
@@ -20,8 +34,6 @@
   {{ with .Content }}<div class="intro-text">{{ . }}</div>{{ end }}
 </section>
 
-{{- $projects := where site.RegularPages "Type" "proje" -}}
-{{- $projects = $projects.ByWeight -}}
 {{- with $projects }}
 <section class="wrap section">
   <div class="section-head">

@@ -22,6 +22,12 @@ other = "Türe göre filtrele"
 other = "Görseller"
 [contact_social]
 other = "Sosyal medya"
+[contact_whatsapp]
+other = "WhatsApp'tan yazın"
+[map_open]
+other = "Haritada aç"
+[map_alt]
+other = "Üsküdar, İstanbul haritası: agca·studio'nun bulunduğu bölge"
 [projects_meta_title]
 other = "Projeler"
 [tur_konut]

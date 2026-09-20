@@ -8,7 +8,6 @@
     </div>
     <ul class="footer-contact">
       <li><a href="mailto:{{ site.Params.email }}">{{ site.Params.email }}</a></li>
-      {{- with site.Params.phone }}<li><a href="tel:{{ replace . " " "" }}">{{ . }}</a></li>{{ end }}
       {{- with site.Params.whatsapp }}<li><a href="https://wa.me/{{ . }}" rel="noopener" target="_blank">WhatsApp</a></li>{{ end }}
       {{- with site.Params.instagram }}<li><a href="{{ . }}" rel="me noopener" target="_blank">Instagram</a></li>{{ end }}
       {{- with site.Params.linkedin }}<li><a href="{{ . }}" rel="me noopener" target="_blank">LinkedIn</a></li>{{ end }}
