@@ -91,6 +91,7 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 | 2026-09-20 | 19 | Proje sayfası (3. düzenleme): künye sol sütunda dikey liste, sağında **5–10 cümlelik özet** (`ozet` alanı, her projede TR/EN); önceki/sonraki proje bağlantılarında kare küçük görsel. | Kullanıcı isteği |
 | 2026-09-20 | 17 | Kapak slaytında noktalar kaldırıldı; sağ-sol ok düğmeleri (klavye ok tuşları da çalışır). | Kullanıcı isteği |
 | 2026-09-20 | 26 | Altbilgi dikey boşlukları azaltıldı (üst 20 px, alt 18 px). | Kullanıcı isteği |
+| 2026-09-20 | 4 | Bodrum ve Zapsu metinleri çizim okumasıyla doğrulandı ve düzeltildi: Zapsu'da yatak odası yok (alt kat resim atölyesi, ortak alan, sinema odası), ev yola bitişik, çatı bahçeye yükselen tek eğim; Bodrum'da fizyoterapi salonu 1. katta, kapak ön cephe ve geçit, dinlenme şezlongları cephe açıklıklarında. Yapay zekâ kavram görsellerinin alt yazısına "taş kaplama ve düz çatı modelden farklıdır" notu eklendi. Rapor paragrafları özeti tekrarlamayacak biçimde yeniden yazıldı. | Doğrulama akışı bulguları |
 
 ## Bekleyen bilgiler (kullanıcıdan)
 

@@ -7,7 +7,7 @@ date: 2024-05-01
 weight: 80
 draft: false
 tur: ["konut"]
-description: "Çiftlik arazisinde eğimli parsele oturan ahşap kaplı ev: bahçeye doğru yükselen tek eğimli çatı, eğim üzerine asılan ahşap teras, alt katta resim atölyesi ve sinema odası."
+description: "Eğimli çiftlik parselinde ahşap kaplı ev: bahçeye yükselen tek eğimli çatı, eğim üzerine asılan teras, alt katta resim atölyesi ve sinema odası."
 kunye:
   yer: ""
   isveren: ""

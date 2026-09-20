@@ -7,7 +7,7 @@ date: 2024-05-01
 weight: 80
 draft: false
 tur: ["konut"]
-description: "A timber-clad house on a sloping farm plot: a mono-pitch roof rising towards the garden, a timber deck over the slope, a painting studio and cinema room on the lower floor."
+description: "Timber-clad house on a sloping farm plot: a mono-pitch roof rising to the garden, a timber deck over the slope, a painting studio and cinema room below."
 kunye:
   yer: ""
   isveren: ""
