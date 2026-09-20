@@ -7,7 +7,7 @@ date: 2024-09-01
 weight: 30
 draft: false
 tur: ["bim", "kentsel"]
-description: "An existing housing estate scanned by drone and turned from a point cloud into a Revit as-built model, with a schematic floor plan, section, elevation and attic plan produced from it."
+description: "An existing housing estate scanned by drone and turned from a point cloud into a Revit as-built model, with schematic plan, section and elevation produced from it."
 kunye:
   yer: ""
   isveren: ""

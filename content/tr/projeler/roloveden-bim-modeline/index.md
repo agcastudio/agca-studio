@@ -7,7 +7,7 @@ date: 2024-09-01
 weight: 30
 draft: false
 tur: ["bim", "kentsel"]
-description: "Mevcut bir konut sitesinin drone ile taranması, nokta bulutundan Revit as-built modeline dönüşümü ve bu modelden üretilen avan kat planı, kesit, görünüş ve çatı arası kat planı."
+description: "Mevcut bir konut sitesinin drone ile taranması, nokta bulutundan Revit as-built modeline dönüşümü ve modelden üretilen avan plan, kesit ve görünüş."
 kunye:
   yer: ""
   isveren: ""

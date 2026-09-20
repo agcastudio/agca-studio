@@ -7,7 +7,7 @@ date: 2024-06-01
 weight: 20
 draft: false
 tur: ["konut"]
-description: "Kartal Kordonboyu'nda eğimli parselde konut yapısı: beyaz sıvalı çerçeveler içinde kattan kata yer değiştiren antrasit balkonlar; bahçe katı, çatı katı, plan, kesit ve görünüşler."
+description: "Kartal Kordonboyu'nda eğimli parselde konut yapısı: beyaz sıvalı çerçeveler içinde kattan kata yer değiştiren antrasit balkonlar; plan, kesit ve görünüşler."
 kunye:
   yer: "Kartal, İstanbul"
   isveren: ""

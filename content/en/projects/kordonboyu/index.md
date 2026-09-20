@@ -8,7 +8,7 @@ date: 2024-06-01
 weight: 20
 draft: false
 tur: ["konut"]
-description: "A residential building on a sloping plot in Kordonboyu, Kartal: anthracite balconies shifting floor to floor inside white rendered frames; garden level, roof floor, plans, section and elevations."
+description: "Residential building on a sloping plot in Kordonboyu, Kartal: anthracite balconies shifting floor to floor inside white rendered frames; plans, section, elevations."
 kunye:
   yer: "Kartal, Istanbul"
   isveren: ""
