@@ -6,6 +6,7 @@
 <script src="{{ $lbJs.RelPermalink }}" integrity="{{ $lbJs.Data.Integrity }}" defer></script>
 {{- end }}
 <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
-{{- with site.Params.cfAnalyticsToken }}
+{{- /* Ölçüm betiği yalnız yayında; yerel sunucuda yüklenmez (beacon localhost'ta CORS hatası verir) */ -}}
+{{- if not hugo.IsServer }}{{ with site.Params.cfAnalyticsToken }}
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ . }}"}'></script>
-{{- end }}
+{{ end }}{{ end }}

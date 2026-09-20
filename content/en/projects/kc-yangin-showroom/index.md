@@ -15,7 +15,7 @@ kunye:
   proje_yili: "2025"
   bitis_yili: ""
   program: "Secure entrance, showroom, meeting area, four-person open office, single-person closed office, coffee niche, WC, rack cabinet and storage; ground-floor facade"
-  durum: "Design"
+  durum: "Built"
   insaat_alani: ""
   arsa_alani: ""
   ekip: ""

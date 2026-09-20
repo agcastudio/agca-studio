@@ -15,7 +15,7 @@ kunye:
   proje_yili: "2025"
   bitis_yili: ""
   program: "Güvenlikli giriş, showroom, toplantı alanı, dört kişilik açık ofis, tek kişilik kapalı ofis, kahve nişi, tuvalet, rack kabin ve depolar; zemin kat cephesi"
-  durum: "Proje"
+  durum: "Uygulandı"
   insaat_alani: ""
   arsa_alani: ""
   ekip: ""

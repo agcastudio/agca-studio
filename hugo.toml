@@ -36,7 +36,7 @@ capitalizeListTitles = false
   mapLink = "https://www.google.com/maps/search/?api=1&query=%C3%9Csk%C3%BCdar%2C+%C4%B0stanbul"  # harita görselinin bağlantısı; tam adres gelince güncellenir
   city = "İstanbul"
   district = "Üsküdar"
-  cfAnalyticsToken = "" # Cloudflare Web Analytics token — boşsa betik yüklenmez
+  cfAnalyticsToken = "5271f33c6aa343309fbfc6843c1c732e" # Cloudflare Web Analytics — çerezsiz, boşsa betik yüklenmez
   ogImage = "img/og-default.jpg"
   indexnowKey = "61519148285613e6e8c936fddbbb6411"  # static/<key>.txt dosyasıyla eşleşir
 
