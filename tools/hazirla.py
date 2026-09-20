@@ -39,7 +39,7 @@ def slugify(s):
 def kategori(rel_dir):
     d = rel_dir.lower()
     if d in (".", ""): return "r"   # proje kökündeki görseller render sayılır
-    if "render" in d: return "r"
+    if "render" in d or "görsel" in d or "gorsel" in d: return "r"
     if "pafta" in d: return "p"
     if "diagram" in d or "diyagram" in d or "sema" in d: return "d"
     return "c"  # plan / kesit / görünüş / perspektif / diğer çizimler

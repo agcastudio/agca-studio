@@ -1,0 +1,78 @@
+---
+title: "Ayazağa Dairesi"
+subtitle: "Daire iç mimarisi"
+translationKey: "proje-ayazaga"
+slug: "ayazaga-ic-mimari"
+date: 2025-07-01
+weight: 60
+draft: false
+tur: ["ic_mekan", "konut"]
+description: "Sarıyer Ayazağa'da daire iç mimarisi: krem ve traverten yüzeyler, zeytin yeşili mutfak dolapları, balıksırtı parke, giyinme odası ve gizli aydınlatmayla sakin bir ev."
+kunye:
+  yer: "Sarıyer, İstanbul"
+  isveren: ""
+  proje_yili: "2025"
+  bitis_yili: ""
+  program: "Daire: giriş holü, salon, yemek alanı, mutfak, yatak odaları, giyinme odası, banyolar ve çamaşır alanı"
+  durum: "Proje"
+  insaat_alani: ""
+  arsa_alani: ""
+  ekip: ""
+  rol: "İç mimari tasarım ve görselleştirme"
+  derece: ""
+sanal_tur: ""
+cover: "r-4.jpg"
+cover_alt: "Ayazağa Dairesi salonu: krem duvarlar, aydınlatmalı raflı televizyon ünitesi, açık renkli köşe koltuk ve halı"
+card: "r-4.jpg"
+card_alt: "Ayazağa Dairesi salonu"
+credits: "İç mimari tasarım ve görselleştirme: agca·studio"
+images:
+  - file: "r-6.jpg"
+    alt: "Giriş holü: kemerli ayna nişi, ahşap vestiyer dolapları, balıksırtı parke ve siyah çerçeveli cam kapı"
+    caption: "Giriş holü"
+  - file: "r-4.jpg"
+    alt: "Salon: raflı televizyon ünitesi, krem köşe koltuk, desenli halı ve pencere önünde perde"
+    caption: "Salon"
+  - file: "r-5.jpg"
+    alt: "Yemek alanı: mermer yemek masası, kadife sandalyeler, aydınlatmalı vitrin ve üçlü sarkıt"
+    caption: "Yemek alanı"
+  - file: "r-2.jpg"
+    alt: "Mutfak: zeytin yeşili üst dolaplar, krem alt dolaplar, aydınlatmalı tezgâh arası ve sarkıt lamba"
+    caption: "Mutfak"
+  - file: "r-3.jpg"
+    alt: "Mutfaktaki oturma köşesi: krem dolaplar, ankastre fırın, yuvarlak masa ve pencere önünde sedir"
+    caption: "Mutfakta oturma köşesi"
+  - file: "r-1.jpg"
+    alt: "Mutfağın uzun aksı: tezgâhlar iki yanda, sonda pencere ve oturma köşesi"
+    caption: "Mutfak, uzun aks"
+  - file: "r-10.jpg"
+    alt: "Koridor: krem dolap kapakları, sonda perdeli pencere ve yeşil tabure"
+    caption: "Koridor"
+  - file: "r-7.jpg"
+    alt: "Yatak odası: manzara desenli duvar kaplaması, yatak başı, çalışma masası ve sarkıt lambalar"
+    caption: "Yatak odası"
+  - file: "r-8.jpg"
+    alt: "Yatak odasında makyaj nişi: aydınlatmalı raflar, yuvarlak ayna ve yeşil tabure"
+    caption: "Makyaj nişi"
+  - file: "r-9.jpg"
+    alt: "Giyinme odası: aydınlatmalı cam kapaklı dolaplar ve ahşap iç bölmeler"
+    caption: "Giyinme odası"
+  - file: "r-11.jpg"
+    alt: "Çalışma ve misafir odası: duvara gömülü çalışma masası, yeşil sandalye ve sedir"
+    caption: "Çalışma ve misafir odası"
+  - file: "r-12.jpg"
+    alt: "Banyo ve çamaşır alanı: traverten yüzeyler, aydınlatmalı ayna ve üst üste çamaşır makineleri"
+    caption: "Banyo ve çamaşır alanı"
+  - file: "r-13.jpg"
+    alt: "Tuvalet: traverten duvarlar, kanallı camlı duş bölmesi ve ahşap niş"
+    caption: "Tuvalet"
+drawings:
+  - file: "c-2025-07-ayazaga-icmimari-web.jpg"
+    alt: "Kat planı: salon, mutfak, yemek alanı, yatak odaları, giyinme odası ve banyolar; mobilyalı yerleşim"
+    caption: "Kat planı"
+---
+Sarıyer Ayazağa'da bir daire için iç mimari çalışması. Ev boyunca tek bir malzeme dili sürer: krem duvarlar ve dolaplar, traverten banyo yüzeyleri, balıksırtı meşe parke ve sıcak beyaz gizli aydınlatma. Renk yalnızca iki yerde belirir: mutfağın zeytin yeşili üst dolaplarında ve yatak odasının manzara desenli duvar kaplamasında.
+
+Giriş holü kemerli bir ayna nişiyle karşılar; salon, yemek alanı ve mutfak birbirini takip eder. Mutfağın uzun aksı pencere önünde bir oturma köşesiyle biter. Yatak odası çalışma masası ve makyaj nişiyle, giyinme odası aydınlatmalı cam kapaklı dolaplarla çözülür; banyo ve çamaşır alanı tek bir traverten hacimde toplanır.
+
+Mobilya, dolap ve aydınlatma kararları Revit modelinde ölçüsüyle kurulup görselleştirildi.

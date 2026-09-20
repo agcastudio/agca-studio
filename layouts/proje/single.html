@@ -2,57 +2,63 @@
 {{- $slug := .Params.slug -}}
 {{- $k := .Params.kunye -}}
 {{- $hero := partial "hero-image.html" . -}}
+{{- $images := .Params.images | default slice -}}
+{{- $drawings := .Params.drawings | default slice -}}
+{{- $diagrams := .Params.diagrams | default slice -}}
 <article class="project">
-  <header class="wrap project-head">
-    <p class="crumb"><a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a></p>
-    <h1 class="project-title">{{ .Title }}</h1>
-    {{- with .Params.subtitle }}<p class="project-sub">{{ . }}</p>{{ end }}
-    <p class="project-meta">{{ with $k.yer }}{{ . }}{{ end }}{{ with $k.proje_yili }} · {{ . }}{{ end }}{{ with .Params.tur }} · {{ i18n (printf "tur_%s" (index . 0)) }}{{ end }}</p>
-  </header>
-
   {{- with $hero }}
   <div class="project-cover">
     {{ partial "hero-picture.html" (dict "hero" . "alt" ($.Params.cover_alt | default $.Title)) }}
   </div>
   {{- end }}
 
-  <div class="wrap project-body">
-    <aside class="kunye" aria-label="{{ i18n "kunye" }}">
-      <dl>
-        {{- $rows := slice "yer" "isveren" "proje_yili" "bitis_yili" "program" "durum" "insaat_alani" "arsa_alani" "rol" "derece" "ekip" -}}
-        {{- range $rows }}
-          {{- $key := . -}}
-          {{- with index $k $key }}
-          <div class="kunye-row"><dt>{{ i18n (printf "kunye_%s" $key) }}</dt><dd>{{ . }}</dd></div>
-          {{- end }}
-        {{- end }}
-        {{- with .Params.tur }}
-          <div class="kunye-row"><dt>{{ i18n "kunye_tur" }}</dt><dd>{{ range $i, $t := . }}{{ if $i }}, {{ end }}{{ i18n (printf "tur_%s" $t) }}{{ end }}</dd></div>
-        {{- end }}
-      </dl>
-      {{- with .Params.sanal_tur }}
-      <a class="btn" href="{{ . }}" target="_blank" rel="noopener">{{ i18n "virtual_tour" }} ↗</a>
+  <header class="wrap project-head">
+    <p class="crumb"><a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a>{{ with .Params.tur }} · {{ i18n (printf "tur_%s" (index . 0)) }}{{ end }}</p>
+    <h1 class="project-title">{{ .Title }}</h1>
+    {{- with .Params.subtitle }}<p class="project-sub">{{ . }}</p>{{ end }}
+    {{- /* ArchDaily düzeni: başlığın altında yatay künye şeridi */ -}}
+    <dl class="facts" aria-label="{{ i18n "kunye" }}">
+      <div class="fact"><dt>{{ i18n "facts_architects" }}</dt><dd>{{ site.Params.brand }}</dd></div>
+      {{- range $key := slice "yer" "proje_yili" "bitis_yili" "insaat_alani" "arsa_alani" "durum" "rol" "derece" "isveren" }}
+        {{- with index $k $key }}<div class="fact"><dt>{{ i18n (printf "kunye_%s" $key) }}</dt><dd>{{ . }}</dd></div>{{ end }}
       {{- end }}
-    </aside>
-    <div class="project-text">
-      {{ .Content }}
-    </div>
+      {{- with .Params.tur }}<div class="fact"><dt>{{ i18n "kunye_tur" }}</dt><dd>{{ range $i, $t := . }}{{ if $i }}, {{ end }}{{ i18n (printf "tur_%s" $t) }}{{ end }}</dd></div>{{ end }}
+      {{- with $k.program }}<div class="fact fact-wide"><dt>{{ i18n "kunye_program" }}</dt><dd>{{ . }}</dd></div>{{ end }}
+      {{- with $k.ekip }}<div class="fact fact-wide"><dt>{{ i18n "kunye_ekip" }}</dt><dd>{{ . }}</dd></div>{{ end }}
+    </dl>
+    {{- with .Params.sanal_tur }}
+    <p><a class="btn" href="{{ . }}" target="_blank" rel="noopener">{{ i18n "virtual_tour" }} ↗</a></p>
+    {{- end }}
+  </header>
+
+  {{- /* Metin ve görseller dönüşümlü: paragraf, görsel, paragraf, görsel… kalan görseller metinden sonra */ -}}
+  {{- $paras := slice -}}
+  {{- range split (string .Content) "</p>" }}{{ if strings.TrimSpace . }}{{ $paras = $paras | append (printf "%s</p>" .) }}{{ end }}{{ end -}}
+  {{- $n := len $images -}}
+  {{- $used := 0 -}}
+  <div class="project-body">
+    {{- range $i, $para := $paras }}
+    <div class="wrap project-text{{ if eq $i 0 }} is-lead{{ end }}">{{ $para | safeHTML }}</div>
+    {{- if lt $i $n }}
+      {{- $it := index $images $i -}}
+      {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
+      <div class="wrap gallery-item">{{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "galeri" "sizes" "(min-width: 1500px) 1400px, 100vw" "loading" (cond (eq $i 0) "eager" "lazy")) }}</div>
+      {{- $used = add $i 1 -}}
+      {{- else }}{{ warnf "Görsel bulunamadı: projeler/%s/%s" $slug $it.file }}{{ end }}
+    {{- end }}
+    {{- end }}
+    {{- if lt $used $n }}
+    <section class="wrap gallery" aria-label="{{ i18n "gallery" }}">
+      {{- range $i, $it := $images }}{{ if ge $i $used }}
+        {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
+        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "galeri" "sizes" "(min-width: 1500px) 1400px, 100vw") }}
+        {{- else }}{{ warnf "Görsel bulunamadı: projeler/%s/%s" $slug $it.file }}{{ end }}
+      {{- end }}{{ end }}
+    </section>
+    {{- end }}
   </div>
 
-  {{- with .Params.images }}
-  <section class="wrap gallery" aria-label="{{ i18n "gallery" }}">
-    {{- range . }}
-      {{- $it := . -}}
-      {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
-        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "galeri" "sizes" "(min-width: 1500px) 1400px, 100vw") }}
-      {{- else }}
-        {{- warnf "Görsel bulunamadı: projeler/%s/%s" $slug $it.file -}}
-      {{- end }}
-    {{- end }}
-  </section>
-  {{- end }}
-
-  {{- with .Params.drawings }}
+  {{- with $drawings }}
   <section class="wrap drawings">
     <h2 class="section-title">{{ i18n "drawings" }}</h2>
     <div class="drawings-grid">
@@ -60,15 +66,13 @@
       {{- $it := . -}}
       {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
         {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "cizimler" "class" "fig-card" "sizes" "(min-width: 861px) 50vw, 100vw" "widths" (slice 640 960 1440 1920)) }}
-      {{- else }}
-        {{- warnf "Çizim bulunamadı: projeler/%s/%s" $slug $it.file -}}
-      {{- end }}
+      {{- else }}{{ warnf "Çizim bulunamadı: projeler/%s/%s" $slug $it.file }}{{ end }}
     {{- end }}
     </div>
   </section>
   {{- end }}
 
-  {{- with .Params.diagrams }}
+  {{- with $diagrams }}
   <section class="wrap drawings">
     <h2 class="section-title">{{ i18n "diagrams" }}</h2>
     <div class="drawings-grid">
@@ -76,11 +80,44 @@
       {{- $it := . -}}
       {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
         {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "diyagramlar" "class" "fig-card" "sizes" "(min-width: 861px) 50vw, 100vw" "widths" (slice 640 960 1440 1920)) }}
-      {{- else }}
-        {{- warnf "Diyagram bulunamadı: projeler/%s/%s" $slug $it.file -}}
-      {{- end }}
+      {{- else }}{{ warnf "Diyagram bulunamadı: projeler/%s/%s" $slug $it.file }}{{ end }}
     {{- end }}
     </div>
+  </section>
+  {{- end }}
+
+  {{- /* Proje galerisi: tüm görseller küçük kareler hâlinde, büyütme penceresine bağlı */ -}}
+  {{- $all := slice -}}
+  {{- range $images }}{{ $all = $all | append . }}{{ end -}}
+  {{- range $drawings }}{{ $all = $all | append . }}{{ end -}}
+  {{- range $diagrams }}{{ $all = $all | append . }}{{ end -}}
+  {{- with $all }}
+  <section class="wrap thumbs-section">
+    <div class="section-head">
+      <h2 class="section-title">{{ i18n "project_gallery" }}</h2>
+      <span class="muted small">{{ i18n "images_count" (len .) }}</span>
+    </div>
+    <ul class="thumbs">
+      {{- range . }}
+        {{- $it := . -}}
+        {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
+        {{- $img := . -}}
+        {{- $t1 := $img.Fill "240x240 webp q75" -}}
+        {{- $t2 := $img.Fill "480x480 webp q75" -}}
+        {{- $tf := $img.Fill "240x240 jpg" -}}
+        {{- $full := $img -}}
+        {{- if gt $img.Height $img.Width }}{{ if gt $img.Height 2048 }}{{ $full = $img.Resize "x2048 webp q80" }}{{ else }}{{ $full = $img.Resize (printf "x%d webp q80" $img.Height) }}{{ end }}{{ else }}{{ if gt $img.Width 2048 }}{{ $full = $img.Resize "2048x webp q80" }}{{ else }}{{ $full = $img.Resize (printf "%dx webp q80" $img.Width) }}{{ end }}{{ end -}}
+        <li class="thumb">
+          <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="tum" data-width="{{ $full.Width }}" data-height="{{ $full.Height }}"{{ with $it.caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $it.alt }}">
+            <picture>
+              <source type="image/webp" srcset="{{ $t1.RelPermalink }} 240w, {{ $t2.RelPermalink }} 480w" sizes="(min-width: 1024px) 220px, (min-width: 640px) 25vw, 33vw">
+              <img src="{{ $tf.RelPermalink }}" width="240" height="240" alt="" loading="lazy" decoding="async">
+            </picture>
+          </a>
+        </li>
+        {{- end }}
+      {{- end }}
+    </ul>
   </section>
   {{- end }}
 

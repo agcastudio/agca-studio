@@ -70,6 +70,13 @@ other = "Role"
 other = "Award"
 [kunye_tur]
 other = "Type"
+[facts_architects]
+other = "Architects"
+[project_gallery]
+other = "Project gallery"
+[images_count]
+one = "{{ . }} image"
+other = "{{ . }} images"
 [drawings]
 other = "Drawings"
 [diagrams]

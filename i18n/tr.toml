@@ -70,6 +70,12 @@ other = "Rol"
 other = "Derece"
 [kunye_tur]
 other = "Tür"
+[facts_architects]
+other = "Mimarlar"
+[project_gallery]
+other = "Proje galerisi"
+[images_count]
+other = "{{ . }} görsel"
 [drawings]
 other = "Çizimler"
 [diagrams]

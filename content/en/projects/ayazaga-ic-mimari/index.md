@@ -1,0 +1,78 @@
+---
+title: "Ayazağa Apartment"
+subtitle: "Apartment interior design"
+translationKey: "proje-ayazaga"
+slug: "ayazaga-ic-mimari"
+date: 2025-07-01
+weight: 60
+draft: false
+tur: ["ic_mekan", "konut"]
+description: "Apartment interior design in Ayazağa, Sarıyer, Istanbul: cream and travertine surfaces, olive green kitchen cabinets, herringbone floors, a dressing room and concealed lighting in a calm home."
+kunye:
+  yer: "Sarıyer, Istanbul"
+  isveren: ""
+  proje_yili: "2025"
+  bitis_yili: ""
+  program: "Apartment: entrance hall, living room, dining area, kitchen, bedrooms, dressing room, bathrooms and laundry area"
+  durum: "Design"
+  insaat_alani: ""
+  arsa_alani: ""
+  ekip: ""
+  rol: "Interior design and visualisation"
+  derece: ""
+sanal_tur: ""
+cover: "r-4.jpg"
+cover_alt: "Ayazağa Apartment living room: cream walls, television unit with lit shelves, light corner sofa and rug"
+card: "r-4.jpg"
+card_alt: "Ayazağa Apartment living room"
+credits: "Interior design and visualisation: agca·studio"
+images:
+  - file: "r-6.jpg"
+    alt: "Entrance hall: arched mirror niche, timber wardrobes, herringbone floor and a black-framed glass door"
+    caption: "Entrance hall"
+  - file: "r-4.jpg"
+    alt: "Living room: television unit with shelves, cream corner sofa, patterned rug and curtains in front of the window"
+    caption: "Living room"
+  - file: "r-5.jpg"
+    alt: "Dining area: marble dining table, velvet chairs, lit display cabinet and a triple pendant"
+    caption: "Dining area"
+  - file: "r-2.jpg"
+    alt: "Kitchen: olive green upper cabinets, cream base cabinets, lit splashback and a pendant lamp"
+    caption: "Kitchen"
+  - file: "r-3.jpg"
+    alt: "Seating corner in the kitchen: cream cabinets, built-in oven, round table and a window seat"
+    caption: "Seating corner in the kitchen"
+  - file: "r-1.jpg"
+    alt: "The long axis of the kitchen: counters on both sides, window and seating corner at the end"
+    caption: "Kitchen, long axis"
+  - file: "r-10.jpg"
+    alt: "Corridor: cream cabinet doors, a curtained window at the end and a green stool"
+    caption: "Corridor"
+  - file: "r-7.jpg"
+    alt: "Bedroom: landscape-patterned wall covering, headboard, desk and pendant lamps"
+    caption: "Bedroom"
+  - file: "r-8.jpg"
+    alt: "Dressing niche in the bedroom: lit shelves, round mirror and a green stool"
+    caption: "Dressing niche"
+  - file: "r-9.jpg"
+    alt: "Dressing room: wardrobes with lit glass doors and timber interiors"
+    caption: "Dressing room"
+  - file: "r-11.jpg"
+    alt: "Study and guest room: built-in desk, green chair and a daybed"
+    caption: "Study and guest room"
+  - file: "r-12.jpg"
+    alt: "Bathroom and laundry area: travertine surfaces, lit mirror and stacked washing machines"
+    caption: "Bathroom and laundry area"
+  - file: "r-13.jpg"
+    alt: "WC: travertine walls, fluted glass shower enclosure and a timber niche"
+    caption: "WC"
+drawings:
+  - file: "c-2025-07-ayazaga-icmimari-web.jpg"
+    alt: "Floor plan: living room, kitchen, dining area, bedrooms, dressing room and bathrooms; furnished layout"
+    caption: "Floor plan"
+---
+Interior design for an apartment in Ayazağa, Sarıyer. A single material language runs through the home: cream walls and cabinets, travertine bathroom surfaces, herringbone oak floors and warm white concealed lighting. Colour appears in only two places: the olive green upper cabinets of the kitchen and the landscape-patterned wall covering of the bedroom.
+
+The entrance hall greets with an arched mirror niche; living room, dining area and kitchen follow one another. The long axis of the kitchen ends in a seating corner in front of the window. The bedroom is resolved with a desk and a dressing niche, the dressing room with wardrobes behind lit glass doors; bathroom and laundry are gathered in a single travertine volume.
+
+Furniture, joinery and lighting decisions were set out to size in a Revit model and visualised from it.
