@@ -78,10 +78,15 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 | 2026-09-20 | 26 | İletişim sayfasına **çerezsiz statik harita**: OpenStreetMap karolarından `tools/harita.py` ile üretilen gri tonlu görsel, tıklayınca Google Haritalar'da açılır. Şimdilik Üsküdar merkezine işaretli; tam adres gelince koordinat ve bağlantı güncellenir. Gömülü harita (iframe) çerez ve KVKK yükü getirdiği için kullanılmadı. | Kullanıcı isteği + çerezsiz site kararı |
 | 2026-09-20 | 6 | Stüdyo sayfasında sıra: Selen Baş Ağca, Kutbeddin Ağca. "Yurt dışı bağlantılı projelerde aktif görev alır." cümlesi kaldırıldı; iki biyografi eşit uzunlukta tutuldu. | Kullanıcı isteği |
 
+| 2026-09-20 | 19 | **Proje sayfası ArchDaily düzenine göre yeniden kuruldu:** kapak → başlık → yatay künye şeridi ("Mimarlar" satırıyla) → paragraf-görsel dönüşümü (1. paragraf, 1. görsel, 2. paragraf, 2. görsel… kalan görseller metinden sonra) → Çizimler → Diyagramlar → **Proje galerisi** (tüm görseller küçük kareler, büyütme penceresine bağlı) → Katkılar → önceki/sonraki. Yan sütun künye kaldırıldı. | Kullanıcı isteği (ArchDaily referansı) |
+| 2026-09-20 | 3 | Üç proje daha eklendi: KC Yangın Showroom ve Ofis (2505, ticari + iç mekân; yer/durum bekleniyor; 360° panoramalar kullanılmadı), Görele Dairesi (2506, iç mekân + konut, Görele/Giresun), Ayazağa Dairesi (2507, iç mekân + konut, Sarıyer). Dizin filtresi altı tür. Klasörde ayrıca 2024_04_bodrum_hidroterapimerkezi ve 2024_05_ÇiftlieviZapsu var; istenmedi, eklenmedi. | Kullanıcı isteği |
+| 2026-09-20 | 6 | Stüdyo: Kutbeddin Ağca'nın yeni portresi (ka_web.jpg); yarışma cümlesi iki cümleye çıkarıldı, iki biyografi aynı yükseklikte. Stüdyo LinkedIn: linkedin.com/company/agca-•-studio. | Kullanıcı isteği |
+
 ## Bekleyen bilgiler (kullanıcıdan)
 
-- Stüdyonun LinkedIn sayfa adresi (altbilgi ve iletişim için).
 - Ofisin tam adresi ya da harita koordinatı (harita işareti ve bağlantısı için).
+- KC Yangın projesinin yeri ve durumu (proje / uygulandı); 2402 BIM projesinin yeri ("Doktor" klasör adı bir site adı mı?).
+- KC'deki 360° panoramalar için sanal tur bileşeni istenip istenmediği.
 
 - ~~Kurucu ortakların ad-soyad, unvan, biyografi~~ → 2026-09-20 alındı: Kutbeddin Ağca (ka.jpg) ve Selen Baş Ağca (sb.jpg), Kurucu Ortak · Mimar; metinler Stüdyo sayfasında, yapısal veride `founder`.
 - ~~Telefon numarası; Instagram ve LinkedIn adresleri~~ → 2026-09-20 alındı: WhatsApp/telefon +90 538 027 62 83, Instagram instagram.com/agcastudio, kişisel LinkedIn hesapları Stüdyo sayfasında (stüdyo LinkedIn sayfası yok).

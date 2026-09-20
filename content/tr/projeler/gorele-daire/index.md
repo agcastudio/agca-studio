@@ -7,13 +7,13 @@ date: 2025-06-01
 weight: 50
 draft: false
 tur: ["ic_mekan", "konut"]
-description: "Görele, Giresun'da 105 m² 3+1 daire iç mimarisi: şömineli salon, ada mutfak, yatak odaları ve banyolar; sıcak ahşap, balıksırtı parke ve gizli aydınlatma."
+description: "Görele, Giresun'da 105 m² 3+1 daire iç mimarisi: şömineli salon, damarlı taş yemek masalı mutfak, yatak odaları ve banyolar; sıcak ahşap ve gizli aydınlatma."
 kunye:
   yer: "Görele, Giresun"
   isveren: ""
   proje_yili: "2025"
   bitis_yili: ""
-  program: "105 m² 3+1 daire: salon, mutfak, ebeveyn yatak odası ve banyosu, iki yatak odası, banyo, hol"
+  program: "105 m² 3+1 daire: salon, mutfak, ebeveyn yatak odası ve banyosu, iki yatak odası, banyo, hol ve çamaşır nişi"
   durum: "Proje"
   insaat_alani: "105 m²"
   arsa_alani: ""
@@ -28,28 +28,28 @@ card_alt: "Görele Dairesi salonu"
 credits: "İç mimari tasarım ve görselleştirme: agca·studio"
 images:
   - file: "r-lv-1.jpg"
-    alt: "Salon: taş kaplı şömine duvarı ve televizyon ünitesi, bej koltuklar, siyah sehpa, sarkıt avize ve geniş pencere"
+    alt: "Salon: taş kaplı şömine duvarı ve televizyon ünitesi, bej koltuklar, siyah-açık meşe sehpa, sarkıt avize ve geniş pencere"
     caption: "Salon"
   - file: "r-lv-2.jpg"
     alt: "Salonun diğer ucu: siyah lambader, ahşap kollu koltuklar, arka duvarda tablo ve şömine"
     caption: "Salon, oturma grubu"
   - file: "r-lv-3.jpg"
-    alt: "Holden salona bakış: koridor kapısı, ahşap dolap ve pencere önünde oturma grubu"
+    alt: "Holden salona bakış: sağda açık mutfak kapısı, önde dallı vazolu konsol ve köşe pencere önünde oturma grubu"
     caption: "Holden salona"
   - file: "r-kit-1.jpg"
-    alt: "Mutfak: krem dolaplar, damarlı taş tezgâh ve ada, aydınlatmalı ahşap tezgâh arası, siyah buzdolabı"
+    alt: "Mutfak: vizon dolaplar ve koyu ahşap üst dolaplar, gizli aydınlatmalı damarlı taş tezgâh arası, damarlı taş yemek masası, siyah buzdolabı"
     caption: "Mutfak"
   - file: "r-kit-2.jpg"
-    alt: "Mutfağın pencere tarafı: ada üstünde lineer sarkıt, açık raflar ve ahşap tezgâh arası"
+    alt: "Mutfağın pencere tarafı: yemek masası üstünde lineer sarkıt, açık raflar ve aydınlatmalı damarlı taş tezgâh arası"
     caption: "Mutfak, pencere tarafı"
   - file: "r-hol-1.jpg"
-    alt: "Giriş holü: ceviz kaplama vestiyer dolabı, aydınlatmalı ayna nişi ve oturma bankı"
+    alt: "Giriş holü: ahşap kaplama vestiyer dolabı, aydınlatmalı ayna nişi, çekmeceli asma konsol ve açık raflar"
     caption: "Giriş holü"
   - file: "r-hol-2.jpg"
-    alt: "Koridor: ahşap kapılar, gizli aydınlatma ve sonda çamaşır makineli banyo"
+    alt: "Koridor: krem lake kapılar, tavan kenarında gizli aydınlatma ve sonda kafesli katlanır kapılı çamaşır dolabı"
     caption: "Koridor"
   - file: "r-mb-1.jpg"
-    alt: "Ebeveyn yatak odası: pencere önünde yatak, sarkıt avize ve jaluzili pencere"
+    alt: "Ebeveyn yatak odası: pencere önünde yatak, sarkıt avize, jaluzili pencere ve sağda pencere altında çalışma masası"
     caption: "Ebeveyn yatak odası"
   - file: "r-mb-2.jpg"
     alt: "Ebeveyn yatak odasında çalışma köşesi: beyaz masa, siyah lamba ve arkada giyinme dolapları"
@@ -58,10 +58,10 @@ images:
     alt: "Ebeveyn yatak odası: yatak başı, tablo, sarkıt lambalar ve balıksırtı parke"
     caption: "Ebeveyn yatak odası, yatak başı"
   - file: "r-bd-1.jpg"
-    alt: "Yatak odası: tek kişilik yatak, pencere önünde çalışma masası ve yeşil sandalye"
+    alt: "Yatak odası: tek kişilik yatak, pencere yanında duvara asılı çalışma masası ve yeşil sandalye"
     caption: "Yatak odası"
   - file: "r-sd-bd2-1.jpg"
-    alt: "İkinci yatak odası: kahverengi dolaplar, tek kişilik yatak ve pencere önünde çalışma masası"
+    alt: "İkinci yatak odası: vizon renkli asma dolap, tek kişilik yatak, pencere yanında çalışma masası ve hasır sırtlı sandalye"
     caption: "İkinci yatak odası"
   - file: "r-sd-mwc-1.jpg"
     alt: "Ebeveyn banyosu: yaprak desenli duvar, yuvarlak ayna, yeşil seramik ve mermer lavabo tezgâhı"
@@ -71,11 +71,11 @@ images:
     caption: "Banyo"
 drawings:
   - file: "c-gorele-105m2-3-1-yatay-page-0001.jpg"
-    alt: "Kat planı: salon, mutfak, ebeveyn yatak odası ve banyosu, iki yatak odası, banyo ve hol; mobilyalı yerleşim"
+    alt: "Kat planı: salon 24,52 m², ebeveyn yatak odası 14,51 m², iki oda 8,33 ve 8,29 m², mutfak, iki banyo, hol ve çamaşır nişi; mobilyalı yerleşim"
     caption: "Kat planı"
 ---
-Görele'de 105 m²'lik bir 3+1 daire için iç mimari çalışması. Dairenin sınırlı alanı, her odada tek bir güçlü yüzeyle karşılanır: salonda şömineyi de taşıyan taş duvar, mutfakta damarlı taş ada, holde ceviz kaplama vestiyer, banyolarda desenli duvar kaplamaları. Geri kalan yüzeyler açık tonda tutulur; balıksırtı parke tüm odaları birbirine bağlar.
+Görele'de 105 m²'lik bir 3+1 daire için iç mimari çalışması. Dairenin sınırlı alanı, her odada tek bir güçlü yüzeyle karşılanır: salonda şömineyi de taşıyan taş duvar, mutfakta damarlı taş yemek masası ve tezgâh arası, holde ahşap kaplama vestiyer, banyolarda desenli duvar kaplamaları. Geri kalan yüzeyler açık tonda tutulur; balıksırtı parke salonu ve yatak odalarını birbirine bağlar, hol, mutfak ve banyolar seramikle ayrılır.
 
-Aydınlatma gizli şeritlerle kurulur: tavan kenarlarında, dolap altlarında ve ayna nişlerinde. Böylece tavan yüksekliği korunur, akşamları mekân yumuşak bir ışıkla dolar. Yatak odalarının her birinde pencere önüne bir çalışma masası konur; ebeveyn yatak odası giyinme dolaplarıyla birlikte çözülür.
+Aydınlatma gizli şeritlerle kurulur: tavan kenarlarında, dolap altlarında ve ayna nişlerinde. Böylece tavan yüksekliği korunur, akşamları mekân yumuşak bir ışıkla dolar. Yatak odalarının her birinde pencere yanına bir çalışma masası konur; ebeveyn yatak odası giyinme dolapları ve kendi banyosuyla birlikte çözülür.
 
 Plan 3+1 düzenini korur; mobilya yerleşimi ve dolaplar Revit modelinde ölçüsüyle kurulup görselleştirildi.

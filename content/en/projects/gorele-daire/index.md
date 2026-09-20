@@ -7,13 +7,13 @@ date: 2025-06-01
 weight: 50
 draft: false
 tur: ["ic_mekan", "konut"]
-description: "Interior design of a 105 m² three-bedroom apartment in Görele, Giresun: living room with fireplace, island kitchen, bedrooms and bathrooms in warm timber."
+description: "Interior design of a 105 m² three-bedroom apartment in Görele, Giresun: living room with fireplace, kitchen with a veined stone dining table, bedrooms and bathrooms."
 kunye:
   yer: "Görele, Giresun"
   isveren: ""
   proje_yili: "2025"
   bitis_yili: ""
-  program: "105 m² three-bedroom apartment: living room, kitchen, master bedroom with bathroom, two bedrooms, bathroom, hall"
+  program: "105 m² three-bedroom apartment: living room, kitchen, master bedroom with bathroom, two bedrooms, bathroom, hall and laundry niche"
   durum: "Design"
   insaat_alani: "105 m²"
   arsa_alani: ""
@@ -28,28 +28,28 @@ card_alt: "Görele Apartment living room"
 credits: "Interior design and visualisation: agca·studio"
 images:
   - file: "r-lv-1.jpg"
-    alt: "Living room: stone-clad fireplace wall and television unit, beige sofas, black coffee table, pendant light and a wide window"
+    alt: "Living room: stone-clad fireplace wall and television unit, beige sofas, a two-tone black and light oak coffee table, pendant light and a wide window"
     caption: "Living room"
   - file: "r-lv-2.jpg"
     alt: "The other end of the living room: black floor lamp, armchairs with timber arms, a painting on the back wall and the fireplace"
     caption: "Living room, seating"
   - file: "r-lv-3.jpg"
-    alt: "View from the hall into the living room: corridor door, timber cabinet and seating in front of the window"
+    alt: "View from the hall into the living room: the open kitchen door on the right, a console with a branch vase in front and seating by the corner window"
     caption: "From the hall to the living room"
   - file: "r-kit-1.jpg"
-    alt: "Kitchen: cream cabinets, veined stone counter and island, lit timber splashback, black refrigerator"
+    alt: "Kitchen: mink-coloured cabinets with dark timber wall units, a veined stone splashback with concealed lighting, a veined stone dining table and a black refrigerator"
     caption: "Kitchen"
   - file: "r-kit-2.jpg"
-    alt: "Window side of the kitchen: linear pendant over the island, open shelves and timber splashback"
+    alt: "Window side of the kitchen: linear pendant over the dining table, open shelves and the lit veined stone splashback"
     caption: "Kitchen, window side"
   - file: "r-hol-1.jpg"
-    alt: "Entrance hall: walnut-veneered wardrobe, lit mirror niche and a bench"
+    alt: "Entrance hall: timber-veneered wardrobe, lit mirror niche, a floating console with drawers and open shelves"
     caption: "Entrance hall"
   - file: "r-hol-2.jpg"
-    alt: "Corridor: timber doors, concealed lighting and a bathroom with washing machine at the end"
+    alt: "Corridor: cream lacquered doors, concealed lighting along the ceiling edge and a laundry cupboard with louvred folding doors at the end"
     caption: "Corridor"
   - file: "r-mb-1.jpg"
-    alt: "Master bedroom: bed in front of the window, pendant light and window blinds"
+    alt: "Master bedroom: bed in front of the window, pendant light, window blinds and a desk under the window on the right"
     caption: "Master bedroom"
   - file: "r-mb-2.jpg"
     alt: "Study corner in the master bedroom: white desk, black lamp and wardrobes behind"
@@ -58,10 +58,10 @@ images:
     alt: "Master bedroom: headboard, painting, pendant lamps and herringbone floor"
     caption: "Master bedroom, headboard"
   - file: "r-bd-1.jpg"
-    alt: "Bedroom: single bed, a desk in front of the window and a green chair"
+    alt: "Bedroom: single bed, a wall-mounted desk beside the window and a green chair"
     caption: "Bedroom"
   - file: "r-sd-bd2-1.jpg"
-    alt: "Second bedroom: brown wardrobes, single bed and a desk in front of the window"
+    alt: "Second bedroom: mink-coloured wall-hung cabinet, single bed, a desk beside the window and a cane-backed chair"
     caption: "Second bedroom"
   - file: "r-sd-mwc-1.jpg"
     alt: "Master bathroom: leaf-patterned wall, round mirror, green tiles and marble basin counter"
@@ -71,11 +71,11 @@ images:
     caption: "Bathroom"
 drawings:
   - file: "c-gorele-105m2-3-1-yatay-page-0001.jpg"
-    alt: "Floor plan: living room, kitchen, master bedroom with bathroom, two bedrooms, bathroom and hall; furnished layout"
+    alt: "Floor plan: living room 24.52 m², master bedroom 14.51 m², two bedrooms of 8.33 and 8.29 m², kitchen, two bathrooms, hall and laundry niche; furnished layout"
     caption: "Floor plan"
 ---
-Interior design for a 105 m² three-bedroom apartment in Görele. The limited floor area is answered in each room with a single strong surface: the stone wall that also carries the fireplace in the living room, the veined stone island in the kitchen, the walnut-veneered wardrobe in the hall, patterned wall coverings in the bathrooms. The remaining surfaces are kept light, and a herringbone floor ties all the rooms together.
+Interior design for a 105 m² three-bedroom apartment in Görele. The limited floor area is answered in each room with a single strong surface: the stone wall that also carries the fireplace in the living room, the veined stone dining table and splashback in the kitchen, the timber-veneered wardrobe in the hall, patterned wall coverings in the bathrooms. The remaining surfaces are kept light; a herringbone floor ties the living room and bedrooms together, while the hall, kitchen and bathrooms are set apart with tiles.
 
-Lighting is built from concealed strips: along ceiling edges, under cabinets and in mirror niches. The ceiling height is preserved, and in the evening the rooms fill with a soft light. Each bedroom has a desk in front of the window; the master bedroom is resolved together with its wardrobes.
+Lighting is built from concealed strips: along ceiling edges, under cabinets and in mirror niches. The ceiling height is preserved, and in the evening the rooms fill with a soft light. Each bedroom has a desk beside the window; the master bedroom is resolved together with its wardrobes and its own bathroom.
 
 The plan keeps the three-bedroom layout; furniture and joinery were set out to size in a Revit model and visualised from it.
