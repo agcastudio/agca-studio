@@ -204,8 +204,23 @@ main:focus { outline: none; }
 .tour-play { width: 0; height: 0; border-style: solid; border-width: 7px 0 7px 12px; border-color: transparent transparent transparent currentColor; }
 .tour-note { margin: 10px 0 0; font-size: 12.5px; }
 .tour-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-/* büyütme penceresinde koyu zeminde görünür odak halkası */
+/* --- büyütme penceresi düzeltmeleri --- */
+/* koyu zeminde görünür odak halkası */
 .glightbox-container button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+/* görsel kırpılmasın: kütüphane object-fit: cover kullanıyor */
+.glightbox-container .gslide-image img { object-fit: contain; max-width: 100vw; max-height: 100vh; width: auto; height: auto; }
+/* dokunmatikte iki parmakla yakınlaştırma serbest; tek parmak kaydırma kütüphaneye kalsın.
+   Kütüphane CSS'i sonra yüklendiği için seçiciler daha özgül yazıldı. */
+body .glightbox-container, .glightbox-container .gslide-image img { touch-action: pinch-zoom; }
+/* yakınlaştırılmışken tek parmakla gezinilebilsin */
+body .glightbox-container.is-zoomed, .glightbox-container.is-zoomed .gslide-image img { touch-action: auto; }
+/* mobilde ileri/geri düğmeleri ekran dışında kalıyordu (kütüphane top: -100% veriyor) */
+@media (max-width: 768px) {
+  body .glightbox-clean .gprev, body .glightbox-clean .gnext { top: auto; bottom: 16px; width: 46px; height: 46px; }
+  body .glightbox-clean .gprev { left: 12px; }
+  body .glightbox-clean .gnext { right: 12px; }
+  body .glightbox-container.is-zoomed .gprev, body .glightbox-container.is-zoomed .gnext { display: none; }
+}
 @media (max-width: 640px) { .tour-frame { aspect-ratio: 4 / 3; } }
 .project-nav { display: flex; justify-content: space-between; gap: 24px; padding: 18px 0 22px; border-top: 1px solid var(--line); margin-top: 28px; }
 .project-nav-link { display: flex; align-items: center; gap: 14px; font-size: 15px; }

@@ -149,6 +149,28 @@
     });
   }
 
+  /* Dokunmatikte büyütme penceresi: iki parmakla yakınlaştırma tarayıcıya bırakılır,
+     yakınlaştırılmışken tek parmakla gezinme açılır (kütüphane bu olayları yutuyordu). */
+  var vv = window.visualViewport;
+  var lbZoomed = function () { return !!vv && vv.scale > 1.01; };
+  var syncLightboxTouch = function () {
+    var c = document.querySelector(".glightbox-container");
+    if (c) c.classList.toggle("is-zoomed", lbZoomed());
+  };
+  if (vv) {
+    vv.addEventListener("resize", syncLightboxTouch);
+    vv.addEventListener("scroll", syncLightboxTouch);
+  }
+  ["touchstart", "touchmove", "touchend"].forEach(function (tip) {
+    document.addEventListener(tip, function (e) {
+      if (!document.querySelector(".glightbox-container")) return;
+      if ((e.touches && e.touches.length > 1) || lbZoomed()) {
+        syncLightboxTouch();
+        e.stopPropagation();
+      }
+    }, true);
+  });
+
   /* Sanal tur: üçüncü taraf çerçeve ancak ziyaretçi başlatınca yüklenir */
   var tour = document.querySelector("[data-tour]");
   var tourStart = tour && tour.querySelector("[data-tour-start]");

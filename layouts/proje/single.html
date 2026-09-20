@@ -64,7 +64,7 @@
         {{- $tf := $img.Fill "240x240 jpg" -}}
         {{- $full := partial "lightbox-src.html" $img -}}
         <li class="thumb">
-          <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="tum" data-width="{{ $full.Width }}" data-height="{{ $full.Height }}" data-alt="{{ $it.alt }}"{{ with $it.caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $it.alt }}">
+          <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="tum" data-alt="{{ $it.alt }}"{{ with $it.caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $it.alt }}">
             <picture>
               <source type="image/webp" srcset="{{ $t1.RelPermalink }} 240w, {{ $t2.RelPermalink }} 480w" sizes="(min-width: 1024px) 220px, (min-width: 640px) 25vw, 33vw">
               <img src="{{ $tf.RelPermalink }}" width="240" height="240" alt="" loading="lazy" decoding="async">
