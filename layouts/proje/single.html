@@ -88,7 +88,6 @@
       {{- with $hero }}{{ partial "hero-picture.html" (dict "hero" . "alt" "" "lazy" true) }}{{ end }}
       <button type="button" class="tour-start" data-tour-start><span class="tour-play" aria-hidden="true"></span>{{ i18n "tour_start" }}</button>
     </div>
-    <p class="tour-note muted">{{ i18n "tour_note" }}</p>
   </section>
   {{- end }}
 

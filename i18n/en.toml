@@ -124,8 +124,6 @@ other = "Start the virtual tour"
 [tour_new_tab]
 other = "Open in a new tab"
 
-[tour_note]
-other = "The tour loads from a third-party server once started."
 
 [kunye_yarisma]
 other = "Competition"

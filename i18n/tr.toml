@@ -123,8 +123,6 @@ other = "Sanal turu başlat"
 [tour_new_tab]
 other = "Yeni sekmede aç"
 
-[tour_note]
-other = "Tur, başlatınca üçüncü taraf sunucudan yüklenir."
 
 [kunye_yarisma]
 other = "Yarışma"
