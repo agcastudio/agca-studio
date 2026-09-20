@@ -1,0 +1,10 @@
+{{- /* Önceki / sonraki proje bağlantısı: kare küçük görsel + etiket + ad */ -}}
+{{- $p := .page -}}
+{{- $file := $p.Params.card | default $p.Params.cover -}}
+<a class="project-nav-link {{ .class }}" href="{{ $p.RelPermalink }}">
+  {{- with resources.Get (printf "projeler/%s/%s" $p.Params.slug $file) }}
+  {{- $t := .Fill "144x144 webp q75" -}}{{ $f := .Fill "144x144 jpg" -}}
+  <picture><source type="image/webp" srcset="{{ $t.RelPermalink }}"><img src="{{ $f.RelPermalink }}" width="72" height="72" alt="" loading="lazy" decoding="async"></picture>
+  {{- end }}
+  <span class="project-nav-text"><span class="muted">{{ .label }}</span><span>{{ $p.Title }}</span></span>
+</a>

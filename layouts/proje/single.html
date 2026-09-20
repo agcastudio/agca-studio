@@ -8,27 +8,34 @@
 {{- /* Paragraflar: ilki açılıştaki açıklama, kalanı görsellerle dönüşümlü rapor */ -}}
 {{- $paras := slice -}}
 {{- range split (string .Content) "</p>" }}{{ if strings.TrimSpace . }}{{ $paras = $paras | append (printf "%s</p>" .) }}{{ end }}{{ end -}}
-{{- $lead := "" -}}{{ with $paras }}{{ $lead = index . 0 }}{{ end -}}
-{{- $rest := slice -}}{{ if gt (len $paras) 1 }}{{ $rest = after 1 $paras }}{{ end -}}
+{{- /* Özet (ozet) varsa künyenin yanında gösterilir, gövdenin tamamı rapora gider; yoksa ilk paragraf özet olur */ -}}
+{{- $summary := "" -}}
+{{- with .Params.ozet }}{{ $summary = . | markdownify }}{{ end -}}
+{{- $rest := $paras -}}
+{{- if not $summary }}{{ with $paras }}{{ $summary = index . 0 | safeHTML }}{{ end }}{{ if gt (len $paras) 1 }}{{ $rest = after 1 $paras }}{{ else }}{{ $rest = slice }}{{ end }}{{ end -}}
 <article class="project">
   {{- /* 1. Açılış: başlık, künye ve açıklama */ -}}
   <header class="wrap project-head">
     <p class="crumb"><a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a>{{ with .Params.tur }} · {{ i18n (printf "tur_%s" (index . 0)) }}{{ end }}</p>
     <h1 class="project-title">{{ .Title }}</h1>
     {{- with .Params.subtitle }}<p class="project-sub">{{ . }}</p>{{ end }}
-    <dl class="facts" aria-label="{{ i18n "kunye" }}">
-      <div class="fact"><dt>{{ i18n "facts_architects" }}</dt><dd>{{ site.Params.brand }}</dd></div>
-      {{- range $key := slice "yer" "proje_yili" "bitis_yili" "insaat_alani" "arsa_alani" "durum" "rol" "derece" "isveren" }}
-        {{- with index $k $key }}<div class="fact"><dt>{{ i18n (printf "kunye_%s" $key) }}</dt><dd>{{ . }}</dd></div>{{ end }}
-      {{- end }}
-      {{- with .Params.tur }}<div class="fact"><dt>{{ i18n "kunye_tur" }}</dt><dd>{{ range $i, $t := . }}{{ if $i }}, {{ end }}{{ i18n (printf "tur_%s" $t) }}{{ end }}</dd></div>{{ end }}
-      {{- with $k.program }}<div class="fact fact-wide"><dt>{{ i18n "kunye_program" }}</dt><dd>{{ . }}</dd></div>{{ end }}
-      {{- with $k.ekip }}<div class="fact fact-wide"><dt>{{ i18n "kunye_ekip" }}</dt><dd>{{ . }}</dd></div>{{ end }}
-    </dl>
-    {{- with $lead }}<div class="project-lead">{{ . | safeHTML }}</div>{{ end }}
-    {{- with .Params.sanal_tur }}
-    <p><a class="btn" href="{{ . }}" target="_blank" rel="noopener">{{ i18n "virtual_tour" }} ↗</a></p>
-    {{- end }}
+    <div class="project-intro">
+      <dl class="facts" aria-label="{{ i18n "kunye" }}">
+        <div class="fact"><dt>{{ i18n "facts_architects" }}</dt><dd>{{ site.Params.brand }}</dd></div>
+        {{- range $key := slice "yer" "proje_yili" "bitis_yili" "insaat_alani" "arsa_alani" "durum" "rol" "derece" "isveren" }}
+          {{- with index $k $key }}<div class="fact"><dt>{{ i18n (printf "kunye_%s" $key) }}</dt><dd>{{ . }}</dd></div>{{ end }}
+        {{- end }}
+        {{- with .Params.tur }}<div class="fact"><dt>{{ i18n "kunye_tur" }}</dt><dd>{{ range $i, $t := . }}{{ if $i }}, {{ end }}{{ i18n (printf "tur_%s" $t) }}{{ end }}</dd></div>{{ end }}
+        {{- with $k.program }}<div class="fact"><dt>{{ i18n "kunye_program" }}</dt><dd>{{ . }}</dd></div>{{ end }}
+        {{- with $k.ekip }}<div class="fact"><dt>{{ i18n "kunye_ekip" }}</dt><dd>{{ . }}</dd></div>{{ end }}
+      </dl>
+      <div class="project-summary">
+        {{ $summary }}
+        {{- with .Params.sanal_tur }}
+        <p><a class="btn" href="{{ . }}" target="_blank" rel="noopener">{{ i18n "virtual_tour" }} ↗</a></p>
+        {{- end }}
+      </div>
+    </div>
   </header>
 
   {{- /* 2. Büyük kapak görseli */ -}}
@@ -134,8 +141,8 @@
   {{- end }}
 
   <nav class="wrap project-nav" aria-label="{{ i18n "nav_projects" }}">
-    {{- with .NextInSection }}<a class="project-nav-link" href="{{ .RelPermalink }}"><span class="muted">{{ i18n "prev_project" }}</span><span>{{ .Title }}</span></a>{{ else }}<span></span>{{ end }}
-    {{- with .PrevInSection }}<a class="project-nav-link is-next" href="{{ .RelPermalink }}"><span class="muted">{{ i18n "next_project" }}</span><span>{{ .Title }}</span></a>{{ end }}
+    {{- with .NextInSection }}{{ partial "project-nav-link.html" (dict "page" . "label" (i18n "prev_project") "class" "") }}{{ else }}<span></span>{{ end }}
+    {{- with .PrevInSection }}{{ partial "project-nav-link.html" (dict "page" . "label" (i18n "next_project") "class" "is-next") }}{{ end }}
   </nav>
 </article>
 {{ end }}

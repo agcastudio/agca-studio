@@ -1,6 +1,6 @@
 ---
 title: "KC Yangın Showroom and Office"
-seo_title: "KC Yangın Showroom and Office · Commercial · agca·studio"
+seo_title: "KC Yangın Showroom and Office · Ümraniye · agca·studio"
 subtitle: "Corporate interior and facade design"
 translationKey: "proje-kc"
 slug: "kc-yangin-showroom"
@@ -10,7 +10,7 @@ draft: false
 tur: ["ticari", "ic_mekan"]
 description: "Showroom and office for KC Yangın: yellow and black identity, cylindrical display counters, meeting area, open and closed offices; facade and interior views."
 kunye:
-  yer: ""
+  yer: "Ümraniye, Istanbul"
   isveren: "KC Yangın"
   proje_yili: "2025"
   bitis_yili: ""
@@ -27,6 +27,8 @@ cover_alt: "KC Yangın showroom: a long meeting table with yellow chairs, a yell
 card: "r-2.jpg"
 card_alt: "KC Yangın showroom with meeting table and yellow corporate wall"
 credits: "Interior design and visualisation: agca·studio"
+ozet: |
+  A showroom and office in Ümraniye, on the ground floor of an existing building, for KC Yangın, a fire and security systems company. The company's yellow and black identity runs from the facade into the interior: yellow letters on black cladding outside, yellow accent walls and a black slatted ceiling inside. The visitor passes through the secure entrance straight into the display; three cylindrical counters and display boxes along the wall carry the products, and screens in the yellow niches present the systems. The long meeting table in the middle is both a presentation and a working surface. Behind are the four-person open office, a single-person closed office in a glass box, the coffee niche, the rack cabinet and the WC. Plan, sections, elevation, axonometrics and renderings were produced from a single Revit model.
 images:
   - file: "r-2.jpg"
     alt: "Showroom: long timber meeting table with yellow chairs, a yellow KC wall and fire-alarm display panel on the left, black slatted ceiling, white cylindrical display counters and yellow niches with screens on the right"

@@ -30,7 +30,8 @@
   var hero = document.querySelector("[data-hero]");
   if (hero) {
     var slides = Array.prototype.slice.call(hero.querySelectorAll(".hero-slide"));
-    var dots = Array.prototype.slice.call(hero.querySelectorAll(".hero-dot"));
+    var arrows = Array.prototype.slice.call(hero.querySelectorAll(".hero-arrow"));
+    var dots = [];
     if (slides.length > 1) {
       var current = 0, timer = null;
       var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -49,8 +50,12 @@
       };
       var start = function () { if (!reduce && !timer) timer = setInterval(function () { show(current + 1); }, 6000); };
       var stop = function () { if (timer) { clearInterval(timer); timer = null; } };
-      dots.forEach(function (d) {
-        d.addEventListener("click", function () { stop(); show(parseInt(d.getAttribute("data-slide"), 10) || 0); start(); });
+      arrows.forEach(function (a) {
+        a.addEventListener("click", function () { stop(); show(current + (parseInt(a.getAttribute("data-dir"), 10) || 1)); start(); });
+      });
+      hero.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowLeft") { stop(); show(current - 1); start(); }
+        if (e.key === "ArrowRight") { stop(); show(current + 1); start(); }
       });
       hero.addEventListener("mouseenter", stop);
       hero.addEventListener("mouseleave", start);

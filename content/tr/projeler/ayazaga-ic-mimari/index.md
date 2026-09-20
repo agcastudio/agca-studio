@@ -26,6 +26,8 @@ cover_alt: "Ayazağa Dairesi salonu: krem duvarlar, aydınlatmalı raflı televi
 card: "r-4.jpg"
 card_alt: "Ayazağa Dairesi salonu"
 credits: "İç mimari tasarım ve görselleştirme: agca·studio"
+ozet: |
+  Sarıyer Ayazağa'da bir daire için iç mimari çalışması. Ev boyunca tek bir malzeme dili sürer: krem duvarlar ve dolaplar, traverten banyo yüzeyleri, balıksırtı meşe parke ve sıcak beyaz gizli aydınlatma. Renk mutfağın zeytin yeşili üst dolaplarında ve yatak odasının ağaç silüetli duvar kaplamasında yoğunlaşır; yeşil, yastık, tabure ve banyo karosunda küçük dokunuşlarla tekrar eder. Giriş holü arkadan aydınlatmalı kemerli bir aynayla karşılar; salon ve yemek alanı tek hacimde çözülür, mutfak antreden ayrı bir oda olarak açılır. Yatak odasının devamındaki giyinme alanı aydınlatmalı cam kapaklı dolaplar ve makyaj nişiyle kurulur; banyo ve çamaşır alanı tek bir traverten hacimde toplanır. Mobilya, dolap ve aydınlatma kararları Revit modelinde ölçüsüyle kurulup görselleştirildi.
 images:
   - file: "r-6.jpg"
     alt: "Giriş holü: arkadan aydınlatmalı kemerli ayna, altında askıda ahşap konsol, ahşap vestiyer dolapları, balıksırtı parke ve siyah çerçeveli buzlu cam sürme kapı"

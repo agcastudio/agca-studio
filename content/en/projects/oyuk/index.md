@@ -26,6 +26,8 @@ cover_alt: "Oyuk: the festival courtyard lit from above, with galleries and pott
 card: "r-kose.jpg"
 card_alt: "Oyuk: white rendered corner facade with timber shutters on Kurşunlu Street"
 credits: "Design and visualisation: agca·studio"
+ozet: |
+  A competition entry for a cultural centre on Kurşunlu Street in Menteşe, Muğla. The building completes the missing link in the city's cultural route of bazaar, han and mosque courtyard with a public void carved from the street into the block. That void is a festival courtyard open at all hours; the stage, workshops, library and café gather around it. The volume is white and quiet, like the limewashed houses of Menteşe; the only moving element of the facade is a set of timber shutters that open and close with the sun. The floors rise from the sound of the street to the quiet of the offices: courtyard and flexible hall at ground level, workshops on the first floor, a library with an inner garden on the second, administration and a terrace facing the square on the third. The total built area is 4,130 m².
 images:
   - file: "r-kose.jpg"
     alt: "White volume seen from the corner of Kurşunlu Street; windows with timber shutters and a glazed ground floor"

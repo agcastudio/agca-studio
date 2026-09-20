@@ -1,5 +1,6 @@
 ---
 title: "KC Yangın Showroom ve Ofis"
+seo_title: "KC Yangın Showroom ve Ofis · Ümraniye · agca·studio"
 subtitle: "Kurumsal iç mekân ve cephe tasarımı"
 translationKey: "proje-kc"
 slug: "kc-yangin-showroom"
@@ -9,7 +10,7 @@ draft: false
 tur: ["ticari", "ic_mekan"]
 description: "KC Yangın için showroom ve ofis: sarı-siyah kimlik, silindirik sergi bankoları, toplantı alanı, açık ve kapalı ofisler; cephe ve iç mekân renderları."
 kunye:
-  yer: ""
+  yer: "Ümraniye, İstanbul"
   isveren: "KC Yangın"
   proje_yili: "2025"
   bitis_yili: ""
@@ -26,6 +27,8 @@ cover_alt: "KC Yangın showroomu: ortada uzun toplantı masası ve sarı sandaly
 card: "r-2.jpg"
 card_alt: "KC Yangın showroomu, toplantı masası ve sarı kurumsal duvar"
 credits: "İç mimari tasarım ve görselleştirme: agca·studio"
+ozet: |
+  Yangın ve güvenlik sistemleri firması KC Yangın için Ümraniye'de, mevcut bir binanın zemin katında showroom ve ofis. Firmanın sarı-siyah kimliği cepheden iç mekâna sürer: siyah kaplama üzerinde sarı harfler, içeride sarı vurgu duvarları ve siyah lamelli tavan. Güvenlikli girişten geçen ziyaretçi önce sergiye alınır; üç silindirik banko ve duvar boyunca dizilen sergi kutuları ürünleri taşır, sarı nişlerdeki ekranlar sistemleri tanıtır. Ortadaki uzun toplantı masası hem sunum hem de çalışma yüzeyidir. Arkada dört kişilik açık ofis, cam kutu içinde tek kişilik kapalı ofis, kahve nişi, rack kabin ve tuvalet yer alır. Plan, kesitler, görünüş, aksonometriler ve renderlar tek Revit modelinden üretildi.
 images:
   - file: "r-2.jpg"
     alt: "Showroom: uzun ahşap toplantı masası ve sarı sandalyeler, solda sarı KC duvarı ve yangın alarm sergi paneli, siyah lamelli tavan, sağda beyaz silindirik sergi bankoları ve ekranlı sarı nişler"

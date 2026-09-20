@@ -26,6 +26,8 @@ cover_alt: "Görele Dairesi salonu: şömineli taş duvar, televizyon ünitesi, 
 card: "r-lv-1.jpg"
 card_alt: "Görele Dairesi salonu"
 credits: "İç mimari tasarım ve görselleştirme: agca·studio"
+ozet: |
+  İstanbul'da 105 m²'lik bir 3+1 daire için iç mimari çalışması. Sınırlı alan her odada tek bir güçlü yüzeyle karşılanır: salonda şömineyi taşıyan taş duvar, mutfakta damarlı taş yemek masası ve tezgâh arası, holde ahşap kaplama vestiyer, banyolarda desenli duvar kaplamaları. Geri kalan yüzeyler açık tonda tutulur; balıksırtı parke salonu ve yatak odalarını bağlar, hol, mutfak ve banyolar seramikle ayrılır. Aydınlatma tavan kenarlarında, dolap altlarında ve ayna nişlerinde gizli şeritlerle kurulur. Her yatak odasında pencere yanına bir çalışma masası konur; ebeveyn yatak odası giyinme dolapları ve kendi banyosuyla çözülür. Mobilya ve dolaplar Revit modelinde ölçüsüyle kurulup görselleştirildi.
 images:
   - file: "r-lv-1.jpg"
     alt: "Salon: taş kaplı şömine duvarı ve televizyon ünitesi, bej koltuklar, siyah-açık meşe sehpa, sarkıt avize ve geniş pencere"

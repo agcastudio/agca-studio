@@ -20,11 +20,8 @@
   </a>
   {{- end }}
   {{- if gt (len .) 1 }}
-  <div class="hero-dots" role="group" aria-label="{{ i18n "nav_projects" }}">
-    {{- range $i, $s := . }}
-    <button type="button" class="hero-dot{{ if eq $i 0 }} is-active{{ end }}" data-slide="{{ $i }}" aria-label="{{ $s.page.Title }}"{{ if eq $i 0 }} aria-current="true"{{ end }}></button>
-    {{- end }}
-  </div>
+  <button type="button" class="hero-arrow hero-arrow-prev" data-dir="-1" aria-label="{{ i18n "prev_project" }}"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button type="button" class="hero-arrow hero-arrow-next" data-dir="1" aria-label="{{ i18n "next_project" }}"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   {{- end }}
 </section>
 {{- end }}

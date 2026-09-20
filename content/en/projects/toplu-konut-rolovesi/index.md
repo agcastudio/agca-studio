@@ -27,6 +27,8 @@ cover_alt: "Drone photograph of an apartment block with a hipped tiled roof and 
 card: "d-2402-kapak.jpg"
 card_alt: "The same block shown in three slices: drone photograph, point cloud and Revit model"
 credits: "Survey, modelling and drawings: agca·studio"
+ozet: |
+  Documentation of an existing housing estate in Üsküdar by the Scan to BIM method. The whole estate was scanned by drone; the point cloud produced by photogrammetry gave a measurable copy of the blocks, the roads and the ground. The interiors of the selected block were scanned as well and added to the cloud. The block was rebuilt in Revit: slabs, walls, windows, balconies and roof were modelled with their dimensions taken from the cloud. Four apartments per floor, two basements, the ground floor, four upper floors and the duplex attic all took their place in the model. A simplified block model was produced for the whole estate, and a schematic plan, section, elevation and attic plan for the selected block. The result is a living information model on which renovation and regeneration decisions can be taken.
 images:
   - file: "d-2402-kapak.jpg"
     alt: "The same apartment block in three slices: a drone photograph on the left, a grey point cloud with the roof removed in the middle, a Revit model with blue windows on the right"

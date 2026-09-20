@@ -26,6 +26,8 @@ cover_alt: "Görele Apartment living room: stone fireplace wall, television unit
 card: "r-lv-1.jpg"
 card_alt: "Görele Apartment living room"
 credits: "Interior design and visualisation: agca·studio"
+ozet: |
+  Interior design for a 105 m² three-bedroom apartment in Istanbul. The limited floor area is answered in each room with a single strong surface: the stone wall carrying the fireplace in the living room, the veined stone dining table and splashback in the kitchen, the timber-veneered wardrobe in the hall, patterned wall coverings in the bathrooms. The remaining surfaces are kept light; a herringbone floor ties the living room and bedrooms together, while the hall, kitchen and bathrooms are set apart with tiles. Lighting is built from concealed strips along ceiling edges, under cabinets and in mirror niches. Each bedroom has a desk beside the window; the master bedroom is resolved with its wardrobes and its own bathroom. Furniture and joinery were set out to size in a Revit model and visualised from it.
 images:
   - file: "r-lv-1.jpg"
     alt: "Living room: stone-clad fireplace wall and television unit, beige sofas, a two-tone black and light oak coffee table, pendant light and a wide window"

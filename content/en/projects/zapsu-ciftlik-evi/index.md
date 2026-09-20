@@ -1,0 +1,86 @@
+---
+title: "Zapsu Farmhouse"
+subtitle: "Single-storey house on a sloping site"
+translationKey: "proje-zapsu"
+slug: "zapsu-ciftlik-evi"
+date: 2024-05-01
+weight: 80
+draft: false
+tur: ["konut"]
+description: "A timber-clad house on a sloping farm plot: a single wide-eaved roof, a timber deck hanging over the garden, bedrooms on the lower floor; plans, sections and elevations."
+kunye:
+  yer: ""
+  isveren: ""
+  proje_yili: "2024"
+  bitis_yili: ""
+  program: "Farmhouse: living room, kitchen and dining area, deck; bedrooms and bathroom on the lower floor"
+  durum: "Design"
+  insaat_alani: ""
+  arsa_alani: ""
+  ekip: ""
+  rol: "Design and visualisation"
+  derece: ""
+sanal_tur: ""
+cover: "d-5pers2-000.jpg"
+cover_alt: "Zapsu Farmhouse: a timber-clad single-storey house with wide eaves among trees and a timber deck hanging over the garden"
+card: "d-6pers2.jpg"
+card_alt: "Zapsu Farmhouse: glazed living room and timber deck"
+credits: "Design and visualisation: agca·studio (concept images AI-assisted)"
+ozet: |
+  A single-storey house on a sloping plot within a farm; a lower floor is exposed on the downhill side. The timber-clad volume is gathered under a single wide-eaved roof; living room, kitchen and dining area open to the garden through glazed facades. The timber deck in front of the living room rises over the slope and hangs above the garden. The bedrooms and bathroom are on the lower floor, buried in the slope and opening to the garden side. The site plan sets the house among the trees, drawn back from the road. The concept images were produced with AI assistance; plans, sections and elevations were taken from the model.
+images:
+  - file: "d-5pers2-000.jpg"
+    alt: "Timber-clad house among trees: wide-eaved grey roof, glazed facade and a timber deck hanging over the garden"
+    caption: "View from the garden"
+  - file: "d-6pers2.jpg"
+    alt: "Deck facade of the timber-clad house: glazed living room, railed timber deck and the garden floor below"
+    caption: "Deck facade"
+  - file: "d-3pers3-000.jpg"
+    alt: "View over the roof: wide-eaved grey roof, timber facade and the sheltered entrance side"
+    caption: "Entrance side"
+  - file: "d-4pers2-002.jpg"
+    alt: "Roof-level view from the opposite corner: the volume gathered under a single roof and the lawn"
+    caption: "Opposite corner"
+  - file: "d-1webplnperszk-edit.jpg"
+    alt: "Ground floor plan perspective: kitchen, dining table, seating and the deck hanging over the garden"
+    caption: "Ground floor, plan perspective"
+  - file: "d-2plnpersbk-edit.jpg"
+    alt: "Lower floor plan perspective: bedrooms, bathroom and the facade opening to the garden"
+    caption: "Lower floor, plan perspective"
+  - file: "r-chatgpt-image-20-eyl-2026-13-00-34.jpg"
+    alt: "AI-assisted concept image: a two-level house with wide glazing and an upper terrace in evening light"
+    caption: "Concept image (AI-assisted)"
+  - file: "r-chatgpt-image-20-eyl-2026-13-00-46.jpg"
+    alt: "AI-assisted concept image: the house seen from the corner, trees and glazed facades"
+    caption: "Concept image (AI-assisted)"
+  - file: "r-chatgpt-image-20-eyl-2026-13-04-37.jpg"
+    alt: "AI-assisted concept image: dining table on the terrace and glass doors opening inside"
+    caption: "Concept image (AI-assisted)"
+drawings:
+  - file: "c-1-vp-page-0001.jpg"
+    alt: "Location plan: the plot within the rural settlement"
+    caption: "Location"
+  - file: "c-2-vp-page-0001.jpg"
+    alt: "Site plan: the house among trees, road and approach"
+    caption: "Site plan"
+  - file: "c-3-zk-page-0001.jpg"
+    alt: "Ground floor plan: living room, kitchen, dining area and deck"
+    caption: "Ground floor plan"
+  - file: "c-4-bk-page-0001.jpg"
+    alt: "Lower floor plan: bedrooms and bathroom"
+    caption: "Lower floor plan"
+  - file: "c-5-k1-page-0001.jpg"
+    alt: "Sections: two levels on the sloping ground and the deck"
+    caption: "Sections"
+  - file: "c-6-g1-page-0001.jpg"
+    alt: "Elevations: wide-eaved roof and timber facade"
+    caption: "Elevations"
+  - file: "c-7-g2-page-0001.jpg"
+    alt: "Elevations: deck facade and side facades"
+    caption: "Elevations, deck facade"
+---
+A single-storey house on a sloping plot within a farm; a lower floor is exposed on the downhill side. The timber-clad volume is gathered under a single wide-eaved roof; living room, kitchen and dining area open to the garden through glazed facades.
+
+The timber deck in front of the living room rises over the slope and hangs above the garden. The bedrooms and bathroom are on the lower floor, buried in the slope and opening to the garden side. The site plan sets the house among the trees, drawn back from the road.
+
+The concept images were produced with AI assistance; plans, sections and elevations were taken from the model.

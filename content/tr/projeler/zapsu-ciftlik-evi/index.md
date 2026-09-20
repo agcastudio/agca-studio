@@ -1,0 +1,86 @@
+---
+title: "Zapsu Çiftlik Evi"
+subtitle: "Eğimli arazide tek katlı ev"
+translationKey: "proje-zapsu"
+slug: "zapsu-ciftlik-evi"
+date: 2024-05-01
+weight: 80
+draft: false
+tur: ["konut"]
+description: "Çiftlik arazisinde eğimli parsele oturan ahşap kaplı ev: geniş saçaklı tek çatı, bahçeye asılan ahşap teras, alt katta yatak odaları; plan, kesit ve görünüşler."
+kunye:
+  yer: ""
+  isveren: ""
+  proje_yili: "2024"
+  bitis_yili: ""
+  program: "Çiftlik evi: salon, mutfak ve yemek alanı, teras; alt katta yatak odaları ve banyo"
+  durum: "Proje"
+  insaat_alani: ""
+  arsa_alani: ""
+  ekip: ""
+  rol: "Tasarım ve görselleştirme"
+  derece: ""
+sanal_tur: ""
+cover: "d-5pers2-000.jpg"
+cover_alt: "Zapsu Çiftlik Evi: ağaçlar arasında ahşap kaplı, geniş saçaklı tek katlı ev ve bahçeye asılan ahşap teras"
+card: "d-6pers2.jpg"
+card_alt: "Zapsu Çiftlik Evi: cam cepheli salon ve ahşap teras"
+credits: "Tasarım ve görselleştirme: agca·studio (kavram görselleri yapay zekâ destekli)"
+ozet: |
+  Bir çiftlik arazisinde, eğimli parsele oturan tek katlı bir ev; eğim tarafında bir alt kat açığa çıkar. Ahşap kaplı kütle geniş saçaklı tek bir çatının altında toplanır; salon, mutfak ve yemek alanı bahçeye doğru cam cephelerle açılır. Salonun önündeki ahşap teras eğimin üzerine çıkarak bahçeye asılır. Yatak odaları ve banyo alt katta, eğime gömülü ve bahçeye açılan tarafta yer alır. Vaziyet planı evi ağaçların arasında, yoldan geri çekilmiş bir konumda kurar. Kavram görselleri yapay zekâ desteğiyle üretildi; plan, kesit ve görünüşler modelden alındı.
+images:
+  - file: "d-5pers2-000.jpg"
+    alt: "Ağaçlar arasında ahşap kaplı ev: geniş saçaklı gri çatı, cam cephe ve bahçeye asılan ahşap teras"
+    caption: "Bahçeden görünüm"
+  - file: "d-6pers2.jpg"
+    alt: "Ahşap kaplı evin teras cephesi: cam cepheli salon, korkuluklu ahşap teras ve altında bahçe katı"
+    caption: "Teras cephesi"
+  - file: "d-3pers3-000.jpg"
+    alt: "Çatı üstünden görünüm: geniş saçaklı gri çatı, ahşap cephe ve giriş tarafındaki saçak altı"
+    caption: "Giriş tarafı"
+  - file: "d-4pers2-002.jpg"
+    alt: "Karşı köşeden çatı üstü görünüm: tek çatı altında toplanan kütle ve çimenli bahçe"
+    caption: "Karşı köşe"
+  - file: "d-1webplnperszk-edit.jpg"
+    alt: "Zemin kat plan perspektifi: mutfak, yemek masası, oturma grubu ve bahçeye asılan teras"
+    caption: "Zemin kat, plan perspektifi"
+  - file: "d-2plnpersbk-edit.jpg"
+    alt: "Alt kat plan perspektifi: yatak odaları, banyo ve bahçeye açılan cephe"
+    caption: "Alt kat, plan perspektifi"
+  - file: "r-chatgpt-image-20-eyl-2026-13-00-34.jpg"
+    alt: "Yapay zekâ destekli kavram görseli: iki katlı, geniş camlı ev ve üst kat terası, akşam ışığında"
+    caption: "Kavram görseli (yapay zekâ destekli)"
+  - file: "r-chatgpt-image-20-eyl-2026-13-00-46.jpg"
+    alt: "Yapay zekâ destekli kavram görseli: evin köşeden görünümü, ağaçlar ve cam cepheler"
+    caption: "Kavram görseli (yapay zekâ destekli)"
+  - file: "r-chatgpt-image-20-eyl-2026-13-04-37.jpg"
+    alt: "Yapay zekâ destekli kavram görseli: terasta yemek masası ve içeriye açılan cam kapılar"
+    caption: "Kavram görseli (yapay zekâ destekli)"
+drawings:
+  - file: "c-1-vp-page-0001.jpg"
+    alt: "Konum planı: kırsal yerleşim içinde parselin yeri"
+    caption: "Konum"
+  - file: "c-2-vp-page-0001.jpg"
+    alt: "Vaziyet planı: ağaçlar arasında ev, yol ve yaklaşım"
+    caption: "Vaziyet planı"
+  - file: "c-3-zk-page-0001.jpg"
+    alt: "Zemin kat planı: salon, mutfak, yemek alanı ve teras"
+    caption: "Zemin kat planı"
+  - file: "c-4-bk-page-0001.jpg"
+    alt: "Alt kat planı: yatak odaları ve banyo"
+    caption: "Alt kat planı"
+  - file: "c-5-k1-page-0001.jpg"
+    alt: "Kesitler: eğimli arazide iki seviye ve teras"
+    caption: "Kesitler"
+  - file: "c-6-g1-page-0001.jpg"
+    alt: "Görünüşler: geniş saçaklı çatı ve ahşap cephe"
+    caption: "Görünüşler"
+  - file: "c-7-g2-page-0001.jpg"
+    alt: "Görünüşler: teras cephesi ve yan cepheler"
+    caption: "Görünüşler, teras cephesi"
+---
+Bir çiftlik arazisinde, eğimli parsele oturan tek katlı bir ev; eğim tarafında bir alt kat açığa çıkar. Ahşap kaplı kütle geniş saçaklı tek bir çatının altında toplanır; salon, mutfak ve yemek alanı bahçeye doğru cam cephelerle açılır.
+
+Salonun önündeki ahşap teras eğimin üzerine çıkarak bahçeye asılır. Yatak odaları ve banyo alt katta, eğime gömülü ve bahçeye açılan tarafta yer alır. Vaziyet planı evi ağaçların arasında, yoldan geri çekilmiş bir konumda kurar.
+
+Kavram görselleri yapay zekâ desteğiyle üretildi; plan, kesit ve görünüşler modelden alındı.

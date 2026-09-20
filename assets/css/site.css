@@ -99,12 +99,12 @@ main:focus { outline: none; }
 .hero-slide:hover .hero-caption { text-decoration: underline; text-underline-offset: 4px; }
 .hero-slide:focus-visible { outline-offset: -4px; }
 .hero-caption { position: absolute; z-index: 1; left: var(--gutter); bottom: 18px; padding: 6px 0; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #fff; }
-.hero-dots { position: absolute; z-index: 2; right: calc(var(--gutter) - 8px); bottom: 14px; display: flex; gap: 2px; }
-.hero-dot { width: 24px; height: 24px; display: grid; place-items: center; }
-.hero-dot::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.55); transition: background var(--t), transform var(--t); }
-.hero-dot:hover::before { background: rgba(255,255,255,.85); }
-.hero-dot.is-active::before { background: #fff; transform: scale(1.3); }
-.hero-dot:focus-visible { outline-color: #fff; outline-offset: -2px; }
+.hero-arrow { position: absolute; z-index: 2; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; display: grid; place-items: center; color: #fff; background: rgba(0,0,0,.18); border-radius: 50%; opacity: .75; transition: opacity var(--t), background var(--t); }
+.hero-arrow:hover { opacity: 1; background: rgba(0,0,0,.35); }
+.hero-arrow:focus-visible { outline-color: #fff; opacity: 1; }
+.hero-arrow-prev { left: var(--gutter); }
+.hero-arrow-next { right: var(--gutter); }
+@media (max-width: 640px) { .hero-arrow { width: 40px; height: 40px; } }
 @media (max-width: 640px) { .hero { height: 62vh; } }
 @media (prefers-reduced-motion: reduce) { .hero-slide { transition: none; } }
 
@@ -150,16 +150,18 @@ main:focus { outline: none; }
 .project-sub { font-size: 17px; color: var(--muted); margin: 8px 0 0; }
 .project-meta { font-size: 13px; letter-spacing: .04em; color: var(--muted); margin: 14px 0 0; }
 .project-cover img { width: 100%; height: auto; max-height: 92vh; object-fit: cover; background: var(--soft); }
-/* künye şeridi (ArchDaily düzeni) */
-.facts { display: flex; flex-wrap: wrap; gap: 14px 36px; margin: 26px 0 0; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.fact { margin: 0; }
-.fact dt { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.fact dd { margin: 2px 0 0; font-size: 14px; }
-.fact-wide { flex-basis: 100%; max-width: 60em; }
-/* açılıştaki açıklama */
-.project-lead { max-width: 44em; margin: 26px 0 8px; font-size: 19px; line-height: 1.5; letter-spacing: -0.005em; }
-.project-lead p { margin: 0; }
-.project-head + .project-cover { margin-top: 24px; }
+/* açılış: künye (sol) + özet (sağ) */
+.project-intro { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 32px 56px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); align-items: start; }
+@media (max-width: 860px) { .project-intro { grid-template-columns: 1fr; gap: 24px; } }
+.facts { margin: 0; }
+.fact { margin: 0; display: grid; grid-template-columns: 104px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+.fact dt { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+.fact dd { margin: 0; }
+.project-summary { max-width: 46em; font-size: 16px; line-height: 1.7; }
+.project-summary p { margin: 0 0 1em; }
+.project-summary p:last-child { margin-bottom: 0; }
+.project-summary p:first-child { font-size: 18px; line-height: 1.55; letter-spacing: -0.005em; }
+.project-head + .project-cover { margin-top: 32px; }
 /* proje raporu: metin ve görsel dönüşümü */
 .project-body { padding: 40px 0 8px; display: grid; gap: 36px; }
 .project-text { max-width: 44em; margin-inline: auto; font-size: 16px; line-height: 1.7; }
@@ -195,10 +197,13 @@ main:focus { outline: none; }
 .fig-card img { background: #fff; }
 .credits { padding: 24px 0 8px; }
 .credits .section-title { margin-bottom: 8px; }
-.project-nav { display: flex; justify-content: space-between; gap: 24px; padding: 48px 0 72px; border-top: 1px solid var(--line); margin-top: 40px; }
-.project-nav-link { display: flex; flex-direction: column; gap: 2px; font-size: 15px; }
+.project-nav { display: flex; justify-content: space-between; gap: 24px; padding: 36px 0 56px; border-top: 1px solid var(--line); margin-top: 40px; }
+.project-nav-link { display: flex; align-items: center; gap: 14px; font-size: 15px; }
+.project-nav-link img { width: 72px; height: 72px; object-fit: cover; background: var(--soft); flex: none; }
+.project-nav-text { display: flex; flex-direction: column; gap: 2px; }
 .project-nav-link .muted { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
-.project-nav-link.is-next { text-align: right; margin-left: auto; }
+.project-nav-link.is-next { text-align: right; margin-left: auto; flex-direction: row-reverse; }
+@media (max-width: 520px) { .project-nav { flex-direction: column; } .project-nav-link.is-next { margin-left: 0; flex-direction: row; text-align: left; } }
 
 /* --- düz sayfalar --- */
 .page-body { padding: 8px 0 56px; }
@@ -232,15 +237,15 @@ main:focus { outline: none; }
 .notfound { padding: 96px 0 120px; }
 
 /* --- altbilgi --- */
-.site-footer { border-top: 1px solid var(--line); margin-top: 24px; }
-.footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 40px 0 44px; align-items: start; }
+.site-footer { border-top: 1px solid var(--line); margin-top: 8px; }
+.footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; padding: 20px 0 18px; align-items: start; }
 .footer-brand img { height: 16px; width: auto; margin-bottom: 10px; }
 .footer-brand p { font-size: 13.5px; line-height: 1.6; margin: 0 0 4px; }
 .footer-brand a { color: var(--muted); }
 .footer-brand a:hover { color: var(--fg); }
 .footer-contact { list-style: none; margin: 0; padding: 26px 0 0; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; line-height: 1.6; justify-self: end; text-align: right; }
 .footer-contact a, .footer-legal a, .nav-lang a { display: inline-block; padding: 4px 6px; margin: -4px -6px; }
-.footer-legal { grid-column: 1 / -1; font-size: 12px; margin: 8px 0 0; }
+.footer-legal { grid-column: 1 / -1; font-size: 12px; margin: 2px 0 0; }
 @media (max-width: 640px) { .footer-grid { grid-template-columns: 1fr; } .footer-contact { justify-self: start; text-align: left; } }
 
 /* --- GLightbox ince ayar --- */

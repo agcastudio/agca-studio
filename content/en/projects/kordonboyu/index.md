@@ -27,6 +27,8 @@ cover_alt: "Kordonboyu Apartment Building: street view of a six-storey residenti
 card: "r-kordonboyu-apartment-image1.jpg"
 card_alt: "Kordonboyu Apartment Building street perspective"
 credits: "Design and visualisation: agca·studio"
+ozet: |
+  A residential building on a sloping plot in Kordonboyu, Kartal, read as six storeys from the street. The slope adds a garden level at the lower end and the hipped roof a roof floor. The facade is built from white rendered frames and, inside them, anthracite balcony panels that shift from floor to floor; a band of planters along their top edge turns the balconies into a green line when seen from the street. The plan is resolved with two apartments either side of a central stair and lift core, with the entrance at the middle of the long facade. The top-floor apartments connect by internal stairs and a gallery void to the roof floor, with terraces cut into the roof. The project was developed in a single Revit model, from which plans, section, elevations and visualisations were produced.
 images:
   - file: "r-kordonboyu-apartment-image1.jpg"
     alt: "Six-storey white residential building seen from the street corner; anthracite balcony panels, dark roof, trees and a neighbouring block"

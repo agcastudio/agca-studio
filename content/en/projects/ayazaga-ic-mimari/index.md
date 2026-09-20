@@ -27,6 +27,8 @@ cover_alt: "Ayazağa Apartment living room: cream walls, television unit with li
 card: "r-4.jpg"
 card_alt: "Ayazağa Apartment living room"
 credits: "Interior design and visualisation: agca·studio"
+ozet: |
+  Interior design for an apartment in Ayazağa, Sarıyer. A single material language runs through the home: cream walls and cabinets, travertine bathroom surfaces, herringbone oak floors and warm white concealed lighting. Colour is concentrated in the olive green upper cabinets of the kitchen and the tree-silhouette wall covering of the bedroom, and green recurs in small touches of cushions, stools and bathroom tile. The entrance hall greets with a backlit arched mirror; living room and dining area share a single space, and the kitchen opens off the entrance hall as a separate room. The dressing area beyond the bedroom is built from wardrobes behind lit glass doors and a vanity niche; bathroom and laundry are gathered in a single travertine volume. Furniture, joinery and lighting decisions were set out to size in a Revit model and visualised from it.
 images:
   - file: "r-6.jpg"
     alt: "Entrance hall: backlit arched mirror over a floating timber console, timber wardrobes, herringbone floor and a black-framed frosted glass sliding door"

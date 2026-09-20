@@ -42,6 +42,8 @@ other = "Ticari"
 other = "Kentsel Dönüşüm"
 [tur_scan_to_bim]
 other = "Scan to BIM"
+[tur_saglik]
+other = "Sağlık"
 [tur_ic_mekan]
 other = "İç Mekân"
 [kunye]

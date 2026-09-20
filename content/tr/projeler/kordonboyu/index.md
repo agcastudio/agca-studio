@@ -26,6 +26,8 @@ cover_alt: "Kordonboyu Apartmanı: beyaz sıvalı, antrasit balkon panelli altı
 card: "r-kordonboyu-apartment-image1.jpg"
 card_alt: "Kordonboyu Apartmanı sokak perspektifi"
 credits: "Tasarım ve görselleştirme: agca·studio"
+ozet: |
+  Kartal Kordonboyu'nda, eğimli bir parselde sokaktan altı kat okunan bir konut yapısı. Eğim alçak uçta bir bahçe katı, kırma çatı da bir çatı katı ekler. Cephe, beyaz sıvalı çerçeveler ve bu çerçevelerin içinde kattan kata yer değiştiren antrasit balkon panelleriyle kurulur; panellerin üst kenarındaki saksı bandı balkonları sokaktan bakınca yeşil bir çizgiye dönüştürür. Plan, ortadaki merdiven-asansör çekirdeğinin iki yanına yerleşen iki daireyle çözülür; giriş uzun cephenin ortasındandır. Son kat daireleri iç merdiven ve galeri boşluğuyla çatı katına bağlanır, teraslar çatıya oyulur. Proje Revit üzerinde tek bilgi modelinde yürütüldü; plan, kesit, görünüş ve görselleştirmeler aynı modelden üretildi.
 images:
   - file: "r-kordonboyu-apartment-image1.jpg"
     alt: "Sokak köşesinden altı katlı beyaz konut yapısı; antrasit balkon panelleri, koyu çatı, ağaçlar ve komşu apartman"
