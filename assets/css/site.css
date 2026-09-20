@@ -194,6 +194,9 @@ main:focus { outline: none; }
 .person-name { font-size: 16px; margin-top: 14px; font-weight: 500; }
 .person-role { font-size: 13px; margin: 2px 0 8px; }
 .person-bio { font-size: 14px; color: #333; }
+.person-link { font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; margin: 4px 0 0; }
+.person-link a { display: inline-block; padding: 6px 0; color: var(--muted); }
+.person-link a:hover { color: var(--fg); }
 .notfound { padding: 96px 0 120px; }
 
 /* --- altbilgi --- */

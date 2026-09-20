@@ -17,6 +17,7 @@
       <dl class="contact-list">
         <div><dt>{{ i18n "contact_email" }}</dt><dd><a href="mailto:{{ site.Params.email }}">{{ site.Params.email }}</a></dd></div>
         {{- with site.Params.phone }}<div><dt>{{ i18n "contact_phone" }}</dt><dd><a href="tel:{{ replace . " " "" }}">{{ . }}</a></dd></div>{{ end }}
+        {{- with site.Params.whatsapp }}<div><dt>WhatsApp</dt><dd><a href="https://wa.me/{{ . }}" rel="noopener" target="_blank">{{ site.Params.phone | default "WhatsApp" }}</a></dd></div>{{ end }}
         <div><dt>{{ i18n "contact_address" }}</dt><dd>{{ site.Params.district }}, {{ site.Params.city }}</dd></div>
         {{- if or site.Params.instagram site.Params.linkedin }}
         <div><dt>{{ i18n "contact_social" }}</dt><dd>
@@ -48,6 +49,7 @@
         <h3 class="person-name">{{ $person.name }}</h3>
         <p class="person-role muted">{{ $person.role }}</p>
         {{- with $person.bio }}<p class="person-bio">{{ . | markdownify }}</p>{{ end }}
+        {{- with $person.linkedin }}<p class="person-link"><a href="{{ . }}" rel="noopener" target="_blank">LinkedIn ↗</a></p>{{ end }}
       </li>
       {{- end }}
     </ul>

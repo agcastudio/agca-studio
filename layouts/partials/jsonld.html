@@ -17,7 +17,11 @@
 {{- with site.GetPage (cond (eq $p.Language.Lang "tr") "/studyo" "/studio") -}}
   {{- with .Params.people -}}
     {{- $founders := slice -}}
-    {{- range . }}{{ $founders = $founders | append (dict "@type" "Person" "name" .name "jobTitle" .role "worksFor" (dict "@id" (printf "%s#org" site.BaseURL))) }}{{ end -}}
+    {{- range . }}
+      {{- $person := dict "@type" "Person" "name" .name "jobTitle" .role "worksFor" (dict "@id" (printf "%s#org" site.BaseURL)) -}}
+      {{- with .linkedin }}{{ $person = merge $person (dict "sameAs" (slice .)) }}{{ end -}}
+      {{- $founders = $founders | append $person -}}
+    {{- end -}}
     {{- $org = merge $org (dict "founder" $founders) -}}
   {{- end -}}
 {{- end -}}

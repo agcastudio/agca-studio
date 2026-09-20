@@ -71,7 +71,7 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 ## Bekleyen bilgiler (kullanıcıdan)
 
 - ~~Kurucu ortakların ad-soyad, unvan, biyografi~~ → 2026-09-20 alındı: Kutbeddin Ağca (ka.jpg) ve Selen Baş Ağca (sb.jpg), Kurucu Ortak · Mimar; metinler Stüdyo sayfasında, yapısal veride `founder`.
-- Telefon numarası; Instagram ve LinkedIn adresleri.
+- ~~Telefon numarası; Instagram ve LinkedIn adresleri~~ → 2026-09-20 alındı: WhatsApp/telefon +90 538 027 62 83, Instagram instagram.com/agcastudio, kişisel LinkedIn hesapları Stüdyo sayfasında (stüdyo LinkedIn sayfası yok).
 - OYUK: yarışmanın resmî adı, yılı, sonuç/derece, ekip (yayınlanacaksa).
 - İkinci projenin klasörü (`Projeler/<kod>_Görseller/`) ve türü.
 - Cloudflare + GitHub adımları (yayın aşamasında birlikte): depo oluşturma, Git bağlantısı, ad sunucusu değişikliği.
