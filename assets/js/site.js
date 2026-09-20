@@ -10,13 +10,22 @@
     var lblClose = toggle.querySelector("[data-label-close]");
     var setOpen = function (open) {
       nav.classList.toggle("is-open", open);
-      document.body.classList.toggle("nav-open", open);
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
       if (lblOpen) lblOpen.hidden = open;
       if (lblClose) lblClose.hidden = !open;
     };
     toggle.addEventListener("click", function () {
       setOpen(!nav.classList.contains("is-open"));
+    });
+    /* bağlantıya basınca kapansın */
+    nav.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest("a")) setOpen(false);
+    });
+    /* menünün dışına dokununca kapansın */
+    document.addEventListener("click", function (e) {
+      if (!nav.classList.contains("is-open")) return;
+      if (nav.contains(e.target) || toggle.contains(e.target)) return;
+      setOpen(false);
     });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && nav.classList.contains("is-open")) { setOpen(false); toggle.focus(); }
