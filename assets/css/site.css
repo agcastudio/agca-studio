@@ -149,7 +149,8 @@ main:focus { outline: none; }
 .project-title { font-size: clamp(30px, 4vw, 52px); font-weight: 400; letter-spacing: -0.02em; }
 .project-sub { font-size: 17px; color: var(--muted); margin: 8px 0 0; }
 .project-meta { font-size: 13px; letter-spacing: .04em; color: var(--muted); margin: 14px 0 0; }
-.project-cover img { width: 100%; height: auto; max-height: 92vh; object-fit: cover; background: var(--soft); }
+.project-cover-link { display: block; cursor: zoom-in; }
+.project-cover img { display: block; width: 100%; height: auto; max-height: 88vh; object-fit: cover; background: var(--soft); }
 /* açılış: künye (sol) + özet (sağ) */
 .project-intro { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 32px 56px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); align-items: start; }
 @media (max-width: 860px) { .project-intro { grid-template-columns: 1fr; gap: 24px; } }
@@ -161,15 +162,9 @@ main:focus { outline: none; }
 .project-summary p { margin: 0 0 1em; }
 .project-summary p:last-child { margin-bottom: 0; }
 .project-summary p:first-child { font-size: 18px; line-height: 1.55; letter-spacing: -0.005em; }
-.project-head + .project-cover { margin-top: 32px; }
-/* proje raporu: metin ve görsel dönüşümü */
-.project-body { padding: 40px 0 8px; display: grid; gap: 36px; }
-.project-text { max-width: 44em; margin-inline: auto; font-size: 16px; line-height: 1.7; }
-.project-text p { margin: 0; }
-.gallery-item .fig { margin: 0; }
-/* küçük kareler (kapağın hemen altında) */
-.thumbs-section { padding: 22px 0 8px; }
-.thumbs-section .section-head { margin-bottom: 14px; }
+.project-head + .project-cover { margin-top: 28px; }
+/* küçük kareler: kapağın hemen altında, başlıksız, kapakla aynı hizada */
+.thumbs-section { padding: 6px 0 8px; }
 .small { font-size: 12.5px; }
 .thumbs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
 @media (max-width: 1023px) { .thumbs { grid-template-columns: repeat(4, 1fr); } }
@@ -195,9 +190,19 @@ main:focus { outline: none; }
 .fig-card { max-width: none; }
 .fig-card .glb { border: 1px solid var(--line); padding: 12px; background: #fff; }
 .fig-card img { background: #fff; }
-.credits { padding: 24px 0 8px; }
-.credits .section-title { margin-bottom: 8px; }
-.project-nav { display: flex; justify-content: space-between; gap: 24px; padding: 36px 0 56px; border-top: 1px solid var(--line); margin-top: 40px; }
+/* sanal tur: tıklayınca yüklenen çerçeve */
+.tour { padding: 36px 0 8px; }
+.tour .section-head { margin-bottom: 14px; }
+.tour-frame { position: relative; aspect-ratio: 16 / 9; background: var(--soft); overflow: hidden; }
+.tour-frame picture, .tour-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tour-frame img { filter: saturate(.8) brightness(.92); }
+.tour-start { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 12px; background: rgba(255,255,255,.94); color: var(--fg); border: 0; padding: 14px 22px 14px 18px; font: inherit; font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: background var(--t), color var(--t); }
+.tour-start:hover, .tour-start:focus-visible { background: var(--fg); color: #fff; }
+.tour-play { width: 0; height: 0; border-style: solid; border-width: 7px 0 7px 12px; border-color: transparent transparent transparent currentColor; }
+.tour-note { position: absolute; left: 14px; bottom: 10px; margin: 0; font-size: 12px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.tour-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+@media (max-width: 640px) { .tour-frame { aspect-ratio: 4 / 3; } }
+.project-nav { display: flex; justify-content: space-between; gap: 24px; padding: 18px 0 22px; border-top: 1px solid var(--line); margin-top: 28px; }
 .project-nav-link { display: flex; align-items: center; gap: 14px; font-size: 15px; }
 .project-nav-link img { width: 72px; height: 72px; object-fit: cover; background: var(--soft); flex: none; }
 .project-nav-text { display: flex; flex-direction: column; gap: 2px; }

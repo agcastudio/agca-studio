@@ -1,0 +1,5 @@
+{{- /* Büyütme penceresi hedefi: en fazla 2048 px kenar, WebP q80. Girdi: görsel kaynağı; çıktı: işlenmiş kaynak */ -}}
+{{- $img := . -}}
+{{- $full := $img -}}
+{{- if gt $img.Height $img.Width }}{{ if gt $img.Height 2048 }}{{ $full = $img.Resize "x2048 webp q80" }}{{ else }}{{ $full = $img.Resize (printf "x%d webp q80" $img.Height) }}{{ end }}{{ else }}{{ if gt $img.Width 2048 }}{{ $full = $img.Resize "2048x webp q80" }}{{ else }}{{ $full = $img.Resize (printf "%dx webp q80" $img.Width) }}{{ end }}{{ end -}}
+{{- return $full -}}

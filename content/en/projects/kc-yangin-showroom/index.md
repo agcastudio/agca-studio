@@ -21,7 +21,7 @@ kunye:
   ekip: ""
   rol: "Interior design and visualisation"
   derece: ""
-sanal_tur: ""
+sanal_tur: "https://storage.net-fs.com/hosting/8371092/4/"
 cover: "r-2.jpg"
 cover_alt: "KC Yangın showroom: a long meeting table with yellow chairs, a yellow KC wall and display plinths on the left, white cylindrical counters on the right, a black wall with screens behind"
 card: "r-2.jpg"

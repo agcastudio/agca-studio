@@ -85,7 +85,7 @@ other = "Diyagramlar"
 [credits]
 other = "Katkılar"
 [virtual_tour]
-other = "Sanal turu aç"
+other = "Sanal tur"
 [prev_project]
 other = "Önceki proje"
 [next_project]
@@ -116,3 +116,15 @@ other = "Aradığınız sayfa taşınmış ya da hiç var olmamış olabilir."
 other = "Ana sayfaya dön"
 [read_more]
 other = "Devamı"
+
+[tour_start]
+other = "Sanal turu başlat"
+
+[tour_new_tab]
+other = "Yeni sekmede aç"
+
+[tour_note]
+other = "Tur, başlatınca üçüncü taraf sunucudan yüklenir."
+
+[kunye_yarisma]
+other = "Yarışma"

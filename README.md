@@ -39,6 +39,9 @@ Tarayıcıda http://localhost:1313 (Hugo `winget install Hugo.Hugo.Extended` ile
 
 ## Metin ve ayarlar
 
+- Proje sayfasında ön bilgideki `ozet` alanı gösterilir; `---` altındaki gövde metni **gösterilmez** (karar 2026-09-20: galeriden sonra metin yok). Gövde, ileride gerekirse diye dosyalarda duruyor.
+- `sanal_tur` alanına bağlantı yazılan projede galerinin altında "Sanal tur" bölümü çıkar; tur ancak ziyaretçi düğmeye basınca yüklenir.
+
 - Telefon, Instagram, LinkedIn: `hugo.toml` → `[params]`. Boş bırakılan alan sitede görünmez.
 - Stüdyo sayfası ve kurucular: `content/tr/studyo.md` (`people` listesi) ve `content/en/studio.md`.
 - Gizlilik: `content/tr/gizlilik.md`, `content/en/privacy.md`.

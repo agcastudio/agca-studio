@@ -21,7 +21,7 @@ kunye:
   ekip: ""
   rol: "İç mimari tasarım ve görselleştirme"
   derece: ""
-sanal_tur: ""
+sanal_tur: "https://storage.net-fs.com/hosting/8371092/4/"
 cover: "r-2.jpg"
 cover_alt: "KC Yangın showroomu: ortada uzun toplantı masası ve sarı sandalyeler, solda sarı KC duvarı ve sergi kaideleri, sağda beyaz silindirik bankolar, arkada ekranlı siyah duvar"
 card: "r-2.jpg"

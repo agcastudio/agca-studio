@@ -86,7 +86,7 @@ other = "Diagrams"
 [credits]
 other = "Credits"
 [virtual_tour]
-other = "Open virtual tour"
+other = "Virtual tour"
 [prev_project]
 other = "Previous project"
 [next_project]
@@ -117,3 +117,15 @@ other = "The page you are looking for may have moved or never existed."
 other = "Back to home"
 [read_more]
 other = "Read more"
+
+[tour_start]
+other = "Start the virtual tour"
+
+[tour_new_tab]
+other = "Open in a new tab"
+
+[tour_note]
+other = "The tour loads from a third-party server once started."
+
+[kunye_yarisma]
+other = "Competition"

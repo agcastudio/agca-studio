@@ -94,9 +94,11 @@
     if (m) apply(decodeURIComponent(m[1]), false);
   }
 
-  /* Büyütme penceresi */
-  if (window.GLightbox && document.querySelector(".glb")) {
-    GLightbox({
+  /* Büyütme penceresi (GLightbox yalnız proje sayfasında yüklenir) */
+  var lb = null;
+  var setupLightbox = function () {
+    if (lb || !window.GLightbox || !document.querySelector(".glb")) return;
+    lb = GLightbox({
       selector: ".glb",
       touchNavigation: true,
       loop: false,
@@ -108,12 +110,39 @@
       moreLength: 0,
       preload: true
     });
-  } else if (document.querySelector(".glb")) {
-    /* GLightbox henüz yüklenmediyse yükleme bitince kur */
-    window.addEventListener("load", function () {
-      if (window.GLightbox) {
-        GLightbox({ selector: ".glb", touchNavigation: true, loop: false, zoomable: true, openEffect: "fade", closeEffect: "fade", slideEffect: "fade", moreLength: 0 });
-      }
+  };
+  setupLightbox();
+  if (!lb) window.addEventListener("load", setupLightbox);
+
+  /* Kapak tıklaması: büyütme penceresini kapak görselinden açar; pencere kurulamazsa bağlantı görseli açar */
+  var coverLink = document.querySelector("[data-cover-open]");
+  if (coverLink) {
+    coverLink.addEventListener("click", function (e) {
+      setupLightbox();
+      if (!lb) return;
+      e.preventDefault();
+      var hrefs = Array.prototype.map.call(document.querySelectorAll(".glb"), function (a) { return a.href; });
+      var i = hrefs.indexOf(coverLink.href);
+      if (i >= 0) { lb.openAt(i); return; }
+      GLightbox({ elements: [{ href: coverLink.href, type: "image" }], openEffect: "fade", closeEffect: "fade" }).open();
+    });
+  }
+
+  /* Sanal tur: üçüncü taraf çerçeve ancak ziyaretçi başlatınca yüklenir */
+  var tour = document.querySelector("[data-tour]");
+  var tourStart = tour && tour.querySelector("[data-tour-start]");
+  if (tour && tourStart) {
+    tourStart.addEventListener("click", function () {
+      var f = document.createElement("iframe");
+      f.src = tour.getAttribute("data-tour");
+      f.title = tour.getAttribute("data-title") || "";
+      f.setAttribute("allow", "fullscreen; accelerometer; gyroscope; xr-spatial-tracking");
+      f.setAttribute("allowfullscreen", "");
+      f.setAttribute("referrerpolicy", "no-referrer");
+      tour.classList.add("is-live");
+      while (tour.firstChild) tour.removeChild(tour.firstChild);
+      tour.appendChild(f);
+      f.focus();
     });
   }
 })();

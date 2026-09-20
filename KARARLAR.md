@@ -56,7 +56,7 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 | 2026-09-19 | 25 | İçerik: yalnız kullanıcı, VS Code'da Markdown + `git push`; yerel önizleme `hugo server`. Yeni proje = klasör + `index.md` + görseller (`hazirla.py` ile). | Sveltia CMS | Kullanıcı (a) | — | hayır |
 | 2026-09-19 | 26 | Form yok: e-posta (info@agca.studio) + telefon + Instagram/LinkedIn bağlantıları. Sunucu tarafı kod yok. | Worker + Turnstile | Kullanıcı (a) | — | hayır |
 | 2026-09-19 | 27 | Derleme anında türevler (Hugo görsel işleme: WebP + JPEG, 480/960/1440/1920). Filigran yok, R2 yedeği yok; orijinaller kullanıcıda. Depoya yalnız `hazirla.py` ile 2560 px sRGB'ye indirilmiş kaynaklar girer. | CDN dönüşümü | Kullanıcı: filigran/arşiv yok | — | kısmen |
-| 2026-09-19 | 28 | Pafta Studio ile **hiçbir ilişki yok**: ayrı depo, ayrı adres, bağlantı verilmez, alt alan adı yapılmaz. | alt alan adı | Kullanıcı: "kesinlikle ilişkilendirme" | — | hayır |
+| 2026-09-19 | 28 | Ofisin diğer web projesiyle **hiçbir ilişki yok**: ayrı depo, ayrı adres, bağlantı verilmez, alt alan adı yapılmaz. | alt alan adı | Kullanıcı: "kesinlikle ilişkilendirme" | — | hayır |
 
 ## F) SEO, ölçüm, hukuk, bakım
 
@@ -92,6 +92,10 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 | 2026-09-20 | 17 | Kapak slaytında noktalar kaldırıldı; sağ-sol ok düğmeleri (klavye ok tuşları da çalışır). | Kullanıcı isteği |
 | 2026-09-20 | 26 | Altbilgi dikey boşlukları azaltıldı (üst 20 px, alt 18 px). | Kullanıcı isteği |
 | 2026-09-20 | 4 | Bodrum ve Zapsu metinleri çizim okumasıyla doğrulandı ve düzeltildi: Zapsu'da yatak odası yok (alt kat resim atölyesi, ortak alan, sinema odası), ev yola bitişik, çatı bahçeye yükselen tek eğim; Bodrum'da fizyoterapi salonu 1. katta, kapak ön cephe ve geçit, dinlenme şezlongları cephe açıklıklarında. Yapay zekâ kavram görsellerinin alt yazısına "taş kaplama ve düz çatı modelden farklıdır" notu eklendi. Rapor paragrafları özeti tekrarlamayacak biçimde yeniden yazıldı. | Doğrulama akışı bulguları |
+| 2026-09-20 | 19 | Proje sayfası (4. düzenleme): kapak ve küçük kareler kenarlardan içeride (`.wrap`) ve aynı hizada; galeri başlığı ve görsel sayısı kaldırıldı; galeriden sonra rapor metni, çizim/diyagram bölümleri ve katkılar gösterilmiyor (gövde metni dosyalarda duruyor, sayfada yalnız `ozet`); kapak tıklanınca büyütme penceresi kapağın karesinden açılır; önceki/sonraki bloğunun üst-alt boşlukları azaltıldı. | Kullanıcı isteği |
+| 2026-09-20 | 7 | Sanal tur bölümü: `sanal_tur` alanı olan projelerde galerinin altında "Sanal tur" bölümü. Üçüncü taraf çerçeve (net-fs.com) yalnız ziyaretçi "Sanal turu başlat" deyince yüklenir (çerezsiz site kararıyla uyumlu); "yeni sekmede aç" bağlantısı var; gizlilik sayfasına üçüncü taraf içerik maddesi eklendi. Şimdilik KC Yangın (`SANAL TUR LİNKLERİ.pdf`'teki 8 turdan sitede olan tek proje). | Kullanıcı isteği |
+| 2026-09-20 | 3 | Oyuk: yarışma bilgileri mugla.bel.tr/yarisma/yarisma-detay/1'den alındı: Muğla Büyükşehir Belediyesi Sosyal, Kültürel ve İdari Hizmetler Binası Ulusal, Tek Kademeli Mimari Proje Yarışması (ilan 08.05.2026, teslim 10.08.2026, kolokyum 07.09.2026); künyeye "Yarışma" satırı (`yarisma`) eklendi, alt başlık resmî ada çekildi. Ödül alan yarışmacılar tutanağında (28.08.2026) 15732 rumuzu yok; derece alanı boş. | Kullanıcı bağlantısı |
+| 2026-09-20 | 24 | GitHub deposu github.com/agcastudio/agca-studio (kullanıcı açtı); yerel `main` dalı `origin` olarak buraya itildi. Cloudflare Workers bağlantısı kullanıcı hesabında yapılacak (YAYIN.md). | Kullanıcı isteği |
 
 ## Bekleyen bilgiler (kullanıcıdan)
 
@@ -103,6 +107,6 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 
 - ~~Kurucu ortakların ad-soyad, unvan, biyografi~~ → 2026-09-20 alındı: Kutbeddin Ağca (ka.jpg) ve Selen Baş Ağca (sb.jpg), Kurucu Ortak · Mimar; metinler Stüdyo sayfasında, yapısal veride `founder`.
 - ~~Telefon numarası; Instagram ve LinkedIn adresleri~~ → 2026-09-20 alındı: WhatsApp/telefon +90 538 027 62 83, Instagram instagram.com/agcastudio, kişisel LinkedIn hesapları Stüdyo sayfasında (stüdyo LinkedIn sayfası yok).
-- OYUK: yarışmanın resmî adı, yılı, sonuç/derece, ekip (yayınlanacaksa).
+- ~~OYUK: yarışmanın resmî adı, yılı, sonuç/derece~~ → 2026-09-20 alındı (mugla.bel.tr); ödül listesinde yok. Ekip adları hâlâ boş.
 - İkinci projenin klasörü (`Projeler/<kod>_Görseller/`) ve türü.
 - Cloudflare + GitHub adımları (yayın aşamasında birlikte): depo oluşturma, Git bağlantısı, ad sunucusu değişikliği.

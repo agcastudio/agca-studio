@@ -5,16 +5,20 @@
 {{- $images := .Params.images | default slice -}}
 {{- $drawings := .Params.drawings | default slice -}}
 {{- $diagrams := .Params.diagrams | default slice -}}
-{{- /* Paragraflar: ilki açılıştaki açıklama, kalanı görsellerle dönüşümlü rapor */ -}}
-{{- $paras := slice -}}
-{{- range split (string .Content) "</p>" }}{{ if strings.TrimSpace . }}{{ $paras = $paras | append (printf "%s</p>" .) }}{{ end }}{{ end -}}
-{{- /* Özet (ozet) varsa künyenin yanında gösterilir, gövdenin tamamı rapora gider; yoksa ilk paragraf özet olur */ -}}
+{{- /* Özet: ozet alanı; yoksa gövdenin ilk paragrafı. Gövdenin kalanı sayfada gösterilmez (karar 2026-09-20: galeriden sonra metin ve görsel yok). */ -}}
 {{- $summary := "" -}}
 {{- with .Params.ozet }}{{ $summary = . | markdownify }}{{ end -}}
-{{- $rest := $paras -}}
-{{- if not $summary }}{{ with $paras }}{{ $summary = index . 0 | safeHTML }}{{ end }}{{ if gt (len $paras) 1 }}{{ $rest = after 1 $paras }}{{ else }}{{ $rest = slice }}{{ end }}{{ end -}}
+{{- if not $summary }}{{ range split (string .Content) "</p>" }}{{ if and (not $summary) (strings.TrimSpace .) }}{{ $summary = printf "%s</p>" . | safeHTML }}{{ end }}{{ end }}{{ end -}}
+{{- /* Tüm görseller tek büyütme dizisi; kapak tıklaması bu dizide kendi karesinden açılır */ -}}
+{{- $all := slice -}}
+{{- range $images }}{{ $all = $all | append . }}{{ end -}}
+{{- range $drawings }}{{ $all = $all | append . }}{{ end -}}
+{{- range $diagrams }}{{ $all = $all | append . }}{{ end -}}
+{{- $coverFull := "" -}}
+{{- with .Params.cover }}{{ with resources.Get (printf "projeler/%s/%s" $slug .) }}{{ $coverFull = (partial "lightbox-src.html" .).RelPermalink }}{{ end }}{{ end -}}
+{{- $coverAlt := .Params.cover_alt | default .Title -}}
 <article class="project">
-  {{- /* 1. Açılış: başlık, künye ve açıklama */ -}}
+  {{- /* 1. Açılış: başlık, künye ve özet */ -}}
   <header class="wrap project-head">
     <p class="crumb"><a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a>{{ with .Params.tur }} · {{ i18n (printf "tur_%s" (index . 0)) }}{{ end }}</p>
     <h1 class="project-title">{{ .Title }}</h1>
@@ -22,7 +26,7 @@
     <div class="project-intro">
       <dl class="facts" aria-label="{{ i18n "kunye" }}">
         <div class="fact"><dt>{{ i18n "facts_architects" }}</dt><dd>{{ site.Params.brand }}</dd></div>
-        {{- range $key := slice "yer" "proje_yili" "bitis_yili" "insaat_alani" "arsa_alani" "durum" "rol" "derece" "isveren" }}
+        {{- range $key := slice "yer" "proje_yili" "bitis_yili" "insaat_alani" "arsa_alani" "durum" "yarisma" "derece" "rol" "isveren" }}
           {{- with index $k $key }}<div class="fact"><dt>{{ i18n (printf "kunye_%s" $key) }}</dt><dd>{{ . }}</dd></div>{{ end }}
         {{- end }}
         {{- with .Params.tur }}<div class="fact"><dt>{{ i18n "kunye_tur" }}</dt><dd>{{ range $i, $t := . }}{{ if $i }}, {{ end }}{{ i18n (printf "tur_%s" $t) }}{{ end }}</dd></div>{{ end }}
@@ -32,30 +36,24 @@
       <div class="project-summary">
         {{ $summary }}
         {{- with .Params.sanal_tur }}
-        <p><a class="btn" href="{{ . }}" target="_blank" rel="noopener">{{ i18n "virtual_tour" }} ↗</a></p>
+        <p><a class="btn" href="#sanal-tur">{{ i18n "virtual_tour" }} ↓</a></p>
         {{- end }}
       </div>
     </div>
   </header>
 
-  {{- /* 2. Büyük kapak görseli */ -}}
+  {{- /* 2. Kapak: kenarlardan içeride (.wrap), altındaki karelerle aynı hizada; tıklanınca büyütme penceresi */ -}}
   {{- with $hero }}
-  <div class="project-cover">
-    {{ partial "hero-picture.html" (dict "hero" . "alt" ($.Params.cover_alt | default $.Title)) }}
+  <div class="wrap project-cover">
+    {{- if $coverFull }}<a class="project-cover-link" href="{{ $coverFull }}" data-cover-open aria-label="{{ i18n "open_image" }}: {{ $coverAlt }}">{{ end }}
+    {{ partial "hero-picture.html" (dict "hero" . "alt" $coverAlt) }}
+    {{- if $coverFull }}</a>{{ end }}
   </div>
   {{- end }}
 
-  {{- /* 3. Kapağın hemen altında küçük kareler: tüm görseller */ -}}
-  {{- $all := slice -}}
-  {{- range $images }}{{ $all = $all | append . }}{{ end -}}
-  {{- range $drawings }}{{ $all = $all | append . }}{{ end -}}
-  {{- range $diagrams }}{{ $all = $all | append . }}{{ end -}}
+  {{- /* 3. Kapağın hemen altında başlıksız küçük kareler: tüm görseller, çizimler ve diyagramlar */ -}}
   {{- with $all }}
-  <section class="wrap thumbs-section">
-    <div class="section-head">
-      <h2 class="section-title">{{ i18n "project_gallery" }}</h2>
-      <span class="muted small">{{ i18n "images_count" (len .) }}</span>
-    </div>
+  <section class="wrap thumbs-section" aria-label="{{ i18n "project_gallery" }}">
     <ul class="thumbs">
       {{- range . }}
         {{- $it := . -}}
@@ -64,8 +62,7 @@
         {{- $t1 := $img.Fill "240x240 webp q75" -}}
         {{- $t2 := $img.Fill "480x480 webp q75" -}}
         {{- $tf := $img.Fill "240x240 jpg" -}}
-        {{- $full := $img -}}
-        {{- if gt $img.Height $img.Width }}{{ if gt $img.Height 2048 }}{{ $full = $img.Resize "x2048 webp q80" }}{{ else }}{{ $full = $img.Resize (printf "x%d webp q80" $img.Height) }}{{ end }}{{ else }}{{ if gt $img.Width 2048 }}{{ $full = $img.Resize "2048x webp q80" }}{{ else }}{{ $full = $img.Resize (printf "%dx webp q80" $img.Width) }}{{ end }}{{ end -}}
+        {{- $full := partial "lightbox-src.html" $img -}}
         <li class="thumb">
           <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="tum" data-width="{{ $full.Width }}" data-height="{{ $full.Height }}"{{ with $it.caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $it.alt }}">
             <picture>
@@ -74,69 +71,24 @@
             </picture>
           </a>
         </li>
-        {{- end }}
+        {{- else }}{{ warnf "Görsel bulunamadı: projeler/%s/%s" $slug $it.file }}{{ end }}
       {{- end }}
     </ul>
   </section>
   {{- end }}
 
-  {{- /* 4. Proje raporu: açıklama paragrafları ve görseller dönüşümlü */ -}}
-  {{- $n := len $images -}}
-  {{- $used := 0 -}}
-  <div class="project-body">
-    {{- range $i, $para := $rest }}
-    <div class="wrap project-text">{{ $para | safeHTML }}</div>
-    {{- if lt $i $n }}
-      {{- $it := index $images $i -}}
-      {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
-      <div class="wrap gallery-item">{{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "galeri" "sizes" "(min-width: 1500px) 1400px, 100vw") }}</div>
-      {{- $used = add $i 1 -}}
-      {{- else }}{{ warnf "Görsel bulunamadı: projeler/%s/%s" $slug $it.file }}{{ end }}
-    {{- end }}
-    {{- end }}
-    {{- if lt $used $n }}
-    <section class="wrap gallery" aria-label="{{ i18n "gallery" }}">
-      {{- range $i, $it := $images }}{{ if ge $i $used }}
-        {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
-        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "galeri" "sizes" "(min-width: 1500px) 1400px, 100vw") }}
-        {{- else }}{{ warnf "Görsel bulunamadı: projeler/%s/%s" $slug $it.file }}{{ end }}
-      {{- end }}{{ end }}
-    </section>
-    {{- end }}
-  </div>
-
-  {{- with $drawings }}
-  <section class="wrap drawings">
-    <h2 class="section-title">{{ i18n "drawings" }}</h2>
-    <div class="drawings-grid">
-    {{- range . }}
-      {{- $it := . -}}
-      {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
-        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "cizimler" "class" "fig-card" "sizes" "(min-width: 861px) 50vw, 100vw" "widths" (slice 640 960 1440 1920)) }}
-      {{- else }}{{ warnf "Çizim bulunamadı: projeler/%s/%s" $slug $it.file }}{{ end }}
-    {{- end }}
+  {{- /* 4. Sanal tur (varsa): üçüncü taraf içerik ziyaretçi başlatınca yüklenir */ -}}
+  {{- with .Params.sanal_tur }}
+  <section class="wrap tour" id="sanal-tur" aria-labelledby="sanal-tur-baslik">
+    <div class="section-head">
+      <h2 class="section-title" id="sanal-tur-baslik">{{ i18n "virtual_tour" }}</h2>
+      <a class="muted small" href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ i18n "tour_new_tab" }} ↗</a>
     </div>
-  </section>
-  {{- end }}
-
-  {{- with $diagrams }}
-  <section class="wrap drawings">
-    <h2 class="section-title">{{ i18n "diagrams" }}</h2>
-    <div class="drawings-grid">
-    {{- range . }}
-      {{- $it := . -}}
-      {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
-        {{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "diyagramlar" "class" "fig-card" "sizes" "(min-width: 861px) 50vw, 100vw" "widths" (slice 640 960 1440 1920)) }}
-      {{- else }}{{ warnf "Diyagram bulunamadı: projeler/%s/%s" $slug $it.file }}{{ end }}
-    {{- end }}
+    <div class="tour-frame" data-tour="{{ . }}" data-title="{{ $.Title }} · {{ i18n "virtual_tour" }}">
+      {{- with $hero }}{{ partial "hero-picture.html" (dict "hero" . "alt" "" "lazy" true) }}{{ end }}
+      <button type="button" class="tour-start" data-tour-start><span class="tour-play" aria-hidden="true"></span>{{ i18n "tour_start" }}</button>
+      <p class="tour-note">{{ i18n "tour_note" }}</p>
     </div>
-  </section>
-  {{- end }}
-
-  {{- with .Params.credits }}
-  <section class="wrap credits">
-    <h2 class="section-title">{{ i18n "credits" }}</h2>
-    <p class="muted">{{ . | markdownify }}</p>
   </section>
   {{- end }}
 

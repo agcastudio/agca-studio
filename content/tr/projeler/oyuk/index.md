@@ -1,13 +1,13 @@
 ---
 title: "Oyuk"
-subtitle: "Kültür Merkezi Yarışma Projesi"
+subtitle: "Sosyal, Kültürel ve İdari Hizmetler Binası Yarışma Projesi"
 translationKey: "proje-oyuk"
 slug: "oyuk"
 date: 2026-05-01
 weight: 10
 draft: false
 tur: ["yarisma"]
-description: "Muğla Menteşe'de, Kurşunlu Caddesi üzerinde bir kültür merkezi yarışma projesi: caddeden avluya oyulan festival avlusu, atölyeler, kütüphane ve idare."
+description: "Muğla Menteşe'de Sosyal, Kültürel ve İdari Hizmetler Binası yarışmasına öneri: caddeden avluya oyulan festival avlusu, atölyeler, kütüphane ve idare."
 kunye:
   yer: "Menteşe, Muğla"
   isveren: ""
@@ -15,6 +15,7 @@ kunye:
   bitis_yili: ""
   program: "Kültür merkezi: festival avlusu, esnek salon, atölyeler, kütüphane, kafe, idare"
   durum: "Yarışma projesi"
+  yarisma: "Muğla Büyükşehir Belediyesi Sosyal, Kültürel ve İdari Hizmetler Binası Ulusal, Tek Kademeli Mimari Proje Yarışması, 2026"
   insaat_alani: "4.130 m²"
   arsa_alani: ""
   ekip: ""
@@ -27,7 +28,7 @@ card: "r-kose.jpg"
 card_alt: "Oyuk: beyaz sıvalı köşe cephesi ve ahşap kepenkler, Kurşunlu Caddesi"
 credits: "Tasarım ve görselleştirme: agca·studio"
 ozet: |
-  Muğla Menteşe'de, Kurşunlu Caddesi üzerinde bir kültür merkezi yarışma projesi. Yapı, kentin arasta, han ve cami avlusundan oluşan kültür rotasındaki eksik halkayı, caddeden avluya oyulan bir kamusal boşlukla tamamlar. Bu boşluk her saat açık bir festival avlusudur; sahne, atölyeler, kütüphane ve kafe onun çevresinde kümelenir. Kütle, Menteşe'nin badanalı evleri gibi beyaz ve sessizdir; cephenin tek hareketli öğesi güneşe göre açılıp kapanan ahşap kepenklerdir. Kat kurgusu sokağın sesinden idarenin sessizliğine doğru yükselir: zeminde avlu ve esnek salon, birinci katta atölyeler, ikinci katta iç bahçeli kütüphane, üçüncü katta idare ve meydana bakan teras. Toplam inşaat alanı 4.130 m²'dir.
+  Muğla Büyükşehir Belediyesi'nin 2026'da açtığı Sosyal, Kültürel ve İdari Hizmetler Binası ulusal mimari proje yarışması için Menteşe'de, Kurşunlu Caddesi üzerindeki parsele hazırlanan öneri. Yapı, kentin arasta, han ve cami avlusundan oluşan kültür rotasındaki eksik halkayı, caddeden avluya oyulan bir kamusal boşlukla tamamlar. Bu boşluk her saat açık bir festival avlusudur; sahne, atölyeler, kütüphane ve kafe onun çevresinde kümelenir. Kütle, Menteşe'nin badanalı evleri gibi beyaz ve sessizdir; cephenin tek hareketli öğesi güneşe göre açılıp kapanan ahşap kepenklerdir. Kat kurgusu sokağın sesinden idarenin sessizliğine doğru yükselir: zeminde avlu ve esnek salon, birinci katta atölyeler, ikinci katta iç bahçeli kütüphane, üçüncü katta idare ve meydana bakan teras. Toplam inşaat alanı 4.130 m²'dir.
 images:
   - file: "r-kose.jpg"
     alt: "Kurşunlu Caddesi köşesinden beyaz kütle; ahşap kepenkli pencereler ve zemin katta cam vitrin"

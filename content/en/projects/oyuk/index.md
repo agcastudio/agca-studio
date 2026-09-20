@@ -1,13 +1,13 @@
 ---
 title: "Oyuk"
-subtitle: "Cultural Centre Competition Entry"
+subtitle: "Social, Cultural and Administrative Services Building Competition Entry"
 translationKey: "proje-oyuk"
 slug: "oyuk"
 date: 2026-05-01
 weight: 10
 draft: false
 tur: ["yarisma"]
-description: "Cultural centre competition entry on Kurşunlu Street, Menteşe, Muğla: a festival courtyard carved from the street into the block, with workshops."
+description: "Entry to the Social, Cultural and Administrative Services Building competition in Menteşe, Muğla: festival courtyard carved from the street, workshops."
 kunye:
   yer: "Menteşe, Muğla"
   isveren: ""
@@ -15,6 +15,7 @@ kunye:
   bitis_yili: ""
   program: "Cultural centre: festival courtyard, flexible hall, workshops, library, café, administration"
   durum: "Competition entry"
+  yarisma: "Muğla Metropolitan Municipality Social, Cultural and Administrative Services Building national single-stage architectural competition, 2026"
   insaat_alani: "4,130 m²"
   arsa_alani: ""
   ekip: ""
@@ -27,7 +28,7 @@ card: "r-kose.jpg"
 card_alt: "Oyuk: white rendered corner facade with timber shutters on Kurşunlu Street"
 credits: "Design and visualisation: agca·studio"
 ozet: |
-  A competition entry for a cultural centre on Kurşunlu Street in Menteşe, Muğla. The building completes the missing link in the city's cultural route of bazaar, han and mosque courtyard with a public void carved from the street into the block. That void is a festival courtyard open at all hours; the stage, workshops, library and café gather around it. The volume is white and quiet, like the limewashed houses of Menteşe; the only moving element of the facade is a set of timber shutters that open and close with the sun. The floors rise from the sound of the street to the quiet of the offices: courtyard and flexible hall at ground level, workshops on the first floor, a library with an inner garden on the second, administration and a terrace facing the square on the third. The total built area is 4,130 m².
+  An entry to the national architectural competition for the Social, Cultural and Administrative Services Building opened by Muğla Metropolitan Municipality in 2026, on a plot on Kurşunlu Street in Menteşe. The building completes the missing link in the city's cultural route of bazaar, han and mosque courtyard with a public void carved from the street into the block. That void is a festival courtyard open at all hours; the stage, workshops, library and café gather around it. The volume is white and quiet, like the limewashed houses of Menteşe; the only moving element of the facade is a set of timber shutters that open and close with the sun. The floors rise from the sound of the street to the quiet of the offices: courtyard and flexible hall at ground level, workshops on the first floor, a library with an inner garden on the second, administration and a terrace facing the square on the third. The total built area is 4,130 m².
 images:
   - file: "r-kose.jpg"
     alt: "White volume seen from the corner of Kurşunlu Street; windows with timber shutters and a glazed ground floor"
