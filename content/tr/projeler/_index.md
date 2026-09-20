@@ -5,4 +5,3 @@ description: "agca·studio projeleri: İstanbul merkezli mimarlık stüdyosunun 
 cascade:
   type: "proje"
 ---
-Konut, yarışma, konsept ve ticari ölçekte seçilmiş projelerimiz. Her proje sayfasında künye, kısa anlatım, görseller ve çizimler yer alır.

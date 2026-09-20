@@ -1,8 +1,8 @@
 ---
-title: "Zapsu Farmhouse"
+title: "Farmhouse"
 subtitle: "Farmhouse on a sloping site"
-translationKey: "proje-zapsu"
-slug: "zapsu-ciftlik-evi"
+translationKey: "proje-ciftlik-evi"
+slug: "ciftlik-evi"
 date: 2024-05-01
 weight: 80
 draft: false
@@ -20,11 +20,11 @@ kunye:
   ekip: ""
   rol: "Design and visualisation"
   derece: ""
-sanal_tur: ""
+sanal_tur: "https://storage.net-fs.com/hosting/8371092/3/"
 cover: "d-5pers2-000.jpg"
-cover_alt: "Zapsu Farmhouse: a vertically timber-clad house with a mono-pitch roof among trees and a timber deck hanging over the slope"
+cover_alt: "Farmhouse: a vertically timber-clad house with a mono-pitch roof among trees and a timber deck hanging over the slope"
 card: "d-6pers2.jpg"
-card_alt: "Zapsu Farmhouse: glazed living room and timber deck"
+card_alt: "Farmhouse: glazed living room and timber deck"
 credits: "Design and visualisation: agca·studio (concept images AI-assisted)"
 ozet: |
   A single-storey house on a sloping plot within a farm, right beside the road; the lower floor is exposed on the garden side of the slope. The vertically timber-clad volume is gathered under a single mono-pitch roof rising towards the garden; at the entrance the extended eaves are carried on two slender columns. On the ground floor the entrance hall and cloakroom lead into one living space with an island kitchen, a long dining table and a fireplace; the timber deck in front of the living room rises over the slope on slender steel columns and hangs above the garden. The lower floor lines up a painting studio, a common room and a cinema room along the glazed garden facade; storage, a WC and the stair sit at the back. A lower deck in front of the studio and common room forms a second outdoor space. The concept images were produced with AI assistance and their stone cladding and flat roof differ from the model; plans, sections and elevations were taken from the model.

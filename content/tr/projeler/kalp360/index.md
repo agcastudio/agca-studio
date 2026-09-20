@@ -1,20 +1,21 @@
 ---
 title: "Kalp360 Sağlık Merkezi"
+seo_title: "Kalp360 Sağlık Merkezi · Kadıköy · agca·studio"
 subtitle: "Sağlık merkezi iç mimari projesi"
 translationKey: "proje-kalp360"
 slug: "kalp360"
-date: 2024-05-16
+date: 2023-05-16
 weight: 90
 draft: false
 tur: ["saglik", "ic_mekan"]
-description: "Kalp360 Sağlık Merkezi iç mimarisi: kavisli danışma bankosu, kemer ve daire motifli paneller, muayene odaları, efor stüdyosu ve toplantı odası."
+description: "Kadıköy'de Kalp360 Sağlık Merkezi iç mimarisi: kavisli danışma bankosu, kemer ve daire motifli paneller, muayene odaları ve efor stüdyosu."
 kunye:
-  yer: ""
+  yer: "Kadıköy, İstanbul"
   isveren: ""
-  proje_yili: "2024"
+  proje_yili: "2023"
   bitis_yili: ""
   program: "Karşılama, bekleme, iki doktor odası, diyetisyen ve koordinatör odaları, rezerv oda, efor ve çekim stüdyosu, toplantı odası, mutfak, teknik oda ve tuvaletler"
-  durum: "Proje"
+  durum: "Uygulandı"
   insaat_alani: "208 m²"
   arsa_alani: ""
   ekip: ""
@@ -27,7 +28,7 @@ card: "r-klp-giris3.jpg"
 card_alt: "Kalp360 bekleme alanı: yarım daire kabartmalı duvar önünde açık yeşil banket"
 credits: "İç mimari tasarım ve görselleştirme: agca·studio"
 ozet: |
-  Kalp360 Sağlık Merkezi için tek katlı, 208 m²'lik bir iç mimari projesi. Uzun dikdörtgen kat, boydan boya geçen 13 m²'lik bir koridorla ikiye ayrılır: kuzeyde bekleme, stüdyo ve toplantı odası, güneyde koordinatör, diyetisyen, rezerv ve doktor odaları sıralanır. Ziyaretçi güneybatı köşesinden girer; 18 m²'lik karşılamada kavisli taş banko, arkasında ışıklı Kalp360 yazısı karşılar. 35 m²'lik bekleme, kemer ve yarım daire motifli kabartma panellerle kurulur; nişlerdeki kuru otlar ve zeytin ağaçları mekânı yumuşatır. Bu kemer-daire motifi koridor duvarında ve stüdyoda da sürerek katın ortak dilini oluşturur. 29 m²'lik stüdyo hem efor alanı hem çekim mekânıdır: iki sedye, koşu bandı ve kondisyon bisikletinin yanında yeşil perdeli bir çekim duvarı bulunur. Doktor odalarında terrazzo tezgâhlı lavabo, kumaş kaplı sedye ve konuk koltukları bir arada çözülür. Palet kırık beyaz, bej ve adaçayı yeşilidir; pirinç profiller, ışıklı gergi tavan panelleri ve gizli LED bantları aydınlatmayı taşır. Plan, kesitler, aksonometri ve renderlar tek Revit modelinden üretildi; mekânlar 360° sanal turda gezilebilir.
+  Kadıköy'de Kalp360 Sağlık Merkezi için tek katlı, 208 m²'lik bir iç mimari projesi; uygulandı. Uzun dikdörtgen kat, boydan boya geçen 13 m²'lik bir koridorla ikiye ayrılır: kuzeyde bekleme, stüdyo ve toplantı odası, güneyde koordinatör, diyetisyen, rezerv ve doktor odaları sıralanır. Ziyaretçi güneybatı köşesinden girer; 18 m²'lik karşılamada kavisli taş banko, arkasında ışıklı Kalp360 yazısı karşılar. 35 m²'lik bekleme, kemer ve yarım daire motifli kabartma panellerle kurulur; nişlerdeki kuru otlar ve zeytin ağaçları mekânı yumuşatır. Bu kemer-daire motifi koridor duvarında ve stüdyoda da sürerek katın ortak dilini oluşturur. 29 m²'lik stüdyo hem efor alanı hem çekim mekânıdır: iki sedye, koşu bandı ve kondisyon bisikletinin yanında yeşil perdeli bir çekim duvarı bulunur. Doktor odalarında terrazzo tezgâhlı lavabo, kumaş kaplı sedye ve konuk koltukları bir arada çözülür. Palet kırık beyaz, bej ve adaçayı yeşilidir; pirinç profiller, ışıklı gergi tavan panelleri ve gizli LED bantları aydınlatmayı taşır. Plan, kesitler, aksonometri ve renderlar tek Revit modelinden üretildi; mekânlar 360° sanal turda gezilebilir.
 images:
   - file: "r-klp-giris.jpg"
     alt: "Kavisli bej kanepe ve krem bukle koltuklar, arkalarında ışıklı kemer nişinde kuru otlar; sağda taş kaplı kavisli danışma bankosu ve tavanda büyük ışık paneli"

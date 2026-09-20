@@ -20,7 +20,7 @@ kunye:
   ekip: ""
   rol: "Interior design and visualisation"
   derece: ""
-sanal_tur: ""
+sanal_tur: "https://storage.net-fs.com/hosting/8371092/1/"
 cover: "r-lv-1.jpg"
 cover_alt: "Görele Apartment living room: stone fireplace wall, television unit, light sofas and herringbone floor"
 card: "r-lv-1.jpg"

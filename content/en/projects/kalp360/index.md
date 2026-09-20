@@ -1,20 +1,21 @@
 ---
 title: "Kalp360 Health Centre"
+seo_title: "Kalp360 Health Centre · Kadıköy · agca·studio"
 subtitle: "Interior design for a health centre"
 translationKey: "proje-kalp360"
 slug: "kalp360"
-date: 2024-05-16
+date: 2023-05-16
 weight: 90
 draft: false
 tur: ["saglik", "ic_mekan"]
-description: "Interior of the Kalp360 Health Centre: a curved reception counter, arch and circle panelling, consulting rooms, an exercise studio and a meeting room."
+description: "Interior of the Kalp360 Health Centre in Kadıköy, Istanbul: a curved reception counter, arch and circle panelling, consulting rooms and a studio."
 kunye:
-  yer: ""
+  yer: "Kadıköy, Istanbul"
   isveren: ""
-  proje_yili: "2024"
+  proje_yili: "2023"
   bitis_yili: ""
   program: "Reception, waiting lounge, two consulting rooms, dietitian and coordinator rooms, reserve room, exercise and filming studio, meeting room, kitchen, plant room and washrooms"
-  durum: "Design"
+  durum: "Built"
   insaat_alani: "208 m²"
   arsa_alani: ""
   ekip: ""
@@ -27,7 +28,7 @@ card: "r-klp-giris3.jpg"
 card_alt: "Kalp360 waiting area: a pale sage bench against a wall of half-circle relief panels"
 credits: "Interior design and visualisation: agca·studio"
 ozet: |
-  A single-storey interior of 208 m² for the Kalp360 Health Centre. The long rectangular floor is divided by a 13 m² corridor running end to end: the waiting lounge, studio and meeting room line up along the north, the coordinator, dietitian, reserve and consulting rooms along the south. Visitors enter at the south-west corner, where the 18 m² reception meets them with a curved stone counter and the lit Kalp360 lettering behind it. The 35 m² waiting lounge is built from relief panels of arches and half-circles, softened by dried grasses in the niches and potted olive trees. That arch and circle motif continues along the corridor wall and into the studio, setting the shared language of the floor. The 29 m² studio serves both as an exercise area and as a filming room: alongside two couches, a treadmill and an exercise bike stands a wall fitted with a green screen. The consulting rooms combine a terrazzo basin counter, an upholstered examination couch and visitor seating in one space. The palette is off-white, beige and sage green, with brass profiles, luminous stretched ceiling panels and concealed LED strips carrying the lighting. Plans, sections, the axonometric and the renders came from a single Revit model, and the rooms can be walked through in a 360° virtual tour.
+  A single-storey interior of 208 m² for the Kalp360 Health Centre in Kadıköy, Istanbul, now built. The long rectangular floor is divided by a 13 m² corridor running end to end: the waiting lounge, studio and meeting room line up along the north, the coordinator, dietitian, reserve and consulting rooms along the south. Visitors enter at the south-west corner, where the 18 m² reception meets them with a curved stone counter and the lit Kalp360 lettering behind it. The 35 m² waiting lounge is built from relief panels of arches and half-circles, softened by dried grasses in the niches and potted olive trees. That arch and circle motif continues along the corridor wall and into the studio, setting the shared language of the floor. The 29 m² studio serves both as an exercise area and as a filming room: alongside two couches, a treadmill and an exercise bike stands a wall fitted with a green screen. The consulting rooms combine a terrazzo basin counter, an upholstered examination couch and visitor seating in one space. The palette is off-white, beige and sage green, with brass profiles, luminous stretched ceiling panels and concealed LED strips carrying the lighting. Plans, sections, the axonometric and the renders came from a single Revit model, and the rooms can be walked through in a 360° virtual tour.
 images:
   - file: "r-klp-giris.jpg"
     alt: "Curved beige sofa and cream boucle armchairs before a backlit arched niche of dried grasses; a stone-clad curved reception counter and a large luminous ceiling panel beyond"

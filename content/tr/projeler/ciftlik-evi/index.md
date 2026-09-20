@@ -1,8 +1,8 @@
 ---
-title: "Zapsu Çiftlik Evi"
+title: "Çiftlik Evi"
 subtitle: "Eğimli arazide çiftlik evi"
-translationKey: "proje-zapsu"
-slug: "zapsu-ciftlik-evi"
+translationKey: "proje-ciftlik-evi"
+slug: "ciftlik-evi"
 date: 2024-05-01
 weight: 80
 draft: false
@@ -20,11 +20,11 @@ kunye:
   ekip: ""
   rol: "Tasarım ve görselleştirme"
   derece: ""
-sanal_tur: ""
+sanal_tur: "https://storage.net-fs.com/hosting/8371092/3/"
 cover: "d-5pers2-000.jpg"
-cover_alt: "Zapsu Çiftlik Evi: ağaçlar arasında düşey ahşap kaplı, tek eğimli çatılı ev ve eğim üzerine asılan ahşap teras"
+cover_alt: "Çiftlik evi: ağaçlar arasında düşey ahşap kaplı, tek eğimli çatılı ev ve eğim üzerine asılan ahşap teras"
 card: "d-6pers2.jpg"
-card_alt: "Zapsu Çiftlik Evi: cam cepheli salon ve ahşap teras"
+card_alt: "Çiftlik evi: cam cepheli salon ve ahşap teras"
 credits: "Tasarım ve görselleştirme: agca·studio (kavram görselleri yapay zekâ destekli)"
 ozet: |
   Bir çiftlik arazisinde, yola bitişik eğimli bir parsele oturan tek katlı ev; alt kat eğimin bahçe tarafında açığa çıkar. Düşey ahşap kaplı kütle, bahçeye doğru yükselen tek eğimli bir çatının altında toplanır; girişte çatının uzayan saçağı iki ince kolonla taşınır. Zemin katta antre ve vestiyerden ada mutfaklı, uzun yemek masalı ve şömineli tek bir yaşama hacmine geçilir; salonun önündeki ahşap teras ince çelik kolonlarla eğimin üzerine çıkarak bahçeye asılır. Alt katta resim atölyesi, ortak alan ve sinema odası bahçeye açılan cam cephe boyunca sıralanır; depo, WC ve merdiven arka tarafta kalır. Alt teras, atölye ve ortak alanın önünde ikinci bir dış mekân oluşturur. Kavram görselleri yapay zekâ desteğiyle üretildi ve taş kaplama ile düz çatı modelden farklıdır; plan, kesit ve görünüşler modelden alındı.

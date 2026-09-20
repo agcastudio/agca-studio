@@ -20,7 +20,7 @@ kunye:
   ekip: ""
   rol: "İç mimari tasarım ve görselleştirme"
   derece: ""
-sanal_tur: ""
+sanal_tur: "https://storage.net-fs.com/hosting/8371092/1/"
 cover: "r-lv-1.jpg"
 cover_alt: "Görele Dairesi salonu: şömineli taş duvar, televizyon ünitesi, açık renkli koltuklar ve balıksırtı parke"
 card: "r-lv-1.jpg"
