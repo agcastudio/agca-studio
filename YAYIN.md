@@ -22,17 +22,25 @@ Sıra önemli. Her adım için kimin yapacağı yazılı: **(sen)** hesap işlem
 - Her `git push` yeni yayın, her dal (branch) ayrı önizleme adresi üretir.
 
 ## 3. DNS'i Cloudflare'e taşıma (sen, 10 dakika + bekleme)
-Mevcut kayıtlar (19 Eylül 2026 envanteri; e-posta kayıtları taşımada aynen korunmalı):
-- **MX** `agca.studio` → `mxa.mailgun.org` ve `mxb.mailgun.org` (öncelik 10) — info@agca.studio yönlendirmesi buna bağlı → **KORUNACAK**
-- **TXT** `agca.studio` → `v=spf1 include:mailgun.org ~all` → **KORUNACAK**
-- DKIM (`*._domainkey`) kaydı dışarıdan görünmedi; Squarespace/Google DNS panelindeki tam listeyi ekran görüntüsüyle gönder, eksik kalanı birlikte ekleriz
-- **A** `agca.studio` → `198.202.211.1` ve **CNAME** `www` → `cdn.webflow.com`: eski Webflow sitesinin kalıntısı, artık 409 veriyor → Cloudflare'de **silinir** (yerine Workers custom domain gelir)
+
+**20 Eylül 2026'da doğrulanan mevcut kayıtlar** (ad sunucuları hâlâ Google/Squarespace'te; kök adres eski Webflow sunucusuna gidip 409 veriyor):
+
+| Ad | Tip | Değer | Ne yapılacak |
+|---|---|---|---|
+| agca.studio | A | 198.202.211.1 | **SİL** (eski Webflow) |
+| www | CNAME | cdn.webflow.com | **SİL** (eski Webflow) |
+| agca.studio | MX 10 | mxa.mailgun.org | **KORU** |
+| agca.studio | MX 10 | mxb.mailgun.org | **KORU** |
+| agca.studio | TXT | `v=spf1 include:mailgun.org ~all` | **KORU** |
+| smtp._domainkey | TXT | `k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCp+WgrPtSvrWWyqj/tOY0yHkSg+SwioGxTtFq74CuYgsGpmCpHzpCrUrv7SOrkysk2YljE7havSCcQ9ToMUoEkpmmz6C/3k/mMRZLXYRtLPp2x6RcKRyBupG+BeUHK168ggfcEZYlYdwjTeBGjgfa5yYof9+KnxmCjJtqeHC7b4wIDAQAB` | **KORU** (Mailgun DKIM) |
+
+`_dmarc` kaydı yok. DKIM anahtarını elle yazman gerekirse değerini Mailgun panelinden kopyala; yukarıdaki metin tek satır olmalı, boşluk içermemeli.
 
 Adımlar:
-1. Cloudflare → **Add a domain** → `agca.studio` → Free plan → Cloudflare mevcut kayıtları tarar; MX ve TXT satırlarının listede olduğunu doğrula (yoksa elle ekle).
+1. Cloudflare → **Add a domain** → `agca.studio` → Free plan → Cloudflare mevcut kayıtları tarar; yukarıdaki dört "KORU" satırının listede olduğunu doğrula, eksik varsa elle ekle.
 2. Cloudflare'in verdiği iki ad sunucusunu (ör. `xxx.ns.cloudflare.com`) Squarespace Domains → agca.studio → DNS → **Nameservers** bölümüne yaz (Squarespace DNS'ten "custom nameservers"a geç).
 3. Aktifleşme 5 dakika ile birkaç saat arası sürer; Cloudflare "Active" dediğinde info@agca.studio'ya bir test e-postası gönder.
-4. Zone "Active" olduktan sonra DNS → Records: eski Webflow kayıtlarını sil — `A agca.studio → 198.202.211.1` ve `CNAME www → cdn.webflow.com`. **MX ve TXT satırlarına dokunma.** Bu kayıtlar dururken alan adı Worker'a bağlanamaz.
+4. Zone "Active" olduktan sonra DNS → Records: `A agca.studio → 198.202.211.1` ve `CNAME www → cdn.webflow.com` kayıtlarını sil. **MX ve TXT satırlarına dokunma.** Bu iki kayıt dururken alan adı Worker'a bağlanamaz.
 
 ## 4. Alan adını siteye bağlama (sen, 2 dakika)
 - Workers & Pages → `agca-studio` → Settings → **Domains & Routes** → Add → Custom domain → `agca.studio`; sonra tekrar Add → `www.agca.studio`.
