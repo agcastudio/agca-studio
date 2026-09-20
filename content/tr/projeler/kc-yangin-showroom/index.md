@@ -7,7 +7,7 @@ date: 2025-04-01
 weight: 40
 draft: false
 tur: ["ticari", "ic_mekan"]
-description: "Yangın ve güvenlik sistemleri firması KC Yangın için showroom ve ofis: sarı-siyah kurumsal kimlik, kavisli sergi bankoları, toplantı alanı, açık ve kapalı ofisler, cephe ve iç mekân görselleştirmeleri."
+description: "KC Yangın için showroom ve ofis: sarı-siyah kurumsal kimlik, kavisli sergi bankoları, toplantı alanı, açık ve kapalı ofisler; cephe ve iç mekân görselleştirmeleri."
 kunye:
   yer: ""
   isveren: "KC Yangın"

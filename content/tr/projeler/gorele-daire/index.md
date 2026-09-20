@@ -7,7 +7,7 @@ date: 2025-06-01
 weight: 50
 draft: false
 tur: ["ic_mekan", "konut"]
-description: "Görele, Giresun'da 105 m² 3+1 daire iç mimarisi: şömineli salon, ada mutfak, ebeveyn ve çocuk yatak odaları, banyolar; sıcak ahşap, balıksırtı parke ve gizli aydınlatma."
+description: "Görele, Giresun'da 105 m² 3+1 daire iç mimarisi: şömineli salon, ada mutfak, yatak odaları ve banyolar; sıcak ahşap, balıksırtı parke ve gizli aydınlatma."
 kunye:
   yer: "Görele, Giresun"
   isveren: ""

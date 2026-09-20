@@ -7,7 +7,7 @@ date: 2025-06-01
 weight: 50
 draft: false
 tur: ["ic_mekan", "konut"]
-description: "Interior design of a 105 m² three-bedroom apartment in Görele, Giresun: living room with fireplace, island kitchen, master and children's bedrooms, bathrooms; warm timber, herringbone floors and concealed lighting."
+description: "Interior design of a 105 m² three-bedroom apartment in Görele, Giresun: living room with fireplace, island kitchen, bedrooms and bathrooms in warm timber."
 kunye:
   yer: "Görele, Giresun"
   isveren: ""

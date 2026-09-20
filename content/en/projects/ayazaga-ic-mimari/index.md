@@ -1,5 +1,6 @@
 ---
 title: "Ayazağa Apartment"
+seo_title: "Ayazağa Apartment · Sarıyer, Istanbul · agca·studio"
 subtitle: "Apartment interior design"
 translationKey: "proje-ayazaga"
 slug: "ayazaga-ic-mimari"
@@ -7,7 +8,7 @@ date: 2025-07-01
 weight: 60
 draft: false
 tur: ["ic_mekan", "konut"]
-description: "Apartment interior design in Ayazağa, Sarıyer, Istanbul: cream and travertine surfaces, olive green kitchen cabinets, herringbone floors, a dressing room and concealed lighting in a calm home."
+description: "Apartment interior design in Ayazağa, Sarıyer: cream and travertine surfaces, olive green kitchen cabinets, herringbone floors and concealed lighting."
 kunye:
   yer: "Sarıyer, Istanbul"
   isveren: ""

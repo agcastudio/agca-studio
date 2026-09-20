@@ -7,7 +7,7 @@ date: 2025-07-01
 weight: 60
 draft: false
 tur: ["ic_mekan", "konut"]
-description: "Sarıyer Ayazağa'da daire iç mimarisi: krem ve traverten yüzeyler, zeytin yeşili mutfak dolapları, balıksırtı parke, giyinme odası ve gizli aydınlatmayla sakin bir ev."
+description: "Sarıyer Ayazağa'da daire iç mimarisi: krem ve traverten yüzeyler, zeytin yeşili mutfak dolapları, balıksırtı parke ve gizli aydınlatmayla sakin bir ev."
 kunye:
   yer: "Sarıyer, İstanbul"
   isveren: ""
