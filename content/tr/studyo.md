@@ -1,7 +1,7 @@
 ---
 title: "Stüdyo"
 translationKey: "studyo"
-description: "agca·studio: Kutbeddin Ağca ve Selen Baş Ağca'nın Üsküdar, İstanbul'daki mimarlık stüdyosu. Kentsel dönüşüm, Revit ile projelendirme, görselleştirme ve sanal tur."
+description: "agca·studio: Kutbeddin Ağca ve Selen Baş Ağca'nın Üsküdar, İstanbul'daki mimarlık stüdyosu. Kentsel dönüşüm, Revit ile projelendirme ve sanal tur."
 lede: "agca·studio, İstanbul Üsküdar'da Kutbeddin Ağca ve Selen Baş Ağca tarafından yürütülen bir mimarlık stüdyosudur."
 people:
   - name: "Kutbeddin Ağca"

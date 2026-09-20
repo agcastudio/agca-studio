@@ -1,7 +1,7 @@
 ---
 title: "Studio"
 translationKey: "studyo"
-description: "agca·studio: the architecture studio of Kutbeddin Ağca and Selen Baş Ağca in Üsküdar, Istanbul. Urban regeneration, design in Revit, visualisation and virtual tours."
+description: "agca·studio: the architecture studio of Kutbeddin Ağca and Selen Baş Ağca in Üsküdar, Istanbul. Urban regeneration, design in Revit and virtual tours."
 lede: "agca·studio is an architecture studio run by Kutbeddin Ağca and Selen Baş Ağca in Üsküdar, Istanbul."
 people:
   - name: "Kutbeddin Ağca"
