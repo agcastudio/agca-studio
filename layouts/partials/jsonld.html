@@ -13,6 +13,14 @@
   "areaServed" (slice "TR")
 -}}
 {{- with site.Params.phone }}{{ $org = merge $org (dict "telephone" .) }}{{ end -}}
+{{- /* Kurucular: Stüdyo sayfasının people listesinden */ -}}
+{{- with site.GetPage (cond (eq $p.Language.Lang "tr") "/studyo" "/studio") -}}
+  {{- with .Params.people -}}
+    {{- $founders := slice -}}
+    {{- range . }}{{ $founders = $founders | append (dict "@type" "Person" "name" .name "jobTitle" .role "worksFor" (dict "@id" (printf "%s#org" site.BaseURL))) }}{{ end -}}
+    {{- $org = merge $org (dict "founder" $founders) -}}
+  {{- end -}}
+{{- end -}}
 {{- $same := slice -}}
 {{- with site.Params.instagram }}{{ $same = $same | append . }}{{ end -}}
 {{- with site.Params.linkedin }}{{ $same = $same | append . }}{{ end -}}

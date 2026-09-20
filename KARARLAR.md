@@ -70,7 +70,7 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 
 ## Bekleyen bilgiler (kullanıcıdan)
 
-- Kurucu ortakların ad-soyad, unvan, 2–3 cümle biyografi; hangi fotoğraf kime ait (ka_ / sb_).
+- ~~Kurucu ortakların ad-soyad, unvan, biyografi~~ → 2026-09-20 alındı: Kutbeddin Ağca (ka.jpg) ve Selen Baş Ağca (sb.jpg), Kurucu Ortak · Mimar; metinler Stüdyo sayfasında, yapısal veride `founder`.
 - Telefon numarası; Instagram ve LinkedIn adresleri.
 - OYUK: yarışmanın resmî adı, yılı, sonuç/derece, ekip (yayınlanacaksa).
 - İkinci projenin klasörü (`Projeler/<kod>_Görseller/`) ve türü.
