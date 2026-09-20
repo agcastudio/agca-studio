@@ -82,6 +82,11 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 | 2026-09-20 | 3 | Üç proje daha eklendi: KC Yangın Showroom ve Ofis (2505, ticari + iç mekân; yer/durum bekleniyor; 360° panoramalar kullanılmadı), Görele Dairesi (2506, iç mekân + konut, Görele/Giresun), Ayazağa Dairesi (2507, iç mekân + konut, Sarıyer). Dizin filtresi altı tür. Klasörde ayrıca 2024_04_bodrum_hidroterapimerkezi ve 2024_05_ÇiftlieviZapsu var; istenmedi, eklenmedi. | Kullanıcı isteği |
 | 2026-09-20 | 6 | Stüdyo: Kutbeddin Ağca'nın yeni portresi (ka_web.jpg); yarışma cümlesi iki cümleye çıkarıldı, iki biyografi aynı yükseklikte. Stüdyo LinkedIn: linkedin.com/company/agca-•-studio. | Kullanıcı isteği |
 
+| 2026-09-20 | 19 | **Proje sayfası sırası (2. düzenleme):** açılışta başlık, künye şeridi ve açıklama (metnin ilk paragrafı) → büyük kapak görseli → hemen altında tüm görsellerin küçük kareleri (proje galerisi) → kalan paragraflar görsellerle dönüşümlü (proje raporu) → Çizimler → Diyagramlar → Katkılar. | Kullanıcı isteği |
+| 2026-09-20 | 3 | Görele Dairesi'nin yeri **İstanbul** (Giresun değil; ad dosya adından). BIM projesi yeniden adlandırıldı: **Toplu Konut Rölövesi**, tür **Scan to BIM** (yeni tür anahtarı `scan_to_bim`), yer Üsküdar; adres `/projeler/toplu-konut-rolovesi/`. Eski `bim` ve `kentsel` etiketleri bu projeden kaldırıldı. | Kullanıcı bilgisi |
+| 2026-09-20 | 26 | Altbilgi: sol sütunda logo, "Üsküdar, İstanbul" ve gri e-posta adresi; sağ sütunda WhatsApp, Instagram, LinkedIn; satır yükseklikleri eşitlendi. | Kullanıcı isteği |
+| 2026-09-20 | 6 | Kutbeddin Ağca: "Yeni araçları ve anlatım biçimlerini…" cümlesi kaldırıldı; yarışma cümlesi iki nokta ile tek cümle. | Kullanıcı isteği |
+
 ## Bekleyen bilgiler (kullanıcıdan)
 
 - Ofisin tam adresi ya da harita koordinatı (harita işareti ve bağlantısı için).

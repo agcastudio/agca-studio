@@ -7,7 +7,7 @@ date: 2025-06-01
 weight: 50
 draft: false
 tur: ["ic_mekan", "konut"]
-description: "İstanbul'da 105 m² 3+1 daire iç mimarisi: şömineli salon, damarlı taş yemek masalı mutfak, yatak odaları ve banyolar; sıcak ahşap, balıksırtı parke ve gizli aydınlatma."
+description: "İstanbul'da 105 m² 3+1 daire iç mimarisi: şömineli salon, damarlı taş yemek masalı mutfak, yatak odaları ve banyolar; sıcak ahşap ve gizli aydınlatma."
 kunye:
   yer: "İstanbul"
   isveren: ""

@@ -1,5 +1,6 @@
 ---
 title: "Toplu Konut Rölövesi"
+seo_title: "Toplu Konut Rölövesi · Scan to BIM, Üsküdar · agca·studio"
 subtitle: "Scan to BIM: drone fotogrametrisi, nokta bulutu ve Revit as-built modeli"
 translationKey: "proje-rolove-bim"
 slug: "toplu-konut-rolovesi"
@@ -7,7 +8,7 @@ date: 2024-09-01
 weight: 30
 draft: false
 tur: ["scan_to_bim"]
-description: "Üsküdar'da mevcut bir konut sitesinin drone ile taranması, nokta bulutundan Revit as-built modeline dönüşümü ve modelden üretilen avan plan, kesit ve görünüş."
+description: "Üsküdar'da bir konut sitesinin drone ile taranması, nokta bulutundan Revit as-built modeline dönüşümü; modelden üretilen avan plan, kesit ve görünüş."
 kunye:
   yer: "Üsküdar, İstanbul"
   isveren: ""
