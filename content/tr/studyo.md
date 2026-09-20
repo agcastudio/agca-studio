@@ -13,7 +13,7 @@ people:
     role: "Kurucu Ortak · Mimar"
     photo: "ka-web.jpg"
     linkedin: "https://www.linkedin.com/in/kutbeddinagca"
-    bio: "İnşaatla teknolojinin kesiştiği yerde çalışır. Yıldız Teknik Üniversitesi Mimarlık mezunu; on yıla yakın süredir farklı ölçeklerde projeler geliştirdi ve yürüttü. BIM standartlarıyla proje üretimi ve Revit modellemede uzman; mimari sunumu, sanal turu ve görselleştirmeyi tasarımın anlatım dili olarak kullanır. Büyük dil modellerinin inşaat sektöründeki rolü üzerine yüksek lisans çalışmasını sürdürüyor. Yarışmalar, uzmanlığının sınırlarını sınadığı alandır: kavramdan paftaya kadar sunumun tamamını üstlenir. Yeni araçları ve anlatım biçimlerini önce burada dener, işe yarayanı stüdyonun gündelik pratiğine taşır."
+    bio: "İnşaatla teknolojinin kesiştiği yerde çalışır. Yıldız Teknik Üniversitesi Mimarlık mezunu; on yıla yakın süredir farklı ölçeklerde projeler geliştirdi ve yürüttü. BIM standartlarıyla proje üretimi ve Revit modellemede uzman; mimari sunumu, sanal turu ve görselleştirmeyi tasarımın anlatım dili olarak kullanır. Büyük dil modellerinin inşaat sektöründeki rolü üzerine yüksek lisans çalışmasını sürdürüyor. Yarışmalar, uzmanlığının sınırlarını sınadığı alandır: kavramdan paftaya kadar sunumun tamamını üstlenir."
 ---
 Mimarlığı, yapının kendisinden çok onun sardığı boşluk üzerinden düşünüyoruz: insanların toplandığı, ürettiği ve hatırladığı yerler. Konut ölçeğinden kamusal yapıya kadar her projeye aynı soruyla başlıyoruz: Bu boşluk kente ne verecek?
 

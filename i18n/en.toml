@@ -40,8 +40,8 @@ other = "Concept"
 other = "Commercial"
 [tur_kentsel]
 other = "Urban Regeneration"
-[tur_bim]
-other = "Survey and BIM"
+[tur_scan_to_bim]
+other = "Scan to BIM"
 [tur_ic_mekan]
 other = "Interior"
 [kunye]

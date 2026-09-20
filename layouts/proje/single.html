@@ -5,18 +5,17 @@
 {{- $images := .Params.images | default slice -}}
 {{- $drawings := .Params.drawings | default slice -}}
 {{- $diagrams := .Params.diagrams | default slice -}}
+{{- /* Paragraflar: ilki açılıştaki açıklama, kalanı görsellerle dönüşümlü rapor */ -}}
+{{- $paras := slice -}}
+{{- range split (string .Content) "</p>" }}{{ if strings.TrimSpace . }}{{ $paras = $paras | append (printf "%s</p>" .) }}{{ end }}{{ end -}}
+{{- $lead := "" -}}{{ with $paras }}{{ $lead = index . 0 }}{{ end -}}
+{{- $rest := slice -}}{{ if gt (len $paras) 1 }}{{ $rest = after 1 $paras }}{{ end -}}
 <article class="project">
-  {{- with $hero }}
-  <div class="project-cover">
-    {{ partial "hero-picture.html" (dict "hero" . "alt" ($.Params.cover_alt | default $.Title)) }}
-  </div>
-  {{- end }}
-
+  {{- /* 1. Açılış: başlık, künye ve açıklama */ -}}
   <header class="wrap project-head">
     <p class="crumb"><a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a>{{ with .Params.tur }} · {{ i18n (printf "tur_%s" (index . 0)) }}{{ end }}</p>
     <h1 class="project-title">{{ .Title }}</h1>
     {{- with .Params.subtitle }}<p class="project-sub">{{ . }}</p>{{ end }}
-    {{- /* ArchDaily düzeni: başlığın altında yatay künye şeridi */ -}}
     <dl class="facts" aria-label="{{ i18n "kunye" }}">
       <div class="fact"><dt>{{ i18n "facts_architects" }}</dt><dd>{{ site.Params.brand }}</dd></div>
       {{- range $key := slice "yer" "proje_yili" "bitis_yili" "insaat_alani" "arsa_alani" "durum" "rol" "derece" "isveren" }}
@@ -26,23 +25,64 @@
       {{- with $k.program }}<div class="fact fact-wide"><dt>{{ i18n "kunye_program" }}</dt><dd>{{ . }}</dd></div>{{ end }}
       {{- with $k.ekip }}<div class="fact fact-wide"><dt>{{ i18n "kunye_ekip" }}</dt><dd>{{ . }}</dd></div>{{ end }}
     </dl>
+    {{- with $lead }}<div class="project-lead">{{ . | safeHTML }}</div>{{ end }}
     {{- with .Params.sanal_tur }}
     <p><a class="btn" href="{{ . }}" target="_blank" rel="noopener">{{ i18n "virtual_tour" }} ↗</a></p>
     {{- end }}
   </header>
 
-  {{- /* Metin ve görseller dönüşümlü: paragraf, görsel, paragraf, görsel… kalan görseller metinden sonra */ -}}
-  {{- $paras := slice -}}
-  {{- range split (string .Content) "</p>" }}{{ if strings.TrimSpace . }}{{ $paras = $paras | append (printf "%s</p>" .) }}{{ end }}{{ end -}}
+  {{- /* 2. Büyük kapak görseli */ -}}
+  {{- with $hero }}
+  <div class="project-cover">
+    {{ partial "hero-picture.html" (dict "hero" . "alt" ($.Params.cover_alt | default $.Title)) }}
+  </div>
+  {{- end }}
+
+  {{- /* 3. Kapağın hemen altında küçük kareler: tüm görseller */ -}}
+  {{- $all := slice -}}
+  {{- range $images }}{{ $all = $all | append . }}{{ end -}}
+  {{- range $drawings }}{{ $all = $all | append . }}{{ end -}}
+  {{- range $diagrams }}{{ $all = $all | append . }}{{ end -}}
+  {{- with $all }}
+  <section class="wrap thumbs-section">
+    <div class="section-head">
+      <h2 class="section-title">{{ i18n "project_gallery" }}</h2>
+      <span class="muted small">{{ i18n "images_count" (len .) }}</span>
+    </div>
+    <ul class="thumbs">
+      {{- range . }}
+        {{- $it := . -}}
+        {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
+        {{- $img := . -}}
+        {{- $t1 := $img.Fill "240x240 webp q75" -}}
+        {{- $t2 := $img.Fill "480x480 webp q75" -}}
+        {{- $tf := $img.Fill "240x240 jpg" -}}
+        {{- $full := $img -}}
+        {{- if gt $img.Height $img.Width }}{{ if gt $img.Height 2048 }}{{ $full = $img.Resize "x2048 webp q80" }}{{ else }}{{ $full = $img.Resize (printf "x%d webp q80" $img.Height) }}{{ end }}{{ else }}{{ if gt $img.Width 2048 }}{{ $full = $img.Resize "2048x webp q80" }}{{ else }}{{ $full = $img.Resize (printf "%dx webp q80" $img.Width) }}{{ end }}{{ end -}}
+        <li class="thumb">
+          <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="tum" data-width="{{ $full.Width }}" data-height="{{ $full.Height }}"{{ with $it.caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $it.alt }}">
+            <picture>
+              <source type="image/webp" srcset="{{ $t1.RelPermalink }} 240w, {{ $t2.RelPermalink }} 480w" sizes="(min-width: 1024px) 220px, (min-width: 640px) 25vw, 33vw">
+              <img src="{{ $tf.RelPermalink }}" width="240" height="240" alt="" loading="lazy" decoding="async">
+            </picture>
+          </a>
+        </li>
+        {{- end }}
+      {{- end }}
+    </ul>
+  </section>
+  {{- end }}
+
+  {{- /* 4. Proje raporu: açıklama paragrafları ve görseller dönüşümlü */ -}}
   {{- $n := len $images -}}
   {{- $used := 0 -}}
   <div class="project-body">
-    {{- range $i, $para := $paras }}
-    <div class="wrap project-text{{ if eq $i 0 }} is-lead{{ end }}">{{ $para | safeHTML }}</div>
+    {{- range $i, $para := $rest }}
+    <div class="wrap project-text">{{ $para | safeHTML }}</div>
     {{- if lt $i $n }}
       {{- $it := index $images $i -}}
       {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
-      <div class="wrap gallery-item">{{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "galeri" "sizes" "(min-width: 1500px) 1400px, 100vw" "loading" (cond (eq $i 0) "eager" "lazy")) }}</div>
+      <div class="wrap gallery-item">{{ partial "figure.html" (dict "img" . "alt" $it.alt "caption" $it.caption "lightbox" true "gallery" "galeri" "sizes" "(min-width: 1500px) 1400px, 100vw") }}</div>
       {{- $used = add $i 1 -}}
       {{- else }}{{ warnf "Görsel bulunamadı: projeler/%s/%s" $slug $it.file }}{{ end }}
     {{- end }}
@@ -83,41 +123,6 @@
       {{- else }}{{ warnf "Diyagram bulunamadı: projeler/%s/%s" $slug $it.file }}{{ end }}
     {{- end }}
     </div>
-  </section>
-  {{- end }}
-
-  {{- /* Proje galerisi: tüm görseller küçük kareler hâlinde, büyütme penceresine bağlı */ -}}
-  {{- $all := slice -}}
-  {{- range $images }}{{ $all = $all | append . }}{{ end -}}
-  {{- range $drawings }}{{ $all = $all | append . }}{{ end -}}
-  {{- range $diagrams }}{{ $all = $all | append . }}{{ end -}}
-  {{- with $all }}
-  <section class="wrap thumbs-section">
-    <div class="section-head">
-      <h2 class="section-title">{{ i18n "project_gallery" }}</h2>
-      <span class="muted small">{{ i18n "images_count" (len .) }}</span>
-    </div>
-    <ul class="thumbs">
-      {{- range . }}
-        {{- $it := . -}}
-        {{- with resources.Get (printf "projeler/%s/%s" $slug $it.file) }}
-        {{- $img := . -}}
-        {{- $t1 := $img.Fill "240x240 webp q75" -}}
-        {{- $t2 := $img.Fill "480x480 webp q75" -}}
-        {{- $tf := $img.Fill "240x240 jpg" -}}
-        {{- $full := $img -}}
-        {{- if gt $img.Height $img.Width }}{{ if gt $img.Height 2048 }}{{ $full = $img.Resize "x2048 webp q80" }}{{ else }}{{ $full = $img.Resize (printf "x%d webp q80" $img.Height) }}{{ end }}{{ else }}{{ if gt $img.Width 2048 }}{{ $full = $img.Resize "2048x webp q80" }}{{ else }}{{ $full = $img.Resize (printf "%dx webp q80" $img.Width) }}{{ end }}{{ end -}}
-        <li class="thumb">
-          <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="tum" data-width="{{ $full.Width }}" data-height="{{ $full.Height }}"{{ with $it.caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $it.alt }}">
-            <picture>
-              <source type="image/webp" srcset="{{ $t1.RelPermalink }} 240w, {{ $t2.RelPermalink }} 480w" sizes="(min-width: 1024px) 220px, (min-width: 640px) 25vw, 33vw">
-              <img src="{{ $tf.RelPermalink }}" width="240" height="240" alt="" loading="lazy" decoding="async">
-            </picture>
-          </a>
-        </li>
-        {{- end }}
-      {{- end }}
-    </ul>
   </section>
   {{- end }}
 

@@ -1,15 +1,15 @@
 ---
-title: "From Survey to BIM Model"
-subtitle: "Drone photogrammetry, point cloud and Revit as-built model"
+title: "Housing Estate Survey"
+subtitle: "Scan to BIM: drone photogrammetry, point cloud and Revit as-built model"
 translationKey: "proje-rolove-bim"
-slug: "roloveden-bim-modeline"
+slug: "toplu-konut-rolovesi"
 date: 2024-09-01
 weight: 30
 draft: false
-tur: ["bim", "kentsel"]
-description: "A housing estate scanned by drone and rebuilt from the point cloud as a Revit as-built model, with schematic plan, section and elevation derived from it."
+tur: ["scan_to_bim"]
+description: "A housing estate in Üsküdar scanned by drone and rebuilt from the point cloud as a Revit as-built model, with schematic plan, section and elevation derived from it."
 kunye:
-  yer: ""
+  yer: "Üsküdar, Istanbul"
   isveren: ""
   proje_yili: "2024"
   bitis_yili: ""
@@ -71,7 +71,7 @@ drawings:
     alt: "Attic floor plan: attic rooms, terraces and bathrooms of the four duplex apartments, with landing, lift machine room and fire stair in the middle, surrounded by the hipped roof surfaces"
     caption: "Attic floor plan"
 ---
-Reading an existing building correctly is the first step in transforming it. In this study a whole housing estate was scanned by drone; the point cloud produced by photogrammetry gave a measurable copy of the blocks, the roads and the ground. The interiors of the selected block were scanned as well and added to the point cloud.
+Reading an existing building correctly is the first step in transforming it. In this study a whole housing estate in Üsküdar was scanned by drone; the point cloud produced by photogrammetry gave a measurable copy of the blocks, the roads and the ground. The interiors of the selected block were scanned as well and added to the point cloud.
 
 This block was rebuilt in Revit: slabs, walls, windows, balconies and roof were modelled with their dimensions taken from the cloud. Four apartments per floor, two basements, the ground floor, four upper floors and the attic holding the upper rooms of the duplex apartments all took their place in the model. A simplified block model was produced for the whole estate, and for the selected block a schematic floor plan, a section, an elevation and an attic floor plan were derived from the model.
 

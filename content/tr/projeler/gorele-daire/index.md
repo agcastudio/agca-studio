@@ -7,9 +7,9 @@ date: 2025-06-01
 weight: 50
 draft: false
 tur: ["ic_mekan", "konut"]
-description: "Görele, Giresun'da 105 m² 3+1 daire iç mimarisi: şömineli salon, damarlı taş yemek masalı mutfak, yatak odaları ve banyolar; sıcak ahşap ve gizli aydınlatma."
+description: "İstanbul'da 105 m² 3+1 daire iç mimarisi: şömineli salon, damarlı taş yemek masalı mutfak, yatak odaları ve banyolar; sıcak ahşap, balıksırtı parke ve gizli aydınlatma."
 kunye:
-  yer: "Görele, Giresun"
+  yer: "İstanbul"
   isveren: ""
   proje_yili: "2025"
   bitis_yili: ""
@@ -74,7 +74,7 @@ drawings:
     alt: "Kat planı: salon 24,52 m², ebeveyn yatak odası 14,51 m², iki oda 8,33 ve 8,29 m², mutfak, iki banyo, hol ve çamaşır nişi; mobilyalı yerleşim"
     caption: "Kat planı"
 ---
-Görele'de 105 m²'lik bir 3+1 daire için iç mimari çalışması. Dairenin sınırlı alanı, her odada tek bir güçlü yüzeyle karşılanır: salonda şömineyi de taşıyan taş duvar, mutfakta damarlı taş yemek masası ve tezgâh arası, holde ahşap kaplama vestiyer, banyolarda desenli duvar kaplamaları. Geri kalan yüzeyler açık tonda tutulur; balıksırtı parke salonu ve yatak odalarını birbirine bağlar, hol, mutfak ve banyolar seramikle ayrılır.
+İstanbul'da 105 m²'lik bir 3+1 daire için iç mimari çalışması. Dairenin sınırlı alanı, her odada tek bir güçlü yüzeyle karşılanır: salonda şömineyi de taşıyan taş duvar, mutfakta damarlı taş yemek masası ve tezgâh arası, holde ahşap kaplama vestiyer, banyolarda desenli duvar kaplamaları. Geri kalan yüzeyler açık tonda tutulur; balıksırtı parke salonu ve yatak odalarını birbirine bağlar, hol, mutfak ve banyolar seramikle ayrılır.
 
 Aydınlatma gizli şeritlerle kurulur: tavan kenarlarında, dolap altlarında ve ayna nişlerinde. Böylece tavan yüksekliği korunur, akşamları mekân yumuşak bir ışıkla dolar. Yatak odalarının her birinde pencere yanına bir çalışma masası konur; ebeveyn yatak odası giyinme dolapları ve kendi banyosuyla birlikte çözülür.
 

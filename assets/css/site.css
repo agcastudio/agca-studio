@@ -156,14 +156,17 @@ main:focus { outline: none; }
 .fact dt { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .fact dd { margin: 2px 0 0; font-size: 14px; }
 .fact-wide { flex-basis: 100%; max-width: 60em; }
-/* metin ve görsel dönüşümü */
+/* açılıştaki açıklama */
+.project-lead { max-width: 44em; margin: 26px 0 8px; font-size: 19px; line-height: 1.5; letter-spacing: -0.005em; }
+.project-lead p { margin: 0; }
+.project-head + .project-cover { margin-top: 24px; }
+/* proje raporu: metin ve görsel dönüşümü */
 .project-body { padding: 40px 0 8px; display: grid; gap: 36px; }
 .project-text { max-width: 44em; margin-inline: auto; font-size: 16px; line-height: 1.7; }
 .project-text p { margin: 0; }
-.project-text.is-lead p { font-size: 19px; line-height: 1.5; letter-spacing: -0.005em; }
 .gallery-item .fig { margin: 0; }
-/* küçük kareler */
-.thumbs-section { padding: 40px 0 8px; }
+/* küçük kareler (kapağın hemen altında) */
+.thumbs-section { padding: 22px 0 8px; }
 .thumbs-section .section-head { margin-bottom: 14px; }
 .small { font-size: 12.5px; }
 .thumbs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
@@ -232,8 +235,10 @@ main:focus { outline: none; }
 .site-footer { border-top: 1px solid var(--line); margin-top: 24px; }
 .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 40px 0 44px; align-items: start; }
 .footer-brand img { height: 16px; width: auto; margin-bottom: 10px; }
-.footer-brand p { font-size: 13px; margin: 0; }
-.footer-contact { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; justify-self: end; text-align: right; }
+.footer-brand p { font-size: 13.5px; line-height: 1.6; margin: 0 0 4px; }
+.footer-brand a { color: var(--muted); }
+.footer-brand a:hover { color: var(--fg); }
+.footer-contact { list-style: none; margin: 0; padding: 26px 0 0; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; line-height: 1.6; justify-self: end; text-align: right; }
 .footer-contact a, .footer-legal a, .nav-lang a { display: inline-block; padding: 4px 6px; margin: -4px -6px; }
 .footer-legal { grid-column: 1 / -1; font-size: 12px; margin: 8px 0 0; }
 @media (max-width: 640px) { .footer-grid { grid-template-columns: 1fr; } .footer-contact { justify-self: start; text-align: left; } }

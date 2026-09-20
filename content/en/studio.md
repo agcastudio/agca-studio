@@ -13,7 +13,7 @@ people:
     role: "Founding Partner · Architect"
     photo: "ka-web.jpg"
     linkedin: "https://www.linkedin.com/in/kutbeddinagca"
-    bio: "Works where construction meets technology. A graduate of the architecture programme at Yıldız Technical University, he has developed and led projects at different scales for close to ten years. An expert in BIM-standard project production and Revit modelling, he treats architectural presentation, virtual tours and visualisation as the language in which a design is explained. He is pursuing a master's degree on large language models in the construction industry. Competitions are where he tests the limits of his expertise: he takes on the whole presentation, from concept to board. New tools and ways of telling a design are tried here first, and what works is carried into the studio's everyday practice."
+    bio: "Works where construction meets technology. A graduate of the architecture programme at Yıldız Technical University, he has developed and led projects at different scales for close to ten years. An expert in BIM-standard project production and Revit modelling, he treats architectural presentation, virtual tours and visualisation as the language in which a design is explained. He is pursuing a master's degree on large language models in the construction industry. Competitions are where he tests the limits of his expertise: he takes on the whole presentation, from concept to board."
 ---
 We think of architecture less as the building itself and more as the space it encloses: the places where people gather, produce and remember. From the scale of a house to a public building, every project starts with the same question: what will this space give to the city?
 

@@ -1,15 +1,15 @@
 ---
-title: "Rölöveden BIM Modeline"
-subtitle: "Drone fotogrametrisi, nokta bulutu ve Revit as-built modeli"
+title: "Toplu Konut Rölövesi"
+subtitle: "Scan to BIM: drone fotogrametrisi, nokta bulutu ve Revit as-built modeli"
 translationKey: "proje-rolove-bim"
-slug: "roloveden-bim-modeline"
+slug: "toplu-konut-rolovesi"
 date: 2024-09-01
 weight: 30
 draft: false
-tur: ["bim", "kentsel"]
-description: "Mevcut bir konut sitesinin drone ile taranması, nokta bulutundan Revit as-built modeline dönüşümü ve modelden üretilen avan plan, kesit ve görünüş."
+tur: ["scan_to_bim"]
+description: "Üsküdar'da mevcut bir konut sitesinin drone ile taranması, nokta bulutundan Revit as-built modeline dönüşümü ve modelden üretilen avan plan, kesit ve görünüş."
 kunye:
-  yer: ""
+  yer: "Üsküdar, İstanbul"
   isveren: ""
   proje_yili: "2024"
   bitis_yili: ""
@@ -71,7 +71,7 @@ drawings:
     alt: "Çatı arası katı planı: dört dubleks dairenin çatı arası odaları, terasları ve banyoları; ortada kat holü, makine dairesi ve yangın merdiveni; çevrede kırma çatı yüzeyleri"
     caption: "Çatı arası katı planı"
 ---
-Mevcut bir yapıyı doğru okumak, onu dönüştürmenin ilk adımıdır. Bu çalışmada bir konut sitesinin tamamı drone ile tarandı; fotogrametriyle üretilen nokta bulutu, blokların, yolların ve arazinin ölçülebilir bir kopyasını verdi. Seçilen bloğun iç mekânları da taranarak nokta bulutuna eklendi.
+Mevcut bir yapıyı doğru okumak, onu dönüştürmenin ilk adımıdır. Bu çalışmada Üsküdar'daki bir konut sitesinin tamamı drone ile tarandı; fotogrametriyle üretilen nokta bulutu, blokların, yolların ve arazinin ölçülebilir bir kopyasını verdi. Seçilen bloğun iç mekânları da taranarak nokta bulutuna eklendi.
 
 Bu blok Revit'te yeniden kuruldu: döşemeler, duvarlar, pencereler, balkonlar ve çatı, ölçüleri buluttan alınarak modellendi. Kat başına dört daire, iki bodrum katı, zemin kat, dört normal kat ve dubleks dairelerin üst piyeslerini taşıyan çatı arası katı modelde yerini aldı. Sitenin tamamı için basitleştirilmiş bir blok modeli, seçilen blok için ise avan düzeyinde kat planı, kesit, görünüş ve çatı arası kat planı bu modelden üretildi.
 

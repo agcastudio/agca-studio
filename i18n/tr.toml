@@ -40,8 +40,8 @@ other = "Konsept"
 other = "Ticari"
 [tur_kentsel]
 other = "Kentsel Dönüşüm"
-[tur_bim]
-other = "Rölöve ve BIM"
+[tur_scan_to_bim]
+other = "Scan to BIM"
 [tur_ic_mekan]
 other = "İç Mekân"
 [kunye]
