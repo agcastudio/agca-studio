@@ -15,7 +15,7 @@ kunye:
   proje_yili: "2025"
   bitis_yili: ""
   program: "Salon: oturma grubu, yemek alanı ve televizyon duvarı"
-  durum: "Proje"
+  durum: "Uygulandı"
   insaat_alani: ""
   arsa_alani: ""
   ekip: ""
@@ -28,7 +28,7 @@ card: "r-niantasi-koru-salon-render-5.jpg"
 card_alt: "Işıklı raf nişleri arasında meşe panele gömülü televizyon duvarı"
 credits: "İç mimari tasarım ve görselleştirme: agca·studio"
 ozet: |
-  Nişantaşı'nda bir dairenin salonu için iç mimari tasarım. Tek bir uzunlamasına hacim, iki bölgeye ayrılır: bir uçta altı kişilik yemek alanı, diğer uçta oturma grubu ve karşısında televizyon duvarı. Bölgeler duvar değil, halı, aydınlatma ve yivli panel değişimiyle ayrılır. Zemin baştan sona koyu ceviz balıksırtı parkedir; duvarlarda kırık beyaz sıva ile açık meşe paneller, aralarında ince pirinç fugalar yer alır. Tavan çevresi kademelenir ve gizli ışıkla yükseltilir; pencere hattındaki yarık perdeyi gizler. Yemek masasının üstünde pirinç renkli kıvrımlı bir lineer sarkıt, oturma grubunun üstünde krem halkalardan oluşan bir avize asılır. Mobilyalar yuvarlak hatlıdır: oval mermer masa, bukle kanepe ve döner berjerler, silindirik ayaklı mermer sehpalar. Tam boy balkon kapısı salonu ağaçların tepesine ve uzaktaki denize açar. Televizyon duvarı boyunca uzanan askılı meşe konsol ve ışıklı siyah nişler odanın tek sabit ünitesidir.
+  Nişantaşı'nda bir dairenin salonu için iç mimari tasarım; uygulandı. Tek bir uzunlamasına hacim, iki bölgeye ayrılır: bir uçta altı kişilik yemek alanı, diğer uçta oturma grubu ve karşısında televizyon duvarı. Bölgeler duvar değil, halı, aydınlatma ve yivli panel değişimiyle ayrılır. Zemin baştan sona koyu ceviz balıksırtı parkedir; duvarlarda kırık beyaz sıva ile açık meşe paneller, aralarında ince pirinç fugalar yer alır. Tavan çevresi kademelenir ve gizli ışıkla yükseltilir; pencere hattındaki yarık perdeyi gizler. Yemek masasının üstünde pirinç renkli kıvrımlı bir lineer sarkıt, oturma grubunun üstünde krem halkalardan oluşan bir avize asılır. Mobilyalar yuvarlak hatlıdır: oval mermer masa, bukle kanepe ve döner berjerler, silindirik ayaklı mermer sehpalar. Tam boy balkon kapısı salonu ağaçların tepesine ve uzaktaki denize açar. Televizyon duvarı boyunca uzanan askılı meşe konsol ve ışıklı siyah nişler odanın tek sabit ünitesidir.
 images:
   - file: "r-niantasi-koru-salon-render-1.jpg"
     alt: "Açık planlı salonun geniş görünümü: solda mermer tablalı oval yemek masası, sağda krem bukle kanepe ve mermer sehpalar; ceviz balıksırtı parke, asma tavanda gizli ışık"

@@ -7,14 +7,14 @@ date: 2023-07-01
 weight: 100
 draft: false
 tur: ["konut"]
-description: "Bahçeli müstakil konut: beyaz kütleler, taş kaplı merdiven kulesi, pergolalı veranda, çatı katında teraslar ve bahçede ateş çukurlu oturma."
+description: "Şile'de bahçeli müstakil konut: beyaz kütleler, taş kaplı merdiven kulesi, pergolalı veranda, çatı katında teraslar ve ateş çukurlu bahçe."
 kunye:
-  yer: ""
+  yer: "Şile, İstanbul"
   isveren: ""
   proje_yili: "2023"
   bitis_yili: ""
   program: "Zemin katta salon, mutfak, oturma odası ve bir yatak odası; birinci katta üç yatak odası, banyolar, sauna, hamam ve jakuzi; çatı katında mutfak, ibadethane, ardiye ve iki teras"
-  durum: "Proje"
+  durum: "Uygulandı"
   insaat_alani: ""
   arsa_alani: ""
   ekip: ""
@@ -27,7 +27,7 @@ card: "r-kulube.jpg"
 card_alt: "Yücel Evi bahçeden: beyaz ve bej kütleler, taş kaplı merdiven kulesi ve pergolalı veranda"
 credits: "Mimari tasarım, iç mimari, peyzaj ve görselleştirme: agca·studio"
 ozet: |
-  Bahçe duvarlarıyla çevrili bir parselde, üç katlı müstakil bir ev. Zemin katta 43 m²'lik salon, 28 m²'lik mutfak, oturma odası ve bir yatak odası bahçeye açılır; giriş holü ile merdiven kütlenin ortasında durur. Birinci katta 43 m²'lik ebeveyn yatak odası kendi terasına bakar, yanında iki yatak odası, çamaşır odası ve banyolar sıralanır; sauna, hamam ve jakuziden oluşan küçük bir ıslak hacim grubu bu kata eklenir. Çatı katı ayrı bir daire gibi kurulur: adalı mutfak, ibadethane, ardiye ve tuvaletin iki yanında 63 ve 52 m²'lik iki teras. Beyaz sıvalı kütleler bej şeritlerle bölünür; merdiven kulesi gri doğal taşla, cephenin kapalı kalan bölümleri düşey ahşap lambriyle kaplanır. Pergolalı veranda açık mutfak ve altı kişilik masayla bahçenin yemek odasıdır. Bahçede ateş çukurlu çukur oturma, nilüferli süs havuzu ve şelale, meyve ağaçları, bostan ve doğal taş yürüyüş yolları yer alır. Kıvrımlı tek merdiven üç katı birbirine bağlar; içeride balıksırtı meşe parke, çıtalı ahşap paneller ve gizli LED aydınlatma sürer. Planlar, kesitler, görünüşler, kat aksonometrileri ve renderlar tek modelden üretildi.
+  Şile'de, bahçe duvarlarıyla çevrili bir parselde üç katlı müstakil bir ev; uygulandı. Zemin katta 43 m²'lik salon, 28 m²'lik mutfak, oturma odası ve bir yatak odası bahçeye açılır; giriş holü ile merdiven kütlenin ortasında durur. Birinci katta 43 m²'lik ebeveyn yatak odası kendi terasına bakar, yanında iki yatak odası, çamaşır odası ve banyolar sıralanır; sauna, hamam ve jakuziden oluşan küçük bir ıslak hacim grubu bu kata eklenir. Çatı katı ayrı bir daire gibi kurulur: adalı mutfak, ibadethane, ardiye ve tuvaletin iki yanında 63 ve 52 m²'lik iki teras. Beyaz sıvalı kütleler bej şeritlerle bölünür; merdiven kulesi gri doğal taşla, cephenin kapalı kalan bölümleri düşey ahşap lambriyle kaplanır. Pergolalı veranda açık mutfak ve altı kişilik masayla bahçenin yemek odasıdır. Bahçede ateş çukurlu çukur oturma, nilüferli süs havuzu ve şelale, meyve ağaçları, bostan ve doğal taş yürüyüş yolları yer alır. Kıvrımlı tek merdiven üç katı birbirine bağlar; içeride balıksırtı meşe parke, çıtalı ahşap paneller ve gizli LED aydınlatma sürer. Planlar, kesitler, görünüşler, kat aksonometrileri ve renderlar tek modelden üretildi.
 images:
   - file: "r-sokak.jpg"
     alt: "Sokaktan bakış: beton bahçe duvarı, 27 numaralı giriş nişi ve düşey ahşap lambri; arkada beyaz sıvalı, bej şeritli iki katlı kütle ve gri taş kaplama"

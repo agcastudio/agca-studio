@@ -15,7 +15,7 @@ kunye:
   proje_yili: "2025"
   bitis_yili: ""
   program: "Living room: seating group, dining area and television wall"
-  durum: "Design"
+  durum: "Built"
   insaat_alani: ""
   arsa_alani: ""
   ekip: ""
@@ -28,7 +28,7 @@ card: "r-niantasi-koru-salon-render-5.jpg"
 card_alt: "Television recessed into an oak panel between lit black shelf niches"
 credits: "Interior design and visualisation: agca·studio"
 ozet: |
-  An interior design for the living room of a flat in Nişantaşı, Istanbul. One long volume is split into two zones: a dining area for six at one end, the seating group and its television wall at the other. The zones are separated not by walls but by a change of rug, lighting and fluted panelling. The floor is dark walnut herringbone parquet from end to end, with off-white plaster and light oak panels on the walls, divided by slender brass reveals. The ceiling steps around its edge and is lifted by concealed light, and a slot along the window line hides the curtain track. A ribbon-like brass pendant hangs over the dining table, and a chandelier of cream rings over the seating group. The furniture is rounded throughout: an oval marble table, a boucle sofa and swivel armchairs, marble side tables on cylindrical bases. A full-height balcony door opens the room to the treetops and the sea in the distance. The floating oak console running along the television wall, with its lit black niches, is the room's only fixed unit.
+  An interior design for the living room of a flat in Nişantaşı, Istanbul, now built. One long volume is split into two zones: a dining area for six at one end, the seating group and its television wall at the other. The zones are separated not by walls but by a change of rug, lighting and fluted panelling. The floor is dark walnut herringbone parquet from end to end, with off-white plaster and light oak panels on the walls, divided by slender brass reveals. The ceiling steps around its edge and is lifted by concealed light, and a slot along the window line hides the curtain track. A ribbon-like brass pendant hangs over the dining table, and a chandelier of cream rings over the seating group. The furniture is rounded throughout: an oval marble table, a boucle sofa and swivel armchairs, marble side tables on cylindrical bases. A full-height balcony door opens the room to the treetops and the sea in the distance. The floating oak console running along the television wall, with its lit black niches, is the room's only fixed unit.
 images:
   - file: "r-niantasi-koru-salon-render-1.jpg"
     alt: "Wide view of the open-plan living room: an oval marble dining table at the left, a cream boucle sofa and marble tables at the right, walnut herringbone parquet, cove-lit ceiling"

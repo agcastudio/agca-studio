@@ -7,14 +7,14 @@ date: 2023-07-01
 weight: 100
 draft: false
 tur: ["konut"]
-description: "A detached house and its garden: white volumes, a stone-clad stair tower, a pergola veranda, roof-floor terraces and a sunken fire pit lounge."
+description: "A detached house in Şile, Istanbul: white volumes, a stone-clad stair tower, a pergola veranda, roof-floor terraces and a sunken fire pit lounge."
 kunye:
-  yer: ""
+  yer: "Şile, Istanbul"
   isveren: ""
   proje_yili: "2023"
   bitis_yili: ""
   program: "Salon, kitchen, sitting room and one bedroom on the ground floor; three bedrooms, bathrooms, sauna, hammam and jacuzzi on the first floor; kitchen, prayer room, store and two terraces on the roof floor"
-  durum: "Design"
+  durum: "Built"
   insaat_alani: ""
   arsa_alani: ""
   ekip: ""
@@ -27,7 +27,7 @@ card: "r-kulube.jpg"
 card_alt: "Yücel House from the garden: white and beige volumes, a stone-clad stair tower and the pergola veranda"
 credits: "Architecture, interiors, landscape and visualisation: agca·studio"
 ozet: |
-  A three-storey detached house on a walled plot. On the ground floor a 43 m² salon, a 28 m² kitchen, a sitting room and one bedroom open to the garden, with the entrance hall and stair held in the middle of the plan. On the first floor the 43 m² main bedroom faces its own terrace, with two further bedrooms, a laundry and bathrooms beside it, and a small wet group of sauna, hammam and jacuzzi added to the floor. The roof floor works almost as a separate flat: an island kitchen, a prayer room, a store and a washroom between two terraces of 63 and 52 m². White rendered volumes are divided by beige bands; the stair tower is clad in grey natural stone and the closed parts of the facade in vertical timber slats. The pergola veranda, with its outdoor kitchen and a table for six, becomes the dining room of the garden. The garden holds a sunken fire pit lounge, a lily pool with a waterfall, fruit trees, a vegetable bed and natural stone paths. One curved stair ties the three floors together, and inside, chevron oak parquet, reeded timber panels and concealed LED lighting continue throughout. Plans, sections, elevations, floor axonometrics and renders all came from a single model.
+  A three-storey detached house on a walled plot in Şile, Istanbul, now built. On the ground floor a 43 m² salon, a 28 m² kitchen, a sitting room and one bedroom open to the garden, with the entrance hall and stair held in the middle of the plan. On the first floor the 43 m² main bedroom faces its own terrace, with two further bedrooms, a laundry and bathrooms beside it, and a small wet group of sauna, hammam and jacuzzi added to the floor. The roof floor works almost as a separate flat: an island kitchen, a prayer room, a store and a washroom between two terraces of 63 and 52 m². White rendered volumes are divided by beige bands; the stair tower is clad in grey natural stone and the closed parts of the facade in vertical timber slats. The pergola veranda, with its outdoor kitchen and a table for six, becomes the dining room of the garden. The garden holds a sunken fire pit lounge, a lily pool with a waterfall, fruit trees, a vegetable bed and natural stone paths. One curved stair ties the three floors together, and inside, chevron oak parquet, reeded timber panels and concealed LED lighting continue throughout. Plans, sections, elevations, floor axonometrics and renders all came from a single model.
 images:
   - file: "r-sokak.jpg"
     alt: "Seen from the street: a concrete boundary wall, an entrance recess numbered 27 with timber slats, and behind it white rendered volumes with beige bands and grey stone"
