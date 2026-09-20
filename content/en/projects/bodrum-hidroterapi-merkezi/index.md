@@ -8,7 +8,7 @@ date: 2024-04-01
 weight: 70
 draft: false
 tur: ["saglik"]
-description: "Physiotherapy and hydrotherapy centre among pines in Bodrum: white prisms, slender colonnades, a coffered-ceiling pool, physiotherapy hall, sauna and courtyards."
+description: "Physiotherapy and hydrotherapy centre among pines in Bodrum: white prisms, slender colonnades, a coffered-ceiling pool, physiotherapy hall and sauna."
 kunye:
   yer: "Bodrum, Muğla"
   isveren: ""

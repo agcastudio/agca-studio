@@ -8,7 +8,7 @@ date: 2024-04-01
 weight: 70
 draft: false
 tur: ["saglik"]
-description: "Bodrum'da çamlar arasında fizik tedavi ve hidroterapi merkezi: beyaz prizmalar, ince kolonlu revaklar, kaset tavanlı havuz, fizyoterapi salonu, sauna ve avlular."
+description: "Bodrum'da çamlar arasında fizik tedavi ve hidroterapi merkezi: beyaz prizmalar, ince kolonlu revaklar, kaset tavanlı havuz, fizyoterapi salonu ve sauna."
 kunye:
   yer: "Bodrum, Muğla"
   isveren: ""

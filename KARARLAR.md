@@ -87,9 +87,16 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 | 2026-09-20 | 26 | Altbilgi: sol sütunda logo, "Üsküdar, İstanbul" ve gri e-posta adresi; sağ sütunda WhatsApp, Instagram, LinkedIn; satır yükseklikleri eşitlendi. | Kullanıcı isteği |
 | 2026-09-20 | 6 | Kutbeddin Ağca: "Yeni araçları ve anlatım biçimlerini…" cümlesi kaldırıldı; yarışma cümlesi iki nokta ile tek cümle. | Kullanıcı isteği |
 
+| 2026-09-20 | 3 | İki proje daha: **Bodrum Hidroterapi Merkezi** (2404, yeni tür `saglik` "Sağlık"; Bodrum/Muğla) ve **Zapsu Çiftlik Evi** (2405, konut; yer bilinmiyor; üç "ChatGPT" görseli "kavram görseli, yapay zekâ destekli" etiketiyle kullanıldı, krediye de yazıldı). Toplam 8 proje. KC Yangın yeri Ümraniye. | Kullanıcı isteği |
+| 2026-09-20 | 19 | Proje sayfası (3. düzenleme): künye sol sütunda dikey liste, sağında **5–10 cümlelik özet** (`ozet` alanı, her projede TR/EN); önceki/sonraki proje bağlantılarında kare küçük görsel. | Kullanıcı isteği |
+| 2026-09-20 | 17 | Kapak slaytında noktalar kaldırıldı; sağ-sol ok düğmeleri (klavye ok tuşları da çalışır). | Kullanıcı isteği |
+| 2026-09-20 | 26 | Altbilgi dikey boşlukları azaltıldı (üst 20 px, alt 18 px). | Kullanıcı isteği |
+
 ## Bekleyen bilgiler (kullanıcıdan)
 
 - Ofisin tam adresi ya da harita koordinatı (harita işareti ve bağlantısı için).
+- Zapsu Çiftlik Evi'nin yeri; KC Yangın'ın durumu (uygulandı mı).
+- Projeler klasöründeki `kalp360` klasörünün ne olduğu (siteye alınmadı).
 - KC Yangın projesinin yeri ve durumu (proje / uygulandı); 2402 BIM projesinin yeri ("Doktor" klasör adı bir site adı mı?).
 - KC'deki 360° panoramalar için sanal tur bileşeni istenip istenmediği.
 

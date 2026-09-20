@@ -7,7 +7,7 @@ date: 2024-05-01
 weight: 80
 draft: false
 tur: ["konut"]
-description: "A timber-clad house on a sloping farm plot: a single wide-eaved roof, a timber deck hanging over the garden, bedrooms on the lower floor; plans, sections and elevations."
+description: "A timber-clad house on a sloping farm plot: a single wide-eaved roof, a timber deck over the garden, bedrooms on the lower floor; plans and sections."
 kunye:
   yer: ""
   isveren: ""
