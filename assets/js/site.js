@@ -94,8 +94,17 @@
     if (m) apply(decodeURIComponent(m[1]), false);
   }
 
-  /* Büyütme penceresi (GLightbox yalnız proje sayfasında yüklenir) */
+  /* Büyütme penceresi (GLightbox yalnız proje sayfasında yüklenir).
+     Hareket azaltma açıkken CSS tüm animasyonları kapatır; GLightbox kapanışı animationend
+     olayını beklediği için efektler "none" yapılır, yoksa pencere kapanmaz. */
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var fx = reduceMotion ? "none" : "fade";
   var lb = null;
+  var lastTrigger = null;
+  var restoreFocus = function () {
+    if (lastTrigger && document.contains(lastTrigger)) lastTrigger.focus();
+    lastTrigger = null;
+  };
   var setupLightbox = function () {
     if (lb || !window.GLightbox || !document.querySelector(".glb")) return;
     lb = GLightbox({
@@ -104,17 +113,24 @@
       loop: false,
       zoomable: true,
       draggable: true,
-      openEffect: "fade",
-      closeEffect: "fade",
-      slideEffect: "fade",
+      openEffect: fx,
+      closeEffect: fx,
+      slideEffect: fx,
       moreLength: 0,
-      preload: true
+      preload: true,
+      onClose: restoreFocus
     });
   };
   setupLightbox();
   if (!lb) window.addEventListener("load", setupLightbox);
 
-  /* Kapak tıklaması: büyütme penceresini kapak görselinden açar; pencere kurulamazsa bağlantı görseli açar */
+  /* Pencere kapanınca odak, açan bağlantıya geri döner */
+  document.addEventListener("click", function (e) {
+    var t = e.target && e.target.closest ? e.target.closest(".glb, [data-cover-open]") : null;
+    if (t) lastTrigger = t;
+  }, true);
+
+  /* Kapak tıklaması: büyütme penceresini kapağın karesinden açar */
   var coverLink = document.querySelector("[data-cover-open]");
   if (coverLink) {
     coverLink.addEventListener("click", function (e) {
@@ -124,7 +140,12 @@
       var hrefs = Array.prototype.map.call(document.querySelectorAll(".glb"), function (a) { return a.href; });
       var i = hrefs.indexOf(coverLink.href);
       if (i >= 0) { lb.openAt(i); return; }
-      GLightbox({ elements: [{ href: coverLink.href, type: "image" }], openEffect: "fade", closeEffect: "fade" }).open();
+      GLightbox({
+        elements: [{ href: coverLink.href, type: "image", alt: coverLink.getAttribute("data-alt") || "" }],
+        openEffect: fx,
+        closeEffect: fx,
+        onClose: restoreFocus
+      }).open();
     });
   }
 

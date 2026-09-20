@@ -5,9 +5,9 @@ Sıra önemli. Her adım için kimin yapacağı yazılı: **(sen)** hesap işlem
 ## 0. Ön koşul — alan adı yenileme (sen)
 - Squarespace Domains → agca.studio → otomatik yenileme AÇIK ve kart güncel. Bitiş: **1 Ekim 2026**.
 
-## 1. GitHub deposu (sen, 2 dakika)
-- github.com/new → Owner **agcastudio**, Repository name **agca-studio**, Public, README/gitignore EKLEME (boş depo).
-- Bana "depo hazır" de; ilk commit'i ben gönderirim (`git remote add origin https://github.com/agcastudio/agca-studio.git && git push -u origin main`).
+## 1. GitHub deposu — TAMAMLANDI (20 Eylül 2026)
+- Depo: github.com/agcastudio/agca-studio; `main` dalı gönderildi.
+- **Yapılacak (sen, 1 dakika):** Settings → General → Danger Zone → Change visibility → **Private**. Depoda `KARARLAR.md` (iç karar kaydı, bekleyen sorular) ve proje dosyalarının sitede yayımlanmayan rapor metinleri var. Cloudflare Workers özel depolarla sorunsuz çalışır.
 
 ## 2. Cloudflare Workers — Git bağlantısı (sen, 5 dakika)
 - dash.cloudflare.com → Workers & Pages → **Create** → Workers → **Import a repository** → GitHub'ı yetkilendir → `agcastudio/agca-studio` seç.
@@ -16,7 +16,8 @@ Sıra önemli. Her adım için kimin yapacağı yazılı: **(sen)** hesap işlem
   - Build command: `hugo --gc --minify`
   - Deploy command: `npx wrangler deploy`
   - Root directory: `/`
-  - Environment variables: `HUGO_VERSION` = `0.166.0`
+  - **Build variables and secrets** (çalışma zamanı "Variables & Secrets" değil): `HUGO_VERSION` = `0.166.0`. Girilmezse derleme görüntüsünün varsayılanı olan Hugo 0.147.7 kullanılır ve site eski sürümle üretilir.
+- Project name, `wrangler.jsonc` içindeki `name` ile birebir aynı olmalı (`agca-studio`), yoksa derleme başarısız olur.
 - Deploy → birkaç dakika sonra `agca-studio.<hesap>.workers.dev` adresinde site açılır. Bu adresi bana gönder; kontrol ederim.
 - Her `git push` yeni yayın, her dal (branch) ayrı önizleme adresi üretir.
 
@@ -31,10 +32,13 @@ Adımlar:
 1. Cloudflare → **Add a domain** → `agca.studio` → Free plan → Cloudflare mevcut kayıtları tarar; MX ve TXT satırlarının listede olduğunu doğrula (yoksa elle ekle).
 2. Cloudflare'in verdiği iki ad sunucusunu (ör. `xxx.ns.cloudflare.com`) Squarespace Domains → agca.studio → DNS → **Nameservers** bölümüne yaz (Squarespace DNS'ten "custom nameservers"a geç).
 3. Aktifleşme 5 dakika ile birkaç saat arası sürer; Cloudflare "Active" dediğinde info@agca.studio'ya bir test e-postası gönder.
+4. Zone "Active" olduktan sonra DNS → Records: eski Webflow kayıtlarını sil — `A agca.studio → 198.202.211.1` ve `CNAME www → cdn.webflow.com`. **MX ve TXT satırlarına dokunma.** Bu kayıtlar dururken alan adı Worker'a bağlanamaz.
 
 ## 4. Alan adını siteye bağlama (sen, 2 dakika)
 - Workers & Pages → `agca-studio` → Settings → **Domains & Routes** → Add → Custom domain → `agca.studio`; sonra tekrar Add → `www.agca.studio`.
-- Sertifika otomatik. `www` → kök yönlendirmesi `static/_redirects` ile hazır.
+- Sertifika otomatik.
+- `www` → kök yönlendirmesini **Redirect Rule** ile kur (Workers statik varlıklarda `_redirects` alan adı düzeyinde yönlendirme yapamaz): agca.studio → Rules → Redirect Rules → Create rule → şablon **Redirect from WWW to Root** → Wildcard `https://www.*` → `https://${1}`, 301, sorgu dizesi korunsun.
+- Settings → Domains & Routes → **workers.dev** adresini kapat; site yalnız kendi alan adından sunulsun (ikinci kopya dizine girmesin).
 - Cloudflare → SSL/TLS → **Full (strict)**; Edge Certificates → **Always Use HTTPS** açık.
 
 ## 5. Doğrulama (ben)

@@ -36,7 +36,7 @@
       <div class="project-summary">
         {{ $summary }}
         {{- with .Params.sanal_tur }}
-        <p><a class="btn" href="#sanal-tur">{{ i18n "virtual_tour" }} ↓</a></p>
+        <p><a class="btn" href="#sanal-tur">{{ i18n "virtual_tour" }} <span aria-hidden="true">↓</span></a></p>
         {{- end }}
       </div>
     </div>
@@ -45,7 +45,7 @@
   {{- /* 2. Kapak: kenarlardan içeride (.wrap), altındaki karelerle aynı hizada; tıklanınca büyütme penceresi */ -}}
   {{- with $hero }}
   <div class="wrap project-cover">
-    {{- if $coverFull }}<a class="project-cover-link" href="{{ $coverFull }}" data-cover-open aria-label="{{ i18n "open_image" }}: {{ $coverAlt }}">{{ end }}
+    {{- if $coverFull }}<a class="project-cover-link" href="{{ $coverFull }}" data-cover-open data-alt="{{ $coverAlt }}" aria-label="{{ i18n "open_image" }}: {{ $coverAlt }}">{{ end }}
     {{ partial "hero-picture.html" (dict "hero" . "alt" $coverAlt) }}
     {{- if $coverFull }}</a>{{ end }}
   </div>
@@ -64,7 +64,7 @@
         {{- $tf := $img.Fill "240x240 jpg" -}}
         {{- $full := partial "lightbox-src.html" $img -}}
         <li class="thumb">
-          <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="tum" data-width="{{ $full.Width }}" data-height="{{ $full.Height }}"{{ with $it.caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $it.alt }}">
+          <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="tum" data-width="{{ $full.Width }}" data-height="{{ $full.Height }}" data-alt="{{ $it.alt }}"{{ with $it.caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $it.alt }}">
             <picture>
               <source type="image/webp" srcset="{{ $t1.RelPermalink }} 240w, {{ $t2.RelPermalink }} 480w" sizes="(min-width: 1024px) 220px, (min-width: 640px) 25vw, 33vw">
               <img src="{{ $tf.RelPermalink }}" width="240" height="240" alt="" loading="lazy" decoding="async">
@@ -82,13 +82,13 @@
   <section class="wrap tour" id="sanal-tur" aria-labelledby="sanal-tur-baslik">
     <div class="section-head">
       <h2 class="section-title" id="sanal-tur-baslik">{{ i18n "virtual_tour" }}</h2>
-      <a class="muted small" href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ i18n "tour_new_tab" }} ↗</a>
+      <a class="muted small" href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ i18n "tour_new_tab" }} <span aria-hidden="true">↗</span></a>
     </div>
     <div class="tour-frame" data-tour="{{ . }}" data-title="{{ $.Title }} · {{ i18n "virtual_tour" }}">
       {{- with $hero }}{{ partial "hero-picture.html" (dict "hero" . "alt" "" "lazy" true) }}{{ end }}
       <button type="button" class="tour-start" data-tour-start><span class="tour-play" aria-hidden="true"></span>{{ i18n "tour_start" }}</button>
-      <p class="tour-note">{{ i18n "tour_note" }}</p>
     </div>
+    <p class="tour-note muted">{{ i18n "tour_note" }}</p>
   </section>
   {{- end }}
 

@@ -96,12 +96,14 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 | 2026-09-20 | 7 | Sanal tur bölümü: `sanal_tur` alanı olan projelerde galerinin altında "Sanal tur" bölümü. Üçüncü taraf çerçeve (net-fs.com) yalnız ziyaretçi "Sanal turu başlat" deyince yüklenir (çerezsiz site kararıyla uyumlu); "yeni sekmede aç" bağlantısı var; gizlilik sayfasına üçüncü taraf içerik maddesi eklendi. Şimdilik KC Yangın (`SANAL TUR LİNKLERİ.pdf`'teki 8 turdan sitede olan tek proje). | Kullanıcı isteği |
 | 2026-09-20 | 3 | Oyuk: yarışma bilgileri mugla.bel.tr/yarisma/yarisma-detay/1'den alındı: Muğla Büyükşehir Belediyesi Sosyal, Kültürel ve İdari Hizmetler Binası Ulusal, Tek Kademeli Mimari Proje Yarışması (ilan 08.05.2026, teslim 10.08.2026, kolokyum 07.09.2026); künyeye "Yarışma" satırı (`yarisma`) eklendi, alt başlık resmî ada çekildi. Ödül alan yarışmacılar tutanağında (28.08.2026) 15732 rumuzu yok; derece alanı boş. | Kullanıcı bağlantısı |
 | 2026-09-20 | 24 | GitHub deposu github.com/agcastudio/agca-studio (kullanıcı açtı); yerel `main` dalı `origin` olarak buraya itildi. Cloudflare Workers bağlantısı kullanıcı hesabında yapılacak (YAYIN.md). | Kullanıcı isteği |
+| 2026-09-20 | 15 | Erişilebilirlik düzeltmeleri (denetim bulguları): hareket azaltma açıkken GLightbox efektleri "none" (CSS `animation: none !important` yüzünden pencere kapanmıyordu — kütüphane kapanışı `animationend` bekliyor); büyütülen görsellere `data-alt`; pencere kapanınca odak açan bağlantıya döner; `:target` için `scroll-margin-top` (çapa yapışkan başlığın altında kalmıyor); sanal tur notu çerçevenin içinden altına alındı (beyaz metin fotoğraf üzerinde okunmuyordu); koyu zeminde beyaz odak halkası; "↓" ve "↗" okları `aria-hidden`. | Denetim akışı |
+| 2026-09-20 | 30 | Cloudflare düzeltmeleri: `_redirects`'teki `www` → kök satırı kaldırıldı (Workers statik varlıklar alan adı düzeyinde yönlendirme yapmaz; yerine panelde Redirect Rule kurulacak); `_headers`'ta `/img/*` kuralı `/*.svg` ve `/*.png` ile değiştirildi (aynı dosyaya iki `Cache-Control` uygulanıyordu); YAYIN.md: HUGO_VERSION **build** değişkeni, eski Webflow A/CNAME kayıtlarının silinmesi ayrı adım, workers.dev adresinin kapatılması, depo Private önerisi. | Denetim akışı |
 
 ## Bekleyen bilgiler (kullanıcıdan)
 
 - Ofisin tam adresi ya da harita koordinatı (harita işareti ve bağlantısı için).
 - Zapsu Çiftlik Evi'nin yeri; KC Yangın'ın durumu (uygulandı mı).
-- Projeler klasöründeki `kalp360` klasörünün ne olduğu (siteye alınmadı).
+- ~~`kalp360` klasörü ne?~~ → 2026-09-20: klasör `2302_Kalp_Görseller` olarak yeniden adlandırılmış (2301_Render + 2302_Teknik Çizim). **Kalp360 Sağlık Merkezi** iç mimari projesi: ~208 m², karşılama-bekleme, 2 doktor odası, diyetisyen, koordinatör, toplantı, efor/stüdyo alanı, mutfak, WC; 10 render + kat planı + 13 kesit + aksonometri; sanal turu da var (/5/). Siteye eklenip eklenmeyeceği **kullanıcıya soruldu**.
 - KC Yangın projesinin yeri ve durumu (proje / uygulandı); 2402 BIM projesinin yeri ("Doktor" klasör adı bir site adı mı?).
 - KC'deki 360° panoramalar için sanal tur bileşeni istenip istenmediği.
 
