@@ -7,4 +7,4 @@ hero_caption: "Oyuk · Menteşe, Muğla"
 hero_link: "/projeler/oyuk/"
 tagline: "İstanbul merkezli bir mimarlık stüdyosu. Kentsel dönüşüm, Revit ile mimari projelendirme, görselleştirme ve sanal tur üzerine çalışıyoruz."
 ---
-agca·studio, İstanbul Üsküdar'da iki kurucu ortağın yürüttüğü bir mimarlık stüdyosudur. [Kentsel dönüşüm projelerinde](/hizmetler/kentsel-donusum/) mevcut dokuyu okuyarak başlıyor, [mimari projelendirmeyi Revit](/hizmetler/revit-mimari-projelendirme/) üzerinde tek bilgi modelinde yürütüyoruz; [mimari görselleştirmeyi](/hizmetler/mimari-gorsellestirme/) ve [sanal turu](/hizmetler/sanal-tur/) tasarımı yapılmadan önce deneyimlemenin araçları olarak kullanıyoruz. [Stüdyo](/studyo/) · [İletişim](/iletisim/)
+agca·studio, İstanbul Üsküdar'da iki kurucu ortağın yürüttüğü bir mimarlık stüdyosudur. Kentsel dönüşüm projelerinde mevcut dokuyu okuyarak başlıyor, mimari projelendirmeyi Revit üzerinde tek bilgi modelinde yürütüyoruz; görselleştirmeyi ve sanal turu, tasarımı yapılmadan önce deneyimlemenin araçları olarak kullanıyoruz. [Stüdyo](/studyo/) · [İletişim](/iletisim/)

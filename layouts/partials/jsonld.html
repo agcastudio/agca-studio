@@ -51,23 +51,6 @@
     {{- with $p.Params.kunye.proje_yili }}{{ $cw = merge $cw (dict "dateCreated" .) }}{{ end -}}
     {{- with .og }}{{ $cw = merge $cw (dict "image" (dict "@type" "ImageObject" "contentUrl" . "creditText" $brand "copyrightNotice" (printf "© %s" $brand))) }}{{ end -}}
     {{- $graph = $graph | append $cw -}}
-  {{- else if and (eq $p.Type "hizmet") (not $p.IsSection) -}}
-    {{- $svc := dict
-      "@type" "Service"
-      "name" $p.Title
-      "serviceType" $p.Title
-      "description" .desc
-      "url" $p.Permalink
-      "inLanguage" $p.Language.Lang
-      "provider" (dict "@id" (printf "%s#org" site.BaseURL))
-      "areaServed" (slice (dict "@type" "City" "name" site.Params.city) (dict "@type" "Country" "name" (cond (eq $p.Language.Lang "tr") "Türkiye" "Turkey")))
-    -}}
-    {{- $graph = $graph | append $svc -}}
-    {{- with $p.Params.faq -}}
-      {{- $qs := slice -}}
-      {{- range . }}{{ $qs = $qs | append (dict "@type" "Question" "name" .q "acceptedAnswer" (dict "@type" "Answer" "text" (.a | markdownify | plainify))) }}{{ end -}}
-      {{- $graph = $graph | append (dict "@type" "FAQPage" "mainEntity" $qs) -}}
-    {{- end -}}
   {{- else if eq $p.Params.pagekind "contact" -}}
     {{- $graph = $graph | append $org -}}
   {{- end -}}

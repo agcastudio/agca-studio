@@ -41,7 +41,6 @@ Tarayıcıda http://localhost:1313 (Hugo `winget install Hugo.Hugo.Extended` ile
 
 - Telefon, Instagram, LinkedIn: `hugo.toml` → `[params]`. Boş bırakılan alan sitede görünmez.
 - Stüdyo sayfası ve kurucular: `content/tr/studyo.md` (`people` listesi) ve `content/en/studio.md`.
-- Hizmet sayfaları: `content/tr/hizmetler/*.md`, `content/en/services/*.md` (`faq` listesi yapısal veriye de girer).
 - Gizlilik: `content/tr/gizlilik.md`, `content/en/privacy.md`.
 
 ## Yayın sonrası bildirim

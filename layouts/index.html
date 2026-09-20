@@ -13,13 +13,6 @@
 <section class="wrap intro">
   <h1 class="tagline">{{ .Params.tagline }}</h1>
   {{ with .Content }}<div class="intro-text">{{ . }}</div>{{ end }}
-  {{- with site.GetPage (cond (eq $lang "tr") "/hizmetler" "/services") }}
-  <ul class="intro-services" aria-label="{{ .Title }}">
-    {{- range .Pages.ByWeight }}
-    <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
-    {{- end }}
-  </ul>
-  {{- end }}
 </section>
 
 {{- $projects := where site.RegularPages "Type" "proje" -}}

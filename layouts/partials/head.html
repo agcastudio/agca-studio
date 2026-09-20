@@ -11,9 +11,6 @@
   {{- $yer := .Params.kunye.yer -}}
   {{- $title = printf "%s · %s · %s" .Title (delimit (slice $tur $yer | complement (slice "")) ", ") $brand -}}
 {{- end -}}
-{{- if and (eq .Type "hizmet") (not .IsSection) -}}
-  {{- $title = printf "%s, %s · %s" .Title $city $brand -}}
-{{- end -}}
 {{- $desc := .Description | default .Params.description | default .Summary | default site.Params.siteDescription | plainify | truncate 160 -}}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

@@ -41,6 +41,7 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 |---|---|---|---|---|---|---|
 | 2026-09-19 | 17 | Ana sayfa: tam genişlik kapak görseli + seçili proje ızgarası + tek cümle. Kapak öncelikli yüklenir. | ızgara-only, slayt, video | Önerim kabul | Aşama 4 | evet |
 | 2026-09-19 | 18 | Menü: Projeler · Stüdyo · Hizmetler · İletişim. Günce yok. Ekipte iki kurucu. | + Haberler | Önerim kabul (a+d) | Aşama 4 | evet |
+| 2026-09-20 | 18 | **Hizmetler bölümü iptal:** dört hizmet sayfası, menü öğesi ve ana sayfadaki hizmet satırı kaldırıldı. Menü: Projeler · Stüdyo · İletişim. Hizmet anlatımı ana sayfa tanıtım paragrafı ve Stüdyo sayfasında kalır. | ayrı hizmet sayfaları | Kullanıcı kararı | Aşama 6 (SEO: hizmet anahtar kelimeleri artık yalnız ana sayfa ve Stüdyo'da) | hayır |
 | 2026-09-19 | 19 | Dizin: 3:2 kırpma, masaüstü 3 sütun / mobil 1; kartta ad + yer; filtre yalnız Tür (proje sayısı az); elle sıra (`weight`). Proje sayfası: kapak → başlık/yer/yıl → künye → kısa metin → görseller → çizimler → krediler → önceki/sonraki. | tuğla dizilimi | Önerim kabul; filtre eksenleri 2 projede Tür'e indirildi | Aşama 4 | evet |
 | 2026-09-19 | 20 | Telefonda büyütme: GLightbox (küçük, bakımlı), klavye/Esc, dokunarak yakınlaştırma. | PhotoSwipe | Önerim kabul | Aşama 4 | evet |
 | 2026-09-19 | 21 | Sosyal: yalnız bağlantı simgeleri (Instagram, LinkedIn — adresler BEKLENİYOR). Gömme yok. Her sayfaya 1200×630 paylaşım kartı. | canlı akış | Önerim kabul | Aşama 6 | evet |
