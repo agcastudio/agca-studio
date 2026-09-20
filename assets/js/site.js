@@ -8,11 +8,20 @@
   if (toggle && nav) {
     var lblOpen = toggle.querySelector("[data-label-open]");
     var lblClose = toggle.querySelector("[data-label-close]");
+    var mainEl = document.getElementById("icerik");
+    var footEl = document.querySelector(".site-footer");
+    var darEkran = function () { return window.matchMedia("(max-width: 760px)").matches; };
     var setOpen = function (open) {
       nav.classList.toggle("is-open", open);
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
       if (lblOpen) lblOpen.hidden = open;
       if (lblClose) lblClose.hidden = !open;
+      /* panel açıkken arkadaki içerik sekme sırasından çıkarılır; yoksa odak
+         panelin altında görünmeyen düğmelere gider */
+      var kilit = open && darEkran();
+      if (mainEl && "inert" in mainEl) mainEl.inert = kilit;
+      if (footEl && "inert" in footEl) footEl.inert = kilit;
+      if (!open && nav.contains(document.activeElement)) toggle.focus();
     };
     toggle.addEventListener("click", function () {
       setOpen(!nav.classList.contains("is-open"));
@@ -103,6 +112,34 @@
     if (m) apply(decodeURIComponent(m[1]), false);
   }
 
+  /* Dokunmatikte büyütme penceresi: iki parmakla yakınlaştırma tarayıcıya bırakılır,
+     yakınlaştırılmışken tek parmakla gezinme açılır (kütüphane bu olayları yutuyordu). */
+  var vv = window.visualViewport;
+  var lbZoomed = function () { return !!vv && vv.scale > 1.01; };
+  var syncLightboxTouch = function () {
+    var c = document.querySelector(".glightbox-container");
+    if (c) c.classList.toggle("is-zoomed", lbZoomed());
+  };
+  if (vv) {
+    vv.addEventListener("resize", syncLightboxTouch);
+    vv.addEventListener("scroll", syncLightboxTouch);
+  }
+  /* iki parmaklı hareketin BİTİŞİ de kütüphaneye gitmemeli: touchend'de
+     e.touches kalkan parmağı içermez, bu yüzden ayrı bayrakla izleniyor */
+  var cokluDokunus = false;
+  ["touchstart", "touchmove", "touchend", "touchcancel"].forEach(function (tip) {
+    document.addEventListener(tip, function (e) {
+      if (!document.querySelector(".glightbox-container")) return;
+      var parmak = (e.touches ? e.touches.length : 0) + (tip === "touchend" || tip === "touchcancel" ? (e.changedTouches ? e.changedTouches.length : 0) : 0);
+      if (parmak > 1) cokluDokunus = true;
+      if (cokluDokunus || lbZoomed()) {
+        syncLightboxTouch();
+        e.stopPropagation();
+      }
+      if (e.touches && e.touches.length === 0) cokluDokunus = false;
+    }, true);
+  });
+
   /* Büyütme penceresi (GLightbox yalnız proje sayfasında yüklenir).
      Hareket azaltma açıkken CSS tüm animasyonları kapatır; GLightbox kapanışı animationend
      olayını beklediği için efektler "none" yapılır, yoksa pencere kapanmaz. */
@@ -127,6 +164,7 @@
       slideEffect: fx,
       moreLength: 0,
       preload: true,
+      onOpen: syncLightboxTouch,
       onClose: restoreFocus
     });
   };
@@ -153,32 +191,11 @@
         elements: [{ href: coverLink.href, type: "image", alt: coverLink.getAttribute("data-alt") || "" }],
         openEffect: fx,
         closeEffect: fx,
+        onOpen: syncLightboxTouch,
         onClose: restoreFocus
       }).open();
     });
   }
-
-  /* Dokunmatikte büyütme penceresi: iki parmakla yakınlaştırma tarayıcıya bırakılır,
-     yakınlaştırılmışken tek parmakla gezinme açılır (kütüphane bu olayları yutuyordu). */
-  var vv = window.visualViewport;
-  var lbZoomed = function () { return !!vv && vv.scale > 1.01; };
-  var syncLightboxTouch = function () {
-    var c = document.querySelector(".glightbox-container");
-    if (c) c.classList.toggle("is-zoomed", lbZoomed());
-  };
-  if (vv) {
-    vv.addEventListener("resize", syncLightboxTouch);
-    vv.addEventListener("scroll", syncLightboxTouch);
-  }
-  ["touchstart", "touchmove", "touchend"].forEach(function (tip) {
-    document.addEventListener(tip, function (e) {
-      if (!document.querySelector(".glightbox-container")) return;
-      if ((e.touches && e.touches.length > 1) || lbZoomed()) {
-        syncLightboxTouch();
-        e.stopPropagation();
-      }
-    }, true);
-  });
 
   /* Sanal tur: üçüncü taraf çerçeve ancak ziyaretçi başlatınca yüklenir */
   var tour = document.querySelector("[data-tour]");

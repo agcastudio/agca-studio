@@ -96,13 +96,16 @@ main:focus { outline: none; }
 
   /* menü başlığın hemen altına açılır. Not: üst bardaki backdrop-filter, fixed
      konumlu çocukları kendi içine hapsettiği için panel absolute kuruldu. */
-  .nav { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); box-shadow: 0 12px 24px rgba(0, 0, 0, .06); padding: 2px var(--gutter) 8px; }
+  .nav { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); box-shadow: 0 12px 24px rgba(0, 0, 0, .06); padding: 2px var(--gutter) 8px;
+    /* alçak ekranda (yatay telefon, tarayıcı yakınlaştırması) alt maddeler erişilebilsin */
+    max-height: calc(100vh - var(--header-h)); max-height: calc(100dvh - var(--header-h)); overflow-y: auto; overscroll-behavior: contain; }
   .nav.is-open { display: block; }
   .nav ul { flex-direction: column; align-items: stretch; gap: 0; }
   .nav li + li { border-top: 1px solid var(--line); }
   .nav a { display: block; font-size: 17px; letter-spacing: .01em; text-transform: none; padding: 15px 0; }
   .nav a::after { display: none; }
-  .nav-lang a { font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  /* altbilgi kuralı aynı özgüllükte ezdiği için daha özgül yazıldı: dokunma hedefi tam satır */
+  .nav .nav-lang a { display: block; padding: 15px 0; margin: 0; font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 }
 
 /* --- kapak slaytı --- */
@@ -221,7 +224,9 @@ main:focus { outline: none; }
 /* koyu zeminde görünür odak halkası */
 .glightbox-container button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 /* görsel kırpılmasın: kütüphane object-fit: cover kullanıyor */
-.glightbox-container .gslide-image img { object-fit: contain; max-width: 100vw; max-height: 100vh; width: auto; height: auto; }
+.glightbox-container .gslide-image img { object-fit: contain; max-width: 100vw; max-height: 100vh; width: auto; height: auto; min-width: 0; }
+/* kütüphanenin gizleme kuralı bizim display:flex kuralımızdan önce geldiği için eziliyordu */
+body .glightbox-container .glightbox-button-hidden { display: none; }
 /* dokunmatikte iki parmakla yakınlaştırma serbest; tek parmak kaydırma kütüphaneye kalsın.
    Kütüphane CSS'i sonra yüklendiği için seçiciler daha özgül yazıldı. */
 body .glightbox-container, .glightbox-container .gslide-image img { touch-action: pinch-zoom; }
@@ -232,7 +237,8 @@ body .glightbox-container.is-zoomed, .glightbox-container.is-zoomed .gslide-imag
   body .glightbox-clean .gprev, body .glightbox-clean .gnext { top: auto; bottom: 16px; width: 46px; height: 46px; }
   body .glightbox-clean .gprev { left: 12px; }
   body .glightbox-clean .gnext { right: 12px; }
-  body .glightbox-container.is-zoomed .gprev, body .glightbox-container.is-zoomed .gnext { display: none; }
+  body .glightbox-container.is-zoomed .gprev, body .glightbox-container.is-zoomed .gnext,
+  body .glightbox-clean .gprev.disabled, body .glightbox-clean .gnext.disabled { display: none; }
 }
 @media (max-width: 640px) { .tour-frame { aspect-ratio: 4 / 3; } }
 .project-nav { display: flex; justify-content: space-between; gap: 24px; padding: 18px 0 22px; border-top: 1px solid var(--line); margin-top: 28px; }

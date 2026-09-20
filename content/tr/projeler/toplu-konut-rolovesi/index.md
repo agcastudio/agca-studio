@@ -30,6 +30,9 @@ credits: "Rölöve, modelleme ve çizimler: agca·studio"
 ozet: |
   Üsküdar'da mevcut bir konut sitesinin Scan to BIM yöntemiyle belgelenmesi. Sitenin tamamı drone ile tarandı; fotogrametriyle üretilen nokta bulutu blokların, yolların ve arazinin ölçülebilir bir kopyasını verdi. Seçilen bloğun iç mekânları da taranarak buluta eklendi. Blok Revit'te yeniden kuruldu: döşemeler, duvarlar, pencereler, balkonlar ve çatı, ölçüleri buluttan alınarak modellendi. Kat başına dört daire, iki bodrum, zemin, dört normal kat ve dubleks çatı arası modelde yerini aldı. Sitenin tamamı için basitleştirilmiş bir blok modeli, seçilen blok için avan plan, kesit, görünüş ve çatı arası kat planı üretildi. Sonuç, yenileme ve dönüşüm kararlarının üzerinde alınacağı yaşayan bir bilgi modelidir.
 images:
+  - file: "r-2402-drone-3d-gorsel.jpg"
+    alt: "Drone ile çekilmiş apartman bloğu: kiremit kırma çatı, çatı katı terasları, önde bayrak direkleri, çevrede ağaçlar ve komşu bloklar"
+    caption: "Drone görüntüsü"
   - file: "d-2402-kapak.jpg"
     alt: "Aynı apartman bloğu üç dilimde: solda drone fotoğrafı, ortada çatısı kaldırılmış gri nokta bulutu, sağda mavi pencereli Revit modeli"
     caption: "Fotoğraftan nokta bulutuna, nokta bulutundan Revit modeline"
