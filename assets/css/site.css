@@ -289,11 +289,12 @@ body .glightbox-container.is-zoomed, .glightbox-container.is-zoomed .gslide-imag
 .footer-brand p { font-size: 13.5px; line-height: 1.6; margin: 0 0 4px; }
 .footer-brand a { color: var(--muted); }
 .footer-brand a:hover { color: var(--fg); }
-.footer-contact { list-style: none; margin: 0; padding: 26px 0 0; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; line-height: 1.6; justify-self: end; text-align: right; }
+/* bağlantılar logoyla aynı hizada başlar */
+.footer-contact { list-style: none; margin: -3px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; line-height: 1.6; justify-self: end; text-align: right; }
 .footer-contact a, .footer-legal a, .nav-lang a { display: inline-block; padding: 4px 6px; margin: -4px -6px; }
 .footer-legal { grid-column: 1 / -1; font-size: 12px; margin: 2px 0 0; }
 /* dar ekranda da bağlantılar sağda kalsın */
-@media (max-width: 640px) { .footer-grid { grid-template-columns: 1fr auto; gap: 10px 16px; } .footer-contact { padding-top: 22px; } }
+@media (max-width: 640px) { .footer-grid { grid-template-columns: 1fr auto; gap: 10px 16px; } }
 
 /* --- haberler --- */
 .news-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
