@@ -39,17 +39,16 @@
         <p><a class="btn" href="#sanal-tur">{{ i18n "virtual_tour" }} <span aria-hidden="true">↓</span></a></p>
         {{- end }}
       </div>
+      {{- /* 2. Kapak: künye ile özetin aynı ızgarasında; telefonda künyenin hemen altına düşer */ -}}
+      {{- with $hero }}
+      <div class="project-cover">
+        {{- if $coverFull }}<a class="project-cover-link" href="{{ $coverFull }}" data-cover-open data-alt="{{ $coverAlt }}" aria-label="{{ i18n "open_image" }}: {{ $coverAlt }}">{{ end }}
+        {{ partial "hero-picture.html" (dict "hero" . "alt" $coverAlt) }}
+        {{- if $coverFull }}</a>{{ end }}
+      </div>
+      {{- end }}
     </div>
   </header>
-
-  {{- /* 2. Kapak: kenarlardan içeride (.wrap), altındaki karelerle aynı hizada; tıklanınca büyütme penceresi */ -}}
-  {{- with $hero }}
-  <div class="wrap project-cover">
-    {{- if $coverFull }}<a class="project-cover-link" href="{{ $coverFull }}" data-cover-open data-alt="{{ $coverAlt }}" aria-label="{{ i18n "open_image" }}: {{ $coverAlt }}">{{ end }}
-    {{ partial "hero-picture.html" (dict "hero" . "alt" $coverAlt) }}
-    {{- if $coverFull }}</a>{{ end }}
-  </div>
-  {{- end }}
 
   {{- /* 3. Kapağın hemen altında başlıksız küçük kareler: tüm görseller, çizimler ve diyagramlar */ -}}
   {{- with $all }}
