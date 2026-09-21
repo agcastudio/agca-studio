@@ -1,38 +1,20 @@
 ---
-title: "OYUK: beş pafta, bir dergi"
+title: "OYUK için basılı dergi"
 translationKey: "haber-oyuk-dergi"
 slug: "oyuk-dergi"
-date: 2026-08-10
+date: 2026-09-01
 draft: false
-kategori: "Yarışma"
-kaynak: "Muğla Büyükşehir Belediyesi yarışması"
-description: "Muğla'daki kültür yapısı yarışmasına beş A1 paftayla katıldık; proje ayrıca basılı bir dergi olarak derlendi. Paftalar ve kavram şemaları burada."
-ozet: "Muğla'daki Sosyal, Kültürel ve İdari Hizmetler Binası yarışmasına beş A1 paftayla katıldık; proje ayrıca basılı bir dergi olarak derlendi."
+kategori: "Basılı iş"
+kaynak: "agca·studio"
+description: "OYUK projesinin anlatımını basılı bir dergi olarak derledik: kavram, tasarım kararları, planlar ve cepheler tek bir okuma sırasında toplandı."
+ozet: "OYUK projesinin anlatımını basılı bir dergi olarak derledik; kavramdan cephe detayına kadar tek bir okuma sırasında toplandı."
 cover: "kapak.jpg"
-cover_alt: "Birinci paftanın üst bandı: solda OYUK logotipi ve manifesto cümlesi, sağda tepeden ışık alan festival avlusunun görseli"
-images:
-  - file: "pafta-1.jpg"
-    alt: "Birinci pafta: OYUK logotipi, festival avlusu görseli, oyuğun beş hâli şeması, kent rotası ve dolu-boş, iklim, bellek diyagramları"
-    caption: "1. pafta: kavram"
-  - file: "pafta-2.jpg"
-    alt: "İkinci pafta: doldur, oy, yar, ört aksonometrileri, kuş bakışı görsel, vaziyet planı, Kurşunlu Caddesi silueti ve izometrik kat şemaları"
-    caption: "2. pafta: tasarım kararları"
-  - file: "pafta-3.jpg"
-    alt: "Üçüncü pafta: bodrum, zemin ve birinci kat planları, esnek kullanım senaryoları, kesit ve festival avlusu ile işlik görselleri"
-    caption: "3. pafta: alt katlar"
-  - file: "pafta-4.jpg"
-    alt: "Dördüncü pafta: ikinci ve üçüncü kat planları, kütüphane ve idare görselleri, iki sokak görünüşü ve komşu yapılarla birlikte kesit"
-    caption: "4. pafta: üst katlar"
-  - file: "pafta-5.jpg"
-    alt: "Beşinci pafta: batı, kuzey ve güney cepheleri, kepenkli cephe görseli, 1/20 cephe detayları ve kesit"
-    caption: "5. pafta: cepheler"
+cover_alt: "Derginin kapak düzeni: solda OYUK logotipi ve açılış cümleleri, sağda tepeden ışık alan festival avlusu"
 ---
-Muğla Büyükşehir Belediyesi'nin Sosyal, Kültürel ve İdari Hizmetler Binası için açtığı ulusal mimari proje yarışmasına OYUK adlı öneriyle katıldık. Teslim 10 Ağustos 2026'da yapıldı; proje beş A1 paftadan oluşuyor. Anlatımın tamamı ayrıca basılı bir dergi olarak derlendi.
+Yarışma paftaları büyük ölçekte okunmak için kurulur; duvara asılır, uzaktan bakılır. OYUK'un anlatımını bir de elde tutulacak ölçekte toparlamak istedik ve projeyi basılı bir dergi olarak derledik.
 
-Paftalar bir sırayı izliyor. Birincisi kavramı kuruyor: yapı dolu bir taş bloktur, kamusallık ondan eksiltilerek kazınır. Oyuğun beş hâli, kentin arasta ve han avlularından geçen kültür rotası ve iklim, bellek, dolu-boş şemaları burada.
+Dergi, paftalardaki sırayı izliyor. Önce kavram: yapı dolu bir taş bloktur, kamusallık ondan eksiltilerek kazınır. Ardından oyuğun beş hâli ve kentin arasta, han avlusu, cami avlusu üzerinden geçen kültür rotası. Sonra tasarım kararları: doldur, oy, yar, ört.
 
-İkinci pafta dört eylemle tasarımı anlatıyor: doldur, oy, yar, ört. Vaziyet planı, Kurşunlu Caddesi silueti ve ışığın oyuk boyunca hareketini gösteren izometrik kat şemaları aynı paftada.
+Devamında planlar geliyor; festival avlusu, esnek salon, işlikler, kütüphane ve idare katları kendi kullanım senaryolarıyla. Son bölüm cepheler ve güneşe göre açılıp kapanan ahşap kepenklerin detayı.
 
-Üçüncü ve dördüncü paftalar planları taşıyor; esnek kullanım senaryoları, kütüphane ve idare katları, iki sokak görünüşü ve komşu yapılarla birlikte kesit. Beşinci pafta cepheleri ve kepenk detaylarını 1/20 ölçekte veriyor.
-
-Projenin sayfası, künyesi ve tüm görselleri için [Oyuk](/projeler/oyuk/) sayfasına bakabilirsiniz.
+Projenin künyesi, paftaları ve tüm görselleri için [Oyuk](/projeler/oyuk/) sayfasına, yarışma teslimi için [OYUK yarışma projesi teslim edildi](/haberler/oyuk-yarisma/) haberine bakabilirsiniz.
