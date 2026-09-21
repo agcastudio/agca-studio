@@ -10,9 +10,12 @@ description: "Selen Baş Ağca's postgraduate study gathers the ways in which th
 ozet: "Selen Baş Ağca's study at Yıldız Technical University gathers the ways in which the gentrification risk created by urban projects can be measured."
 belge: "/belgeler/soylulastirma-riski-donem-projesi-selen-bas-agca-2026.pdf"
 belge_label: "Read the study (PDF, Turkish)"
-cover: "sekil-s30.jpg"
-cover_alt: "PRISMA 2020 flow diagram: the screening steps from 467 records to 319 screened, then to the 11 studies read in full and included in the review"
+cover: "kapak.jpg"
+cover_alt: "The cover page of the study: the Yıldız Technical University imprint, the title 'Assessing the Risk of Gentrification in Urban Projects: A Systematic Literature Review', the author and the supervisor"
 images:
+  - file: "kapak.jpg"
+    alt: "Cover page of the study: title, author, supervisor and the Yıldız Technical University imprint"
+    caption: "Cover page"
   - file: "sekil-s27.jpg"
     alt: "The four-step research framework: conceptualisation and problem definition, data collection and systematic filtering, analysis and content coding, synthesis and model development"
     caption: "Research framework"
@@ -22,9 +25,6 @@ images:
   - file: "sekil-s31.jpg"
     alt: "Keyword strategy diagram: search terms grouped into three contexts, gentrification, types of urban project and risk measurement"
     caption: "Keyword strategy"
-  - file: "kapak.jpg"
-    alt: "Cover page of the study: title, author, supervisor and the Yıldız Technical University imprint"
-    caption: "Cover page"
 ---
 Selen Baş Ağca completed her postgraduate term project in the Construction Management programme of the Graduate School of Science and Engineering at Yıldız Technical University in June 2026, supervised by Dr Ozan Okudan. It is titled "Assessing the Risk of Gentrification in Urban Projects: A Systematic Literature Review".
 

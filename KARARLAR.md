@@ -138,6 +138,16 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 | 2026-09-21 | 19 | OYUK yarışma haberinin kapağı, projenin ana görseli oldu (`r-1-huzmeli.jpg` kopyalandı); festival avlusu kapak metniyle birlikte güncellendi. | Kullanıcı isteği |
 | 2026-09-21 | 19 | Soylulaştırma haberinde kapak, tezden çıkarılan **PRISMA akış şeması** (`sekil-s30.jpg`, 1122×1402) oldu; oranı metin sütununa yakın olduğu için neredeyse hiç kırpılmıyor. Galeriye araştırma çerçevesi (s27), anahtar kelime stratejisi (s31) ve kapak sayfası da eklendi; yanlış sayfadan alınan `prisma.jpg` ve `anahtar-kelime.jpg` silindi. | Kullanıcı isteği |
 | 2026-09-21 | 19 | Bodrum haberinde renderlar kaldırıldı, yalnızca **dört A1 paftası** kaldı (orijinal 9519×13798 dosyalardan 2200 piksele küçültüldü). Kapak, 1. paftadaki girişi gösteren görselden 0,96 oranında kırpıldı (1600×1667), böylece metin sütununa oturuyor. | Kullanıcı isteği |
+| 2026-09-21 | 3 | **Bodrum yarışması ekibi alındı:** Selen Baş Ağca, Kutbeddin Ağca, Ethem Ünal. Proje künyesine `ekip` alanı olarak yazıldı; haber metnine de bir cümleyle eklendi. Arkitera'nın yedi isimlik listesi kullanılmadı, kullanıcının verdiği üç isim esas alındı. | Kullanıcı bilgisi |
+| 2026-09-21 | 19 | Künyedeki **"Ekip"** satırı tekilleştirildi: `kunye.ekip` doluysa isimleri, boşsa ofis adını (`agca·studio`) gösteriyor. Önceden hem `facts_architects` hem `kunye_ekip` satırı "Ekip" etiketini taşıyordu, ikisi birden dolunca sayfada iki aynı adlı satır çıkacaktı. Kullanılmayan `kunye_ekip` çeviri anahtarı silindi. | Karar |
+| 2026-09-21 | 12 | **IPCMC bildirisi yayımlanmayacak;** haberde yalnızca kongre sayfasına bağlantı kalıyor (`https://2026.ipcmc.com/`). `static/belgeler/` altında bildiri PDF'i yok. | Kullanıcı kararı |
+| 2026-09-21 | 19 | **OYUK dergisinin yayın tarihi 1 Eylül** olarak doğrulandı; haber tarihi `2026-09-01` (varsayım değil). | Kullanıcı bilgisi |
+| 2026-09-21 | 19 | **Haber galerisinde geçiş hatası düzeltildi.** GLightbox yalnız `.Type == "proje"` sayfalarında yükleniyordu; haber sayfasında küçük kareler kütüphane olmadan ham görsel dosyasına gidiyor, dolayısıyla görseller arasında ileri-geri gezinilemiyordu. `layouts/partials/scripts.html` koşulu `in (slice "proje" "haber") .Type` oldu. Haber kareleri zaten `data-gallery="haber"` taşıdığı için tek dizi olarak geziliyor; liste sayfalarına kütüphane hâlâ yüklenmiyor. | Kullanıcı bildirimi |
+| 2026-09-21 | 19 | Soylulaştırma haberinin kapağı **tezin kapak sayfası** (`kapak.jpg`, 1191×1684) oldu; metin sütununa uzayıp üstten ve alttan kırpılıyor (kullanıcı kırpmaya izin verdi). Kapak, galeri listesinde de ilk sıraya alındı. | Kullanıcı isteği |
+| 2026-09-21 | 19 | Dergi haberinin galerisi yedi kareye indi: iki basılı nüsha fotoğrafı + derginin 1, 2, 3, 4 ve 25. sayfaları. `sayfa-02` (iç kapak, agca·studio logosu) ve `sayfa-04` (Lao Tzu alıntılı manifesto sayfası) `News/Dergi/Dergi.pdf`'ten 1061 piksel genişlikte üretildi; kullanılmayan 5, 6, 12 ve 13. sayfa dosyaları silindi. | Kullanıcı isteği |
+| 2026-09-21 | 3 | **OYUK ekibi: agca·studio** (kişi adı verilmedi). Künyede `ekip` alanı boş bırakıldı, "Ekip" satırı ofis adını gösteriyor. | Kullanıcı bilgisi |
+| 2026-09-21 | 30 | Google Search Console doğrulama TXT kaydı eklendi ve DNS'te doğrulandı (`google-site-verification=rwS920Jns3ksHqlyMoNLxH714Ocw49PvhvW-LDxSSO4`). | Kullanıcı yaptı |
+| 2026-09-21 | 15 | Ekip künyesi değişikliği beş boyutta denetlendi (şablon, TR/EN paritesi, arayüz-erişilebilirlik, yapısal veri, depo hijyeni); bildirilen beş bulgunun tamamı üçer bağımsız şüpheci tarafından oybirliğiyle çürütüldü, uygulanacak düzeltme çıkmadı. | Denetim akışı |
 
 ## Bekleyen bilgiler (kullanıcıdan)
 
@@ -149,6 +159,10 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 
 - ~~Kurucu ortakların ad-soyad, unvan, biyografi~~ → 2026-09-20 alındı: Kutbeddin Ağca (ka.jpg) ve Selen Baş Ağca (sb.jpg), Kurucu Ortak · Mimar; metinler Stüdyo sayfasında, yapısal veride `founder`.
 - ~~Telefon numarası; Instagram ve LinkedIn adresleri~~ → 2026-09-20 alındı: WhatsApp/telefon +90 538 027 62 83, Instagram instagram.com/agcastudio, kişisel LinkedIn hesapları Stüdyo sayfasında (stüdyo LinkedIn sayfası yok).
-- ~~OYUK: yarışmanın resmî adı, yılı, sonuç/derece~~ → 2026-09-20 alındı (mugla.bel.tr); ödül listesinde yok. Ekip adları hâlâ boş.
+- ~~OYUK: yarışmanın resmî adı, yılı, sonuç/derece~~ → 2026-09-20 alındı (mugla.bel.tr); ödül listesinde yok. OYUK'un ekibi 2026-09-21'de alındı: agca·studio (kişi adı yok).
+- ~~Bodrum yarışması ekip künyesi~~ → 2026-09-21 alındı: Selen Baş Ağca, Kutbeddin Ağca, Ethem Ünal.
+- ~~IPCMC bildirisi yayımlansın mı~~ → 2026-09-21: hayır, yalnızca kongre sayfasına bağlantı.
+- ~~OYUK dergisinin gerçek tarihi~~ → 2026-09-21 alındı: 1 Eylül.
+- ~~Google Search Console doğrulaması için `agca.studio` alan adına TXT kaydı~~ → 2026-09-21 eklendi, DNS'te doğrulandı.
 - İkinci projenin klasörü (`Projeler/<kod>_Görseller/`) ve türü.
 - Cloudflare + GitHub adımları (yayın aşamasında birlikte): depo oluşturma, Git bağlantısı, ad sunucusu değişikliği.

@@ -10,9 +10,12 @@ description: "Selen Baş Ağca'nın yüksek lisans çalışması, kentsel projel
 ozet: "Selen Baş Ağca'nın Yıldız Teknik Üniversitesi'nde hazırladığı çalışma, kentsel projelerin yarattığı soylulaştırma riskini ölçmenin yollarını derliyor."
 belge: "/belgeler/soylulastirma-riski-donem-projesi-selen-bas-agca-2026.pdf"
 belge_label: "Çalışmayı oku (PDF)"
-cover: "sekil-s30.jpg"
-cover_alt: "PRISMA 2020 akış şeması: 467 kayıttan 319 taranan kayda, oradan tam metin incelenen ve derlemeye alınan 11 çalışmaya inen eleme adımları"
+cover: "kapak.jpg"
+cover_alt: "Çalışmanın kapak sayfası: Yıldız Teknik Üniversitesi künyesi, 'Kentsel Projelerde Soylulaştırma Riskinin Değerlendirilmesi: Sistematik Literatür Taraması' başlığı, yazar ve danışman adları"
 images:
+  - file: "kapak.jpg"
+    alt: "Çalışmanın kapak sayfası: başlık, yazar adı, danışman ve Yıldız Teknik Üniversitesi künyesi"
+    caption: "Kapak sayfası"
   - file: "sekil-s27.jpg"
     alt: "Dört adımlı araştırma çerçevesi: kavramsallaştırma ve problem tanımı, veri toplama ve sistematik filtreleme, analiz ve içerik kodlaması, sentez ve model geliştirme"
     caption: "Araştırma çerçevesi"
@@ -22,9 +25,6 @@ images:
   - file: "sekil-s31.jpg"
     alt: "Anahtar kelime stratejisi şeması: soylulaştırma, kentsel proje türleri ve risk ölçümü olmak üzere üç bağlamda gruplanmış arama terimleri"
     caption: "Anahtar kelime stratejisi"
-  - file: "kapak.jpg"
-    alt: "Çalışmanın kapak sayfası: başlık, yazar adı, danışman ve Yıldız Teknik Üniversitesi künyesi"
-    caption: "Kapak sayfası"
 ---
 Selen Baş Ağca'nın Yıldız Teknik Üniversitesi Fen Bilimleri Enstitüsü Yapı İşletmesi programında hazırladığı yüksek lisans dönem projesi Haziran 2026'da tamamlandı. Danışmanlığını Dr. Öğr. Üyesi Ozan Okudan yürüttü. Çalışmanın adı "Kentsel Projelerde Soylulaştırma Riskinin Değerlendirilmesi: Sistematik Literatür Taraması".
 

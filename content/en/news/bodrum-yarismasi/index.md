@@ -30,6 +30,6 @@ We entered the National Architectural Project Competition for a Physiotherapy an
 
 Entries were submitted on 14 January 2025. The jury, chaired by Özgür Bingöl, completed its work on 3 February 2025, having assessed 177 projects. The submitted schemes were exhibited at the Bodrum Heredot Cultural Centre from 5 to 15 February 2025, and the colloquium was held there on 15 February.
 
-Our scheme was not among the prizewinners; it took part as a participant. The design ties recovery not to a single moment but to a process carried through the whole building: the pool hall is one volume with columns on all four sides, the physiotherapy hall looks out over the hills from the floor above, and the treatment rooms are arranged around the inner courtyard.
+The entry was prepared by Selen Baş Ağca, Kutbeddin Ağca and Ethem Ünal. Our scheme was not among the prizewinners; it took part as a participant. The design ties recovery not to a single moment but to a process carried through the whole building: the pool hall is one volume with columns on all four sides, the physiotherapy hall looks out over the hills from the floor above, and the treatment rooms are arranged around the inner courtyard.
 
 For the project data, the plans and all the images, see [Bodrum Hydrotherapy Centre](/en/projects/bodrum-hidroterapi-merkezi/).

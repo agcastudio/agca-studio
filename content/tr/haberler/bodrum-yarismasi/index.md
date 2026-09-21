@@ -30,6 +30,6 @@ Bodrum Sağlık Vakfı'nın, Mimarlar Odası Muğla Şubesi Bodrum Temsilciliği
 
 Projeler 14 Ocak 2025'te teslim edildi. Jüri, başkanlığını Özgür Bingöl'ün yürüttüğü çalışmasını 3 Şubat 2025'te tamamladı ve 177 proje değerlendirildi. Teslim edilen projeler 5-15 Şubat 2025 arasında Bodrum Heredot Kültür Merkezi'nde sergilendi, kolokyum 15 Şubat'ta aynı yerde yapıldı.
 
-Önerimiz ödül listesine girmedi, katılımcı olarak yer aldı. Tasarım, iyileşmeyi tek bir ana değil mekânın bütününe yayılan bir sürece bağlıyor: havuz salonu dört yanı kolonlu tek bir hacim, fizyoterapi salonu üst katta tepelere bakıyor, tedavi odaları iç avlunun çevresine diziliyor.
+Projeyi Selen Baş Ağca, Kutbeddin Ağca ve Ethem Ünal hazırladı. Önerimiz ödül listesine girmedi, katılımcı olarak yer aldı. Tasarım, iyileşmeyi tek bir ana değil mekânın bütününe yayılan bir sürece bağlıyor: havuz salonu dört yanı kolonlu tek bir hacim, fizyoterapi salonu üst katta tepelere bakıyor, tedavi odaları iç avlunun çevresine diziliyor.
 
 Projenin künyesi, planları ve tüm görselleri için [Bodrum Hidroterapi Merkezi](/projeler/bodrum-hidroterapi-merkezi/) sayfasına bakabilirsiniz.

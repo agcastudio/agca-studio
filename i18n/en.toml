@@ -64,8 +64,6 @@ other = "Status"
 other = "Built area"
 [kunye_arsa_alani]
 other = "Site area"
-[kunye_ekip]
-other = "Team"
 [kunye_rol]
 other = "Role"
 [kunye_derece]

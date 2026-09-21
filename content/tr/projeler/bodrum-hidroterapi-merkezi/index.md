@@ -18,7 +18,7 @@ kunye:
   durum: "Katılımcı"
   insaat_alani: ""
   arsa_alani: ""
-  ekip: ""
+  ekip: "Selen Baş Ağca, Kutbeddin Ağca, Ethem Ünal"
   rol: "Tasarım ve görselleştirme"
   derece: ""
 sanal_tur: ""

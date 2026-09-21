@@ -64,8 +64,6 @@ other = "Durum"
 other = "İnşaat Alanı"
 [kunye_arsa_alani]
 other = "Arsa Alanı"
-[kunye_ekip]
-other = "Ekip"
 [kunye_rol]
 other = "Rol"
 [kunye_derece]

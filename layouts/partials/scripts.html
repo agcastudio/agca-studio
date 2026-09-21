@@ -1,5 +1,6 @@
 {{- $js := resources.Get "js/site.js" | resources.Minify | resources.Fingerprint }}
-{{- if and (eq .Type "proje") (not .IsSection) }}
+{{- /* Büyütme penceresi proje ve haber sayfalarında yüklenir; küçük kareler tek dizi olarak gezilir */ -}}
+{{- if and (in (slice "proje" "haber") .Type) (not .IsSection) }}
 {{- $lbCss := resources.Get "vendor/glightbox.min.css" | resources.Fingerprint }}
 {{- $lbJs := resources.Get "vendor/glightbox.min.js" | resources.Fingerprint }}
 <link rel="stylesheet" href="{{ $lbCss.RelPermalink }}" integrity="{{ $lbCss.Data.Integrity }}">

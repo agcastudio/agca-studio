@@ -18,7 +18,7 @@ kunye:
   durum: "Participant"
   insaat_alani: ""
   arsa_alani: ""
-  ekip: ""
+  ekip: "Selen Baş Ağca, Kutbeddin Ağca, Ethem Ünal"
   rol: "Design and visualisation"
   derece: ""
 sanal_tur: ""

@@ -34,13 +34,12 @@
     {{- with .Params.subtitle }}<p class="project-sub">{{ . }}</p>{{ end }}
     <div class="project-intro">
       <dl class="facts" aria-label="{{ i18n "kunye" }}">
-        <div class="fact"><dt>{{ i18n "facts_architects" }}</dt><dd>{{ site.Params.brand }}</dd></div>
+        <div class="fact"><dt>{{ i18n "facts_architects" }}</dt><dd>{{ with $k.ekip }}{{ . }}{{ else }}{{ site.Params.brand }}{{ end }}</dd></div>
         {{- range $key := slice "yer" "proje_yili" "bitis_yili" "insaat_alani" "arsa_alani" "durum" "yarisma" "derece" "rol" "isveren" }}
           {{- with index $k $key }}<div class="fact"><dt>{{ i18n (printf "kunye_%s" $key) }}</dt><dd>{{ . }}</dd></div>{{ end }}
         {{- end }}
         {{- with .Params.tur }}<div class="fact"><dt>{{ i18n "kunye_tur" }}</dt><dd>{{ range $i, $t := . }}{{ if $i }}, {{ end }}{{ i18n (printf "tur_%s" $t) }}{{ end }}</dd></div>{{ end }}
         {{- with $k.program }}<div class="fact"><dt>{{ i18n "kunye_program" }}</dt><dd>{{ . }}</dd></div>{{ end }}
-        {{- with $k.ekip }}<div class="fact"><dt>{{ i18n "kunye_ekip" }}</dt><dd>{{ . }}</dd></div>{{ end }}
       </dl>
       <div class="project-summary">
         {{ $summary }}
