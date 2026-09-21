@@ -7,7 +7,7 @@ slug: "kalp360"
 date: 2023-05-16
 weight: 90
 draft: false
-tur: ["saglik", "ic_mekan"]
+tur: ["saglik", "ic_mekan", "ticari"]
 description: "Kadıköy'de Kalp360 Sağlık Merkezi iç mimarisi: kavisli danışma bankosu, kemer ve daire motifli paneller, muayene odaları ve efor stüdyosu."
 kunye:
   yer: "Kadıköy, İstanbul"

@@ -148,6 +148,8 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 | 2026-09-21 | 3 | **OYUK ekibi: agca·studio** (kişi adı verilmedi). Künyede `ekip` alanı boş bırakıldı, "Ekip" satırı ofis adını gösteriyor. | Kullanıcı bilgisi |
 | 2026-09-21 | 30 | Google Search Console doğrulama TXT kaydı eklendi ve DNS'te doğrulandı (`google-site-verification=rwS920Jns3ksHqlyMoNLxH714Ocw49PvhvW-LDxSSO4`). | Kullanıcı yaptı |
 | 2026-09-21 | 15 | Ekip künyesi değişikliği beş boyutta denetlendi (şablon, TR/EN paritesi, arayüz-erişilebilirlik, yapısal veri, depo hijyeni); bildirilen beş bulgunun tamamı üçer bağımsız şüpheci tarafından oybirliğiyle çürütüldü, uygulanacak düzeltme çıkmadı. | Denetim akışı |
+| 2026-09-21 | 19 | Büyütme kütüphanesi artık yalnız **büyütülecek görseli olan** tekil proje ve haber sayfalarına yükleniyor (`images`, `drawings` ya da `diagrams` dolu olmalı). Galerisi kaldırılan IPCMC haberinde boşuna yüklenen ~30 KB kalktı; 22 proje ve 8 haber sayfasında yüklenmeye devam ediyor. | Kullanıcı isteği |
+| 2026-09-21 | 3 | Kalp360 Sağlık Merkezi **Ticari** filtresine de girdi (`tur: ["saglik", "ic_mekan", "ticari"]`). İlk değer değişmediği için kırıntı, kart etiketi ve sayfa başlığı hâlâ "Sağlık". Ticari süzgeci artık KC Yangın ile Kalp360'ı gösteriyor. | Kullanıcı isteği |
 
 ## Bekleyen bilgiler (kullanıcıdan)
 

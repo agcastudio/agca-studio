@@ -7,7 +7,7 @@ slug: "kalp360"
 date: 2023-05-16
 weight: 90
 draft: false
-tur: ["saglik", "ic_mekan"]
+tur: ["saglik", "ic_mekan", "ticari"]
 description: "Interior of the Kalp360 Health Centre in Kadıköy, Istanbul: a curved reception counter, arch and circle panelling, consulting rooms and a studio."
 kunye:
   yer: "Kadıköy, Istanbul"
