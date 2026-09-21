@@ -10,8 +10,8 @@ description: "Kutbeddin Ağca, IPCMC 2026'da İstanbul Havalimanı örneğinde m
 ozet: "Kutbeddin Ağca, 16-18 Ekim 2026'da Gaziantep'te düzenlenecek kongrede, İstanbul Havalimanı üzerinden mega projelerde toplumsal kabulün nasıl değiştiğini anlatacak."
 link: "https://2026.ipcmc.com/"
 link_label: "Kongre sayfası"
-cover: "sekil-4.jpg"
-cover_alt: "Çeyrek dönemlere göre net destek eğrisi: 2012-2026 arasında mavi ve pembe alanlarla işaretlenmiş dalgalanma, ihale, temel atma, açılış ve pandemi çizgileriyle"
+cover: "ipcmc-logo.jpg"
+cover_alt: "IPCMC 2026 logosu: mavi ve mor tonlarda dört kollu yıldız simgesi, yanında kongrenin adı ve alt satırda açılımı"
 images:
   - file: "sekil-4.jpg"
     alt: "Çeyrek dönemlere göre net destek eğrisi: 2012-2026 arasında ihale, temel atma, işçi eylemi, açılış, pandemi ve kar fırtınası çizgileriyle işaretlenmiş dalgalanma"

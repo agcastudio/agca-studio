@@ -9,25 +9,27 @@
     <p class="news-meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ partial "tarih.html" . }}</time>{{ with .Params.kaynak }} · {{ . }}{{ end }}</p>
   </header>
 
-  {{- with $cover }}
-  {{- $c := .Fill "1600x900 webp q82" -}}
-  {{- $c2 := .Fill "1000x563 webp q82" -}}
-  {{- $cf := .Fill "1600x900 jpg" -}}
-  <div class="wrap news-cover">
-    <picture>
-      <source type="image/webp" srcset="{{ $c2.RelPermalink }} 1000w, {{ $c.RelPermalink }} 1600w" sizes="(min-width: 1500px) 1400px, 100vw">
-      <img src="{{ $cf.RelPermalink }}" width="1600" height="900" alt="{{ $.Params.cover_alt | default $.Title }}" fetchpriority="high">
-    </picture>
-  </div>
-  {{- end }}
+  <div class="wrap news-main">
+    <div class="news-body prose">
+      {{ .Content }}
+      {{- with .Params.link }}
+      <p><a class="btn" href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ with $.Params.link_label }}{{ . }}{{ else }}{{ i18n "news_visit" }}{{ end }} <span aria-hidden="true">↗</span></a></p>
+      {{- end }}
+      {{- with .Params.belge }}
+      <p><a class="btn" href="{{ . }}" target="_blank" rel="noopener">{{ with $.Params.belge_label }}{{ . }}{{ else }}{{ i18n "news_document" }}{{ end }} <span aria-hidden="true">↗</span></a></p>
+      {{- end }}
+    </div>
 
-  <div class="wrap news-body prose">
-    {{ .Content }}
-    {{- with .Params.link }}
-    <p><a class="btn" href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ with $.Params.link_label }}{{ . }}{{ else }}{{ i18n "news_visit" }}{{ end }} <span aria-hidden="true">↗</span></a></p>
-    {{- end }}
-    {{- with .Params.belge }}
-    <p><a class="btn" href="{{ . }}" target="_blank" rel="noopener">{{ with $.Params.belge_label }}{{ . }}{{ else }}{{ i18n "news_document" }}{{ end }} <span aria-hidden="true">↗</span></a></p>
+    {{- with $cover }}
+    {{- $w1 := .Resize "600x webp q82" -}}
+    {{- $w2 := .Resize "900x webp q82" -}}
+    {{- $fb := .Resize "700x jpg" -}}
+    <figure class="news-figure">
+      <picture>
+        <source type="image/webp" srcset="{{ $w1.RelPermalink }} 600w, {{ $w2.RelPermalink }} 900w" sizes="(min-width: 861px) 42vw, 100vw">
+        <img src="{{ $fb.RelPermalink }}" width="{{ $fb.Width }}" height="{{ $fb.Height }}" alt="{{ $.Params.cover_alt | default $.Title }}" fetchpriority="high">
+      </picture>
+    </figure>
     {{- end }}
   </div>
 

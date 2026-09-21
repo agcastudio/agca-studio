@@ -10,8 +10,8 @@ description: "Kutbeddin Ağca will present a paper on the social acceptance of m
 ozet: "Kutbeddin Ağca will speak at the conference in Gaziantep on 16-18 October 2026 on how social acceptance of megaprojects shifts, taking Istanbul Airport as the case."
 link: "https://2026.ipcmc.com/"
 link_label: "Conference website"
-cover: "sekil-4.jpg"
-cover_alt: "Quarterly net support curve between 2012 and 2026, shaded blue and pink, marked with the tender call, groundbreaking, opening and pandemic"
+cover: "ipcmc-logo.jpg"
+cover_alt: "The IPCMC 2026 logo: a four-pointed star mark in blue and violet beside the name of the conference and its full title below"
 images:
   - file: "sekil-4.jpg"
     alt: "Quarterly net support curve from 2012 to 2026, marked with the tender call, groundbreaking, worker protest, opening, pandemic and snowstorm"

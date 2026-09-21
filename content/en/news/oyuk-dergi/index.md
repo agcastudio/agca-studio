@@ -10,8 +10,8 @@ description: "We compiled the account of the OYUK project as a printed magazine 
 ozet: "We compiled the account of the OYUK project as a printed magazine of 25 pages, gathering everything from the concept to the facade details in one order."
 belge: "/belgeler/oyuk-dergi.pdf"
 belge_label: "Open the magazine (PDF, 10 MB, Turkish)"
-cover: "dergi-kapak.jpg"
-cover_alt: "The magazine resting on a travertine ledge: the title OYUK on the cover, its subtitle below and the daylit festival courtyard"
+cover: "dergi-acik.jpg"
+cover_alt: "The magazine lying open on a travertine ledge: the ground floor plan at the left, views of the festival courtyard and the flexible foyer at the right"
 images:
   - file: "dergi-kapak.jpg"
     alt: "The magazine resting on a travertine ledge: the title OYUK on the cover, its subtitle below and the image of the daylit festival courtyard"

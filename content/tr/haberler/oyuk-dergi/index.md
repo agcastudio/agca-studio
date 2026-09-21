@@ -10,8 +10,8 @@ description: "OYUK projesinin anlatımını 25 sayfalık basılı bir dergi olar
 ozet: "OYUK projesinin anlatımını 25 sayfalık basılı bir dergi olarak derledik; kavramdan cephe detayına kadar tek bir okuma sırasında toplandı."
 belge: "/belgeler/oyuk-dergi.pdf"
 belge_label: "Dergiyi aç (PDF, 10 MB)"
-cover: "dergi-kapak.jpg"
-cover_alt: "Traverten bir sedirin üzerinde duran dergi: kapakta OYUK başlığı, altında eksilterek var etmek alt başlığı ve tepeden ışık alan festival avlusu"
+cover: "dergi-acik.jpg"
+cover_alt: "Traverten bir sedirin üzerinde açılmış dergi: solda zemin kat planı, sağda festival avlusu ve esnek fuaye görselleri"
 images:
   - file: "dergi-kapak.jpg"
     alt: "Traverten bir sedirin üzerinde duran dergi: kapakta OYUK başlığı, altında eksilterek var etmek alt başlığı ve tepeden ışık alan festival avlusunun görseli"
