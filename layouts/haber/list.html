@@ -4,31 +4,32 @@
   {{ with .Content }}<div class="lede">{{ . }}</div>{{ end }}
 </section>
 <section class="wrap">
-  <ol class="news-list">
+  <ul class="grid news-grid">
     {{- range .RegularPages.ByDate.Reverse }}
     {{- $img := partial "haber-img.html" . -}}
-    <li class="news-item">
-      <a class="news-link" href="{{ .RelPermalink }}">
-        <div class="news-text">
-          <p class="news-meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ partial "tarih.html" . }}</time>{{ with .Params.kategori }} · {{ . }}{{ end }}</p>
-          <h2 class="news-title">{{ .Title }}</h2>
-          {{- with .Params.ozet }}<p class="news-excerpt">{{ . }}</p>{{ end }}
-        </div>
-        {{- with $img }}
-        <div class="news-media">
-          {{- $t1 := .Fill "320x240 webp" -}}
-          {{- $t2 := .Fill "480x360 webp" -}}
-          {{- $t3 := .Fill "720x540 webp" -}}
-          {{- $fb := .Fill "480x360 jpg" -}}
+    <li class="card news-card">
+      <a href="{{ .RelPermalink }}">
+        <div class="card-media">
+          {{- with $img }}
+          {{- $set := slice -}}
+          {{- range $w := slice 480 720 960 1200 -}}
+            {{- $r := $img.Fill (printf "%dx%d webp" $w (div (mul $w 2) 3)) -}}
+            {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $w) -}}
+          {{- end -}}
+          {{- $fb := $img.Fill "960x640 jpg" -}}
           <picture>
-            <source type="image/webp" srcset="{{ $t1.RelPermalink }} 320w, {{ $t2.RelPermalink }} 480w, {{ $t3.RelPermalink }} 720w" sizes="(min-width: 861px) 260px, 100vw">
-            <img src="{{ $fb.RelPermalink }}" width="480" height="360" alt="" loading="lazy" decoding="async">
+            <source type="image/webp" srcset="{{ delimit $set ", " }}" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw">
+            <img src="{{ $fb.RelPermalink }}" width="960" height="640" alt="" loading="lazy" decoding="async">
           </picture>
+          {{- end }}
         </div>
-        {{- end }}
+        <div class="card-text">
+          <span class="card-meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ partial "tarih.html" . }}</time>{{ with .Params.kategori }} · {{ . }}{{ end }}</span>
+          <span class="card-title">{{ .Title }}</span>
+        </div>
       </a>
     </li>
     {{- end }}
-  </ol>
+  </ul>
 </section>
 {{ end }}
