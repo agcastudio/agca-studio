@@ -18,7 +18,16 @@
 {{- with .Params.cover }}{{ with resources.Get (printf "projeler/%s/%s" $slug .) }}{{ $coverFull = (partial "lightbox-src.html" .).RelPermalink }}{{ end }}{{ end -}}
 {{- $coverAlt := .Params.cover_alt | default .Title -}}
 <article class="project">
-  {{- /* 1. Açılış: başlık, künye ve özet */ -}}
+  {{- /* 1. Kapak: sayfanın en üstünde, kenarlardan içeride; tıklanınca büyütme penceresi */ -}}
+  {{- with $hero }}
+  <div class="wrap project-cover">
+    {{- if $coverFull }}<a class="project-cover-link" href="{{ $coverFull }}" data-cover-open data-alt="{{ $coverAlt }}" aria-label="{{ i18n "open_image" }}: {{ $coverAlt }}">{{ end }}
+    {{ partial "hero-picture.html" (dict "hero" . "alt" $coverAlt) }}
+    {{- if $coverFull }}</a>{{ end }}
+  </div>
+  {{- end }}
+
+  {{- /* 2. Başlık, künye ve özet */ -}}
   <header class="wrap project-head">
     <p class="crumb"><a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a>{{ with .Params.tur }} · {{ i18n (printf "tur_%s" (index . 0)) }}{{ end }}</p>
     <h1 class="project-title">{{ .Title }}</h1>
@@ -39,14 +48,6 @@
         <p><a class="btn" href="#sanal-tur">{{ i18n "virtual_tour" }} <span aria-hidden="true">↓</span></a></p>
         {{- end }}
       </div>
-      {{- /* 2. Kapak: künye ile özetin aynı ızgarasında; telefonda künyenin hemen altına düşer */ -}}
-      {{- with $hero }}
-      <div class="project-cover">
-        {{- if $coverFull }}<a class="project-cover-link" href="{{ $coverFull }}" data-cover-open data-alt="{{ $coverAlt }}" aria-label="{{ i18n "open_image" }}: {{ $coverAlt }}">{{ end }}
-        {{ partial "hero-picture.html" (dict "hero" . "alt" $coverAlt) }}
-        {{- if $coverFull }}</a>{{ end }}
-      </div>
-      {{- end }}
     </div>
   </header>
 
