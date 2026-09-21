@@ -119,8 +119,9 @@ main:focus { outline: none; }
 .hero-slide:hover .hero-caption { text-decoration: underline; text-underline-offset: 4px; }
 .hero-slide:focus-visible { outline-offset: -4px; }
 .hero-caption { position: absolute; z-index: 1; left: var(--gutter); bottom: 18px; padding: 6px 0; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #fff; }
-.hero-arrow { position: absolute; z-index: 2; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; display: grid; place-items: center; color: #fff; background: rgba(0,0,0,.18); border-radius: 50%; opacity: .75; transition: opacity var(--t), background var(--t); }
-.hero-arrow:hover { opacity: 1; background: rgba(0,0,0,.35); }
+/* oklar saydam zeminde; açık görsellerde okunsun diye hafif gölge */
+.hero-arrow { position: absolute; z-index: 2; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; display: grid; place-items: center; color: #fff; background: none; border-radius: 50%; opacity: .85; filter: drop-shadow(0 1px 4px rgba(0,0,0,.5)); transition: opacity var(--t); }
+.hero-arrow:hover { opacity: 1; }
 .hero-arrow:focus-visible { outline-color: #fff; opacity: 1; }
 .hero-arrow-prev { left: var(--gutter); }
 .hero-arrow-next { right: var(--gutter); }

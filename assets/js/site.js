@@ -44,7 +44,9 @@
     });
   }
 
-  /* Kapak slaytı (ana sayfa): yumuşak geçiş, üzerine gelince ve odaklanınca durur, hareket azaltmada otomatik ilerlemez */
+  /* Kapak slaytı (ana sayfa): yumuşak geçiş, 6 saniyede bir kendi ilerler.
+     Fare üzerindeyken DURMAZ (kapak ekranı kapladığı için imleç çoğu zaman üstünde kalıyordu);
+     yalnız klavye odağında ve sekme arka plandayken durur, hareket azaltmada hiç ilerlemez. */
   var hero = document.querySelector("[data-hero]");
   if (hero) {
     var slides = Array.prototype.slice.call(hero.querySelectorAll(".hero-slide"));
@@ -75,8 +77,6 @@
         if (e.key === "ArrowLeft") { stop(); show(current - 1); start(); }
         if (e.key === "ArrowRight") { stop(); show(current + 1); start(); }
       });
-      hero.addEventListener("mouseenter", stop);
-      hero.addEventListener("mouseleave", start);
       hero.addEventListener("focusin", stop);
       hero.addEventListener("focusout", start);
       document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); else start(); });
