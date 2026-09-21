@@ -11,7 +11,7 @@ ozet: "Muğla'daki Sosyal, Kültürel ve İdari Hizmetler Binası ulusal yarış
 link: "https://mugla.bel.tr/yarisma/yarisma-detay/1"
 link_label: "Yarışma sayfası"
 cover: "kapak.jpg"
-cover_alt: "Birinci paftanın üst bandı: solda OYUK logotipi ve manifesto cümlesi, sağda tepeden ışık alan festival avlusunun görseli"
+cover_alt: "Festival avlusu: tepeden süzülen gün ışığı, iki yanda galeriler, saksı ağaçları ve yürüyen insanlar"
 images:
   - file: "pafta-1.jpg"
     alt: "Birinci pafta: OYUK logotipi, festival avlusu görseli, oyuğun beş hâli şeması, kent rotası ve dolu-boş, iklim, bellek diyagramları"

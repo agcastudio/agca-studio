@@ -318,11 +318,16 @@ body .glightbox-container.is-zoomed, .glightbox-container.is-zoomed .gslide-imag
 .news-body p { margin: 0 0 1.1em; }
 .news-body p:last-child { margin-bottom: 0; }
 .news-body .btn { margin-top: 6px; margin-right: 10px; }
-.news-figure { margin: 0; }
-.news-figure img { display: block; width: 100%; height: auto; background: var(--soft); }
+/* görsel, metin sütunuyla aynı yükseklikte başlar ve biter */
+.news-figure { margin: 0; align-self: stretch; position: relative; min-height: 240px; }
+.news-figure img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; background: var(--soft); }
+/* kırpılmaması gereken görseller (dergi, logo) kendi oranında durur */
+.news-figure.is-tam { position: static; align-self: start; min-height: 0; }
+.news-figure.is-tam img { position: static; height: auto; object-fit: contain; }
 @media (max-width: 860px) {
   .news-main { grid-template-columns: 1fr; gap: 22px; }
-  .news-figure { order: -1; }
+  .news-figure { order: -1; position: static; align-self: start; min-height: 0; }
+  .news-figure img { position: static; height: auto; }
 }
 
 /* --- GLightbox ince ayar --- */

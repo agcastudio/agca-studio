@@ -11,7 +11,7 @@ ozet: "We entered the national competition for the Social, Cultural and Administ
 link: "https://mugla.bel.tr/yarisma/yarisma-detay/1"
 link_label: "Competition website"
 cover: "kapak.jpg"
-cover_alt: "The top band of the first panel: the OYUK wordmark and its opening lines at the left, the daylit festival courtyard at the right"
+cover_alt: "Festival courtyard: daylight filtering from above, galleries on both sides, potted trees and people walking"
 images:
   - file: "pafta-1.jpg"
     alt: "First panel: the OYUK wordmark, the festival courtyard view, the five states of the hollow, the urban route and the solid-void, climate and memory diagrams"
