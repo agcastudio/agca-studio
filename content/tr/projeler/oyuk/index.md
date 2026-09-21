@@ -14,7 +14,7 @@ kunye:
   proje_yili: "2026"
   bitis_yili: ""
   program: "Kültür merkezi: festival avlusu, esnek salon, atölyeler, kütüphane, kafe, idare"
-  durum: "Yarışma projesi"
+  durum: "Katılımcı"
   yarisma: "Muğla Büyükşehir Belediyesi Sosyal, Kültürel ve İdari Hizmetler Binası Ulusal, Tek Kademeli Mimari Proje Yarışması, 2026"
   insaat_alani: "4.130 m²"
   arsa_alani: ""

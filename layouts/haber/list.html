@@ -1,0 +1,34 @@
+{{ define "main" }}
+<section class="wrap page-head">
+  <h1 class="page-title">{{ .Title }}</h1>
+  {{ with .Content }}<div class="lede">{{ . }}</div>{{ end }}
+</section>
+<section class="wrap">
+  <ol class="news-list">
+    {{- range .RegularPages.ByDate.Reverse }}
+    {{- $img := partial "haber-img.html" . -}}
+    <li class="news-item">
+      <a class="news-link" href="{{ .RelPermalink }}">
+        <div class="news-text">
+          <p class="news-meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ partial "tarih.html" . }}</time>{{ with .Params.kategori }} · {{ . }}{{ end }}</p>
+          <h2 class="news-title">{{ .Title }}</h2>
+          {{- with .Params.ozet }}<p class="news-excerpt">{{ . }}</p>{{ end }}
+        </div>
+        {{- with $img }}
+        <div class="news-media">
+          {{- $t1 := .Fill "320x240 webp" -}}
+          {{- $t2 := .Fill "480x360 webp" -}}
+          {{- $t3 := .Fill "720x540 webp" -}}
+          {{- $fb := .Fill "480x360 jpg" -}}
+          <picture>
+            <source type="image/webp" srcset="{{ $t1.RelPermalink }} 320w, {{ $t2.RelPermalink }} 480w, {{ $t3.RelPermalink }} 720w" sizes="(min-width: 861px) 260px, 100vw">
+            <img src="{{ $fb.RelPermalink }}" width="480" height="360" alt="" loading="lazy" decoding="async">
+          </picture>
+        </div>
+        {{- end }}
+      </a>
+    </li>
+    {{- end }}
+  </ol>
+</section>
+{{ end }}

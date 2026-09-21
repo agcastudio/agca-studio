@@ -15,7 +15,7 @@ kunye:
   proje_yili: "2024"
   bitis_yili: ""
   program: "Hydrotherapy pool, physiotherapy hall, treatment rooms, sauna, café and offices; car park in the basement; basement, ground and two upper floors"
-  durum: "Competition entry"
+  durum: "Participant"
   insaat_alani: ""
   arsa_alani: ""
   ekip: ""

@@ -15,7 +15,7 @@ kunye:
   proje_yili: "2024"
   bitis_yili: ""
   program: "Hidroterapi havuzu, fizyoterapi salonu, tedavi odaları, sauna, kafe ve ofisler; bodrumda otopark; bodrum, zemin ve iki normal kat"
-  durum: "Yarışma projesi"
+  durum: "Katılımcı"
   insaat_alani: ""
   arsa_alani: ""
   ekip: ""

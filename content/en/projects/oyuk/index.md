@@ -14,7 +14,7 @@ kunye:
   proje_yili: "2026"
   bitis_yili: ""
   program: "Cultural centre: festival courtyard, flexible hall, workshops, library, café, administration"
-  durum: "Competition entry"
+  durum: "Participant"
   yarisma: "Muğla Metropolitan Municipality Social, Cultural and Administrative Services Building national single-stage architectural competition, 2026"
   insaat_alani: "4,130 m²"
   arsa_alani: ""

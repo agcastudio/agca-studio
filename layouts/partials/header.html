@@ -2,6 +2,7 @@
 {{- $home := site.Home.RelPermalink -}}
 {{- $nav := slice
   (dict "key" "nav_projects" "path" (cond (eq $lang "tr") "projeler" "projects"))
+  (dict "key" "nav_news" "path" (cond (eq $lang "tr") "haberler" "news"))
   (dict "key" "nav_studio" "path" (cond (eq $lang "tr") "studyo" "studio"))
   (dict "key" "nav_contact" "path" (cond (eq $lang "tr") "iletisim" "contact"))
 -}}

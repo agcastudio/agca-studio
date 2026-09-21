@@ -1,0 +1,17 @@
+{{- /* Önceki/sonraki haber: kare küçük görsel + etiket + başlık */ -}}
+{{- $p := .page -}}
+{{- $img := partial "haber-img.html" $p -}}
+<a class="project-nav-link{{ with .class }} {{ . }}{{ end }}" href="{{ $p.RelPermalink }}">
+  {{- with $img }}
+  {{- $t := .Fill "144x144 webp q75" -}}
+  {{- $tf := .Fill "72x72 jpg" -}}
+  <picture>
+    <source type="image/webp" srcset="{{ $tf.RelPermalink }} 72w, {{ $t.RelPermalink }} 144w" sizes="72px">
+    <img src="{{ $tf.RelPermalink }}" width="72" height="72" alt="" loading="lazy" decoding="async">
+  </picture>
+  {{- end }}
+  <span class="project-nav-text">
+    <span class="muted">{{ $.label }}</span>
+    <span>{{ $p.Title }}</span>
+  </span>
+</a>

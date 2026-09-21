@@ -127,3 +127,18 @@ other = "Open in a new tab"
 
 [kunye_yarisma]
 other = "Competition"
+
+[nav_news]
+other = "News"
+
+[news_visit]
+other = "Go to the source"
+
+[news_document]
+other = "Open the document"
+
+[prev_news]
+other = "Previous"
+
+[next_news]
+other = "Next"

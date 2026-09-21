@@ -1,0 +1,64 @@
+{{ define "main" }}
+{{- $slug := .Params.slug -}}
+{{- $images := .Params.images | default slice -}}
+{{- $cover := partial "haber-img.html" . -}}
+<article class="news">
+  <header class="wrap news-head">
+    <p class="crumb"><a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a>{{ with .Params.kategori }} · {{ . }}{{ end }}</p>
+    <h1 class="news-single-title">{{ .Title }}</h1>
+    <p class="news-meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ partial "tarih.html" . }}</time>{{ with .Params.kaynak }} · {{ . }}{{ end }}</p>
+  </header>
+
+  {{- with $cover }}
+  {{- $c := .Fill "1600x900 webp q82" -}}
+  {{- $c2 := .Fill "1000x563 webp q82" -}}
+  {{- $cf := .Fill "1600x900 jpg" -}}
+  <div class="wrap news-cover">
+    <picture>
+      <source type="image/webp" srcset="{{ $c2.RelPermalink }} 1000w, {{ $c.RelPermalink }} 1600w" sizes="(min-width: 1500px) 1400px, 100vw">
+      <img src="{{ $cf.RelPermalink }}" width="1600" height="900" alt="{{ $.Params.cover_alt | default $.Title }}" fetchpriority="high">
+    </picture>
+  </div>
+  {{- end }}
+
+  <div class="wrap news-body prose">
+    {{ .Content }}
+    {{- with .Params.link }}
+    <p><a class="btn" href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ with $.Params.link_label }}{{ . }}{{ else }}{{ i18n "news_visit" }}{{ end }} <span aria-hidden="true">↗</span></a></p>
+    {{- end }}
+    {{- with .Params.belge }}
+    <p><a class="btn" href="{{ . }}" target="_blank" rel="noopener">{{ with $.Params.belge_label }}{{ . }}{{ else }}{{ i18n "news_document" }}{{ end }} <span aria-hidden="true">↗</span></a></p>
+    {{- end }}
+  </div>
+
+  {{- with $images }}
+  <section class="wrap thumbs-section" aria-label="{{ i18n "project_gallery" }}">
+    <ul class="thumbs">
+      {{- range . }}
+        {{- $it := . -}}
+        {{- with resources.Get (printf "haberler/%s/%s" $slug $it.file) }}
+        {{- $img := . -}}
+        {{- $t1 := $img.Fill "240x240 webp q75" -}}
+        {{- $t2 := $img.Fill "480x480 webp q75" -}}
+        {{- $tf := $img.Fill "240x240 jpg" -}}
+        {{- $full := partial "lightbox-src.html" $img -}}
+        <li class="thumb">
+          <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="haber" data-alt="{{ $it.alt }}"{{ with $it.caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $it.alt }}">
+            <picture>
+              <source type="image/webp" srcset="{{ $t1.RelPermalink }} 240w, {{ $t2.RelPermalink }} 480w" sizes="(min-width: 1024px) 220px, (min-width: 640px) 25vw, 33vw">
+              <img src="{{ $tf.RelPermalink }}" width="240" height="240" alt="" loading="lazy" decoding="async">
+            </picture>
+          </a>
+        </li>
+        {{- else }}{{ warnf "Haber görseli bulunamadı: haberler/%s/%s" $slug $it.file }}{{ end }}
+      {{- end }}
+    </ul>
+  </section>
+  {{- end }}
+
+  <nav class="wrap project-nav" aria-label="{{ .Parent.Title }}">
+    {{- with .NextInSection }}{{ partial "haber-nav-link.html" (dict "page" . "label" (i18n "prev_news") "class" "") }}{{ else }}<span></span>{{ end }}
+    {{- with .PrevInSection }}{{ partial "haber-nav-link.html" (dict "page" . "label" (i18n "next_news") "class" "is-next") }}{{ end }}
+  </nav>
+</article>
+{{ end }}

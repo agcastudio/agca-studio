@@ -126,3 +126,18 @@ other = "Yeni sekmede aç"
 
 [kunye_yarisma]
 other = "Yarışma"
+
+[nav_news]
+other = "Haberler"
+
+[news_visit]
+other = "Kaynağa git"
+
+[news_document]
+other = "Belgeyi aç"
+
+[prev_news]
+other = "Önceki haber"
+
+[next_news]
+other = "Sonraki haber"

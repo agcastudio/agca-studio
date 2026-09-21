@@ -1,0 +1,8 @@
+{{- /* Tarihi sayfanın diline göre yazar: 12 Eylül 2026 / 12 September 2026 */ -}}
+{{- $d := .Date -}}
+{{- if eq .Language.Lang "tr" -}}
+  {{- $aylar := slice "Ocak" "Şubat" "Mart" "Nisan" "Mayıs" "Haziran" "Temmuz" "Ağustos" "Eylül" "Ekim" "Kasım" "Aralık" -}}
+  {{- printf "%d %s %d" $d.Day (index $aylar (sub (int $d.Month) 1)) $d.Year -}}
+{{- else -}}
+  {{- $d.Format "2 January 2006" -}}
+{{- end -}}

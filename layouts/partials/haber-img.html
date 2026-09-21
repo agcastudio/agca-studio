@@ -1,0 +1,6 @@
+{{- /* Haber görseli: assets/haberler/<slug>/<dosya> altındaki kapak kaynağını döndürür */ -}}
+{{- $out := "" -}}
+{{- with .Params.cover }}
+  {{- with resources.Get (printf "haberler/%s/%s" $.Params.slug .) }}{{ $out = . }}{{ end }}
+{{- end -}}
+{{- return $out -}}
