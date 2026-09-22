@@ -74,5 +74,5 @@
 <meta name="twitter:card" content="summary_large_image">
 {{- end }}
 {{- /* Yapısal veri */ -}}
-{{ partial "jsonld.html" (dict "page" . "title" $title "desc" $desc "og" $og) }}
+{{ partial "jsonld.html" (dict "page" . "title" $title "desc" $desc "og" $og "hero" $hero) }}
 {{- end }}

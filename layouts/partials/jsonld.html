@@ -61,7 +61,25 @@
       "locationCreated" (dict "@type" "Place" "name" $p.Params.kunye.yer)
     -}}
     {{- with $p.Params.kunye.proje_yili }}{{ $cw = merge $cw (dict "dateCreated" .) }}{{ end -}}
-    {{- with .og }}{{ $cw = merge $cw (dict "image" (dict "@type" "ImageObject" "contentUrl" . "creditText" $brand "copyrightNotice" (printf "© %s" $brand))) }}{{ end -}}
+    {{- /* Görsel meta verisi: Google "lisanslanabilir görsel" alanlarını ister (creator, license, acquireLicensePage).
+           contentUrl, Google'ın eşleştirmeyi bu adresten yaptığı için sayfada GERÇEKTEN basılan kapak karesidir
+           (hero-picture.html'deki <img src>), sosyal kart kırpımı değil. */ -}}
+    {{- $lisansSayfa := site.GetPage (cond (eq $p.Language.Lang "tr") "/gizlilik" "/privacy") -}}
+    {{- $iletisimSayfa := site.GetPage (cond (eq $p.Language.Lang "tr") "/iletisim" "/contact") -}}
+    {{- with .hero }}{{ with .fallback -}}
+      {{- $img := dict
+        "@type" "ImageObject"
+        "contentUrl" .Permalink
+        "creditText" $brand
+        "copyrightNotice" (printf "© %s" $brand)
+        "creator" (dict "@type" "Organization" "@id" (printf "%s#org" site.BaseURL) "name" $brand)
+        "copyrightHolder" (dict "@id" (printf "%s#org" site.BaseURL))
+      -}}
+      {{- with $p.Params.cover_alt }}{{ $img = merge $img (dict "name" .) }}{{ end -}}
+      {{- with $lisansSayfa }}{{ $img = merge $img (dict "license" (printf "%s#%s" .Permalink (cond (eq $p.Language.Lang "tr") "gorsel-haklari" "image-rights"))) }}{{ end -}}
+      {{- with $iletisimSayfa }}{{ $img = merge $img (dict "acquireLicensePage" .Permalink) }}{{ end -}}
+      {{- $cw = merge $cw (dict "image" $img) -}}
+    {{- end }}{{ end -}}
     {{- $graph = $graph | append $cw -}}
   {{- else if eq $p.Params.pagekind "contact" -}}
     {{- $graph = $graph | append $org -}}

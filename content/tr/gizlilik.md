@@ -1,7 +1,7 @@
 ---
 title: "Gizlilik ve KVKK"
 translationKey: "gizlilik"
-description: "agca·studio gizlilik bildirimi: çerez kullanılmaz, kişisel veri toplanmaz; e-posta yazışmalarında veri işleme ve KVKK hakları."
+description: "agca·studio gizlilik bildirimi: çerez kullanılmaz, kişisel veri toplanmaz; e-posta yazışmalarında veri işleme, KVKK hakları ve görsel kullanım koşulları."
 sitemap:
   priority: 0.1
 ---
@@ -22,6 +22,10 @@ Sitede form yoktur; hiçbir kişisel veri toplanmaz. Bize e-posta ile yazdığı
 ## Haklarınız
 
 KVKK'nın 11. maddesi uyarınca kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, düzeltilmesini veya silinmesini isteme haklarına sahipsiniz. Başvurularınızı **info@agca.studio** adresine iletebilirsiniz.
+
+## Görsel hakları {#gorsel-haklari}
+
+Sitedeki tüm görseller, çizimler ve metinler agca·studio'ya aittir; tüm hakları saklıdır. Görseller yazılı izin alınmadan kopyalanamaz, çoğaltılamaz, değiştirilemez ve ticari olarak kullanılamaz. Basın ve yayın kullanımı ile diğer izin talepleri için [İletişim](/iletisim/) sayfasından ya da **info@agca.studio** adresinden bize yazın; kaynak gösterilmesi koşuluyla izin verilebilir.
 
 ## Veri sorumlusu
 

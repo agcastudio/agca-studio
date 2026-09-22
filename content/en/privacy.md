@@ -1,7 +1,7 @@
 ---
 title: "Privacy"
 translationKey: "gizlilik"
-description: "agca.studio privacy notice: no cookies, no personal data collected; how email correspondence is handled and your rights under Turkish data protection law."
+description: "agca.studio privacy notice: no cookies, no personal data collected; how email is handled, your rights under Turkish data protection law, and image use terms."
 sitemap:
   priority: 0.1
 ---
@@ -22,6 +22,10 @@ There are no forms on the site, and the site itself collects no personal data. W
 ## Your rights
 
 Under Article 11 of Law No. 6698 you may ask whether your personal data has been processed, request information about that processing, and ask for it to be corrected or deleted. Send requests to **info@agca.studio**.
+
+## Image rights {#image-rights}
+
+All images, drawings and texts on this site belong to agca·studio; all rights are reserved. The images may not be copied, reproduced, altered or used commercially without written permission. For press use and any other permission request, write to us from the [Contact](/en/contact/) page or at **info@agca.studio**; permission may be granted on condition that the source is credited.
 
 ## Data controller
 
