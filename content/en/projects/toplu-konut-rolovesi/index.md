@@ -1,6 +1,6 @@
 ---
 title: "Housing Estate Survey"
-seo_title: "Housing Estate Survey · Scan to BIM, Üsküdar · agca·studio"
+seo_title: "Housing Estate Survey · Scan to BIM, Istanbul · agca·studio"
 subtitle: "Scan to BIM: drone photogrammetry, point cloud and Revit as-built model"
 translationKey: "proje-rolove-bim"
 slug: "toplu-konut-rolovesi"

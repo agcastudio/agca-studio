@@ -1,6 +1,6 @@
 ---
 title: "KC Yangın Showroom and Office"
-seo_title: "KC Yangın Showroom and Office · Ümraniye · agca·studio"
+seo_title: "KC Yangın Showroom · Ümraniye, Istanbul · agca·studio"
 subtitle: "Corporate interior and facade design"
 translationKey: "proje-kc"
 slug: "kc-yangin-showroom"

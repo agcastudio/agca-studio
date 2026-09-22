@@ -1,0 +1,16 @@
+{{- /* Google resim meta verisi düğümü (creator, license, acquireLicensePage dahil).
+       Girdi: dict (url: mutlak adres, alt: metin, lang: dil kodu). */ -}}
+{{- $brand := site.Params.brand -}}
+{{- $tr := eq .lang "tr" -}}
+{{- $img := dict
+  "@type" "ImageObject"
+  "contentUrl" .url
+  "creditText" $brand
+  "copyrightNotice" (printf "© %s" $brand)
+  "creator" (dict "@type" "Organization" "@id" (printf "%s#org" site.BaseURL) "name" $brand)
+  "copyrightHolder" (dict "@id" (printf "%s#org" site.BaseURL))
+-}}
+{{- with .alt }}{{ $img = merge $img (dict "name" .) }}{{ end -}}
+{{- with site.GetPage (cond $tr "/gizlilik" "/privacy") }}{{ $img = merge $img (dict "license" (printf "%s#%s" .Permalink (cond $tr "gorsel-haklari" "image-rights"))) }}{{ end -}}
+{{- with site.GetPage (cond $tr "/iletisim" "/contact") }}{{ $img = merge $img (dict "acquireLicensePage" .Permalink) }}{{ end -}}
+{{- return $img -}}

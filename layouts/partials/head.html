@@ -45,6 +45,9 @@
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
 {{- /* Kapak görseli ön yükleme (LCP). imagesrcset, Go şablonunun URL kaçışından (boşluk→%20) korunmak için safeHTMLAttr ile basılır. */ -}}
 {{- $hero := partial "hero-image.html" . -}}
+{{- /* Haber kapağı: hero-src türevleri haber düzenine uymadığı için ayrı çözülür */ -}}
+{{- $haberKapak := "" -}}
+{{- if and (eq .Type "haber") (not .IsSection) }}{{ $haberKapak = partial "haber-img.html" . }}{{ end -}}
 {{- with $hero }}
 {{- if .srcsetWide }}
 <link rel="preload" as="image" media="(min-width: 900px)" href="{{ .fallback.RelPermalink }}" {{ printf "imagesrcset=\"%s\"" .srcsetWide | safeHTMLAttr }} imagesizes="100vw" fetchpriority="high">
@@ -53,19 +56,31 @@
 <link rel="preload" as="image" href="{{ .fallback.RelPermalink }}" {{ printf "imagesrcset=\"%s\"" .srcset | safeHTMLAttr }} imagesizes="100vw" fetchpriority="high">
 {{- end }}
 {{- end }}
+{{- with $haberKapak }}
+{{- $k := partial "haber-kapak.html" . }}
+<link rel="preload" as="image" href="{{ $k.fallback.RelPermalink }}" {{ printf "imagesrcset=\"%s\"" $k.srcset | safeHTMLAttr }} imagesizes="{{ $k.sizes }}" fetchpriority="high">
+{{- end }}
 {{- if not $is404 }}
 {{- /* Paylaşım kartı */ -}}
 {{- $og := "" -}}
 {{- with $hero }}{{ $og = (.image.Fill "1200x630 q80 jpg").Permalink }}{{ end -}}
+{{- if not $og }}{{ with $haberKapak }}{{ $og = (.Fill "1200x630 q80 jpg").Permalink }}{{ end }}{{ end -}}
 {{- if not $og }}{{ with resources.Get site.Params.ogImage }}{{ $og = .Permalink }}{{ end }}{{ end -}}
 {{- $ogAlt := .Params.hero_alt | default .Params.cover_alt | default $brand -}}
-<meta property="og:type" content="{{ if and (eq .Type "proje") (not .IsSection) }}article{{ else }}website{{ end }}">
+<meta property="og:type" content="{{ if and (in (slice "proje" "haber") .Type) (not .IsSection) }}article{{ else }}website{{ end }}">
 <meta property="og:site_name" content="{{ $brand }}">
 <meta property="og:locale" content="{{ if eq $lang "tr" }}tr_TR{{ else }}en_GB{{ end }}">
 <meta property="og:locale:alternate" content="{{ if eq $lang "tr" }}en_GB{{ else }}tr_TR{{ end }}">
 <meta property="og:title" content="{{ $title }}">
 <meta property="og:description" content="{{ $desc }}">
 <meta property="og:url" content="{{ .Permalink }}">
+{{- if and (eq .Type "haber") (not .IsSection) }}
+<meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+<meta property="article:publisher" content="{{ site.BaseURL }}">
+{{- with .Params.kategori }}
+<meta property="article:section" content="{{ . }}">{{ end }}
+{{- end }}
 {{- with $og }}
 <meta property="og:image" content="{{ . }}">
 <meta property="og:image:width" content="1200">
@@ -74,5 +89,5 @@
 <meta name="twitter:card" content="summary_large_image">
 {{- end }}
 {{- /* Yapısal veri */ -}}
-{{ partial "jsonld.html" (dict "page" . "title" $title "desc" $desc "og" $og "hero" $hero) }}
+{{ partial "jsonld.html" (dict "page" . "title" $title "desc" $desc "og" $og "hero" $hero "haberKapak" $haberKapak) }}
 {{- end }}

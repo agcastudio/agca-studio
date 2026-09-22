@@ -1,5 +1,6 @@
 ---
 title: "Stüdyo"
+seo_title: "Stüdyo · Mimarlık Ofisi, Üsküdar İstanbul · agca·studio"
 translationKey: "studyo"
 description: "agca·studio: Selen Baş Ağca ve Kutbeddin Ağca'nın Üsküdar, İstanbul'daki mimarlık stüdyosu. Kentsel dönüşüm, BIM ile projelendirme ve sanal tur."
 lede: "agca·studio, İstanbul Üsküdar'da Selen Baş Ağca ve Kutbeddin Ağca tarafından yürütülen bir mimarlık stüdyosudur."
@@ -20,3 +21,5 @@ Mimarlığı, yapının kendisinden çok onun sardığı boşluk üzerinden dü�
 Projelendirmeyi Revit üzerinde, tek ve tutarlı bir bilgi modelinde yürütüyoruz. Konsept aşamasından uygulama projesine kadar planlar, kesitler, metrajlar ve görselleştirmeler aynı modelden üretilir; böylece her karar çizimlerin tamamına aynı anda işler.
 
 Kentsel dönüşüm projelerinde mevcut dokuyu okumakla başlıyor, yerleşim ve emsal etütlerinden avan ve uygulama projelerine kadar süreci tek elden götürüyoruz. Görselleştirme ve sanal turları, tasarımı yapılmadan önce deneyimlemenin ve anlatmanın araçları olarak görüyoruz.
+
+Çalışma biçimimizi somut örnekler üzerinden görmek için [projelerimize](/projeler/), yarışmalar ve yayınlar için [haberlerimize](/haberler/) bakabilirsiniz.

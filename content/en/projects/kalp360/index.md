@@ -1,6 +1,6 @@
 ---
 title: "Kalp360 Health Centre"
-seo_title: "Kalp360 Health Centre · Kadıköy · agca·studio"
+seo_title: "Kalp360 Health Centre · Kadıköy, Istanbul · agca·studio"
 subtitle: "Interior design for a health centre"
 translationKey: "proje-kalp360"
 slug: "kalp360"

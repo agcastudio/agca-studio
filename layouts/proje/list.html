@@ -17,7 +17,7 @@
 </section>
 <section class="wrap">
   <ul class="grid" data-grid>
-    {{- range $projects }}{{ partial "card.html" . }}{{ end }}
+    {{- range $i, $p := $projects }}{{ partial "card.html" (dict "page" $p "oncelik" (eq $i 0)) }}{{ end }}
   </ul>
 </section>
 {{ end }}

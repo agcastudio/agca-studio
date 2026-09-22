@@ -1,6 +1,6 @@
 ---
 title: "Nişantaşı Koru Flat"
-seo_title: "Nişantaşı Koru Flat · Interior · agca·studio"
+seo_title: "Nişantaşı Koru Flat · Interior, Istanbul · agca·studio"
 subtitle: "Interior design for a living room"
 translationKey: "proje-nisantasi"
 slug: "nisantasi"

@@ -5,10 +5,10 @@
 </section>
 <section class="wrap">
   <ul class="grid news-grid">
-    {{- range .RegularPages.ByDate.Reverse }}
-    {{- $img := partial "haber-img.html" . -}}
+    {{- range $i, $h := .RegularPages.ByDate.Reverse }}
+    {{- $img := partial "haber-img.html" $h -}}
     <li class="card news-card">
-      <a href="{{ .RelPermalink }}">
+      <a href="{{ $h.RelPermalink }}">
         <div class="card-media">
           {{- with $img }}
           {{- $set := slice -}}
@@ -19,13 +19,13 @@
           {{- $fb := $img.Fill "960x640 jpg" -}}
           <picture>
             <source type="image/webp" srcset="{{ delimit $set ", " }}" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw">
-            <img src="{{ $fb.RelPermalink }}" width="960" height="640" alt="" loading="lazy" decoding="async">
+            <img src="{{ $fb.RelPermalink }}" width="960" height="640" alt="{{ $h.Params.cover_alt }}"{{ if eq $i 0 }} fetchpriority="high"{{ else }} loading="lazy" decoding="async"{{ end }}>
           </picture>
           {{- end }}
         </div>
         <div class="card-text">
-          <span class="card-meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ partial "tarih.html" . }}</time>{{ with .Params.kategori }} · {{ . }}{{ end }}</span>
-          <span class="card-title">{{ .Title }}</span>
+          <span class="card-meta"><time datetime="{{ $h.Date.Format "2006-01-02" }}">{{ partial "tarih.html" $h }}</time>{{ with $h.Params.kategori }} · {{ . }}{{ end }}</span>
+          <span class="card-title">{{ $h.Title }}</span>
         </div>
       </a>
     </li>

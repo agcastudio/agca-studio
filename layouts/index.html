@@ -40,7 +40,7 @@
     {{- end }}
   </div>
   <ul class="grid">
-    {{- range first 6 . }}{{ partial "card.html" . }}{{ end }}
+    {{- range first 6 . }}{{ partial "card.html" (dict "page" .) }}{{ end }}
   </ul>
 </section>
 {{- end }}

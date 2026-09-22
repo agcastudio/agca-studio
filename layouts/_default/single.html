@@ -27,11 +27,11 @@
         {{- end }}
       </dl>
       {{- with resources.Get "img/harita.jpg" }}
-      {{- $fb := .Resize "1200x jpg" -}}
+      {{- $fb := .Resize "1200x jpg q70" -}}
       <figure class="map">
         <a href="{{ site.Params.mapLink }}" target="_blank" rel="noopener" aria-label="{{ i18n "map_open" }}">
           <picture>
-            <source type="image/webp" srcset="{{ (.Resize "600x webp").RelPermalink }} 600w, {{ (.Resize "1200x webp").RelPermalink }} 1200w" sizes="(min-width: 900px) 704px, 100vw">
+            <source type="image/webp" srcset="{{ (.Resize "600x webp q70").RelPermalink }} 600w, {{ (.Resize "704x webp q70").RelPermalink }} 704w, {{ (.Resize "1200x webp q70").RelPermalink }} 1200w" sizes="(min-width: 900px) 704px, 100vw">
             <img src="{{ $fb.RelPermalink }}" width="{{ $fb.Width }}" height="{{ $fb.Height }}" alt="{{ i18n "map_alt" }}" loading="lazy" decoding="async">
           </picture>
         </a>

@@ -1,0 +1,14 @@
+{{- /* Haber kapağı adayları: hem sayfadaki <picture> hem de <head>'deki ön yükleme aynı türevleri kullansın.
+       Girdi: görsel kaynağı. Çıktı: dict (srcset, fallback, sizes). */ -}}
+{{- $img := . -}}
+{{- $set := slice -}}
+{{- range $w := slice 480 640 900 1280 -}}
+  {{- if le $w $img.Width -}}
+    {{- $r := $img.Resize (printf "%dx webp q82" $w) -}}
+    {{- $set = $set | append (printf "%s %dw" $r.RelPermalink $w) -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $set }}{{ $set = $set | append (printf "%s %dw" ($img.Resize (printf "%dx webp q82" $img.Width)).RelPermalink $img.Width) }}{{ end -}}
+{{- $fbw := 700 -}}
+{{- if lt $img.Width $fbw }}{{ $fbw = $img.Width }}{{ end -}}
+{{- return (dict "srcset" (delimit $set ", ") "fallback" ($img.Resize (printf "%dx jpg" $fbw)) "sizes" "(min-width: 861px) 42vw, calc(100vw - 32px)") -}}

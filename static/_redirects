@@ -1,1 +1,12 @@
 /tr/ / 301
+
+# Eski Webflow sitesinin dizinde kalan adresleri (2026-09-22 doğrulandı: hepsi 404 dönüyordu).
+# Yalnız içerik karşılığı kesin olanlar yönlendirildi; karşılığı olmayan eski adres 404 kalır.
+/we /studyo/ 301
+/we/ /studyo/ 301
+/hakkimda-2/ /studyo/ 301
+/project /projeler/ 301
+/project/ /projeler/ 301
+/projects /projeler/ 301
+/projects/ /projeler/ 301
+/projects/yevi /projeler/yucel-evi/ 301

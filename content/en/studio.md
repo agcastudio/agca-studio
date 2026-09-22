@@ -1,5 +1,6 @@
 ---
 title: "Studio"
+seo_title: "Studio · Architecture Office, Üsküdar Istanbul · agca·studio"
 translationKey: "studyo"
 description: "agca·studio: the architecture studio of Selen Baş Ağca and Kutbeddin Ağca in Üsküdar, Istanbul. Urban regeneration, BIM-based design and virtual tours."
 lede: "agca·studio is an architecture studio run by Selen Baş Ağca and Kutbeddin Ağca in Üsküdar, Istanbul."
@@ -20,3 +21,5 @@ We think of architecture less as the building itself and more as the space it en
 We design in Revit, within a single, consistent building information model. Plans, sections, quantities and visualisations are produced from the same model, from concept to construction documents, so every decision is carried through the whole set of drawings at once.
 
 In urban regeneration projects we start by reading the existing fabric and take the process from massing and density studies through to schematic design and construction documents, all under one roof. We treat visualisation and virtual tours as tools for experiencing and explaining a design before it is built.
+
+To see how this works in practice, look through our [projects](/en/projects/), and our [news](/en/news/) for competitions and publications.

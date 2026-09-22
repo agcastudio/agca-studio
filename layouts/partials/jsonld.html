@@ -1,16 +1,19 @@
 {{- $p := .page -}}
 {{- $brand := site.Params.brand -}}
+{{- /* @type yalnız Organization: LocalBusiness/ProfessionalService sokak adresi ve açılış saati ister,
+       elimizde yok; eksik alanlı LocalBusiness Search Console'da uyarı üretir. */ -}}
 {{- $org := dict
-  "@type" (slice "Organization" "ProfessionalService")
+  "@type" "Organization"
   "@id" (printf "%s#org" site.BaseURL)
   "name" $brand
   "alternateName" (slice "agca studio" "agca.studio" "Ağca Studio")
+  "description" site.Params.siteDescription
   "url" site.BaseURL
   "logo" (printf "%simg/logo-og.png" site.BaseURL)
   "image" (printf "%simg/og-default.jpg" site.BaseURL)
   "email" site.Params.email
   "address" (dict "@type" "PostalAddress" "addressLocality" site.Params.district "addressRegion" site.Params.city "addressCountry" "TR")
-  "areaServed" (slice "TR")
+  "areaServed" (dict "@type" "Country" "name" "Türkiye")
 -}}
 {{- with site.Params.phone }}{{ $org = merge $org (dict "telephone" .) }}{{ end -}}
 {{- /* Kurucular: Stüdyo sayfasının people listesinden */ -}}
@@ -20,6 +23,8 @@
     {{- range . }}
       {{- $person := dict "@type" "Person" "name" .name "jobTitle" .role "worksFor" (dict "@id" (printf "%s#org" site.BaseURL)) -}}
       {{- with .linkedin }}{{ $person = merge $person (dict "sameAs" (slice .)) }}{{ end -}}
+      {{- with .bio }}{{ $person = merge $person (dict "description" (. | plainify | truncate 300)) }}{{ end -}}
+      {{- with .photo }}{{ with resources.Get (printf "img/%s" .) }}{{ $person = merge $person (dict "image" (.Fill "800x800 jpg").Permalink) }}{{ end }}{{ end -}}
       {{- $founders = $founders | append $person -}}
     {{- end -}}
     {{- $org = merge $org (dict "founder" $founders) -}}
@@ -33,10 +38,13 @@
 {{- $graph := slice -}}
 {{- if $p.IsHome -}}
   {{- $graph = $graph | append $org -}}
-  {{- $graph = $graph | append (dict "@type" "WebSite" "url" site.BaseURL "name" $brand "alternateName" (slice "agca studio" "agca.studio") "inLanguage" $p.Language.Lang "publisher" (dict "@id" (printf "%s#org" site.BaseURL))) -}}
+  {{- $graph = $graph | append (dict "@type" "WebSite" "@id" (printf "%s#website" $p.Permalink) "url" $p.Permalink "name" $brand "alternateName" (slice "agca studio" "agca.studio") "inLanguage" $p.Language.Lang "publisher" (dict "@id" (printf "%s#org" site.BaseURL))) -}}
 {{- else -}}
-  {{- /* Diğer sayfalarda @id referansı çözülsün diye kısa kuruluş düğümü */ -}}
-  {{- if ne $p.Params.pagekind "contact" -}}
+  {{- /* İletişim ve stüdyo sayfasında tam kuruluş düğümü; diğerlerinde @id referansı çözülsün diye kısa düğüm */ -}}
+  {{- $tamOrg := or (eq $p.Params.pagekind "contact") (eq $p.Params.translationKey "studyo") -}}
+  {{- if $tamOrg -}}
+    {{- $graph = $graph | append $org -}}
+  {{- else -}}
     {{- $graph = $graph | append (dict "@type" "Organization" "@id" (printf "%s#org" site.BaseURL) "name" $brand "url" site.BaseURL "logo" (printf "%simg/logo-og.png" site.BaseURL)) -}}
   {{- end -}}
   {{- /* Ekmek kırıntısı */ -}}
@@ -58,31 +66,36 @@
       "inLanguage" $p.Language.Lang
       "creator" (dict "@id" (printf "%s#org" site.BaseURL))
       "copyrightHolder" (dict "@id" (printf "%s#org" site.BaseURL))
-      "locationCreated" (dict "@type" "Place" "name" $p.Params.kunye.yer)
     -}}
+    {{- with $p.Params.kunye.yer }}{{ $cw = merge $cw (dict "locationCreated" (dict "@type" "Place" "name" .)) }}{{ end -}}
     {{- with $p.Params.kunye.proje_yili }}{{ $cw = merge $cw (dict "dateCreated" .) }}{{ end -}}
-    {{- /* Görsel meta verisi: Google "lisanslanabilir görsel" alanlarını ister (creator, license, acquireLicensePage).
-           contentUrl, Google'ın eşleştirmeyi bu adresten yaptığı için sayfada GERÇEKTEN basılan kapak karesidir
-           (hero-picture.html'deki <img src>), sosyal kart kırpımı değil. */ -}}
-    {{- $lisansSayfa := site.GetPage (cond (eq $p.Language.Lang "tr") "/gizlilik" "/privacy") -}}
-    {{- $iletisimSayfa := site.GetPage (cond (eq $p.Language.Lang "tr") "/iletisim" "/contact") -}}
+    {{- /* Görsel meta verisi: contentUrl, Google eşleştirmeyi bu adresten yaptığı için sayfada GERÇEKTEN
+           basılan kapak karesidir (hero-picture.html'deki <img src>), sosyal kart kırpımı değil. */ -}}
     {{- with .hero }}{{ with .fallback -}}
-      {{- $img := dict
-        "@type" "ImageObject"
-        "contentUrl" .Permalink
-        "creditText" $brand
-        "copyrightNotice" (printf "© %s" $brand)
-        "creator" (dict "@type" "Organization" "@id" (printf "%s#org" site.BaseURL) "name" $brand)
-        "copyrightHolder" (dict "@id" (printf "%s#org" site.BaseURL))
-      -}}
-      {{- with $p.Params.cover_alt }}{{ $img = merge $img (dict "name" .) }}{{ end -}}
-      {{- with $lisansSayfa }}{{ $img = merge $img (dict "license" (printf "%s#%s" .Permalink (cond (eq $p.Language.Lang "tr") "gorsel-haklari" "image-rights"))) }}{{ end -}}
-      {{- with $iletisimSayfa }}{{ $img = merge $img (dict "acquireLicensePage" .Permalink) }}{{ end -}}
-      {{- $cw = merge $cw (dict "image" $img) -}}
+      {{- $cw = merge $cw (dict "image" (partial "gorsel-nesnesi.html" (dict "url" .Permalink "alt" ($p.Params.cover_alt | default "") "lang" $p.Language.Lang))) -}}
     {{- end }}{{ end -}}
     {{- $graph = $graph | append $cw -}}
-  {{- else if eq $p.Params.pagekind "contact" -}}
-    {{- $graph = $graph | append $org -}}
+  {{- else if and (eq $p.Type "haber") (not $p.IsSection) -}}
+    {{- /* Haber: Article ailesinden BlogPosting; yazar ve yayıncı stüdyonun kendisi */ -}}
+    {{- $art := dict
+      "@type" "BlogPosting"
+      "headline" ($p.Title | truncate 110)
+      "description" .desc
+      "url" $p.Permalink
+      "mainEntityOfPage" (dict "@type" "WebPage" "@id" $p.Permalink)
+      "inLanguage" $p.Language.Lang
+      "datePublished" ($p.Date.Format "2006-01-02T15:04:05Z07:00")
+      "dateModified" ($p.Lastmod.Format "2006-01-02T15:04:05Z07:00")
+      "author" (dict "@id" (printf "%s#org" site.BaseURL))
+      "publisher" (dict "@id" (printf "%s#org" site.BaseURL))
+      "copyrightHolder" (dict "@id" (printf "%s#org" site.BaseURL))
+    -}}
+    {{- with $p.Params.kategori }}{{ $art = merge $art (dict "articleSection" .) }}{{ end -}}
+    {{- with .haberKapak -}}
+      {{- $k := partial "haber-kapak.html" . -}}
+      {{- $art = merge $art (dict "image" (partial "gorsel-nesnesi.html" (dict "url" $k.fallback.Permalink "alt" ($p.Params.cover_alt | default "") "lang" $p.Language.Lang))) -}}
+    {{- end -}}
+    {{- $graph = $graph | append $art -}}
   {{- end -}}
 {{- end -}}
 <script type="application/ld+json">{{ (dict "@context" "https://schema.org" "@graph" $graph) | jsonify (dict "noHTMLEscape" true) | safeJS }}</script>

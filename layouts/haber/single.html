@@ -21,13 +21,11 @@
     </div>
 
     {{- with $cover }}
-    {{- $w1 := .Resize "600x webp q82" -}}
-    {{- $w2 := .Resize "900x webp q82" -}}
-    {{- $fb := .Resize "700x jpg" -}}
+    {{- $k := partial "haber-kapak.html" . -}}
     <figure class="news-figure{{ if $.Params.gorsel_tam }} is-tam{{ end }}">
       <picture>
-        <source type="image/webp" srcset="{{ $w1.RelPermalink }} 600w, {{ $w2.RelPermalink }} 900w" sizes="(min-width: 861px) 42vw, 100vw">
-        <img src="{{ $fb.RelPermalink }}" width="{{ $fb.Width }}" height="{{ $fb.Height }}" alt="{{ $.Params.cover_alt | default $.Title }}" fetchpriority="high">
+        <source type="image/webp" srcset="{{ $k.srcset }}" sizes="{{ $k.sizes }}">
+        <img src="{{ $k.fallback.RelPermalink }}" width="{{ $k.fallback.Width }}" height="{{ $k.fallback.Height }}" alt="{{ $.Params.cover_alt | default $.Title }}" fetchpriority="high">
       </picture>
     </figure>
     {{- end }}
@@ -48,7 +46,7 @@
           <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="haber" data-alt="{{ $it.alt }}"{{ with $it.caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $it.alt }}">
             <picture>
               <source type="image/webp" srcset="{{ $t1.RelPermalink }} 240w, {{ $t2.RelPermalink }} 480w" sizes="(min-width: 1024px) 220px, (min-width: 640px) 25vw, 33vw">
-              <img src="{{ $tf.RelPermalink }}" width="240" height="240" alt="" loading="lazy" decoding="async">
+              <img src="{{ $tf.RelPermalink }}" width="240" height="240" alt="{{ $it.alt }}" loading="lazy" decoding="async">
             </picture>
           </a>
         </li>
