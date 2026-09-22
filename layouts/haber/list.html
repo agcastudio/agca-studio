@@ -9,7 +9,7 @@
     {{- $img := partial "haber-img.html" $h -}}
     <li class="card news-card">
       <a href="{{ $h.RelPermalink }}">
-        <div class="card-media">
+        <div class="card-media{{ if $h.Params.gorsel_belge }} is-belge{{ end }}">
           {{- with $img }}
           {{- $set := slice -}}
           {{- range $w := slice 480 720 960 1200 -}}

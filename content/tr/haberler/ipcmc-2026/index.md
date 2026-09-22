@@ -11,6 +11,7 @@ ozet: "Kutbeddin Ağca, 16-18 Ekim 2026'da Gaziantep'te düzenlenecek kongrede, 
 link: "https://2026.ipcmc.com/"
 link_label: "Kongre sayfası"
 gorsel_tam: true
+gorsel_belge: true
 cover: "ipcmc-logo.jpg"
 cover_alt: "IPCMC 2026 logosu: mavi ve mor tonlarda dört kollu yıldız simgesi, yanında kongrenin adı ve alt satırda açılımı"
 ---

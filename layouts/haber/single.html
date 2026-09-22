@@ -22,7 +22,7 @@
 
     {{- with $cover }}
     {{- $k := partial "haber-kapak.html" . -}}
-    <figure class="news-figure{{ if $.Params.gorsel_tam }} is-tam{{ end }}">
+    <figure class="news-figure{{ if $.Params.gorsel_tam }} is-tam{{ end }}{{ if $.Params.gorsel_belge }} is-belge{{ end }}">
       <picture>
         <source type="image/webp" srcset="{{ $k.srcset }}" sizes="{{ $k.sizes }}">
         <img src="{{ $k.fallback.RelPermalink }}" width="{{ $k.fallback.Width }}" height="{{ $k.fallback.Height }}" alt="{{ $.Params.cover_alt | default $.Title }}" fetchpriority="high">

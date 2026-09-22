@@ -23,6 +23,7 @@
   --muted: #6f6f6f;
   --line: #e7e7e7;
   --soft: #f4f4f4;
+  --paper: #f7f5f2;   /* metin/belge görsellerinin çok açık zemini */
   --accent: #F4A888;
   --accent-ink: #b35a36; /* somon ailesi, beyazda 4,7:1 (metin için yeterli) */
   --wrap: 1440px;
@@ -297,15 +298,38 @@ body .glightbox-container.is-zoomed, .glightbox-container.is-zoomed .gslide-imag
 .footer-contact a, .footer-legal a, .nav-lang a { display: inline-block; padding: 4px 6px; margin: -4px -6px; }
 .footer-legal { grid-column: 1 / -1; font-size: 12px; margin: 2px 0 0; }
 /* dar ekranda da bağlantılar sağda kalsın */
-@media (max-width: 640px) { .footer-grid { grid-template-columns: 1fr auto; gap: 10px 16px; } }
+@media (max-width: 640px) {
+  .site-footer { margin-top: 30px; }
+  .footer-grid { grid-template-columns: 1fr auto; gap: 10px 16px; padding: 24px 0 18px; }
+}
 
 /* --- haberler --- */
 /* haber kartları proje kartlarıyla aynı ızgarayı kullanır; tarih üstte, başlık altta */
-.news-grid { gap: 36px 24px; }
+.news-grid { gap: 30px 24px; }
+/* haber kartı: ince çerçeve ve yumuşak gölgeyle sayfa zemininden kopar */
+.news-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(17, 17, 17, .04), 0 10px 26px -16px rgba(17, 17, 17, .30);
+  transition: box-shadow var(--t) var(--ease), transform var(--t) var(--ease), border-color var(--t);
+}
+.news-card a { height: 100%; display: flex; flex-direction: column; }
 .news-card .card-meta { letter-spacing: .08em; text-transform: uppercase; font-size: 11.5px; }
 .news-card .card-title { font-size: 17px; line-height: 1.35; letter-spacing: -0.01em; transition: color var(--t); }
-.news-card .card-text { gap: 6px; padding-top: 14px; }
+.news-card .card-text { gap: 6px; padding: 14px 16px 16px; }
+.news-card:hover, .news-card:focus-within {
+  transform: translateY(-2px);
+  border-color: #dcdcdc;
+  box-shadow: 0 2px 6px rgba(17, 17, 17, .06), 0 18px 34px -18px rgba(17, 17, 17, .34);
+}
+@media (prefers-reduced-motion: reduce) { .news-card:hover, .news-card:focus-within { transform: none; } }
 .news-card a:hover .card-title { color: var(--accent-ink); }
+/* metin taşıyan görseller (seminer logosu, tez kapağı): çok açık zemin, kırpmadan ortalanır */
+.card-media.is-belge { background: var(--paper); }
+.card-media.is-belge img { object-fit: contain; padding: 16px; }
+.card a:hover .card-media.is-belge img { transform: none; }
 @media (max-width: 860px) { .news-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) { .news-grid { grid-template-columns: 1fr; gap: 30px; } }
 /* haber sayfası */
@@ -324,6 +348,8 @@ body .glightbox-container.is-zoomed, .glightbox-container.is-zoomed .gslide-imag
 /* kırpılmaması gereken görseller (dergi, logo) kendi oranında durur */
 .news-figure.is-tam { position: static; align-self: start; min-height: 0; }
 .news-figure.is-tam img { position: static; height: auto; object-fit: contain; }
+.news-figure.is-belge { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; }
+.news-figure.is-belge img { object-fit: contain; padding: 20px; background: none; }
 @media (max-width: 860px) {
   .news-main { grid-template-columns: 1fr; gap: 22px; }
   .news-figure { order: -1; position: static; align-self: start; min-height: 0; }

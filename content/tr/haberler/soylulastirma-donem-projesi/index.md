@@ -10,6 +10,7 @@ description: "Selen Baş Ağca'nın yüksek lisans çalışması, kentsel projel
 ozet: "Selen Baş Ağca'nın Yıldız Teknik Üniversitesi'nde hazırladığı çalışma, kentsel projelerin yarattığı soylulaştırma riskini ölçmenin yollarını derliyor."
 belge: "/belgeler/soylulastirma-riski-donem-projesi-selen-bas-agca-2026.pdf"
 belge_label: "Çalışmayı oku (PDF)"
+gorsel_belge: true
 cover: "kapak.jpg"
 cover_alt: "Çalışmanın kapak sayfası: Yıldız Teknik Üniversitesi künyesi, 'Kentsel Projelerde Soylulaştırma Riskinin Değerlendirilmesi: Sistematik Literatür Taraması' başlığı, yazar ve danışman adları"
 images:

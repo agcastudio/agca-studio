@@ -11,6 +11,7 @@ ozet: "Kutbeddin Ağca will speak at the conference in Gaziantep on 16-18 Octobe
 link: "https://2026.ipcmc.com/"
 link_label: "Conference website"
 gorsel_tam: true
+gorsel_belge: true
 cover: "ipcmc-logo.jpg"
 cover_alt: "The IPCMC 2026 logo: a four-pointed star mark in blue and violet beside the name of the conference and its full title below"
 ---
