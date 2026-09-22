@@ -17,6 +17,6 @@ cover_alt: "The IPCMC 2026 logo: a four-pointed star mark in blue and violet bes
 ---
 Kutbeddin Ağca will present a paper at the 9th International Project and Construction Management Conference, meeting in Gaziantep on 16-18 October 2026 and hosted by Hasan Kalyoncu University. This year's theme is rethinking the built environment through artificial intelligence.
 
-The paper, written with Almula Köksal, examines how social acceptance of a megaproject shifts over its life, taking Istanbul Airport as its case. Some 141,336 Turkish-language posts from 2010 to 2026 are classified with the help of a large language model across four phases: announcement, tender, construction and operation.
+The paper, written with Prof. Dr. Almula Köksal, examines how social acceptance of a megaproject shifts over its life, taking Istanbul Airport as its case. Some 141,336 Turkish-language posts from 2010 to 2026 are classified with the help of a large language model across four phases: announcement, tender, construction and operation.
 
 The finding is that acceptance does not mature along a straight line: it is at its most negative at announcement, turns to support at tender, slips back during construction and recovers in operation.
