@@ -29,6 +29,8 @@ card_alt: "Oyuk: white rendered corner facade with timber shutters on Kurşunlu 
 credits: "Design and visualisation: agca·studio"
 ozet: |
   An entry to the national architectural competition for the Social, Cultural and Administrative Services Building opened by Muğla Metropolitan Municipality in 2026, on a plot on Kurşunlu Street in Menteşe. The building completes the missing link in the city's cultural route of bazaar, han and mosque courtyard with a public void carved from the street into the block. That void is a festival courtyard open at all hours; the stage, workshops, library and café gather around it. The volume is white and quiet, like the limewashed houses of Menteşe; the only moving element of the facade is a set of timber shutters that open and close with the sun. The floors rise from the sound of the street to the quiet of the offices: courtyard and flexible hall at ground level, workshops on the first floor, a library with an inner garden on the second, administration and a terrace facing the square on the third. The total built area is 4,130 m².
+
+  For the submitted panels see the [competition entry](/en/news/oyuk-yarisma/), and for the 25-page printed account of the project the [magazine](/en/news/oyuk-dergi/).
 images:
   - file: "r-1-huzmeli.jpg"
     alt: "Festival courtyard: daylight filtering from above, galleries on both sides, potted trees and people walking"

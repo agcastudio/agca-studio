@@ -1,3 +1,6 @@
+# DİKKAT: Alttaki satır TAM EŞLEŞMEDİR; /tr/* biçimine ÇEVİRMEYİN.
+# Cloudflare yönlendirmeleri varlıklardan önce çalışır; joker yapılırsa /tr/sitemap.xml de
+# 301'e gider ve Türkçe site haritasındaki 22 adres kaybolur.
 /tr/ / 301
 
 # Eski Webflow sitesinin dizinde kalan adresleri (2026-09-22 doğrulandı: hepsi 404 dönüyordu).

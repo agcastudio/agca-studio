@@ -29,6 +29,8 @@ card_alt: "Oyuk: beyaz sıvalı köşe cephesi ve ahşap kepenkler, Kurşunlu Ca
 credits: "Tasarım ve görselleştirme: agca·studio"
 ozet: |
   Muğla Büyükşehir Belediyesi'nin 2026'da açtığı Sosyal, Kültürel ve İdari Hizmetler Binası ulusal mimari proje yarışması için Menteşe'de, Kurşunlu Caddesi üzerindeki parsele hazırlanan öneri. Yapı, kentin arasta, han ve cami avlusundan oluşan kültür rotasındaki eksik halkayı, caddeden avluya oyulan bir kamusal boşlukla tamamlar. Bu boşluk her saat açık bir festival avlusudur; sahne, atölyeler, kütüphane ve kafe onun çevresinde kümelenir. Kütle, Menteşe'nin badanalı evleri gibi beyaz ve sessizdir; cephenin tek hareketli öğesi güneşe göre açılıp kapanan ahşap kepenklerdir. Kat kurgusu sokağın sesinden idarenin sessizliğine doğru yükselir: zeminde avlu ve esnek salon, birinci katta atölyeler, ikinci katta iç bahçeli kütüphane, üçüncü katta idare ve meydana bakan teras. Toplam inşaat alanı 4.130 m²'dir.
+
+  Yarışmaya teslim edilen paftalar için [yarışma haberine](/haberler/oyuk-yarisma/), projenin 25 sayfalık basılı anlatımı için [dergi haberine](/haberler/oyuk-dergi/) bakabilirsiniz.
 images:
   - file: "r-1-huzmeli.jpg"
     alt: "Festival avlusu: tepeden süzülen gün ışığı, iki yanda galeriler, saksı ağaçları ve yürüyen insanlar"

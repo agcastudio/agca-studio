@@ -29,6 +29,8 @@ card_alt: "Bodrum Hidroterapi Merkezi kuş bakışı: beyaz bloklar, avlular ve 
 credits: "Tasarım ve görselleştirme: agca·studio"
 ozet: |
   Bodrum'da çam ağaçları arasında bir fizyoterapi ve hidroterapi merkezi için hazırlanan yarışma projesi. Yapı, beyaz prizmalardan oluşan alçak iki blok ve bunları birleştiren bir köprü katıyla kurulur; bloklar arasındaki avludan girilir. Zemin katta dört yanı kolon dizili hidroterapi havuzu, soyunma ve tedavi odaları, çakıl avlusuna açılan ahşap sauna ve ayrı kanatta kafe bulunur. Birinci katta üç yanı kolonlar arası camla çevrili fizyoterapi salonu ile iç avlu çevresine dizilen tedavi odaları ve ofisler yer alır; kısmi ikinci kat ofis ve toplantı odalarına ayrılır. Bodrum kat rampalı otoparkı ve teknik hacimleri taşır. Havuz ve salonların kaset tavanları, kolon dizileriyle birlikte yapının dilini kurar. İki asansör çekirdeği, havuza inen rampa ve kot farksız avlu girişiyle dolaşım tekerlekli sandalye kullanıcıları için düz ve geniş tutulur. Bodrum, zemin ve iki normal katın planları, kesitler ve görünüşler tek modelden üretildi.
+
+  Yarışmanın takvimi, jürisi ve teslim edilen paftalar için [yarışma haberine](/haberler/bodrum-yarismasi/) bakabilirsiniz.
 images:
   - file: "r-bsvfhm-kapak-duzeltilmis-lightroom-sm10.jpg"
     alt: "Ön cephe: üst katta kolon dizili fizyoterapi salonu ve altında düşey çıtalı perde, duvarda yapı adı yazısı, iki blok arasındaki geçit; önde taş döşeli avlu, solda çim ve çamlar"

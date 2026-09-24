@@ -29,6 +29,8 @@ card_alt: "Bodrum Hydrotherapy Centre from above: white blocks, courtyards and p
 credits: "Design and visualisation: agca·studio"
 ozet: |
   A competition entry for a physiotherapy and hydrotherapy centre among pine trees in Bodrum. The building is composed of two low blocks of white prisms and a bridge floor joining them; it is entered from the courtyard between the blocks. The ground floor holds the hydrotherapy pool with columns on all four sides, changing and treatment rooms, a timber sauna opening onto a gravel courtyard and a café in a separate wing. The first floor holds the physiotherapy hall, glazed between columns on three sides, with treatment rooms and offices arranged around the inner courtyard; a partial second floor is given to offices and meeting rooms. The basement carries the car park with its ramp and the technical rooms. The coffered ceilings of the pool and the halls, together with the colonnades, set the language of the building. Two lift cores, a ramp into the pool and a level courtyard entrance keep circulation flat and wide for wheelchair users. Plans of the basement, ground and two upper floors, sections and elevations were produced from a single model.
+
+  For the competition timetable, the jury and the submitted panels see the [competition entry](/en/news/bodrum-yarismasi/).
 images:
   - file: "r-bsvfhm-kapak-duzeltilmis-lightroom-sm10.jpg"
     alt: "Front facade: the colonnaded physiotherapy hall on the upper floor above a screen of vertical slats, the building's name lettered on the wall and the passage between the two blocks; a paved forecourt in front, lawn and pines to the left"
