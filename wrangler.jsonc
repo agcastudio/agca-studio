@@ -3,10 +3,10 @@
   // Cloudflare panelinde: Build command = hugo --gc --minify · Deploy command = npx wrangler deploy · HUGO_VERSION = 0.166.0
   "name": "agca-studio",
   "compatibility_date": "2026-09-01",
-  // NOT (2026-09-24): "workers_dev": false ve "preview_urls": false denendi; dağıtım tamamlanmadı
-  // (40 dakika sonunda yeni sürüm yayına girmedi, site eski sürümü sunmaya devam etti). Geri alındı.
-  // workers.dev kopyası şimdilik Cloudflare panelinden kapatılmalı:
-  // Workers & Pages > agca-studio > Settings > Domains & Routes > workers.dev satırını devre dışı bırak.
+  // workers.dev kopya ana makinesi kapalı. Panelden kapatmak KALICI DEĞİL: bu alan yokken
+  // "wrangler deploy" her dağıtımda workers.dev rotasını yeniden açıyor (2026-09-24 ölçüldü).
+  // Not: "preview_urls" alanı da denendi, dağıtım tamamlanmadı; o yüzden yalnız bu alan kullanılıyor.
+  "workers_dev": false,
   "assets": {
     "directory": "./public",
     "not_found_handling": "404-page",
