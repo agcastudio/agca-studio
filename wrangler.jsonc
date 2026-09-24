@@ -3,11 +3,10 @@
   // Cloudflare panelinde: Build command = hugo --gc --minify · Deploy command = npx wrangler deploy · HUGO_VERSION = 0.166.0
   "name": "agca-studio",
   "compatibility_date": "2026-09-01",
-  // Kopya ana makine olmasın diye: site yalnız agca.studio özel alan adından sunulur.
-  // workers.dev ve sürüm önizleme adresleri sitenin birebir kopyasını sunuyordu; Google
-  // "Kopya, farklı standart sayfa seçildi" uyarısı verdi (2026-09-24).
-  "workers_dev": false,
-  "preview_urls": false,
+  // NOT (2026-09-24): "workers_dev": false ve "preview_urls": false denendi; dağıtım tamamlanmadı
+  // (40 dakika sonunda yeni sürüm yayına girmedi, site eski sürümü sunmaya devam etti). Geri alındı.
+  // workers.dev kopyası şimdilik Cloudflare panelinden kapatılmalı:
+  // Workers & Pages > agca-studio > Settings > Domains & Routes > workers.dev satırını devre dışı bırak.
   "assets": {
     "directory": "./public",
     "not_found_handling": "404-page",

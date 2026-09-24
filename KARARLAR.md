@@ -171,6 +171,7 @@ Keşif anketi: `../00_KESIF_SORULARI.md`. Cevaplar 19 Eylül 2026'da alındı.
 | 2026-09-24 | 27 | İç bağlantı: Oyuk ve Bodrum proje özetlerinden ilgili haberlere (yarışma teslimi, dergi) karşılıklı bağlantı verildi. Türkçe iletişim sayfasının gövdesi boştu — İngilizcesinde olan projeler/haberler cümlesi Türkçesine de eklendi (22 Eylül'deki toplu düzenlemede atlanmıştı). | Denetim akışı |
 | 2026-09-24 | 19 | `static/_redirects` başına uyarı yorumu: `/tr/` satırı tam eşleşmedir, joker (`/tr/*`) yapılırsa `/tr/sitemap.xml` de yönlenir ve Türkçe site haritasındaki 22 adres kaybolur. | Denetim akışı |
 | 2026-09-24 | 15 | **Elenen öneriler:** eğik çizgisiz adresleri 307 yerine 301 yapmak için `_redirects`e 44 satır yazmak (Google belgesi: diğer standartlaştırma sinyalleri — 44 sayfanın canonical'ı, site haritasının tamamı, site içi bağlantıların hepsi — zaten eğik çizgili adresi gösteriyor, 307 dizine eklemeyi engellemiyor); `enableGitInfo` ile site haritası lastmod'u (sığ klon sorunu, kazanç yok); yönlendiren adresler için dizine ekleme isteği (Google bunu istemiyor). | Karar |
+| 2026-09-24 | 30 | **`workers_dev`/`preview_urls` denemesi geri alındı.** `wrangler.jsonc`'a eklendikten sonra dağıtım 40 dakika boyunca tamamlanmadı; canlı site eski sürümü sunmaya devam etti (başarısız dağıtım siteyi bozmadı). Yerelde Node olmadığı için `wrangler deploy --dry-run` ile doğrulanamadı. İki satır kaldırıldı, gerekçe dosyaya yorum olarak yazıldı. workers.dev kopyası şimdilik **panelden** kapatılacak. | Olay |
 
 ## Bekleyen bilgiler (kullanıcıdan)
 
