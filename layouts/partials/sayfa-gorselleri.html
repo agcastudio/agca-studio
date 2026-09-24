@@ -1,0 +1,22 @@
+{{- /* Sayfanın görsel site haritasına girecek tam çözünürlüklü görselleri: mutlak adres dizisi döner.
+       Proje ve haber sayfalarında kapak + galeri; diğer sayfalarda boş. */ -}}
+{{- $p := . -}}
+{{- $out := slice -}}
+{{- $slug := $p.Params.slug -}}
+{{- $klasor := "" -}}
+{{- if and (eq $p.Type "proje") (not $p.IsSection) }}{{ $klasor = printf "projeler/%s" $slug }}{{ end -}}
+{{- if and (eq $p.Type "haber") (not $p.IsSection) }}{{ $klasor = printf "haberler/%s" $slug }}{{ end -}}
+{{- with $klasor -}}
+  {{- $dizin := . -}}
+  {{- $dosyalar := slice -}}
+  {{- with $p.Params.cover }}{{ $dosyalar = $dosyalar | append . }}{{ end -}}
+  {{- range $p.Params.images }}{{ $dosyalar = $dosyalar | append .file }}{{ end -}}
+  {{- range $p.Params.drawings }}{{ $dosyalar = $dosyalar | append .file }}{{ end -}}
+  {{- range $p.Params.diagrams }}{{ $dosyalar = $dosyalar | append .file }}{{ end -}}
+  {{- range (uniq $dosyalar) -}}
+    {{- with resources.Get (printf "%s/%s" $dizin .) -}}
+      {{- $out = $out | append (partial "lightbox-src.html" .).Permalink -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return (uniq $out) -}}
