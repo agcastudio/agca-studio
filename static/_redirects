@@ -16,5 +16,7 @@
 # 2026-09-24, Search Console performans dışa aktarımından: hâlâ gösterim alan eski adresler.
 /projects/kc-showroom /projeler/kc-yangin-showroom/ 301
 /projects/gorele-konutlari /projeler/gorele-daire/ 301
-# Karşılığı olmayan eski adresler bilerek 404 bırakıldı (Google site taşıma belgesi):
-#   /projects/sb-kolektif, /projects/emekapartmani
+# 2026-09-24, kullanıcı eşleştirdi (eski Webflow proje adları):
+/projects/emekapartmani /projeler/kordonboyu/ 301
+/projects/sb-kolektif /projeler/ciftlik-evi/ 301
+/projects/nazevi /projeler/ayazaga-ic-mimari/ 301
