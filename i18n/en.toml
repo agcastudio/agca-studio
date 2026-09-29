@@ -85,6 +85,10 @@ other = "Diagrams"
 other = "Credits"
 [virtual_tour]
 other = "Virtual tour"
+[hero_pause]
+other = "Pause the slideshow"
+[hero_play]
+other = "Play the slideshow"
 [prev_project]
 other = "Previous project"
 [next_project]

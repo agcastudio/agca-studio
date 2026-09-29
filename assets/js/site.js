@@ -55,21 +55,47 @@
     if (slides.length > 1) {
       var current = 0, timer = null;
       var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      /* Sonraki karenin görseli, geçişten önce indirilsin; yoksa kare bir an boş kalır. */
+      var onYukle = function (n) {
+        var s = slides[(n + slides.length) % slides.length];
+        if (!s) return;
+        var im = s.querySelector("img");
+        if (im && im.loading === "lazy") { im.loading = "eager"; }
+      };
       var show = function (n) {
         current = (n + slides.length) % slides.length;
         slides.forEach(function (s, i) {
           var on = i === current;
           s.classList.toggle("is-active", on);
           s.setAttribute("aria-hidden", on ? "false" : "true");
-          if (on) s.removeAttribute("tabindex"); else s.setAttribute("tabindex", "-1");
+          /* gizli kare odak almasın: inert, tabindex'ten güvenli */
+          if (on) { s.removeAttribute("tabindex"); s.removeAttribute("inert"); }
+          else { s.setAttribute("tabindex", "-1"); s.setAttribute("inert", ""); }
         });
+        onYukle(current + 1);
         dots.forEach(function (d, i) {
           d.classList.toggle("is-active", i === current);
           if (i === current) d.setAttribute("aria-current", "true"); else d.removeAttribute("aria-current");
         });
       };
-      var start = function () { if (!reduce && !timer) timer = setInterval(function () { show(current + 1); }, 6000); };
-      var stop = function () { if (timer) { clearInterval(timer); timer = null; } };
+      var toggle = hero.querySelector("[data-hero-toggle]");
+      /* duraklatma kullanıcı tercihidir: elle durdurulduysa odak/sekme dönüşünde yeniden başlamaz */
+      var elleDurdu = reduce;
+      var durumYaz = function () {
+        if (!toggle) return;
+        var duruyor = !timer;
+        hero.classList.toggle("is-paused", duruyor);
+        toggle.setAttribute("aria-label", toggle.getAttribute(duruyor ? "data-label-play" : "data-label-pause") || "");
+        toggle.setAttribute("aria-pressed", duruyor ? "true" : "false");
+      };
+      var start = function () { if (!elleDurdu && !timer) timer = setInterval(function () { show(current + 1); }, 6000); durumYaz(); };
+      var stop = function () { if (timer) { clearInterval(timer); timer = null; } durumYaz(); };
+      if (toggle) {
+        toggle.addEventListener("click", function () {
+          if (timer) { elleDurdu = true; stop(); }
+          else { elleDurdu = false; start(); }
+        });
+      }
       arrows.forEach(function (a) {
         a.addEventListener("click", function () { stop(); show(current + (parseInt(a.getAttribute("data-dir"), 10) || 1)); start(); });
       });
@@ -77,9 +103,10 @@
         if (e.key === "ArrowLeft") { stop(); show(current - 1); start(); }
         if (e.key === "ArrowRight") { stop(); show(current + 1); start(); }
       });
-      hero.addEventListener("focusin", stop);
+      hero.addEventListener("focusin", function () { if (timer) { clearInterval(timer); timer = null; durumYaz(); } });
       hero.addEventListener("focusout", start);
       document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); else start(); });
+      onYukle(1);
       start();
     }
   }

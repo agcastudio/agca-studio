@@ -11,6 +11,7 @@ ozet: "Selen Baş Ağca'nın Yıldız Teknik Üniversitesi'nde hazırladığı �
 belge: "/belgeler/soylulastirma-riski-donem-projesi-selen-bas-agca-2026.pdf"
 belge_label: "Çalışmayı oku (PDF)"
 gorsel_belge: true
+gorsel_sahip: "Selen Baş Ağca"
 cover: "kapak.jpg"
 cover_alt: "Çalışmanın kapak sayfası: Yıldız Teknik Üniversitesi künyesi, 'Kentsel Projelerde Soylulaştırma Riskinin Değerlendirilmesi: Sistematik Literatür Taraması' başlığı, yazar ve danışman adları"
 images:

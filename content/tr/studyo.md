@@ -9,7 +9,7 @@ people:
     role: "Kurucu Ortak · Mimar"
     photo: "sb.jpg"
     linkedin: "https://www.linkedin.com/in/selen-bas-agca/"
-    bio: "Kentsel dönüşümü yalnızca bir yapı süreci değil, bir kent meselesi olarak ele alır. Yıldız Teknik Üniversitesi Mimarlık mezunu; on yılı aşkın süredir kentsel dönüşüm ve ruhsat projelerinde çalışıyor. Süreç takibinde, müteahhit ile mal sahibi arasındaki dengeyi kurmakta deneyimli. İnşaat projelerinin soylulaştırma üzerindeki etkilerini araştırdığı yüksek lisans teziyle, yapının sosyal etkisini işin merkezine koyar. Yarışma projelerinde stüdyonun kentsel okumasını ve program kurgusunu üstlenir."
+    bio: "Kentsel dönüşümü yalnızca bir yapı süreci değil, bir kent meselesi olarak ele alır. Yıldız Teknik Üniversitesi Mimarlık mezunu; on yılı aşkın süredir kentsel dönüşüm ve ruhsat projelerinde çalışıyor. Süreç takibinde, müteahhit ile mal sahibi arasındaki dengeyi kurmakta deneyimli. İnşaat projelerinin soylulaştırma üzerindeki etkilerini araştırdığı yüksek lisans dönem projesiyle, yapının sosyal etkisini işin merkezine koyar. Yarışma projelerinde stüdyonun kentsel okumasını ve program kurgusunu üstlenir."
   - name: "Kutbeddin Ağca"
     role: "Kurucu Ortak · Mimar"
     photo: "ka-web.jpg"

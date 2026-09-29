@@ -11,4 +11,4 @@
 {{- if not $set }}{{ $set = $set | append (printf "%s %dw" ($img.Resize (printf "%dx webp q82" $img.Width)).RelPermalink $img.Width) }}{{ end -}}
 {{- $fbw := 700 -}}
 {{- if lt $img.Width $fbw }}{{ $fbw = $img.Width }}{{ end -}}
-{{- return (dict "srcset" (delimit $set ", ") "fallback" ($img.Resize (printf "%dx jpg" $fbw)) "sizes" "(min-width: 861px) 42vw, calc(100vw - 32px)") -}}
+{{- return (dict "srcset" (delimit $set ", ") "fallback" ($img.Resize (printf "%dx jpg" $fbw)) "sizes" "(min-width: 1440px) 605px, (min-width: 861px) 43vw, calc(100vw - 32px)") -}}

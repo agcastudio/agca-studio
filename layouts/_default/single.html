@@ -7,7 +7,7 @@
   </header>
   {{- with $hero }}
   <div class="project-cover">
-    {{ partial "hero-picture.html" (dict "hero" . "alt" $.Params.hero_alt) }}
+    {{ partial "hero-picture.html" (dict "hero" . "alt" $.Params.hero_alt "sizes" "(min-width: 1440px) 1392px, calc(100vw - 48px)") }}
   </div>
   {{- end }}
   <div class="wrap page-body{{ if eq .Params.pagekind "contact" }} contact{{ end }}">

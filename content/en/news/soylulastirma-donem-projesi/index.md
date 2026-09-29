@@ -11,6 +11,7 @@ ozet: "Selen Baş Ağca's study at Yıldız Technical University gathers the way
 belge: "/belgeler/soylulastirma-riski-donem-projesi-selen-bas-agca-2026.pdf"
 belge_label: "Read the study (PDF, Turkish)"
 gorsel_belge: true
+gorsel_sahip: "Selen Baş Ağca"
 cover: "kapak.jpg"
 cover_alt: "The cover page of the study: the Yıldız Technical University imprint, the title 'Assessing the Risk of Gentrification in Urban Projects: A Systematic Literature Review', the author and the supervisor"
 images:

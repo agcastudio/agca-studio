@@ -9,7 +9,7 @@ people:
     role: "Founding Partner · Architect"
     photo: "sb.jpg"
     linkedin: "https://www.linkedin.com/in/selen-bas-agca/"
-    bio: "Treats urban regeneration as a matter of the city, not only of construction. A graduate of the architecture programme at Yıldız Technical University, she has worked on urban regeneration and permit projects for more than ten years, and is experienced in steering the process between contractor and owner. Her master's thesis on the effects of construction projects on gentrification keeps the social impact of building at the centre of her work. In competitions she leads the studio's reading of the city and the shaping of the programme."
+    bio: "Treats urban regeneration as a matter of the city, not only of construction. A graduate of the architecture programme at Yıldız Technical University, she has worked on urban regeneration and permit projects for more than ten years, and is experienced in steering the process between contractor and owner. Her postgraduate term project on the effects of construction projects on gentrification keeps the social impact of building at the centre of her work. In competitions she leads the studio's reading of the city and the shaping of the programme."
   - name: "Kutbeddin Ağca"
     role: "Founding Partner · Architect"
     photo: "ka-web.jpg"

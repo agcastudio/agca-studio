@@ -115,15 +115,26 @@ main:focus { outline: none; }
 .hero-slide { position: absolute; inset: 0; display: block; color: #fff; opacity: 0; visibility: hidden; transition: opacity 1000ms var(--ease), visibility 0s 1000ms; }
 .hero-slide.is-active { opacity: 1; visibility: visible; transition: opacity 1000ms var(--ease), visibility 0s; }
 .hero-slide img, .hero-slide picture { width: 100%; height: 100%; object-fit: cover; }
-.hero-slide::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 140px; background: linear-gradient(transparent, rgba(0,0,0,.5)); pointer-events: none; }
+.hero-slide::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 180px; background: linear-gradient(transparent, rgba(0,0,0,.72)); pointer-events: none; }
 .hero-slide:hover { color: #fff; }
 .hero-slide:hover .hero-caption { text-decoration: underline; text-underline-offset: 4px; }
 .hero-slide:focus-visible { outline-offset: -4px; }
-.hero-caption { position: absolute; z-index: 1; left: var(--gutter); bottom: 18px; padding: 6px 0; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #fff; }
+.hero-caption { position: absolute; z-index: 1; left: var(--gutter); bottom: 18px; padding: 6px 0; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.85); }
 /* oklar saydam zeminde; açık görsellerde okunsun diye hafif gölge */
-.hero-arrow { position: absolute; z-index: 2; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; display: grid; place-items: center; color: #fff; background: none; border-radius: 50%; opacity: .85; filter: drop-shadow(0 1px 4px rgba(0,0,0,.5)); transition: opacity var(--t); }
+.hero-arrow { position: absolute; z-index: 2; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; display: grid; place-items: center; color: #fff; background: none; border-radius: 50%; opacity: .95; filter: drop-shadow(0 1px 2px rgba(0,0,0,.9)) drop-shadow(0 0 6px rgba(0,0,0,.6)); transition: opacity var(--t); }
 .hero-arrow:hover { opacity: 1; }
 .hero-arrow:focus-visible { outline-color: #fff; opacity: 1; }
+/* durdur/oynat: saydam zemin, güçlü gölge (kullanıcı kararı: okların arkası saydam) */
+.hero-play {
+  position: absolute; right: 16px; bottom: 16px; z-index: 3;
+  width: 44px; height: 44px; display: grid; place-items: center;
+  background: none; border: 0; color: #fff; cursor: pointer;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .9)) drop-shadow(0 0 6px rgba(0, 0, 0, .6));
+}
+.hero-play:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.hero-icon-play { display: none; }
+.hero.is-paused .hero-icon-play { display: inline; }
+.hero.is-paused .hero-icon-pause { display: none; }
 .hero-arrow-prev { left: var(--gutter); }
 .hero-arrow-next { right: var(--gutter); }
 @media (max-width: 640px) { .hero-arrow { width: 40px; height: 40px; } }
@@ -316,6 +327,8 @@ body .glightbox-container.is-zoomed, .glightbox-container.is-zoomed .gslide-imag
   transition: box-shadow var(--t) var(--ease), transform var(--t) var(--ease), border-color var(--t);
 }
 .news-card a { height: 100%; display: flex; flex-direction: column; }
+/* kartta overflow:hidden var; odak halkası dışarıda kalırsa kırpılır, içeri alındı */
+.news-card a:focus-visible { outline-offset: -3px; }
 .news-card .card-meta { letter-spacing: .08em; text-transform: uppercase; font-size: 11.5px; }
 .news-card .card-title { font-size: 17px; line-height: 1.35; letter-spacing: -0.01em; transition: color var(--t); }
 .news-card .card-text { gap: 6px; padding: 14px 16px 16px; }

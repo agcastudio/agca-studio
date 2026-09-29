@@ -1,9 +1,10 @@
 {{- /* Kapak <picture>: geniş ekranda 3:2 kırpım, dar ekranda özgün oran. Parametreler: hero (dict), alt, lazy (bool: ilk kare değilse) */ -}}
 {{- $h := .hero -}}
+{{- $sizes := .sizes | default "100vw" -}}
 <picture>
   {{- with $h.srcsetWide }}
-  <source type="image/webp" media="(min-width: 900px)" srcset="{{ . }}" sizes="100vw">
+  <source type="image/webp" media="(min-width: 900px)" srcset="{{ . }}" sizes="{{ $sizes }}">
   {{- end }}
-  <source type="image/webp" srcset="{{ $h.srcset }}" sizes="100vw">
+  <source type="image/webp" srcset="{{ $h.srcset }}" sizes="{{ $sizes }}">
   <img src="{{ $h.fallback.RelPermalink }}" width="{{ $h.fallback.Width }}" height="{{ $h.fallback.Height }}" alt="{{ .alt }}"{{ if .lazy }} loading="lazy" decoding="async"{{ else }} fetchpriority="high"{{ end }}>
 </picture>

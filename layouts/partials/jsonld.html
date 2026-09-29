@@ -61,7 +61,7 @@
     {{- $cw := dict
       "@type" "CreativeWork"
       "name" $p.Title
-      "headline" (printf "%s — %s" $p.Title ($p.Params.subtitle | default ""))
+      "headline" (printf "%s — %s" ($p.Title | plainify) ($p.Params.subtitle | default "" | plainify))
       "description" .desc
       "url" $p.Permalink
       "inLanguage" $p.Language.Lang
@@ -73,14 +73,14 @@
     {{- /* Görsel meta verisi: contentUrl, Google eşleştirmeyi bu adresten yaptığı için sayfada GERÇEKTEN
            basılan kapak karesidir (hero-picture.html'deki <img src>), sosyal kart kırpımı değil. */ -}}
     {{- with .hero }}{{ with .fallback -}}
-      {{- $cw = merge $cw (dict "image" (partial "gorsel-nesnesi.html" (dict "url" .Permalink "alt" ($p.Params.cover_alt | default "") "lang" $p.Language.Lang))) -}}
+      {{- $cw = merge $cw (dict "image" (partial "gorsel-nesnesi.html" (dict "url" .Permalink "alt" ($p.Params.cover_alt | default "") "lang" $p.Language.Lang "sahip" ($p.Params.gorsel_sahip | default "")))) -}}
     {{- end }}{{ end -}}
     {{- $graph = $graph | append $cw -}}
   {{- else if and (eq $p.Type "haber") (not $p.IsSection) -}}
     {{- /* Haber: Article ailesinden BlogPosting; yazar ve yayıncı stüdyonun kendisi */ -}}
     {{- $art := dict
       "@type" "BlogPosting"
-      "headline" ($p.Title | truncate 110)
+      "headline" ($p.Title | plainify | truncate 110)
       "description" .desc
       "url" $p.Permalink
       "mainEntityOfPage" (dict "@type" "WebPage" "@id" $p.Permalink)
@@ -94,7 +94,7 @@
     {{- with $p.Params.kategori }}{{ $art = merge $art (dict "articleSection" .) }}{{ end -}}
     {{- with .haberKapak -}}
       {{- $k := partial "haber-kapak.html" . -}}
-      {{- $art = merge $art (dict "image" (partial "gorsel-nesnesi.html" (dict "url" $k.fallback.Permalink "alt" ($p.Params.cover_alt | default "") "lang" $p.Language.Lang))) -}}
+      {{- $art = merge $art (dict "image" (partial "gorsel-nesnesi.html" (dict "url" $k.fallback.Permalink "alt" ($p.Params.cover_alt | default "") "lang" $p.Language.Lang "sahip" ($p.Params.gorsel_sahip | default "")))) -}}
     {{- end -}}
     {{- $graph = $graph | append $art -}}
   {{- end -}}

@@ -1,15 +1,23 @@
-{{- /* Sayfanın görsel site haritasına girecek tam çözünürlüklü görselleri: mutlak adres dizisi döner.
-       Proje ve haber sayfalarında kapak + galeri; diğer sayfalarda boş. */ -}}
+{{- /* Sayfanın görsel site haritasına girecek görselleri: mutlak adres dizisi döner.
+       Galeri kareleri büyütme penceresindeki tam çözünürlüklü türevi gösterir (sayfadan bağlantı verilir);
+       haber kapağı ise sayfada basılan türevi gösterir, yoksa site haritası yetim dosya bildirir. */ -}}
 {{- $p := . -}}
 {{- $out := slice -}}
 {{- $slug := $p.Params.slug -}}
 {{- $klasor := "" -}}
+{{- $haber := and (eq $p.Type "haber") (not $p.IsSection) -}}
 {{- if and (eq $p.Type "proje") (not $p.IsSection) }}{{ $klasor = printf "projeler/%s" $slug }}{{ end -}}
-{{- if and (eq $p.Type "haber") (not $p.IsSection) }}{{ $klasor = printf "haberler/%s" $slug }}{{ end -}}
+{{- if $haber }}{{ $klasor = printf "haberler/%s" $slug }}{{ end -}}
 {{- with $klasor -}}
   {{- $dizin := . -}}
+  {{- /* haber kapağı: sayfadaki <img src> türevi */ -}}
+  {{- if $haber -}}
+    {{- with $p.Params.cover }}{{ with resources.Get (printf "%s/%s" $dizin .) }}
+      {{- $out = $out | append (partial "haber-kapak.html" .).fallback.Permalink -}}
+    {{- end }}{{ end -}}
+  {{- end -}}
   {{- $dosyalar := slice -}}
-  {{- with $p.Params.cover }}{{ $dosyalar = $dosyalar | append . }}{{ end -}}
+  {{- if not $haber }}{{ with $p.Params.cover }}{{ $dosyalar = $dosyalar | append . }}{{ end }}{{ end -}}
   {{- range $p.Params.images }}{{ $dosyalar = $dosyalar | append .file }}{{ end -}}
   {{- range $p.Params.drawings }}{{ $dosyalar = $dosyalar | append .file }}{{ end -}}
   {{- range $p.Params.diagrams }}{{ $dosyalar = $dosyalar | append .file }}{{ end -}}
