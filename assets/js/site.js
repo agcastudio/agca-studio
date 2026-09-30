@@ -78,20 +78,22 @@
           if (i === current) d.setAttribute("aria-current", "true"); else d.removeAttribute("aria-current");
         });
       };
-      var toggle = hero.querySelector("[data-hero-toggle]");
+      /* DİKKAT: bu dosyanın tamamı tek bir işlev kapsamı; "var" ile tanımlanan adlar
+         bölümler arasında paylaşılır. Menüdeki "toggle" ile çakışmaması için ayrı ad. */
+      var duraklatDugmesi = hero.querySelector("[data-hero-toggle]");
       /* duraklatma kullanıcı tercihidir: elle durdurulduysa odak/sekme dönüşünde yeniden başlamaz */
       var elleDurdu = reduce;
       var durumYaz = function () {
-        if (!toggle) return;
+        if (!duraklatDugmesi) return;
         var duruyor = !timer;
         hero.classList.toggle("is-paused", duruyor);
-        toggle.setAttribute("aria-label", toggle.getAttribute(duruyor ? "data-label-play" : "data-label-pause") || "");
-        toggle.setAttribute("aria-pressed", duruyor ? "true" : "false");
+        duraklatDugmesi.setAttribute("aria-label", duraklatDugmesi.getAttribute(duruyor ? "data-label-play" : "data-label-pause") || "");
+        duraklatDugmesi.setAttribute("aria-pressed", duruyor ? "true" : "false");
       };
       var start = function () { if (!elleDurdu && !timer) timer = setInterval(function () { show(current + 1); }, 6000); durumYaz(); };
       var stop = function () { if (timer) { clearInterval(timer); timer = null; } durumYaz(); };
-      if (toggle) {
-        toggle.addEventListener("click", function () {
+      if (duraklatDugmesi) {
+        duraklatDugmesi.addEventListener("click", function () {
           if (timer) { elleDurdu = true; stop(); }
           else { elleDurdu = false; start(); }
         });
