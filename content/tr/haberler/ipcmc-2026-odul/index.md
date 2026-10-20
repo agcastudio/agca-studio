@@ -20,8 +20,8 @@ images:
     alt: "Hasan Kalyoncu Üniversitesi kongre salonu: sahnedeki ekranda IPCMC 2026 yazısı, ön planda yaka kartlı bir katılımcı"
     caption: "Kongre salonu, Gaziantep"
   - file: "kongre-panosu.jpg"
-    alt: "IPCMC 2026 panosunun önünde iki kişilik portre; arkada kongrenin adı, tarihi ve düzenleyen üniversitelerin logoları"
-    caption: "IPCMC 2026 panosu önünde"
+    alt: "Kutbeddin Ağca ve Selen Baş Ağca, IPCMC 2026 panosunun önünde; arkada kongrenin adı, tarihi ve düzenleyen üniversitelerin logoları"
+    caption: "Kutbeddin Ağca ve Selen Baş Ağca"
 ---
 Kutbeddin Ağca'nın Prof. Dr. Almula Köksal ile yazdığı "The Evolution of Social Acceptance in Megaprojects: An LLM-Driven Stance Analysis of the Istanbul Airport" başlıklı bildiri, 9. Uluslararası Proje ve Yapım Yönetimi Kongresi'nde (IPCMC 2026) En İyi Bildiri Ödülü'ne layık görüldü.
 

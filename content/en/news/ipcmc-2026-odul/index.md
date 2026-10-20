@@ -20,8 +20,8 @@ images:
     alt: "The conference hall at Hasan Kalyoncu University: IPCMC 2026 on the screen above the stage, a participant wearing a conference badge in the foreground"
     caption: "Conference hall, Gaziantep"
   - file: "kongre-panosu.jpg"
-    alt: "A portrait of two people in front of the IPCMC 2026 backdrop, showing the conference name, dates and the logos of the organising universities"
-    caption: "In front of the IPCMC 2026 backdrop"
+    alt: "Kutbeddin Ağca and Selen Baş Ağca in front of the IPCMC 2026 backdrop, showing the conference name, dates and the logos of the organising universities"
+    caption: "Kutbeddin Ağca and Selen Baş Ağca"
 ---
 The paper "The Evolution of Social Acceptance in Megaprojects: An LLM-Driven Stance Analysis of the Istanbul Airport", written by Kutbeddin Ağca with Prof. Dr. Almula Köksal, received the Best Paper Award at the 9th International Project and Construction Management Conference (IPCMC 2026).
 
