@@ -21,3 +21,5 @@ Kutbeddin Ağca will present a paper at the 9th International Project and Constr
 The paper, written with Prof. Dr. Almula Köksal, examines how social acceptance of a megaproject shifts over its life, taking Istanbul Airport as its case. Some 141,336 Turkish-language posts from 2010 to 2026 are classified with the help of a large language model across four phases: announcement, tender, construction and operation.
 
 The finding is that acceptance does not mature along a straight line: it is at its most negative at announcement, turns to support at tender, slips back during construction and recovers in operation.
+
+**Update:** the paper received the Best Paper Award at the conference; see [the award news](/en/news/ipcmc-2026-odul/).

@@ -21,3 +21,5 @@ Kutbeddin Ağca, 16-18 Ekim 2026'da Gaziantep'te toplanacak 9. Uluslararası Pro
 Prof. Dr. Almula Köksal ile yazılan bildiri, mega projelerde toplumsal kabulün proje boyunca nasıl değiştiğini İstanbul Havalimanı örneğinde ele alıyor. 2010-2026 arasındaki 141.336 Türkçe ileti, büyük dil modeli desteğiyle duyuru, ihale, inşaat ve işletme evrelerine göre sınıflandırılıyor.
 
 Bulgu şu: kabul düz bir çizgide olgunlaşmıyor; duyuruda en olumsuz düzeyde seyrediyor, ihalede desteğe dönüyor, inşaatta geriliyor, işletmede toparlanıyor.
+
+**Güncelleme:** Bildiri kongrede En İyi Bildiri Ödülü'nü aldı; ayrıntılar [ödül haberinde](/haberler/ipcmc-2026-odul/).
