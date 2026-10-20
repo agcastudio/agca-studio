@@ -20,3 +20,7 @@
 /projects/emekapartmani /projeler/kordonboyu/ 301
 /projects/sb-kolektif /projeler/ciftlik-evi/ 301
 /projects/nazevi /projeler/ayazaga-ic-mimari/ 301
+# 2026-10-20, Search Console 404 listesinden: eski Webflow proje adları.
+# "klinik": Kalp360'ın eski adı (sanal turdaki marka hâlâ "KLİNİK 360").
+/projects/klinik /projeler/kalp360/ 301
+/projects/bodrumsaglikmerkezi /projeler/bodrum-hidroterapi-merkezi/ 301
