@@ -10,6 +10,8 @@ description: "Kutbeddin Ağca, IPCMC 2026'da İstanbul Havalimanı örneğinde m
 ozet: "Kutbeddin Ağca, 16-18 Ekim 2026'da Gaziantep'te düzenlenecek kongrede, İstanbul Havalimanı üzerinden mega projelerde toplumsal kabulün nasıl değiştiğini anlatacak."
 link: "https://2026.ipcmc.com/"
 link_label: "Kongre sayfası"
+belge: "https://2026.ipcmc.com/proceedings-book/"
+belge_label: "Bildiriler kitabı (s. 211–222)"
 gorsel_tam: true
 gorsel_belge: true
 gorsel_sahip: "IPCMC 2026"
@@ -22,4 +24,4 @@ Prof. Dr. Almula Köksal ile yazılan bildiri, mega projelerde toplumsal kabulü
 
 Bulgu şu: kabul düz bir çizgide olgunlaşmıyor; duyuruda en olumsuz düzeyde seyrediyor, ihalede desteğe dönüyor, inşaatta geriliyor, işletmede toparlanıyor.
 
-**Güncelleme:** Bildiri kongrede En İyi Bildiri Ödülü'nü aldı; ayrıntılar [ödül haberinde](/haberler/ipcmc-2026-odul/).
+**Güncelleme:** Bildiri kongrede En İyi Bildiri Ödülü'nü aldı; ayrıntılar [ödül haberinde](/haberler/ipcmc-2026-odul/). Tam metin kongrenin [bildiriler kitabında](https://2026.ipcmc.com/proceedings-book/), 211–222. sayfalarda.

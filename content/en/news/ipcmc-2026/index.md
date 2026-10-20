@@ -10,6 +10,8 @@ description: "Kutbeddin Ağca will present a paper on the social acceptance of m
 ozet: "Kutbeddin Ağca will speak at the conference in Gaziantep on 16-18 October 2026 on how social acceptance of megaprojects shifts, taking Istanbul Airport as the case."
 link: "https://2026.ipcmc.com/"
 link_label: "Conference website"
+belge: "https://2026.ipcmc.com/proceedings-book/"
+belge_label: "Proceedings book (pp. 211–222)"
 gorsel_tam: true
 gorsel_belge: true
 gorsel_sahip: "IPCMC 2026"
@@ -22,4 +24,4 @@ The paper, written with Prof. Dr. Almula Köksal, examines how social acceptance
 
 The finding is that acceptance does not mature along a straight line: it is at its most negative at announcement, turns to support at tender, slips back during construction and recovers in operation.
 
-**Update:** the paper received the Best Paper Award at the conference; see [the award news](/en/news/ipcmc-2026-odul/).
+**Update:** the paper received the Best Paper Award at the conference; see [the award news](/en/news/ipcmc-2026-odul/). The full paper is on pages 211–222 of the [proceedings book](https://2026.ipcmc.com/proceedings-book/).

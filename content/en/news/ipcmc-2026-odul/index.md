@@ -10,10 +10,14 @@ description: "The paper by Kutbeddin Ağca and Prof. Dr. Almula Köksal on Istan
 ozet: "Our paper on the social acceptance of megaprojects, taking Istanbul Airport as its case, received the Best Paper Award at the 9th International Project and Construction Management Conference."
 link: "https://2026.ipcmc.com/"
 link_label: "Conference website"
+belge: "https://2026.ipcmc.com/proceedings-book/"
+belge_label: "Proceedings book (pp. 211–222)"
 cover: "odul-sertifika.jpg"
+kapak_capa: "Center"
 cover_alt: "The IPCMC 2026 Best Paper Award certificate made out to Kutbeddin Ağca and Almula Köksal, bearing the paper's title and the signatures of the conference co-chairs, in a black folder"
 images:
   - file: "odul-sertifika.jpg"
+    capa: "Center"
     alt: "The IPCMC 2026 Best Paper Award certificate made out to Kutbeddin Ağca and Almula Köksal, bearing the paper's title and the signatures of the conference co-chairs"
     caption: "Award certificate"
   - file: "kongre-salonu.jpg"
@@ -29,4 +33,4 @@ The conference was held in Gaziantep on 16-18 October 2026, hosted by Hasan Kaly
 
 The paper examines how social acceptance of a megaproject shifts over its life, taking Istanbul Airport as its case: 141,336 Turkish-language posts are classified with the help of a large language model across the announcement, tender, construction and operation phases.
 
-We [announced the paper](/en/news/ipcmc-2026/) ahead of the conference.
+The full paper appears on pages 211–222 of the conference [proceedings book](https://2026.ipcmc.com/proceedings-book/). We [announced the paper](/en/news/ipcmc-2026/) ahead of the conference.

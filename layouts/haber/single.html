@@ -38,9 +38,10 @@
         {{- $it := . -}}
         {{- with resources.Get (printf "haberler/%s/%s" $slug $it.file) }}
         {{- $img := . -}}
-        {{- $t1 := $img.Fill "240x240 webp q75" -}}
-        {{- $t2 := $img.Fill "480x480 webp q75" -}}
-        {{- $tf := $img.Fill "240x240 jpg" -}}
+        {{- $capa := "" }}{{ with $it.capa }}{{ $capa = printf " %s" . }}{{ end -}}
+        {{- $t1 := $img.Fill (printf "240x240 webp q75%s" $capa) -}}
+        {{- $t2 := $img.Fill (printf "480x480 webp q75%s" $capa) -}}
+        {{- $tf := $img.Fill (printf "240x240 jpg%s" $capa) -}}
         {{- $full := partial "lightbox-src.html" $img -}}
         <li class="thumb">
           <a class="glb" href="{{ $full.RelPermalink }}" data-gallery="haber" data-alt="{{ $it.alt }}"{{ with $it.caption }} data-description="{{ . }}"{{ end }} aria-label="{{ i18n "open_image" }}: {{ $it.alt }}">
