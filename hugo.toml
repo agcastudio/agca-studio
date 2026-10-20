@@ -27,6 +27,8 @@ capitalizeListTitles = false
 
 [params]
   brand = "agca·studio"
+  # Pinterest > Ayarlar > Hesap sahipliği iddiası > HTML etiketi: content="..." içindeki kod
+  pinterestDomainVerify = "b4d6052d69db51ac48da095bee7d09bc"
   accent = "#F4A888"
   email = "info@agca.studio"
   phone = ""                         # telefon sitede gösterilmiyor (kullanıcı kararı); WhatsApp kullanılıyor

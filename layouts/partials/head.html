@@ -67,6 +67,9 @@
 {{- if not $og }}{{ with $haberKapak }}{{ $og = (.Fill "1200x630 q80 jpg").Permalink }}{{ end }}{{ end -}}
 {{- if not $og }}{{ with resources.Get site.Params.ogImage }}{{ $og = .Permalink }}{{ end }}{{ end -}}
 {{- $ogAlt := .Params.hero_alt | default .Params.cover_alt | default $brand -}}
+{{- /* Pinterest site doğrulaması: kod hugo.toml [params] pinterestDomainVerify içinde */ -}}
+{{ with site.Params.pinterestDomainVerify }}<meta name="p:domain_verify" content="{{ . }}">
+{{ end -}}
 <meta property="og:type" content="{{ if and (in (slice "proje" "haber") .Type) (not .IsSection) }}article{{ else }}website{{ end }}">
 <meta property="og:site_name" content="{{ $brand }}">
 <meta property="og:locale" content="{{ if eq $lang "tr" }}tr_TR{{ else }}en_GB{{ end }}">
