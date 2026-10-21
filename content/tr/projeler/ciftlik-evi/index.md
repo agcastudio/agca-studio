@@ -25,9 +25,9 @@ cover: "d-6pers2.jpg"
 cover_alt: "Çiftlik evinin teras cephesi: cam cepheli salon, korkuluklu ahşap teras ve altında alt terasta yemek masası"
 card: "d-5pers2-000.jpg"
 card_alt: "Çiftlik evi: ağaçlar arasında düşey ahşap kaplı, tek eğimli çatılı ev"
-credits: "Tasarım ve görselleştirme: agca·studio (kavram görselleri yapay zekâ destekli)"
+credits: "Tasarım ve görselleştirme: agca·studio"
 ozet: |
-  Bir çiftlik arazisinde, yola bitişik eğimli bir parsele oturan tek katlı ev; alt kat eğimin bahçe tarafında açığa çıkar. Düşey ahşap kaplı kütle, bahçeye doğru yükselen tek eğimli bir çatının altında toplanır; girişte çatının uzayan saçağı iki ince kolonla taşınır. Zemin katta antre ve vestiyerden ada mutfaklı, uzun yemek masalı ve şömineli tek bir yaşama hacmine geçilir; salonun önündeki ahşap teras ince çelik kolonlarla eğimin üzerine çıkarak bahçeye asılır. Alt katta resim atölyesi, ortak alan ve sinema odası bahçeye açılan cam cephe boyunca sıralanır; depo, WC ve merdiven arka tarafta kalır. Alt teras, atölye ve ortak alanın önünde ikinci bir dış mekân oluşturur. Kavram görselleri yapay zekâ desteğiyle üretildi ve taş kaplama ile düz çatı modelden farklıdır; plan, kesit ve görünüşler modelden alındı.
+  Bir çiftlik arazisinde, yola bitişik eğimli bir parsele oturan tek katlı ev; alt kat eğimin bahçe tarafında açığa çıkar. Düşey ahşap kaplı kütle, bahçeye doğru yükselen tek eğimli bir çatının altında toplanır; girişte çatının uzayan saçağı iki ince kolonla taşınır. Zemin katta antre ve vestiyerden ada mutfaklı, uzun yemek masalı ve şömineli tek bir yaşama hacmine geçilir; salonun önündeki ahşap teras ince çelik kolonlarla eğimin üzerine çıkarak bahçeye asılır. Alt katta resim atölyesi, ortak alan ve sinema odası bahçeye açılan cam cephe boyunca sıralanır; depo, WC ve merdiven arka tarafta kalır. Alt teras, atölye ve ortak alanın önünde ikinci bir dış mekân oluşturur. Kavram görsellerindeki taş kaplama ve düz çatı modelden farklıdır; plan, kesit ve görünüşler modelden alındı.
 images:
   - file: "d-5pers2-000.jpg"
     alt: "Ağaçlar arasında düşey ahşap kaplı ev: tek eğimli gri çatı, cam cephe ve ince kolonlarla eğim üzerine çıkan ahşap teras"
@@ -47,15 +47,12 @@ images:
   - file: "d-4pers2-002.jpg"
     alt: "Karşı köşeden çatı üstü görünüm: tek çatı altında toplanan ahşap kütle ve çimenli bahçe"
     caption: "Karşı köşe"
-  - file: "r-chatgpt-image-20-eyl-2026-13-00-34.jpg"
-    alt: "Yapay zekâ destekli kavram görseli: taş kaplı, düz çatılı, geniş camlı iki katlı ev ve üst kat terası, akşam ışığında"
-    caption: "Kavram görseli (yapay zekâ destekli; taş kaplama ve düz çatı modelden farklıdır)"
-  - file: "r-chatgpt-image-20-eyl-2026-13-00-46.jpg"
-    alt: "Yapay zekâ destekli kavram görseli: evin köşeden görünümü, ağaçlar ve cam cepheler"
-    caption: "Kavram görseli (yapay zekâ destekli; taş kaplama ve düz çatı modelden farklıdır)"
-  - file: "r-chatgpt-image-20-eyl-2026-13-04-37.jpg"
-    alt: "Yapay zekâ destekli kavram görseli: terasta yemek masası, camın ardında şövaleli resim atölyesi ve merdiven"
-    caption: "Kavram görseli (yapay zekâ destekli; taş kaplama ve düz çatı modelden farklıdır)"
+  - file: "r-teras-cephesi.jpg"
+    alt: "Kavram görseli: taş kaplı, düz çatılı, geniş camlı iki katlı ev ve üst kat terası, akşam ışığında"
+    caption: "Kavram görseli: teras cephesi (taş kaplama ve düz çatı modelden farklıdır)"
+  - file: "r-resim-atolyesi.jpg"
+    alt: "Kavram görseli: terasta yemek masası, camın ardında şövaleli resim atölyesi ve merdiven"
+    caption: "Kavram görseli: alt teras ve resim atölyesi (taş kaplama ve düz çatı modelden farklıdır)"
 drawings:
   - file: "c-1-vp-page-0001.jpg"
     alt: "Konum planı: kırsal yerleşimde büyük parselin yol kenarındaki köşesinde ev ve yanında mevcut yapı"
