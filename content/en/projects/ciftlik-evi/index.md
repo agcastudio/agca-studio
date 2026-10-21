@@ -27,7 +27,7 @@ card: "d-5pers2-000.jpg"
 card_alt: "Farmhouse: a vertically timber-clad house with a mono-pitch roof among trees"
 credits: "Design and visualisation: agca·studio"
 ozet: |
-  A single-storey house on a sloping plot within a farm, right beside the road; the lower floor is exposed on the garden side of the slope. The vertically timber-clad volume is gathered under a single mono-pitch roof rising towards the garden; at the entrance the extended eaves are carried on two slender columns. On the ground floor the entrance hall and cloakroom lead into one living space with an island kitchen, a long dining table and a fireplace; the timber deck in front of the living room rises over the slope on slender steel columns and hangs above the garden. The lower floor lines up a painting studio, a common room and a cinema room along the glazed garden facade; storage, a WC and the stair sit at the back. A lower deck in front of the studio and common room forms a second outdoor space. The stone cladding and flat roof in the concept images differ from the model; plans, sections and elevations were taken from the model.
+  A single-storey house on a sloping plot within a farm, right beside the road; the lower floor is exposed on the garden side of the slope. The vertically timber-clad volume is gathered under a single mono-pitch roof rising towards the garden; at the entrance the extended eaves are carried on two slender columns. On the ground floor the entrance hall and cloakroom lead into one living space with an island kitchen, a long dining table and a fireplace; the timber deck in front of the living room rises over the slope on slender steel columns and hangs above the garden. The lower floor lines up a painting studio, a common room and a cinema room along the glazed garden facade; storage, a WC and the stair sit at the back. A lower deck in front of the studio and common room forms a second outdoor space.
 images:
   - file: "d-5pers2-000.jpg"
     alt: "Vertically timber-clad house among trees: mono-pitch grey roof, glazed facade and a timber deck rising over the slope on slender columns"
@@ -49,10 +49,10 @@ images:
     caption: "Opposite corner"
   - file: "r-teras-cephesi.jpg"
     alt: "Concept image: a stone-clad, flat-roofed two-level house with wide glazing and an upper terrace in evening light"
-    caption: "Concept image: terrace facade (stone cladding and flat roof differ from the model)"
+    caption: "Concept image: terrace facade"
   - file: "r-resim-atolyesi.jpg"
     alt: "Concept image: dining table on the terrace, a painting studio with easels behind the glass and the stair"
-    caption: "Concept image: lower terrace and painting studio (stone cladding and flat roof differ from the model)"
+    caption: "Concept image: lower terrace and painting studio"
 drawings:
   - file: "c-1-vp-page-0001.jpg"
     alt: "Location plan: the house at the roadside corner of a large plot in a rural settlement, with an existing building beside it"

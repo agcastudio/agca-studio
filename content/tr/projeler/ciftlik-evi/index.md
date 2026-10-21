@@ -27,7 +27,7 @@ card: "d-5pers2-000.jpg"
 card_alt: "Çiftlik evi: ağaçlar arasında düşey ahşap kaplı, tek eğimli çatılı ev"
 credits: "Tasarım ve görselleştirme: agca·studio"
 ozet: |
-  Bir çiftlik arazisinde, yola bitişik eğimli bir parsele oturan tek katlı ev; alt kat eğimin bahçe tarafında açığa çıkar. Düşey ahşap kaplı kütle, bahçeye doğru yükselen tek eğimli bir çatının altında toplanır; girişte çatının uzayan saçağı iki ince kolonla taşınır. Zemin katta antre ve vestiyerden ada mutfaklı, uzun yemek masalı ve şömineli tek bir yaşama hacmine geçilir; salonun önündeki ahşap teras ince çelik kolonlarla eğimin üzerine çıkarak bahçeye asılır. Alt katta resim atölyesi, ortak alan ve sinema odası bahçeye açılan cam cephe boyunca sıralanır; depo, WC ve merdiven arka tarafta kalır. Alt teras, atölye ve ortak alanın önünde ikinci bir dış mekân oluşturur. Kavram görsellerindeki taş kaplama ve düz çatı modelden farklıdır; plan, kesit ve görünüşler modelden alındı.
+  Bir çiftlik arazisinde, yola bitişik eğimli bir parsele oturan tek katlı ev; alt kat eğimin bahçe tarafında açığa çıkar. Düşey ahşap kaplı kütle, bahçeye doğru yükselen tek eğimli bir çatının altında toplanır; girişte çatının uzayan saçağı iki ince kolonla taşınır. Zemin katta antre ve vestiyerden ada mutfaklı, uzun yemek masalı ve şömineli tek bir yaşama hacmine geçilir; salonun önündeki ahşap teras ince çelik kolonlarla eğimin üzerine çıkarak bahçeye asılır. Alt katta resim atölyesi, ortak alan ve sinema odası bahçeye açılan cam cephe boyunca sıralanır; depo, WC ve merdiven arka tarafta kalır. Alt teras, atölye ve ortak alanın önünde ikinci bir dış mekân oluşturur.
 images:
   - file: "d-5pers2-000.jpg"
     alt: "Ağaçlar arasında düşey ahşap kaplı ev: tek eğimli gri çatı, cam cephe ve ince kolonlarla eğim üzerine çıkan ahşap teras"
@@ -49,10 +49,10 @@ images:
     caption: "Karşı köşe"
   - file: "r-teras-cephesi.jpg"
     alt: "Kavram görseli: taş kaplı, düz çatılı, geniş camlı iki katlı ev ve üst kat terası, akşam ışığında"
-    caption: "Kavram görseli: teras cephesi (taş kaplama ve düz çatı modelden farklıdır)"
+    caption: "Kavram görseli: teras cephesi"
   - file: "r-resim-atolyesi.jpg"
     alt: "Kavram görseli: terasta yemek masası, camın ardında şövaleli resim atölyesi ve merdiven"
-    caption: "Kavram görseli: alt teras ve resim atölyesi (taş kaplama ve düz çatı modelden farklıdır)"
+    caption: "Kavram görseli: alt teras ve resim atölyesi"
 drawings:
   - file: "c-1-vp-page-0001.jpg"
     alt: "Konum planı: kırsal yerleşimde büyük parselin yol kenarındaki köşesinde ev ve yanında mevcut yapı"
