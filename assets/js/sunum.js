@@ -75,12 +75,29 @@
   var canFs = !!(root.requestFullscreen || root.webkitRequestFullscreen);
   function toggleFullscreen() {
     if (!(document.fullscreenElement || document.webkitFullscreenElement)) {
-      (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+      var req = (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+      // Dokunmatik ekranda tam ekrana geçince yatay konuma kilitle (Android Chrome); desteklenmezse sessizce geçer
+      if (req && req.then && screen.orientation && screen.orientation.lock && window.matchMedia('(pointer: coarse)').matches) {
+        req.then(function () { return screen.orientation.lock('landscape'); }).catch(function () {});
+      }
     } else {
       (document.exitFullscreen || document.webkitExitFullscreen).call(document);
     }
   }
   if (canFs) { fsBtn.hidden = false; fsBtn.addEventListener('click', toggleFullscreen); }
+
+  // Telefon yan çevrilince kontroller 2,5 sn sonra gizlenir; dokunma, fare ya da tuşla geri gelir
+  var box = document.querySelector('.sunum');
+  var compact = window.matchMedia('(orientation: landscape) and (max-height: 520px)');
+  var hideTimer = null;
+  function wake() {
+    box.classList.remove('gizle');
+    clearTimeout(hideTimer);
+    if (compact.matches) hideTimer = setTimeout(function () { box.classList.add('gizle'); }, 2500);
+  }
+  ['touchstart', 'mousemove', 'keydown'].forEach(function (t) { document.addEventListener(t, wake, { passive: true }); });
+  if (compact.addEventListener) compact.addEventListener('change', wake); else if (compact.addListener) compact.addListener(wake);
+  wake();
 
   var start = parseInt(location.hash.slice(1), 10);
   go(isFinite(start) ? start - 1 : 0);

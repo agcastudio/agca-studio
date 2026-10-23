@@ -120,6 +120,38 @@ body {
   .ileri { right: calc(50% - 64px); }
 }
 
+/* Telefon yan çevrilince slayt ekranı doldurur; üst bar, oklar ve ilerleme çubuğu slaytın üstünde durur ve
+   birkaç saniye dokunulmayınca gizlenir (sunum.js "gizle" sınıfı). iPhone tarayıcıları sayfalara gerçek tam ekran
+   izni vermediği için orada tam ekrana en yakın görünüm budur. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .sunum { grid-template-rows: 1fr; }
+  .ust {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    height: 48px;
+    background: linear-gradient(rgba(10, 11, 12, .72), rgba(10, 11, 12, 0));
+    transition: opacity .3s;
+  }
+  .baslik { display: block; }
+  .sayac { margin-left: 0; }
+  .sahne { padding: 0; }
+  .cerceve { max-width: calc(100vh * 16 / 9); max-width: calc(100dvh * 16 / 9); box-shadow: none; }
+  .ok { top: 50%; bottom: auto; transform: translateY(-50%); z-index: 2; background: rgba(10, 11, 12, .45); transition: opacity .3s, background .2s; }
+  .geri { left: max(10px, env(safe-area-inset-left)); }
+  .ileri { right: max(10px, env(safe-area-inset-right)); }
+  .ilerleme { position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; }
+  .gizle .ust, .gizle .ok { opacity: 0; pointer-events: none; }
+}
+
+/* Telefon dikey tutulurken yan çevirme önerisi */
+.cevir { display: none; }
+@media (orientation: portrait) and (max-width: 760px) and (pointer: coarse) {
+  .cevir { display: block; position: absolute; left: 0; right: 0; bottom: 76px; margin: 0; text-align: center; font-size: 13px; color: var(--soluk); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .slayt, #cubuk { transition: none; }
 }
