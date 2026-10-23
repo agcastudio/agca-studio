@@ -1,0 +1,78 @@
+{{- /* Müşteri sunumu görüntüleyici. Site iskeletini (baseof) kullanmaz: menü, altbilgi, yapısal veri ve
+       dil bağlantıları yok; arama motorlarına kapalı. Slaytlar sayfa paketindeki 01.webp, 02.webp ... dosyalarıdır,
+       alt metinleri ön bilgideki `slaytlar` listesindedir. İndirme bağlantısı verilmez (KARARLAR 2026-10-23). */ -}}
+{{- $slides := sort (.Resources.Match "[0-9][0-9].webp") "Name" -}}
+{{- $n := len $slides -}}
+{{- $alts := .Params.slaytlar -}}
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ .Title }} · {{ site.Params.brand }}</title>
+<meta name="description" content="{{ .Description }}">
+<meta name="robots" content="noindex, nofollow, noimageindex, noarchive">
+<meta name="theme-color" content="#141617">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="/img/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/inter-turkish.woff2" as="font" type="font/woff2" crossorigin>
+{{- $css := resources.Get "css/sunum.css" | resources.Minify | resources.Fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- with index $slides 0 }}
+<link rel="preload" as="image" href="{{ (. | fingerprint).RelPermalink }}" fetchpriority="high">
+{{- /* Paylaşım kartı (WhatsApp vb.): kapak slaytı */ -}}
+{{- $og := .Fill "1200x630 q80 jpg Center" }}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ site.Params.brand }}">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:title" content="{{ $.Title }}">
+<meta property="og:description" content="{{ $.Description }}">
+<meta property="og:url" content="{{ $.Permalink }}">
+<meta property="og:image" content="{{ $og.Permalink }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+{{- end }}
+</head>
+<body>
+<div class="sunum">
+  <header class="ust">
+    <a class="marka" href="/" aria-label="{{ site.Params.brand }} ana sayfa"><img src="/img/logo-white.svg" alt="{{ site.Params.brand }}" width="1447" height="258"></a>
+    <p class="baslik">{{ .Title }}</p>
+    <p class="sayac" aria-live="polite"><span id="no">1</span> / {{ $n }}</p>
+    <button class="dugme" id="tam" type="button" aria-label="Tam ekran" hidden>
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </header>
+  <main class="sahne" id="sahne" aria-label="Sunum slaytları">
+    <button class="dugme ok geri" id="geri" type="button" aria-label="Önceki slayt">
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="cerceve" id="cerceve">
+      {{- range $i, $r := $slides }}
+      {{- $f := $r | fingerprint }}
+      {{- $alt := index $alts $i | default (printf "Slayt %d" (add $i 1)) }}
+      {{- if lt $i 2 }}
+      <img class="slayt{{ if eq $i 0 }} aktif{{ end }}" src="{{ $f.RelPermalink }}" width="{{ $r.Width }}" height="{{ $r.Height }}" alt="{{ $alt }}" draggable="false" decoding="async"{{ if ne $i 0 }} aria-hidden="true"{{ end }}>
+      {{- else }}
+      <img class="slayt" data-src="{{ $f.RelPermalink }}" width="{{ $r.Width }}" height="{{ $r.Height }}" alt="{{ $alt }}" draggable="false" decoding="async" aria-hidden="true">
+      {{- end }}
+      {{- end }}
+    </div>
+    <button class="dugme ok ileri" id="ileri" type="button" aria-label="Sonraki slayt">
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </main>
+  <div class="ilerleme" aria-hidden="true"><span id="cubuk"></span></div>
+</div>
+<noscript><p class="noscript">Sunumu gezinmek için JavaScript gerekli.</p></noscript>
+{{- $js := resources.Get "js/sunum.js" | resources.Minify | resources.Fingerprint }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{- if not hugo.IsServer }}{{ with site.Params.cfAnalyticsToken }}
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ . }}"}'></script>
+{{ end }}{{ end }}
+</body>
+</html>

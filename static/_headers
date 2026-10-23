@@ -21,3 +21,5 @@
   Cache-Control: public, max-age=604800
 /*.png
   Cache-Control: public, max-age=604800
+/sunum/*
+  X-Robots-Tag: noindex, nofollow, noimageindex, noarchive
