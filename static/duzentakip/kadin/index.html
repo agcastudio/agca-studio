@@ -160,13 +160,20 @@ input:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus
 .q.sleepq { cursor: default; }
 .q.sleepq .row { margin-top: 6px; gap: 12px; }
 .q.sleepq input[type="time"] { padding: 4px 6px; font-size: 0.95rem; margin-left: 4px; }
-.card.water { gap: 8px; }
+.panetabs { display: flex; gap: 6px; }
+.panetabs button { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 4px; font-size: 0.8rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.panetabs button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+.panetabs .cnt { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 0.72rem; line-height: 18px; }
+.panes { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+.panes::-webkit-scrollbar { display: none; }
+.pane { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; padding: 2px 2px 0; }
+.waterbox { display: flex; flex-direction: column; gap: 8px; }
 .shopgrp { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
 .shop { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--line); font-size: 0.92rem; cursor: pointer; }
 .shop input { width: 20px; height: 20px; margin: 0; accent-color: var(--good); flex: none; }
 .shop.on .grow { text-decoration: line-through; color: var(--ink-3); }
 .shop.have { opacity: 0.6; }
-.waterslider { width: 100%; accent-color: var(--water); height: 32px; margin: 0; padding: 0; background: transparent; border: 0; }
+.waterslider { width: 100%; accent-color: var(--water); height: 32px; margin: 0; padding: 0; background: transparent; border: 0; touch-action: none; }
 .drops { display: flex; flex-wrap: wrap; gap: 2px; }
 .drop { background: none; border: 0; font-size: 1.45rem; line-height: 1; padding: 3px; filter: grayscale(1); opacity: 0.35; }
 .drop.on { filter: none; opacity: 1; }
@@ -737,7 +744,7 @@ const state = {
   logs: {}, settings: { E: null, K: null }, rewards: null, recipes: {},
   mode: 'loading', db: null, sample: null, assets: null, imgOk: false,
   dirty: new Set(), pendingLocal: new Set(), timers: new Map(), inflight: new Map(),
-  busy: new Set(), open: new Set(), showWeight: false, modeNote: ''
+  busy: new Set(), open: new Set(), pane: 0, showWeight: false, modeNote: ''
 };
 const STATIC_HOST = !(window.claude && typeof window.claude.use === 'function');
 function logId(p, d) { return p + '_' + d; }
@@ -972,13 +979,6 @@ function heroHtml(p, L, c) {
     (isToday && pts >= DAY_WIN ? '<div class="celebrate">' + (pts >= DAY_MAX ? 'Mükemmel gün! 11/11 🏆' : 'Gün kazanıldı! ' + pts + '/11 🎉') + ' Yarın aynı saatte.</div>' : '') + wbar + lvl + earned +
     '<p class="motto">' + esc(motto(L, c, pts, p, lp)) + '</p></div>';
 }
-function waterHtml(L, c) {
-  const goal = c.waterGoal, max = Math.max(goal + 4, L.water), nDrops = Math.max(goal, L.water);
-  let drops = ''; for (let i = 1; i <= nDrops; i++) drops += '<button type="button" class="drop' + (i <= L.water ? ' on' : '') + '" data-action="drop" data-n="' + i + '" aria-label="' + i + '. bardak">💧</button>';
-  return '<div class="card water"><div class="waterline"><b>💧 Su <span id="waterCount">' + L.water + '</span> / ' + goal + ' bardak</b><span class="tiny num" id="waterLitre">' + n1(L.water * 0.25) + ' L · hedefte +2 puan</span></div>' +
-    '<input type="range" id="waterRange" class="waterslider" min="0" max="' + max + '" step="1" value="' + L.water + '" aria-label="Su bardak sayısı">' +
-    '<div class="drops" id="drops">' + drops + '</div><p class="tiny">Kaydırarak ya da damlalara dokunarak işaretle · 1 bardak = 250 ml</p></div>';
-}
 function updateWaterUI(L, c) {
   const cnt = $('#waterCount'), lit = $('#waterLitre'); if (cnt) cnt.textContent = L.water; if (lit) lit.textContent = n1(L.water * 0.25) + ' L · hedefte +2 puan';
   const drops = document.querySelectorAll('#drops .drop'); drops.forEach(d => d.classList.toggle('on', Number(d.dataset.n) <= L.water));
@@ -1006,12 +1006,36 @@ function questsHtml(p, L, c) {
   const active = isToday ? items.filter(q => !q.on && !expired(q)) : items;
   const archived = isToday ? items.filter(q => q.on || expired(q)) : [];
   const doneCount = items.filter(q => q.on).length, missed = archived.filter(q => !q.on && q.pts);
+  const groupOf = q => (['k', 'a1', 'o', 'a2', 'ak', 'vinegar'].indexOf(q.id) >= 0 ? 'ogun' : ['run', 'walkNoon', 'walkEve', 'strength'].indexOf(q.id) >= 0 ? 'hareket' : 'uyku');
+  const PANES = [
+    { key: 'su', label: '💧 Su', count: L.water >= c.waterGoal ? 0 : 1 },
+    { key: 'ogun', label: '🍽 Öğünler', count: active.filter(q => groupOf(q) === 'ogun' && q.pts).length },
+    { key: 'hareket', label: '🏃 Hareket', count: active.filter(q => groupOf(q) === 'hareket' && q.pts).length },
+    { key: 'uyku', label: dow === c.weighDay ? '😴 Uyku · ⚖️' : '😴 Uyku', count: active.filter(q => groupOf(q) === 'uyku').length }
+  ];
+  const paneBody = key => {
+    if (key === 'su') return waterPane(L, c);
+    const rows = active.filter(q => groupOf(q) === key);
+    if (rows.length) return '<div class="qlist">' + rows.map(q => questRow(q, L)).join('') + '</div>';
+    const done = items.filter(q => groupOf(q) === key && q.on).length, tot = items.filter(q => groupOf(q) === key).length;
+    return '<div class="celebrate">' + (done === tot ? 'Bu bölüm tamam ✓' : 'Kalan yok; kaçanlar arşivde, geç de işaretlenebilir.') + '</div>';
+  };
+  const tabs = '<div class="panetabs" role="tablist">' + PANES.map((pn, i) => '<button type="button" role="tab" data-pane="' + i + '"' + (i === state.pane ? ' class="on"' : '') + '>' + pn.label + (pn.count ? ' <span class="cnt">' + pn.count + '</span>' : '') + '</button>').join('') + '</div>';
+  const panes = '<div class="panes" id="panes">' + PANES.map(pn => '<div class="pane" data-key="' + pn.key + '">' + paneBody(pn.key) + '</div>').join('') + '</div>';
   const archiveHtml = archived.length ? '<details class="item" id="sub-arsiv"' + (state.open.has('sub-arsiv') ? ' open' : '') + '><summary>Arşiv<span class="sub">' + doneCount + ' tamamlandı' + (missed.length ? ' · ' + missed.length + ' kaçtı (geç de işaretlenebilir)' : '') + '</span></summary><div class="qlist">' + archived.map(q => questRow(q, L)).join('') + '</div></details>' : '';
   return '<div class="card"><div class="daterow"><button type="button" class="iconbtn" data-action="prevday" aria-label="Önceki gün">‹</button><div class="d">' + (isToday ? 'Bugünün görevleri' : fmtD(d)) + '<small>' + fmtDL(d) + ' · ' + menu.name + (isToday ? ' · ' + active.length + ' görev kaldı' : '') + '</small></div><button type="button" class="iconbtn" data-action="nextday" aria-label="Sonraki gün"' + (isToday ? ' disabled' : '') + '>›</button></div>' +
     (nx ? '<div class="next"><b>' + nx[0] + '</b><span>Sırada: ' + esc(nx[1]) + '</span></div>' : '') +
-    (active.length ? '<div class="qlist">' + active.map(q => questRow(q, L)).join('') + '</div>' : '<div class="celebrate">Bugünün tüm görevleri arşivde. ' + (doneCount >= 9 ? 'Harika gün 🎉' : 'Kaçanları arşivden geç de işaretleyebilirsin.') + '</div>') +
+    tabs + panes + '<p class="tiny" style="text-align:center">Yana kaydır: su · öğünler · hareket · uyku</p>' +
     archiveHtml + '<div class="status" id="saveStatus"></div></div>';
 }
+function waterPane(L, c) {
+  const goal = c.waterGoal, max = Math.max(goal + 4, L.water), nDrops = Math.max(goal, L.water);
+  let drops = ''; for (let i = 1; i <= nDrops; i++) drops += '<button type="button" class="drop' + (i <= L.water ? ' on' : '') + '" data-action="drop" data-n="' + i + '" aria-label="' + i + '. bardak">💧</button>';
+  return '<div class="waterbox"><div class="waterline"><b>💧 Su <span id="waterCount">' + L.water + '</span> / ' + goal + ' bardak</b><span class="tiny num" id="waterLitre">' + n1(L.water * 0.25) + ' L · hedefte +2 puan</span></div>' +
+    '<input type="range" id="waterRange" class="waterslider" min="0" max="' + max + '" step="1" value="' + L.water + '" aria-label="Su bardak sayısı">' +
+    '<div class="drops" id="drops">' + drops + '</div><p class="tiny">Çubuğu kaydır ya da damlalara dokun · 1 bardak = 250 ml · hedefe ulaşınca +2 puan</p></div>';
+}
+function restorePane() { const el = $('#panes'); if (!el) return; const w = el.clientWidth; if (w) el.scrollLeft = (state.pane || 0) * w; }
 function foodsBody(L, p) {
   const rows = L.foods.map(f => {
     const img = f.photo && !STATIC_HOST ? '<img src="/_blob/' + f.photo + '" alt="">' : '<div class="ph">🍽</div>';
@@ -1036,9 +1060,10 @@ function renderToday() {
     if (!ci) { cycleSub = 'Son adet tarihini girin'; cycleBody = '<p class="muted">Son adetin başladığı günü girin; döngü günü, PMS haftası ve tahmini sonraki tarih burada görünür.</p><div class="addfood"><input type="date" id="cycleDate" max="' + state.today + '"><button type="button" class="btn small" data-action="cycleSave">Kaydet</button></div>'; }
     else { cycleSub = ci.day + '. gün · ' + ci.phase + ' · sonraki ' + fmtD(ci.next); cycleBody = '<div class="row"><span class="pill' + (ci.pms ? ' warn' : ci.phase === 'Adet' ? ' accent' : ' good') + '">' + ci.phase + '</span><span class="tiny">döngü ' + c.cycleLen + ' gün</span></div><p class="muted">' + esc(ci.tip) + '</p><div class="row"><button type="button" class="btn ghost small" data-action="cycleStart">Adet başladı</button></div>'; }
   }
-  $('#view-bugun').innerHTML = heroHtml(p, L, c) + waterHtml(L, c) + questsHtml(p, L, c) +
+  $('#view-bugun').innerHTML = heroHtml(p, L, c) + questsHtml(p, L, c) +
     subSec('sub-yemek', '🍽', 'Ne yedik?', (L.foods.length ? L.foods.length + ' kayıt' + (total ? ' · ' + Math.round(total) + ' kcal' : '') : 'Fotoğraf veya yazıyla öğün kaydı') + ' · hedef ' + c.kcal + ' kcal', foodsBody(L, p)) +
     (p === 'K' ? subSec('sub-dongu', '🌙', 'Döngü', cycleSub, cycleBody) : '');
+  restorePane();
   const st = $('#saveStatus'); if (st) st.textContent = state.mode === 'db' ? (state.dirty.size ? 'Kaydediliyor…' : (L.updatedAt ? 'Son kayıt ' + localTime(L.updatedAt) + ' · ikinizde de görünür' : '')) : (state.mode === 'local' ? 'Girdiler bu cihazda saklanıyor' : '');
 }
 </script>
@@ -1116,7 +1141,8 @@ async function addFood(text, file) {
 function bindToday() {
   const v = $('#view-bugun');
   v.addEventListener('click', async e => {
-    const act = e.target.closest('[data-action]'), tog = e.target.closest('[data-toggle]'), meal = e.target.closest('[data-meal]'), pc = e.target.closest('[data-person]');
+    const act = e.target.closest('[data-action]'), tog = e.target.closest('[data-toggle]'), meal = e.target.closest('[data-meal]'), pc = e.target.closest('[data-person]'), pb = e.target.closest('[data-pane]');
+    if (pb) { state.pane = Number(pb.dataset.pane) || 0; const el = $('#panes'); if (el) el.scrollTo({ left: state.pane * el.clientWidth, behavior: 'smooth' }); document.querySelectorAll('.panetabs button').forEach((b, i) => b.classList.toggle('on', i === state.pane)); return; }
     if (pc) { if (!PERSON_LOCK && pc.dataset.person !== state.person) { state.person = pc.dataset.person; lsSet('bt_person', state.person); renderAll(); } return; }
     if (act) {
       const a = act.dataset.action;
@@ -1138,6 +1164,11 @@ function bindToday() {
     } else if (tog) { const f = tog.dataset.toggle; editLog(L => { L[f] = !L[f]; }); renderToday(); }
     else if (meal) { const k = meal.dataset.meal; editLog(L => { L.meals[k] = !L.meals[k]; }); renderToday(); }
   });
+  let paneRaf = 0;
+  v.addEventListener('scroll', e => {
+    if (e.target.id !== 'panes') return;
+    if (paneRaf) return; paneRaf = requestAnimationFrame(() => { paneRaf = 0; const el = e.target, w = el.clientWidth; if (!w) return; const i = Math.round(el.scrollLeft / w); if (i !== state.pane) { state.pane = i; document.querySelectorAll('.panetabs button').forEach((b, k) => b.classList.toggle('on', k === i)); } });
+  }, true);
   v.addEventListener('keydown', e => {
     const meal = e.target.closest('[data-meal]'); if (meal && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); meal.click(); return; }
     if (e.target.id === 'foodText' && e.key === 'Enter') { e.preventDefault(); addFood(e.target.value, null); }
