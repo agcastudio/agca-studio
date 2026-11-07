@@ -1025,7 +1025,7 @@ function questsHtml(p, L, c) {
   const archiveHtml = archived.length ? '<details class="item" id="sub-arsiv"' + (state.open.has('sub-arsiv') ? ' open' : '') + '><summary>Arşiv<span class="sub">' + doneCount + ' tamamlandı' + (missed.length ? ' · ' + missed.length + ' kaçtı (geç de işaretlenebilir)' : '') + '</span></summary><div class="qlist">' + archived.map(q => questRow(q, L)).join('') + '</div></details>' : '';
   return '<div class="card"><div class="daterow"><button type="button" class="iconbtn" data-action="prevday" aria-label="Önceki gün">‹</button><div class="d">' + (isToday ? 'Bugünün görevleri' : fmtD(d)) + '<small>' + fmtDL(d) + ' · ' + menu.name + (isToday ? ' · ' + active.length + ' görev kaldı' : '') + '</small></div><button type="button" class="iconbtn" data-action="nextday" aria-label="Sonraki gün"' + (isToday ? ' disabled' : '') + '>›</button></div>' +
     (nx ? '<div class="next"><b>' + nx[0] + '</b><span>Sırada: ' + esc(nx[1]) + '</span></div>' : '') +
-    tabs + panes + '<p class="tiny" style="text-align:center">Yana kaydır: su · öğünler · hareket · uyku</p>' +
+    tabs + panes +
     archiveHtml + '<div class="status" id="saveStatus"></div></div>';
 }
 function waterPane(L, c) {
