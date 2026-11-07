@@ -169,6 +169,10 @@ input:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus
 .chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 12px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; }
 .chip.on { background: var(--good-soft); border-color: var(--good); color: var(--ink); }
 .chip.on::before { content: "✓"; color: var(--good); font-weight: 700; }
+/* tabs (in-page views, not site navigation) */
+.tabs { display: flex; gap: 4px; background: var(--surface-2); border-radius: 14px; padding: 4px; }
+.tabs button { flex: 1; min-width: 0; border: 0; background: transparent; border-radius: 10px; padding: 9px 4px; font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tabs button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
 /* sections */
 .sec { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); min-width: 0; }
 .sec > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 13px 16px; }
@@ -287,11 +291,16 @@ ul.plain, ol.plain { margin: 0; padding-left: 18px; font-size: 0.9rem; color: va
 </head>
 <body>
 <main class="wrap">
+  <nav class="tabs" aria-label="Bölümler">
+    <button type="button" data-tab="bugun" id="tab-bugun">☑ Bugün</button>
+    <button type="button" data-tab="menu" id="tab-menu">📋 Menü</button>
+    <button type="button" data-tab="tarifler" id="tab-tarifler">👩‍🍳 Tarifler</button>
+    <button type="button" data-tab="ayarlar" id="tab-ayarlar">⚙️ Ayarlar</button>
+  </nav>
   <section class="view" id="view-bugun"></section>
-  <details class="sec" id="sec-gelisim"><summary><span class="ic">📈</span><span class="st">Gelişim<span class="sub">Kilo eğrisi, tempo, haftalık analiz</span></span></summary><div class="view" id="view-gelisim"></div></details>
-  <details class="sec" id="sec-program"><summary><span class="ic">📋</span><span class="st">Program<span class="sub">Günlük ritim, haftalık menü, içecekler</span></span></summary><div class="view" id="view-program"></div></details>
-  <details class="sec" id="sec-tarifler"><summary><span class="ic">👩‍🍳</span><span class="st">Tarifler<span class="sub">16 pratik tarif, yıldızla ve favorile</span></span></summary><div class="view" id="view-tarifler"></div></details>
-  <details class="sec" id="sec-ayarlar"><summary><span class="ic">⚙️</span><span class="st">Ayarlar<span class="sub">Plan, ödüller, yedek</span></span></summary><div class="view" id="view-ayarlar"></div></details>
+  <section class="view" id="view-program" hidden></section>
+  <section class="view" id="view-tarifler" hidden></section>
+  <section class="view" id="view-ayarlar" hidden></section>
   <p class="foot">Kayıtlar <span id="syncText">bağlanıyor</span><span id="sync" class="sync"><i></i></span></p>
 </main>
 <script>
@@ -314,8 +323,7 @@ const RHYTHM = [
   ['12:15', 'Sirkeli su: 1 yk elma sirkesi + 1 bardak su'],
   ['12:30', 'Öğle: önce çorba/salata → protein → en son bulgur/baklagil'],
   ['13:15', '10–15 dk dışarıda yürüyüş (gün ışığı)'],
-  ['13:30', 'İkinci kahve'],
-  ['15:00', 'Son kahve; sonrası bitki çayı'],
+  ['13:30', 'İkinci ve son kahve; sonrası bitki çayı (günde en fazla 2 fincan)'],
   ['16:00', 'Ara 2: proteinli (kefir, yoğurt, yumurta, humus)'],
   ['19:00', 'Akşam: protein + sebze; tahıl E 0–3 yk, K 0–2 yk'],
   ['19:45', '10 dk yürüyüş, mutfak kapanır'],
@@ -388,7 +396,7 @@ const SNACKS = [
 const DRINKS = [
   'Su: E 2,5–3 L · K 2–2,3 L. Sabah 2 bardak, her ana öğünden 15 dk önce 1 bardak',
   'Sirkeli su: 1 yk doğal elma sirkesi + 1 bardak su, öğleden 10–15 dk önce; en fazla 2 yk/gün',
-  'Kahve: K 09:30, 13:30, en geç 15:00 · E 1–2 fincan; şekersiz, sütlü olabilir',
+  'Kahve: ikiniz için günde en fazla 2 fincan, 09:30 ve en geç 14:00; şekersiz, sütlü olabilir. Üçüncü istek gelirse rooibos veya kuşburnu',
   'Yeşil çay yerine: rooibos, kuşburnu, papatya, melisa, ıhlamur, rezene, nane, zencefil',
   'Kaçın: hibiskus (tansiyonu düşürür), meyan kökü (yükseltir), paketli detoks çayları',
   'Adaçayı haftada en fazla 2 fincan'
@@ -538,7 +546,7 @@ const PERSON_LOCK = (window.PERSON_LOCK === 'E' || window.PERSON_LOCK === 'K') ?
 const state = {
   person: PERSON_LOCK || (lsGet('bt_person', 'E') === 'K' ? 'K' : 'E'),
   date: todayStr(), today: todayStr(), tab: 'bugun',
-  logs: {}, settings: { E: null, K: null }, rewards: null, recipes: {}, analysis: {},
+  logs: {}, settings: { E: null, K: null }, rewards: null, recipes: {},
   mode: 'loading', db: null, sample: null, assets: null, imgOk: false,
   dirty: new Set(), pendingLocal: new Set(), timers: new Map(), inflight: new Map(),
   busy: new Set(), open: new Set(), showWeight: false, modeNote: ''
@@ -666,9 +674,8 @@ function loadLocal() {
   state.settings.E = s.E || null; state.settings.K = s.K || null;
   state.rewards = normRewards(lsGet('bt_rewards_v1', null));
   const rc = lsGet('bt_recipes_v1', {}) || {}; state.recipes = {}; Object.keys(rc).forEach(id => { state.recipes[id] = normRecipe(rc[id]); });
-  state.analysis = lsGet('bt_analysis_v1', {}) || {};
 }
-function persistLocal() { lsSet('bt_logs_v1', state.logs); lsSet('bt_settings_v1', state.settings); lsSet('bt_rewards_v1', state.rewards); lsSet('bt_recipes_v1', state.recipes); lsSet('bt_analysis_v1', state.analysis); }
+function persistLocal() { lsSet('bt_logs_v1', state.logs); lsSet('bt_settings_v1', state.settings); lsSet('bt_rewards_v1', state.rewards); lsSet('bt_recipes_v1', state.recipes); }
 function setMode(m, text) { state.mode = m; const el = $('#sync'); if (el) el.className = 'sync ' + (m === 'db' ? 'ok' : m === 'local' ? 'local' : ''); const t = $('#syncText'); if (t) t.textContent = text; }
 function setStatus(t) { const st = $('#saveStatus'); if (st) st.textContent = t; }
 function saveLog(doc) {
@@ -694,7 +701,6 @@ async function writeDoc(path, data) {
 async function saveSettings(p, s) { state.settings[p] = s; return writeDoc('settings/' + p, s); }
 async function saveRewards() { state.rewards = normRewards(state.rewards); return writeDoc('settings/rewards', state.rewards); }
 async function saveRecipe(id, patch) { const cur = state.recipes[id] || normRecipe(null); const next = normRecipe(Object.assign({}, cur, patch, { rating: Object.assign({}, cur.rating, patch.rating || {}), fav: Object.assign({}, cur.fav, patch.fav || {}) })); state.recipes[id] = next; return writeDoc('recipes/' + id, next); }
-async function saveAnalysis(key, doc) { state.analysis[key] = doc; return writeDoc('analysis/' + key, doc); }
 async function connect() {
   loadLocal(); renderAll();
   if (STATIC_HOST) { setMode('local', 'bu cihazda saklanıyor'); state.modeNote = 'Girdiler yalnızca bu cihazda saklanıyor.'; renderAll(); return; }
@@ -718,8 +724,7 @@ async function connect() {
     renderAll();
   }, err => { clearTimeout(timer); fallbackLocal('Paylaşımlı veriye ulaşılamadı (' + (err && err.code ? err.code : 'hata') + '); girdiler bu cihazda saklanıyor.'); renderAll(); });
   db.collection('settings').onSnapshot(snap => { snap.docs.forEach(d => { if (d.id === 'E' || d.id === 'K') state.settings[d.id] = d.data(); else if (d.id === 'rewards') state.rewards = normRewards(d.data()); }); renderAll(); }, () => {});
-  db.collection('recipes').onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { next[d.id] = normRecipe(d.data()); }); state.recipes = next; if (isOpen('sec-tarifler')) renderAll(); }, () => {});
-  db.collection('analysis').limit(200).onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { const a = d.data(); if (a && typeof a.text === 'string') next[d.id] = { text: a.text.slice(0, 4000), at: String(a.at || '').slice(0, 30), points: Number(a.points) || 0 }; }); state.analysis = next; if (isOpen('sec-gelisim')) renderAll(); }, () => {});
+  db.collection('recipes').onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { next[d.id] = normRecipe(d.data()); }); state.recipes = next; if (state.tab === 'tarifler') renderAll(); }, () => {});
 }
 </script>
 
@@ -767,7 +772,7 @@ function motto(L, c, pts, p, lp) {
   if (meals === 5) return 'Beş öğün tamam, kan şekeri dümdüz 📈';
   if (lp.streak >= 2) return lp.streak + ' haftalık seri sürüyor, zincir kırılmasın 🔗';
   if (pts >= 8) return 'Bir iki adım kaldı: yürüyüş, su ya da erken yatış, gün senin 🚶';
-  const pool = ['Küçük adımlar, büyük merdiven 🪜', 'Bugünün puanı yarının ödülü 🎁', 'Önce salata, sonra protein, en son bulgur 🥗', 'Yemek sonrası 10 dakika yürüyüş, kan şekerine en ucuz ilaç 🚶', 'Kefir gece dostudur, cips değil 🥛', 'Haftada bir tartı yeter; günlük dalga sudur 🌊', 'Zerdeçala karabiber, emilim 20 kat 🌶'];
+  const pool = ['Küçük adımlar, büyük merdiven 🪜', 'Bugünün puanı yarının ödülü 🎁', 'Her görev bir puan, her puan ödüle bir adım 🎯', 'Zincir kırılmasın; bugün de işaretle 🔗', 'On puan = kazanılmış gün. Hadi 🙌', 'Hafta sonu ödülü için bugünden başla 🌟', 'Haftada bir tartı, her gün bir görev ⚖️'];
   return pool[parseD(state.date).getDay()];
 }
 function heroHtml(p, L, c) {
@@ -815,8 +820,7 @@ function questsHtml(p, L, c) {
     (nx ? '<div class="next"><b>' + nx[0] + '</b><span>Sırada: ' + esc(nx[1]) + '</span></div>' : '') +
     (miss.length ? '<p class="tiny">Saate göre eksik: ' + esc(miss.join(', ')) + '</p>' : '') +
     '<div class="qlist">' + rows + '</div>' +
-    '<div><div class="waterline"><b>💧 Su ' + L.water + ' / ' + goal + ' bardak</b><span class="tiny num">' + n1(L.water * 0.25) + ' L · hedefte +2 puan</span></div><div class="drops">' + drops + '</div></div>' +
-    '<div class="tipbox">' + esc(menu.tip) + '</div></div>';
+    '<div><div class="waterline"><b>💧 Su ' + L.water + ' / ' + goal + ' bardak</b><span class="tiny num">' + n1(L.water * 0.25) + ' L · hedefte +2 puan</span></div><div class="drops">' + drops + '</div></div></div>';
 }
 function foodsBody(L, p) {
   const rows = L.foods.map(f => {
@@ -970,144 +974,17 @@ function bindToday() {
 
 <script>
 'use strict';
-// ---------- progress, weekly analysis, program ----------
-function linfit(pts) { const n = pts.length; if (n < 2) return null; let sx = 0, sy = 0, sxx = 0, sxy = 0; for (const q of pts) { sx += q.x; sy += q.y; sxx += q.x * q.x; sxy += q.x * q.y; } const den = n * sxx - sx * sx; if (!den) return null; const m = (n * sxy - sx * sy) / den; return { m: m, b: (sy - m * sx) / n }; }
-function planWeight(c, date) { const t = daysBetween(c.startDate, date); if (t < 0) return c.startWeight; return Math.max(c.goalWeight, c.startWeight - c.rate * t / 7); }
-function planEndDate(c) { const weeks = c.rate > 0 ? (c.startWeight - c.goalWeight) / c.rate : 13; return addDays(c.startDate, Math.max(7, Math.ceil(weeks * 7))); }
-function weekSummary(p, ws) {
-  const c = cfg(p), s = { ws: ws, we: addDays(ws, 6), days: 0, logged: 0, meals: { k: 0, a1: 0, o: 0, a2: 0, ak: 0 }, mealsDone: 0, water: [], waterDays: 0, run: 0, walkNoon: 0, walkEve: 0, strength: 0, weights: [], kcal: [], sleep: [], late: 0, points: weekPoints(p, ws) };
-  for (let i = 0; i < 7; i++) {
-    const d = addDays(ws, i); if (d > state.today) break; s.days++;
-    const L = state.logs[logId(p, d)]; if (!L) continue; s.logged++;
-    MEAL_KEYS.forEach(k => { if (L.meals[k]) { s.meals[k]++; s.mealsDone++; } });
-    s.water.push(L.water); if (L.water >= c.waterGoal) s.waterDays++;
-    if (L.run) s.run++; if (L.walkNoon) s.walkNoon++; if (L.walkEve) s.walkEve++; if (L.strength) s.strength++;
-    if (L.weight != null) s.weights.push({ d: d, w: L.weight });
-    const kc = L.foods.reduce((a, f) => a + (f.kcal || 0), 0); if (kc > 0) s.kcal.push(kc);
-    if (L.sleep != null) s.sleep.push(L.sleep); if (L.bed && L.bed > '23:15') s.late++;
-  }
-  return s;
-}
-function ruleAnalysis(p, s, prevS) {
-  const c = cfg(p), out = [], denom = s.logged * 5;
-  if (!s.logged) return ['Bu hafta için kayıt yok. Bugün sekmesinden işaretlemeye başlayın; analiz kayıtla birlikte oluşur.'];
-  const won = [0, 1, 2, 3, 4, 5, 6].filter(i => { const L = state.logs[logId(p, addDays(s.ws, i))]; return L && dayPoints(L, c) >= DAY_WIN; }).length;
-  out.push('Puan: ' + s.points.points + '/' + WEEK_MAX + ' (' + Math.round(s.points.points / WEEK_MAX * 100) + '%), kazanılan gün ' + won + '/' + s.logged + '. ' + (s.points.points >= 65 ? 'Çok iyi bir hafta.' : s.points.points >= 50 ? 'Program büyük ölçüde tuttu.' : 'Hafta zorlu geçmiş; aşağıdaki tek odağa bakın.'));
-  const adh = denom ? Math.round(s.mealsDone / denom * 100) : 0;
-  const worst = MEAL_KEYS.slice().sort((a, b) => s.meals[a] - s.meals[b])[0];
-  out.push('Öğün uyumu %' + adh + (s.meals[worst] < s.logged ? '; en çok atlanan: ' + MEAL_NAMES[worst] + ' (' + s.meals[worst] + '/' + s.logged + ' gün).' : '; hiçbir öğün atlanmamış.'));
-  const wa = avg(s.water);
-  if (wa != null) out.push('Su ortalama ' + n1(wa) + ' bardak/gün (hedef ' + c.waterGoal + '); hedefe ulaşılan gün ' + s.waterDays + '/' + s.logged + '.');
-  out.push('Hareket: koşu ' + s.run + ', öğle yürüyüşü ' + s.walkNoon + ', akşam yürüyüşü ' + s.walkEve + ', kuvvet ' + s.strength + ' gün.');
-  if (s.weights.length) {
-    const last = s.weights[s.weights.length - 1], plan = planWeight(c, last.d), diff = last.w - plan;
-    let w = 'Tartı ' + n1(last.w) + ' kg (' + fmtD(last.d) + '); plana göre ' + (Math.abs(diff) <= 0.5 ? 'tam planda.' : diff < 0 ? n1(-diff) + ' kg önde.' : n1(diff) + ' kg geride.');
-    if (prevS && prevS.weights.length) { const pw = prevS.weights[prevS.weights.length - 1].w; w += ' Geçen haftaya göre ' + sgn(last.w - pw) + ' kg.'; }
-    out.push(w);
-  } else out.push('Bu hafta tartı yok; haftalık tartı +5 puan ve gidişatın tek nesnel ölçüsü.');
-  const ka = avg(s.kcal);
-  if (ka != null && s.kcal.length >= 2) out.push('Kayıtlı öğünlerden günlük ortalama ' + Math.round(ka) + ' kcal (hedef ' + c.kcal + '); ' + (ka > c.kcal * 1.1 ? 'hedefin üstünde, porsiyonları kontrol edin.' : ka < c.kcal * 0.8 ? 'hedefin çok altında olabilir ya da bazı öğünler kaydedilmemiş.' : 'hedefle uyumlu.'));
-  const sl = avg(s.sleep);
-  if (sl != null) out.push('Uyku ortalama ' + n1(sl) + ' saat' + (s.late ? '; ' + s.late + ' gece 23:15\'ten geç yatılmış.' : '; yatış saati tutmuş.'));
-  if (p === 'K') { const ci = cycleInfo(c, s.we < state.today ? s.we : state.today); if (ci) out.push('Döngü: ' + ci.phase + ' (' + ci.day + '. gün). ' + (ci.pms ? 'Tartıdaki dalgalanma ve tatlı isteği bu dönemde beklenir.' : '')); }
-  let focus;
-  if (adh < 70) focus = MEAL_NAMES[worst] + ' öğününü sabit saate bağlamak (telefona hatırlatma).';
-  else if (wa != null && wa < c.waterGoal * 0.7) focus = 'Su: masada 750 ml şişe, her ana öğünden 15 dk önce 1 bardak.';
-  else if (s.walkNoon + s.walkEve < s.logged) focus = 'Yemek sonrası 10 dk yürüyüş: kan şekeri ve gece atıştırması için en ucuz araç.';
-  else if (!s.weights.length) focus = DAY_NAMES[c.weighDay] + ' sabahı tartı.';
-  else focus = 'Aynı düzeni koru; porsiyon ölçülerini (zeytinyağı, ekmek, kuruyemiş) gözden geçir.';
-  out.push('Gelecek haftanın tek odağı: ' + focus);
-  return out;
-}
-function renderProgress() {
-  const p = state.person, c = cfg(p), today = state.today;
-  const wl = logsOf(p).filter(l => l.weight != null), last = wl.length ? wl[wl.length - 1] : null, cur = last ? last.weight : c.startWeight;
-  const lost = c.startWeight - cur, remain = cur - c.goalWeight, endPlan = planEndDate(c);
-  const dayN = Math.max(0, daysBetween(c.startDate, today)), totalDays = daysBetween(c.startDate, endPlan);
-  const recent = wl.filter(l => daysBetween(l.date, today) <= 28 && l.date <= today);
-  let pace = null, eta = null;
-  if (recent.length >= 3 && daysBetween(recent[0].date, recent[recent.length - 1].date) >= 7) { const fit = linfit(recent.map(l => ({ x: daysBetween(c.startDate, l.date), y: l.weight }))); if (fit) { pace = fit.m * 7; if (fit.m < -0.005 && cur > c.goalWeight) eta = addDays(today, Math.ceil((cur - c.goalWeight) / -fit.m)); } }
-  const diff = last ? last.weight - planWeight(c, last.date) : 0;
-  const pill = !last ? '<span class="pill">Henüz tartı yok</span>' : Math.abs(diff) <= 0.5 ? '<span class="pill good">Planda</span>' : diff < 0 ? '<span class="pill good">Planın önünde ' + n1(-diff) + ' kg</span>' : '<span class="pill warn">Planın gerisinde ' + n1(diff) + ' kg</span>';
-  const ws0 = mondayOf(today), sums = [0, 1, 2, 3].map(i => weekSummary(p, addDays(ws0, -7 * i)));
-  const f = v => v == null ? '—' : n1(v);
-  const table = '<div class="tablewrap"><table><thead><tr><th>Hafta</th><th class="n">Puan</th><th class="n">Kilo</th><th class="n">Su</th><th class="n">Öğün %</th><th class="n">Koşu</th><th class="n">kcal</th></tr></thead><tbody>' +
-    sums.map(s => { const lw = s.weights.length ? s.weights[s.weights.length - 1].w : null, ka = avg(s.kcal); return '<tr><td>' + parseD(s.ws).getDate() + '–' + parseD(s.we).getDate() + ' ' + MONTHS_TR[parseD(s.we).getMonth()] + (s.logged ? '' : ' <span class="tiny">(kayıt yok)</span>') + '</td><td class="n">' + (s.logged ? s.points.points : '—') + '</td><td class="n">' + f(lw) + '</td><td class="n">' + f(avg(s.water)) + '</td><td class="n">' + (s.logged ? Math.round(s.mealsDone / (s.logged * 5) * 100) : '—') + '</td><td class="n">' + (s.logged ? s.run : '—') + '</td><td class="n">' + (ka != null ? Math.round(ka) : '—') + '</td></tr>'; }).join('') + '</tbody></table></div>';
-  const key = p + '_' + ws0, prevKey = p + '_' + addDays(ws0, -7), an = state.analysis[key], anPrev = state.analysis[prevKey];
-  const rules = ruleAnalysis(p, sums[0], sums[1]), rulesPrev = sums[1].logged ? ruleAnalysis(p, sums[1], sums[2]) : null;
-  const claudeBtn = (!STATIC_HOST && state.sample) ? '<div class="row"><button type="button" class="btn small" data-action="claudeAnalyze" data-ws="' + ws0 + '">' + (an ? 'Claude yorumunu yenile' : 'Claude yorumlasın') + '</button><span class="tiny" id="anStatus">' + (an ? 'Son yorum ' + (an.at ? fmtD(an.at.slice(0, 10)) + ' ' + localTime(an.at) : '') : 'Haftanın verisini özetleyip kısa bir koç değerlendirmesi yazar.') + '</span></div>' : (STATIC_HOST ? '<p class="tiny">Claude yorumu Claude sürümünde.</p>' : '');
-  const both = ['E', 'K'].map(q => { const cq = cfg(q), w = logsOf(q).filter(l => l.weight != null); const lw = w.length ? w[w.length - 1].weight : cq.startWeight; return { name: cq.name, lost: cq.startWeight - lw, has: w.length > 0, pts: weekPoints(q, ws0).points }; });
-  $('#view-gelisim').innerHTML =
-    '<div class="tiles"><div class="tile"><span class="v num">' + n1(cur) + '<small> kg</small></span><span class="l">' + (last ? 'Son tartı · ' + fmtD(last.date) : 'Başlangıç kilosu') + '</span></div>' +
-    '<div class="tile"><span class="v num">' + (lost > 0.049 ? '−' : lost < -0.049 ? '+' : '') + n1(Math.abs(lost)) + '<small> kg</small></span><span class="l">Verilen</span></div>' +
-    '<div class="tile"><span class="v num">' + n1(Math.max(0, remain)) + '<small> kg</small></span><span class="l">Hedefe kalan (' + n1(c.goalWeight) + ' kg)</span></div>' +
-    '<div class="tile"><span class="v num">' + dayN + '<small> / ' + totalDays + ' gün</small></span><span class="l">Plan bitişi ' + fmtDL(endPlan) + '</span></div></div>' +
-    '<div class="card"><div class="card-h"><h2>Haftalık analiz</h2><span class="meta">' + fmtD(ws0) + ' – ' + fmtD(addDays(ws0, 6)) + '</span></div><div class="analysis">' + rules.map(r => '<p>' + esc(r) + '</p>').join('') + '</div>' +
-    (an ? '<div class="tipbox"><b>Claude:</b> ' + esc(an.text) + '</div>' : '') + claudeBtn +
-    (rulesPrev ? '<details><summary>Geçen hafta<span class="sub">' + fmtD(sums[1].ws) + ' – ' + fmtD(sums[1].we) + '</span></summary><div class="analysis">' + rulesPrev.map(r => '<p>' + esc(r) + '</p>').join('') + (anPrev ? '<div class="tipbox"><b>Claude:</b> ' + esc(anPrev.text) + '</div>' : '') + '</div></details>' : '') + '</div>' +
-    '<div class="card"><div class="card-h"><h2>Kilo eğrisi</h2>' + pill + '</div>' + chartSvg(c, wl, today, endPlan) + '<div class="legend"><span><i></i>Tartılar</span><span><i class="plan"></i>Plan (' + n1(c.rate) + ' kg/hafta)</span><span><i class="goal"></i>Hedef ' + n1(c.goalWeight) + ' kg</span></div><div class="tiny" id="chartTip">' + (wl.length ? 'Noktaya dokununca tarih ve kilo görünür.' : DAY_NAMES[c.weighDay] + ' günü ilk tartıyı girince eğri başlar.') + '</div></div>' +
-    '<div class="card"><div class="card-h"><h2>Tempo</h2><span class="meta">Son 28 gün</span></div>' +
-    (pace == null ? '<p class="muted">Tempo için en az 7 güne yayılmış 3 tartı gerekiyor; haftada bir tartı 3 haftada yeter.</p>' : '<p>Mevcut tempo <b class="num">' + sgn(pace) + ' kg/hafta</b> (plan ' + n1(-c.rate) + ').</p>' + (eta ? '<p>Bu tempoyla hedefe varış: <b>' + fmtDL(eta) + '</b> (plan: ' + fmtDL(endPlan) + ').</p>' : '<p>Bu tempoyla hedefe yaklaşılmıyor; porsiyon, zeytinyağı ve ekmek ölçülerini kontrol edin.</p>') + (pace < -1.2 ? '<p class="muted">Haftada 1 kg\'dan hızlı kayıp kas kaybettirir; porsiyonları kısmayın.</p>' : '')) +
-    '<p class="tiny">Plan: ' + n1(c.startWeight) + ' → ' + n1(c.goalWeight) + ' kg, ' + fmtDL(c.startDate) + ' başlangıç, ' + n1(c.rate) + ' kg/hafta, tartı günü ' + DAY_NAMES[c.weighDay] + '.</p></div>' +
-    '<div class="card"><div class="card-h"><h2>Haftalık özet</h2><span class="meta">Ortalamalar</span></div>' + table + '<p class="tiny">Puan haftalık /' + WEEK_MAX + ' · su bardak/gün · öğün % = işaretlenen / 5 · kcal kayıtlı öğünlerden günlük ortalama</p></div>' +
-    (PERSON_LOCK ? '' : '<div class="card"><div class="card-h"><h2>Birlikte</h2><span class="meta">Bu hafta</span></div><div class="row">' + both.map(b => '<div class="grow"><div class="eyebrow">' + esc(b.name) + '</div><div class="num" style="font-family:var(--font-display);font-weight:700;font-size:1.3rem">' + (b.has ? (b.lost > 0.049 ? '−' : b.lost < -0.049 ? '+' : '') + n1(Math.abs(b.lost)) + ' kg' : '—') + '</div><div class="tiny">' + b.pts + ' puan</div></div>').join('') +
-    '<div class="grow"><div class="eyebrow">Toplam</div><div class="num" style="font-family:var(--font-display);font-weight:700;font-size:1.3rem">' + (both.some(b => b.has) ? '−' + n1(Math.max(0, both.reduce((s, b) => s + (b.has ? b.lost : 0), 0))) + ' kg' : '—') + '</div></div></div></div>');
-}
-function chartSvg(c, wl, today, endPlan) {
-  const W = 360, H = 210, L = 38, R = 14, T = 14, B = 28;
-  let x0 = c.startDate; if (wl.length && wl[0].date < x0) x0 = wl[0].date;
-  let x1 = endPlan; if (today > x1) x1 = today; if (wl.length && wl[wl.length - 1].date > x1) x1 = wl[wl.length - 1].date;
-  const span = Math.max(14, daysBetween(x0, x1));
-  const ys = wl.map(l => l.weight).concat([c.startWeight, c.goalWeight]);
-  let yMin = Math.floor(Math.min.apply(null, ys)) - 1, yMax = Math.ceil(Math.max.apply(null, ys)) + 1; if (yMax - yMin < 6) yMax = yMin + 6;
-  const X = d => L + (daysBetween(x0, d) / span) * (W - L - R), Y = v => T + (yMax - v) / (yMax - yMin) * (H - T - B);
-  let g = ''; const step = (yMax - yMin) > 12 ? 4 : 2;
-  for (let v = yMin; v <= yMax; v += step) g += '<line class="grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '"/><text x="' + (L - 6) + '" y="' + (Y(v) + 4).toFixed(1) + '" text-anchor="end">' + v + '</text>';
-  for (let i = 0; i <= 4; i++) { const d = addDays(x0, Math.round(span * i / 4)), dd = parseD(d); g += '<text x="' + X(d).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="' + (i === 0 ? 'start' : i === 4 ? 'end' : 'middle') + '">' + dd.getDate() + ' ' + MONTHS_TR[dd.getMonth()] + '</text>'; }
-  g += '<line class="goal" x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(c.goalWeight).toFixed(1) + '" y2="' + Y(c.goalWeight).toFixed(1) + '"/>';
-  g += '<line class="plan" x1="' + X(c.startDate).toFixed(1) + '" y1="' + Y(c.startWeight).toFixed(1) + '" x2="' + X(endPlan).toFixed(1) + '" y2="' + Y(c.goalWeight).toFixed(1) + '"/>';
-  if (wl.length) {
-    const pts = wl.map(l => [X(l.date), Y(l.weight)]), path = pts.map((q, i) => (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' ');
-    if (pts.length > 1) g += '<path class="area" d="' + path + ' L' + pts[pts.length - 1][0].toFixed(1) + ' ' + (H - B) + ' L' + pts[0][0].toFixed(1) + ' ' + (H - B) + ' Z"/>';
-    g += '<path class="line" d="' + path + '"/>';
-    wl.forEach((l, i) => { const q = pts[i]; g += '<circle class="dot" cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="' + (i === wl.length - 1 ? 5 : 4) + '" data-d="' + l.date + '" data-w="' + l.weight + '"><title>' + fmtD(l.date) + ' · ' + n1(l.weight) + ' kg</title></circle>'; });
-    const lp = pts[pts.length - 1], anchor = lp[0] > W - 60 ? 'end' : 'start';
-    g += '<text class="lbl" x="' + (lp[0] + (anchor === 'end' ? -8 : 8)).toFixed(1) + '" y="' + (lp[1] - 8).toFixed(1) + '" text-anchor="' + anchor + '">' + n1(wl[wl.length - 1].weight) + '</text>';
-  }
-  return '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Kilo eğrisi">' + g + '</svg>';
-}
-async function claudeAnalysis(p, ws) {
-  if (!state.sample) return;
-  const c = cfg(p), s = weekSummary(p, ws), prev = weekSummary(p, addDays(ws, -7));
-  const data = { kisi: p === 'E' ? '35 yaş erkek, 170 cm, hedef 87→78 kg, 1800 kcal, ailede diyabet, zaman zaman şişkinlik' : '37 yaş kadın, 160 cm, hedef 74→62 kg (3 ayda 67–68 ara hedef), 1450 kcal, dönemsel tatlı isteği',
-    hafta: s.ws + ' / ' + s.we, kayitli_gun: s.logged, puan: s.points.points + '/75', ogunler: s.meals, su_ort: avg(s.water), su_hedef: c.waterGoal, kosu: s.run, yuruyus: s.walkNoon + s.walkEve, kuvvet: s.strength,
-    tartilar: s.weights, plan_kilo_hafta_sonu: Math.round(planWeight(c, s.we) * 10) / 10, onceki_hafta_tarti: prev.weights.length ? prev.weights[prev.weights.length - 1].w : null, kcal_ort: avg(s.kcal), uyku_ort: avg(s.sleep), gec_yatis: s.late,
-    notlar: [0, 1, 2, 3, 4, 5, 6].map(i => { const L = state.logs[logId(p, addDays(ws, i))]; return L && L.note ? L.note.slice(0, 120) : null; }).filter(Boolean) };
-  if (p === 'K') { const ci = cycleInfo(c, s.we < state.today ? s.we : state.today); if (ci) data.dongu = ci.phase + ', ' + ci.day + '. gün'; }
-  const prompt = 'Sen destekleyici ama net bir beslenme koçusun. Aşağıdaki haftalık takip özetine (JSON) göre Türkçe bir hafta değerlendirmesi yaz: 1) iyi giden, 2) aksayan, 3) gelecek haftanın tek odağı; sonunda 1 cümle motivasyon. En fazla 110 kelime, madde işaretleriyle, başlık yok, yargılama yok. Program: Akdeniz tipi, 3 ana + 2 ara öğün, öğünler 07:30/10:30/12:30/16:00/19:00, haftalık tartı, sabah koşusu, yemek sonrası yürüyüş.\n' + JSON.stringify(data);
-  const st = $('#anStatus'); if (st) st.textContent = 'Claude yazıyor…';
-  const btn = $('[data-action="claudeAnalyze"]'); if (btn) btn.disabled = true;
-  try { const r = await state.sample(prompt, { modelTier: 'default', cache: false }); await saveAnalysis(p + '_' + ws, { text: r.text.slice(0, 4000), at: new Date().toISOString(), points: s.points.points }); }
-  catch (e) { const code = e && e.code ? e.code : 'hata'; if (code === 'not_granted' || code === 'sampling_disabled') state.sample = null; const st2 = $('#anStatus'); if (st2) st2.textContent = code === 'rate_limited' ? 'Şu an çok istek var; birazdan deneyin.' : 'Yorum alınamadı (' + code + ').'; }
-  renderProgress();
-}
-function bindProgress() {
-  $('#view-gelisim').addEventListener('click', e => {
-    const dot = e.target.closest('.dot'); if (dot) { $('#chartTip').textContent = fmtDL(dot.dataset.d) + ': ' + n1(Number(dot.dataset.w)) + ' kg'; return; }
-    const b = e.target.closest('[data-action="claudeAnalyze"]'); if (b) claudeAnalysis(state.person, b.dataset.ws);
-  });
-}
+// ---------- menu tab: rhythm, weekly menu, snacks, drinks ----------
 function renderProgram() {
   const p = state.person, name = cfg(p).name, dow = parseD(state.today).getDay(), hm = nowHM();
   let curI = -1; RHYTHM.forEach((r, i) => { if (r[0] <= hm) curI = i; });
   const tl = RHYTHM.map((r, i) => '<div class="tl' + (i === curI ? ' now' : '') + '"><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>').join('');
-  const days = [1, 2, 3, 4, 5, 6, 0].map(k => { const m = MENU[k]; return '<details' + (k === dow ? ' open' : '') + '><summary>' + m.name + (k === dow ? ' · bugün' : '') + '</summary><div class="mlist">' + m.meals.map(x => '<div class="mi"><b>' + MEAL_NAMES[x.k] + ' ' + MEAL_TIMES[x.k] + '</b> · ' + esc(x.t) + (x[p] ? '<span class="p">' + esc(name) + ': ' + esc(x[p]) + '</span>' : '') + recipeLinks(k, x.k) + '</div>').join('') + '<div class="tipbox">' + esc(m.tip) + '</div></div></details>'; }).join('');
+  const days = [1, 2, 3, 4, 5, 6, 0].map(k => { const m = MENU[k]; return '<details' + (k === dow ? ' open' : '') + '><summary>' + m.name + (k === dow ? ' · bugün' : '') + '</summary><div class="mlist">' + m.meals.map(x => '<div class="mi"><b>' + MEAL_NAMES[x.k] + ' ' + MEAL_TIMES[x.k] + '</b> · ' + esc(x.t) + (x[p] ? '<span class="p">' + esc(name) + ': ' + esc(x[p]) + '</span>' : '') + recipeLinks(k, x.k) + '</div>').join('') + '</div></details>'; }).join('');
   $('#view-program').innerHTML =
+    '<div class="card"><div class="card-h"><h2>Haftalık menü</h2><span class="meta">' + esc(name) + ' porsiyonları · 📖 tarife gider</span></div><div>' + days + '</div></div>' +
     '<div class="card"><div class="card-h"><h2>Günlük ritim</h2><span class="meta">Hafta içi · hafta sonu koşu 07:00, kahvaltı 08:30</span></div><div class="timeline">' + tl + '</div></div>' +
-    '<div class="card"><div class="card-h"><h2>Haftalık menü</h2><span class="meta">' + esc(name) + ' porsiyonları</span></div><div>' + days + '</div></div>' +
     '<div class="card"><div class="card-h"><h2>Ara öğün havuzu</h2><span class="meta">100–150 kcal</span></div><ul class="plain">' + SNACKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
-    '<div class="card"><div class="card-h"><h2>İçecekler</h2></div><ul class="plain">' + DRINKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
-    '<div class="card"><div class="card-h"><h2>Neyi neyle</h2></div><ul class="plain">' + RULES.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>';
+    '<div class="card"><div class="card-h"><h2>İçecekler</h2></div><ul class="plain">' + DRINKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>';
 }
 </script>
 
@@ -1126,7 +1003,10 @@ function renderRecipes() {
       '<div><div class="eyebrow">Yapılışı</div><ol class="plain">' + r.steps.map(s => '<li>' + esc(s) + '</li>').join('') + '</ol></div>' +
       '<p class="muted"><b>Porsiyon</b> · E: ' + esc(r.por.E) + ' · K: ' + esc(r.por.K) + '</p><div class="tipbox">' + esc(r.tip) + '</div>' +
       '<div class="field"><label for="rn-' + r.id + '">Notunuz (değişiklik, beğeni)</label><input type="text" id="rn-' + r.id + '" data-note="' + r.id + '" value="' + esc(d.note) + '" maxlength="300" placeholder="Örn. kimyonu artırdık, çocuklar sevdi"></div></div></details>'; }).join('');
-  $('#view-tarifler').innerHTML = '<div class="card"><div class="card-h"><h2>Pratik tarifler</h2><span class="meta">' + RECIPES.length + ' tarif · favoriler üstte</span></div><p class="tiny">Programdaki yemeklerin iki kişilik tarifleri. Yıldızlayın, favorilere alın, notunuzu yazın; ikiniz de görürsünüz.</p><div>' + items + '</div></div>';
+  const dayTips = [1, 2, 3, 4, 5, 6, 0].map(k => '<li><b>' + MENU[k].name + ':</b> ' + esc(MENU[k].tip) + '</li>').join('');
+  $('#view-tarifler').innerHTML = '<div class="card"><div class="card-h"><h2>Pratik tarifler</h2><span class="meta">' + RECIPES.length + ' tarif · favoriler üstte</span></div><p class="tiny">Programdaki yemeklerin iki kişilik tarifleri. Yıldızlayın, favorilere alın, notunuzu yazın; ikiniz de görürsünüz.</p><div>' + items + '</div></div>' +
+    '<div class="card"><div class="card-h"><h2>Püf noktaları</h2><span class="meta">Neyi neyle, nasıl pişir</span></div><ul class="plain">' + RULES.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
+    '<div class="card"><div class="card-h"><h2>Günün püf noktası</h2><span class="meta">Haftalık menüye göre</span></div><ul class="plain">' + dayTips + '</ul></div>';
 }
 function bindRecipes() {
   const v = $('#view-tarifler'); const timers = new Map();
@@ -1138,7 +1018,7 @@ function bindRecipes() {
 }
 
 // ---------- settings ----------
-function backupJson() { return JSON.stringify({ app: 'beslenme-takip', v: 2, exported: new Date().toISOString(), settings: { E: state.settings.E, K: state.settings.K }, rewards: state.rewards, recipes: state.recipes, analysis: state.analysis, logs: state.logs }); }
+function backupJson() { return JSON.stringify({ app: 'beslenme-takip', v: 2, exported: new Date().toISOString(), settings: { E: state.settings.E, K: state.settings.K }, rewards: state.rewards, recipes: state.recipes, logs: state.logs }); }
 async function restoreBackup(text) {
   let data; try { data = JSON.parse(text); } catch (e) { return 'Yedek metni okunamadı; tamamını yapıştırdığınızdan emin olun.'; }
   if (!data || typeof data !== 'object' || !data.logs || typeof data.logs !== 'object') return 'Bu metin bir yedek değil.';
@@ -1147,7 +1027,6 @@ async function restoreBackup(text) {
   if (data.settings && typeof data.settings === 'object') for (const p of ['E', 'K']) if (data.settings[p] && typeof data.settings[p] === 'object') { state.settings[p] = data.settings[p]; await writeDoc('settings/' + p, state.settings[p]); }
   if (data.rewards && typeof data.rewards === 'object') { const inc = normRewards(data.rewards); ['E', 'K'].forEach(q => { Object.assign(inc.claimed[q], state.rewards.claimed[q], inc.claimed[q]); }); state.rewards = inc; await saveRewards(); }
   if (data.recipes && typeof data.recipes === 'object') for (const id of Object.keys(data.recipes)) if (!state.recipes[id]) await saveRecipe(id, normRecipe(data.recipes[id]));
-  if (data.analysis && typeof data.analysis === 'object') for (const k of Object.keys(data.analysis)) if (!state.analysis[k] && data.analysis[k] && typeof data.analysis[k].text === 'string') await saveAnalysis(k, data.analysis[k]);
   if (!canDb()) persistLocal();
   renderAll(); return n + ' günlük kayıt eklendi veya güncellendi.';
 }
@@ -1189,31 +1068,27 @@ function bindSettings() {
   });
 }
 
-// ---------- shell: one page, collapsible sections ----------
-const SECS = { 'sec-gelisim': renderProgress, 'sec-program': renderProgram, 'sec-tarifler': renderRecipes, 'sec-ayarlar': renderSettings };
-function isOpen(id) { const el = document.getElementById(id); return !!(el && el.open); }
+// ---------- shell: tabs (in-page views) ----------
+const TABS = { bugun: { view: 'view-bugun', render: null }, menu: { view: 'view-program', render: renderProgram }, tarifler: { view: 'view-tarifler', render: renderRecipes }, ayarlar: { view: 'view-ayarlar', render: renderSettings } };
 function focusedInput() { const a = document.activeElement; return !!(a && a.closest && a.closest('#view-bugun') && /^(INPUT|TEXTAREA)$/.test(a.tagName)); }
-function renderHeader() { if (!focusedInput()) renderToday(); }
-function renderAll() {
-  if (!focusedInput()) renderToday();
-  Object.keys(SECS).forEach(id => {
-    if (!isOpen(id)) return;
-    const a = document.activeElement;
-    if (a && a.closest && a.closest('#' + id) && /^(INPUT|TEXTAREA)$/.test(a.tagName)) return;
-    SECS[id]();
-  });
+function renderTab() {
+  Object.keys(TABS).forEach(t => { $('#' + TABS[t].view).hidden = state.tab !== t; $('#tab-' + t).classList.toggle('on', state.tab === t); });
+  if (state.tab === 'bugun') { if (!focusedInput()) renderToday(); return; }
+  const a = document.activeElement;
+  if (a && a.closest && a.closest('#' + TABS[state.tab].view) && /^(INPUT|TEXTAREA)$/.test(a.tagName)) return;
+  TABS[state.tab].render();
 }
+function renderAll() { renderTab(); }
+function setTab(t) { if (!TABS[t]) t = 'bugun'; state.tab = t; if (location.hash.replace('#', '') !== t) { try { location.hash = t; } catch (e) {} } renderTab(); window.scrollTo(0, 0); }
 function refreshNext() {
   const t = todayStr();
-  if (state.today !== t) { if (state.date === state.today) state.date = t; state.today = t; if (!focusedInput()) renderToday(); return; }
-  if (state.date === t && !focusedInput()) renderToday();
+  if (state.today !== t) { if (state.date === state.today) state.date = t; state.today = t; if (state.tab === 'bugun' && !focusedInput()) renderToday(); return; }
+  if (state.tab === 'bugun' && state.date === t && !focusedInput()) renderToday();
 }
 function openRecipe(id) {
   if (!RECIPES.find(r => r.id === id)) return;
-  const sec = document.getElementById('sec-tarifler');
-  state.open.add('sec-tarifler'); state.open.add('rec-' + id); lsSet('bt_open', Array.from(state.open));
-  if (sec && !sec.open) sec.open = true;
-  renderRecipes();
+  state.open.add('rec-' + id); lsSet('bt_open', Array.from(state.open));
+  setTab('tarifler');
   const d = document.getElementById('rec-' + id); if (d) { d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
 function boot() {
@@ -1223,10 +1098,11 @@ function boot() {
     const el = e.target; if (!el || el.tagName !== 'DETAILS' || !el.id) return;
     if (el.open) state.open.add(el.id); else state.open.delete(el.id);
     lsSet('bt_open', Array.from(state.open));
-    if (el.open && SECS[el.id]) SECS[el.id]();
   }, true);
-  Object.keys(SECS).forEach(id => { const el = document.getElementById(id); if (el && state.open.has(id)) el.open = true; });
-  bindToday(); bindProgress(); bindRecipes(); bindSettings();
+  $('.tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
+  window.addEventListener('hashchange', () => { const t = location.hash.replace('#', ''); if (t !== state.tab) setTab(t); });
+  const h = location.hash.replace('#', ''); state.tab = TABS[h] ? h : 'bugun';
+  bindToday(); bindRecipes(); bindSettings();
   setInterval(refreshNext, 60000);
   connect();
 }
