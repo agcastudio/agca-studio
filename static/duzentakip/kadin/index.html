@@ -3,19 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Beslenme Takip Defteri</title>
-<meta name="description" content="İki kişilik kış beslenme programı için günlük takip. Listelenmeyen sayfa.">
+<title>Beslenme Takip · Kadın</title>
+<meta name="description" content="İki kişilik kış beslenme programı için günlük takip (Kadın). Listelenmeyen sayfa.">
 <meta name="robots" content="noindex, nofollow, noimageindex, noarchive">
 <meta name="theme-color" content="#F2F3EE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#15180F" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Takip">
+<meta name="apple-mobile-web-app-title" content="Takip Kadın">
 <link rel="icon" href="/img/mark.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/inter-turkish.woff2" as="font" type="font/woff2" crossorigin><style>
+<link rel="preload" href="/fonts/inter-turkish.woff2" as="font" type="font/woff2" crossorigin>
+<script>window.PERSON_LOCK = 'K';</script>
+<style>
 /* Sitenin kendi Inter dosyaları (KARARLAR 2026-09-19 / 9: Google Fonts kullanılmaz) */
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 400 600; font-display: swap; src: url("/fonts/inter-latin.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 400 600; font-display: swap; src: url("/fonts/inter-turkish.woff2") format("woff2"); unicode-range: U+011E-011F, U+0130, U+015E-015F; }
@@ -157,6 +159,14 @@ textarea { width: 100%; min-height: 64px; resize: vertical; }
 .pill.warn { background: var(--warn-soft); color: var(--warn); }
 .pill.accent { background: var(--accent-soft); color: var(--accent); }
 .reward .big { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; }
+.bar.big { height: 14px; border-radius: 8px; }
+.ladder { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.rung { text-align: center; font-size: 0.68rem; color: var(--ink-3); line-height: 1.2; }
+.rung .ic { display: block; font-size: 1.35rem; line-height: 1.3; }
+.rung.done { color: var(--good); font-weight: 600; }
+.rung.next { color: var(--accent); font-weight: 700; }
+.rung.lock { opacity: 0.55; }
+.weekly { border-top: 1px solid var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 6px; }
 .reward .pts { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; }
 .reward .pts small { font-size: 0.9rem; color: var(--ink-2); font-weight: 500; }
 .food { display: grid; grid-template-columns: 56px 1fr; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); align-items: start; }
@@ -467,10 +477,11 @@ function avg(a) { return a.length ? a.reduce((x, y) => x + y, 0) / a.length : nu
 const isDate = s => /^\d{4}-\d{2}-\d{2}$/.test(String(s));
 
 // ---------- state ----------
+const PERSON_LOCK = (window.PERSON_LOCK === 'E' || window.PERSON_LOCK === 'K') ? window.PERSON_LOCK : null;
 const state = {
-  person: lsGet('bt_person', 'E') === 'K' ? 'K' : 'E',
+  person: PERSON_LOCK || (lsGet('bt_person', 'E') === 'K' ? 'K' : 'E'),
   date: todayStr(), today: todayStr(), tab: 'bugun',
-  logs: {}, settings: { E: null, K: null }, rewards: { items: [] }, recipes: {}, analysis: {},
+  logs: {}, settings: { E: null, K: null }, rewards: null, recipes: {}, analysis: {},
   mode: 'loading', db: null, sample: null, assets: null, imgOk: false,
   dirty: new Set(), pendingLocal: new Set(), timers: new Map(), inflight: new Map(),
   busy: new Set(), showWeight: false, modeNote: ''
@@ -518,12 +529,34 @@ function cfg(p) {
   }
   return s;
 }
+const RUNG_WEEKS = [1, 2, 4, 8, 13, 26];
+const RUNG_LABELS = { 1: 'Her hafta', 2: '2 hafta', 4: '1 ay', 8: '2 ay', 13: '3 ay', 26: '6 ay' };
+const LADDER_DEFAULT = {
+  E: [{ weeks: 1, icon: '🕌', title: 'Camii gezisi' }, { weeks: 2, icon: '🩸', title: 'Detaylı kan tahlili' }, { weeks: 4, icon: '🦷', title: 'Diş temizletme' }, { weeks: 8, icon: '👟', title: 'Koşu ekipmanı' }, { weeks: 13, icon: '🎿', title: 'Kayak tatili' }, { weeks: 26, icon: '✨', title: 'Tüm eşyalarımı sıfırlama' }],
+  K: [{ weeks: 1, icon: '📍', title: 'Yeni bir mekân gezisi' }, { weeks: 2, icon: '🍽️', title: 'AKM\'de yemek' }, { weeks: 4, icon: '📖', title: 'Kubi bir kitap okuyacak' }, { weeks: 8, icon: '📱', title: 'Telefon yenileme' }, { weeks: 13, icon: '🎿', title: '3–4 gün kayak tatili' }, { weeks: 26, icon: '🏝️', title: 'Girit adası tatili' }]
+};
 function normRewards(doc) {
-  const items = doc && Array.isArray(doc.items) ? doc.items : [];
-  return { items: items.filter(r => r && typeof r === 'object').slice(0, 50).map(r => ({
-    id: String(r.id || uid()).slice(0, 24), title: String(r.title || '').slice(0, 80),
-    who: ['E', 'K', 'B'].indexOf(r.who) >= 0 ? r.who : 'B', points: Math.round(num(r.points, 10, 75) || REWARD_DEFAULT_POINTS),
-    claimed: r.claimed && typeof r.claimed === 'object' && isDate(r.claimed.week) ? { week: r.claimed.week, date: isDate(r.claimed.date) ? r.claimed.date : r.claimed.week, by: r.claimed.by === 'K' ? 'K' : 'E' } : null })) };
+  const d = doc && typeof doc === 'object' ? doc : {};
+  const out = { threshold: Math.round(num(d.threshold, 20, 75) || REWARD_DEFAULT_POINTS), ladder: { E: [], K: [] }, claimed: { E: {}, K: {} } };
+  ['E', 'K'].forEach(p => {
+    const src = d.ladder && Array.isArray(d.ladder[p]) ? d.ladder[p] : [];
+    out.ladder[p] = RUNG_WEEKS.map((w, i) => { const r = src.find(x => x && Number(x.weeks) === w) || {}; const def = LADDER_DEFAULT[p][i]; return { weeks: w, icon: String(r.icon || def.icon).slice(0, 4), title: String(r.title || def.title).slice(0, 80) }; });
+    const cl = d.claimed && d.claimed[p] && typeof d.claimed[p] === 'object' ? d.claimed[p] : {};
+    Object.keys(cl).forEach(k => { if (/^w(2|4|8|13|26)$/.test(k) && isDate(cl[k])) out.claimed[p][k] = cl[k]; });
+  });
+  return out;
+}
+state.rewards = normRewards(null);
+function ladderProgress(p) {
+  const c = cfg(p), th = state.rewards.threshold, start = mondayOf(c.startDate), cur = mondayOf(state.today);
+  const weeks = []; let count = 0, streak = 0;
+  for (let ws = start; ws <= cur; ws = addDays(ws, 7)) { const pts = weekPoints(p, ws).points, ok = pts >= th; weeks.push({ ws: ws, points: pts, ok: ok }); if (ok) { count++; streak++; } else if (ws !== cur) streak = 0; }
+  const curW = weeks.length ? weeks[weeks.length - 1] : { ws: cur, points: weekPoints(p, cur).points, ok: false };
+  const frac = curW.ok ? 0 : Math.min(0.99, curW.points / th);
+  const ladder = state.rewards.ladder[p], claimed = state.rewards.claimed[p];
+  const next = ladder.find(r => r.weeks > 1 && count < r.weeks) || null;
+  const earned = ladder.filter(r => r.weeks > 1 && count >= r.weeks && !claimed['w' + r.weeks]);
+  return { weeks: weeks, count: count, streak: streak, current: curW, progress: count + frac, next: next, earned: earned, warmup: cur < start, threshold: th };
 }
 function normRecipe(doc) {
   const r = doc && typeof doc === 'object' ? doc : {};
@@ -546,7 +579,6 @@ function weekPoints(p, ws) {
   for (let i = 0; i < 7; i++) { const d = addDays(ws, i); const L = state.logs[logId(p, d)]; if (!L) continue; pts += dayPoints(L, c); if (L.weight != null) weighed = true; }
   return { points: pts + (weighed ? 5 : 0), weighed: weighed, max: 75 };
 }
-function activeReward(p) { return state.rewards.items.find(r => !r.claimed && (r.who === p || r.who === 'B')) || null; }
 function cycleInfo(c, date) {
   if (!c.cycleStart) return null;
   const L = c.cycleLen, P = c.periodLen;
@@ -653,22 +685,21 @@ function gidisat(L, c) {
   return t;
 }
 function rewardCard(p) {
-  const ws = mondayOf(state.today), wp = weekPoints(p, ws), r = activeReward(p);
-  const daysLeft = 6 - daysBetween(ws, state.today);
-  let body;
-  if (!r) {
-    body = '<p class="muted">Bu hafta <b class="num">' + wp.points + '</b> puan topladınız. Henüz ödül tanımlı değil.</p>' +
-      '<div class="addfood"><input type="text" id="rewardTitle" placeholder="Ödül (örn. Cumartesi sinema)" maxlength="80"><button type="button" class="btn small" data-action="addReward">Ekle</button></div>' +
-      '<p class="tiny">Varsayılan eşik ' + REWARD_DEFAULT_POINTS + ' puan; Ayarlar\'dan değiştirilir. Günde en çok 10 puan: 5 öğün, su hedefi 2, koşu 1, iki yürüyüş 2; haftalık tartı +5.</p>';
-  } else {
-    const pct = Math.min(100, wp.points / r.points * 100), done = wp.points >= r.points;
-    body = '<div class="row"><div class="grow"><div class="eyebrow">' + (r.who === 'B' ? 'Ortak ödül' : cfg(r.who).name + ' için') + '</div><div class="big">' + esc(r.title) + '</div></div>' +
-      '<div class="pts num">' + wp.points + '<small> / ' + r.points + '</small></div></div>' +
-      '<div class="bar' + (done ? ' good' : '') + '"><i style="width:' + pct + '%"></i></div>' +
-      '<div class="row"><span class="tiny grow">' + (done ? 'Ödül hak edildi.' : (r.points - wp.points) + ' puan kaldı · Pazar\'a ' + daysLeft + ' gün' + (wp.weighed ? '' : ' · tartı bonusu +5 bekliyor')) + '</span>' +
-      (done ? '<button type="button" class="btn small" data-action="claimReward" data-id="' + r.id + '">Ödülü aldım</button>' : '') + '</div>';
-  }
-  return '<div class="card reward"><div class="card-h"><h2>Haftalık ödül</h2><span class="meta">' + fmtD(ws) + ' – ' + fmtD(addDays(ws, 6)) + '</span></div>' + body + '</div>';
+  const lp = ladderProgress(p), ladder = state.rewards.ladder[p], th = lp.threshold, name = cfg(p).name;
+  const weekly = ladder[0], cw = lp.current, left = Math.max(0, th - cw.points), daysLeft = 6 - daysBetween(cw.ws, state.today);
+  const track = ladder.map(r => { const done = r.weeks === 1 ? cw.ok : lp.count >= r.weeks, isNext = lp.next && r.weeks === lp.next.weeks; return '<div class="rung' + (done ? ' done' : isNext ? ' next' : ' lock') + '" title="' + esc(r.title) + '"><span class="ic">' + esc(r.icon) + '</span>' + RUNG_LABELS[r.weeks] + (done ? ' ✓' : '') + '</div>'; }).join('');
+  let main;
+  if (lp.warmup) main = '<p class="muted">Program ' + fmtD(mondayOf(cfg(p).startDate)) + ' Pazartesi başlıyor; bu hafta ısınma turu. Puanlar o gün sayılmaya başlar, bar o günden itibaren dolar.</p>';
+  else if (lp.next) {
+    const pct = Math.min(100, lp.progress / lp.next.weeks * 100), remainW = lp.next.weeks - lp.count;
+    main = '<div class="row"><div class="grow"><div class="eyebrow">Sıradaki büyük ödül · ' + RUNG_LABELS[lp.next.weeks] + '</div><div class="big">' + esc(lp.next.icon) + ' ' + esc(lp.next.title) + '</div></div><div class="pts num">' + lp.count + '<small> / ' + lp.next.weeks + ' hafta</small></div></div>' +
+      '<div class="bar big"><i style="width:' + pct + '%"></i></div>' +
+      '<p class="tiny">' + (remainW === 1 ? 'Bu hafta da tutarsa ' + esc(lp.next.title) + ' cebinde! ' : remainW + ' başarılı hafta kaldı. ') + 'Bar her gün puanla dolar; hafta ' + th + ' puana ulaşınca bir basamak çıkılır.' + (lp.streak >= 2 ? ' Seri: ' + lp.streak + ' hafta 🔥' : '') + '</p>';
+  } else main = '<p class="muted">Merdiven tamamlandı 🏆 ' + esc(name) + ', 6 aylık ödül dahil hepsi hak edildi.</p>';
+  const earned = lp.earned.map(r => '<div class="row"><span class="grow">🎉 ' + esc(r.icon) + ' <b>' + esc(r.title) + '</b> hak edildi!</span><button type="button" class="btn small" data-action="claimRung" data-w="' + r.weeks + '">Ödülü aldım</button></div>').join('');
+  const weeklyHtml = lp.warmup ? '' : '<div class="weekly"><div class="row"><span class="grow"><b>' + esc(weekly.icon) + ' ' + esc(weekly.title) + '</b> <span class="tiny">· haftalık ödül</span></span><span class="num tiny">' + cw.points + ' / ' + th + ' puan</span></div><div class="bar' + (cw.ok ? ' good' : '') + '"><i style="width:' + Math.min(100, cw.points / th * 100) + '%"></i></div>' +
+    '<p class="tiny">' + (cw.ok ? 'Bu haftanın ödülü hak edildi: hafta sonu ' + esc(weekly.title.toLocaleLowerCase('tr-TR')) + ' zamanı.' : left + ' puan daha gerek; Pazar\'a ' + daysLeft + ' gün var, günde en çok 10 puan + haftalık tartı 5.') + '</p></div>';
+  return '<div class="card reward"><div class="card-h"><h2>Ödül merdiveni</h2><span class="meta">' + lp.count + ' başarılı hafta' + (lp.streak >= 2 ? ' · seri ' + lp.streak : '') + '</span></div><div class="ladder">' + track + '</div>' + main + earned + weeklyHtml + '</div>';
 }
 function cycleCard(c) {
   const ci = cycleInfo(c, state.date);
@@ -811,8 +842,7 @@ function bindToday() {
       else if (a === 'foodAdd') { const t = $('#foodText'); await addFood(t ? t.value : '', null); }
       else if (a === 'foodDel') { const id = act.dataset.id; editLog(L => { L.foods = L.foods.filter(x => x.id !== id); }); renderToday(); }
       else if (a === 'foodRetry') { analyzeFood(state.person, state.date, act.dataset.id, null); }
-      else if (a === 'addReward') { const t = $('#rewardTitle'); const title = t ? t.value.trim() : ''; if (!title) return; state.rewards.items.push({ id: uid(), title: title, who: 'B', points: REWARD_DEFAULT_POINTS, claimed: null }); await saveRewards(); renderToday(); }
-      else if (a === 'claimReward') { const r = state.rewards.items.find(x => x.id === act.dataset.id); if (r && !r.claimed) { r.claimed = { week: mondayOf(state.today), date: state.today, by: state.person }; await saveRewards(); renderToday(); } }
+      else if (a === 'claimRung') { const w = Number(act.dataset.w); if (RUNG_WEEKS.indexOf(w) > 0) { state.rewards.claimed[state.person]['w' + w] = state.today; await saveRewards(); renderToday(); } }
       else if (a === 'cycleSave') { const inp = $('#cycleDate'); if (!inp || !isDate(inp.value) || inp.value > state.today) return; const c = cfg('K'); c.cycleStart = inp.value; await saveSettings('K', c); renderToday(); }
       else if (a === 'cycleStart') {
         const c = cfg('K'); const hist = c.cycleHistory.slice(); if (c.cycleStart && c.cycleStart !== state.date) hist.push(c.cycleStart);
@@ -826,7 +856,6 @@ function bindToday() {
   v.addEventListener('keydown', e => {
     const meal = e.target.closest('[data-meal]'); if (meal && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); meal.click(); return; }
     if (e.target.id === 'foodText' && e.key === 'Enter') { e.preventDefault(); addFood(e.target.value, null); }
-    if (e.target.id === 'rewardTitle' && e.key === 'Enter') { e.preventDefault(); const b = v.querySelector('[data-action="addReward"]'); if (b) b.click(); }
   });
   v.addEventListener('change', e => { if (e.target.id === 'foodPhoto' && e.target.files && e.target.files[0]) { const t = $('#foodText'); addFood(t ? t.value : '', e.target.files[0]); e.target.value = ''; } });
   v.addEventListener('input', e => {
@@ -920,8 +949,8 @@ function renderProgress() {
     (pace == null ? '<p class="muted">Tempo için en az 7 güne yayılmış 3 tartı gerekiyor; haftada bir tartı 3 haftada yeter.</p>' : '<p>Mevcut tempo <b class="num">' + sgn(pace) + ' kg/hafta</b> (plan ' + n1(-c.rate) + ').</p>' + (eta ? '<p>Bu tempoyla hedefe varış: <b>' + fmtDL(eta) + '</b> (plan: ' + fmtDL(endPlan) + ').</p>' : '<p>Bu tempoyla hedefe yaklaşılmıyor; porsiyon, zeytinyağı ve ekmek ölçülerini kontrol edin.</p>') + (pace < -1.2 ? '<p class="muted">Haftada 1 kg\'dan hızlı kayıp kas kaybettirir; porsiyonları kısmayın.</p>' : '')) +
     '<p class="tiny">Plan: ' + n1(c.startWeight) + ' → ' + n1(c.goalWeight) + ' kg, ' + fmtDL(c.startDate) + ' başlangıç, ' + n1(c.rate) + ' kg/hafta, tartı günü ' + DAY_NAMES[c.weighDay] + '.</p></div>' +
     '<div class="card"><div class="card-h"><h2>Haftalık özet</h2><span class="meta">Ortalamalar</span></div>' + table + '<p class="tiny">Puan haftalık /75 · su bardak/gün · öğün % = işaretlenen / 5 · kcal kayıtlı öğünlerden günlük ortalama</p></div>' +
-    '<div class="card"><div class="card-h"><h2>Birlikte</h2><span class="meta">Bu hafta</span></div><div class="row">' + both.map(b => '<div class="grow"><div class="eyebrow">' + esc(b.name) + '</div><div class="num" style="font-family:var(--font-display);font-weight:700;font-size:1.3rem">' + (b.has ? (b.lost > 0.049 ? '−' : b.lost < -0.049 ? '+' : '') + n1(Math.abs(b.lost)) + ' kg' : '—') + '</div><div class="tiny">' + b.pts + ' puan</div></div>').join('') +
-    '<div class="grow"><div class="eyebrow">Toplam</div><div class="num" style="font-family:var(--font-display);font-weight:700;font-size:1.3rem">' + (both.some(b => b.has) ? '−' + n1(Math.max(0, both.reduce((s, b) => s + (b.has ? b.lost : 0), 0))) + ' kg' : '—') + '</div></div></div></div>';
+    (PERSON_LOCK ? '' : '<div class="card"><div class="card-h"><h2>Birlikte</h2><span class="meta">Bu hafta</span></div><div class="row">' + both.map(b => '<div class="grow"><div class="eyebrow">' + esc(b.name) + '</div><div class="num" style="font-family:var(--font-display);font-weight:700;font-size:1.3rem">' + (b.has ? (b.lost > 0.049 ? '−' : b.lost < -0.049 ? '+' : '') + n1(Math.abs(b.lost)) + ' kg' : '—') + '</div><div class="tiny">' + b.pts + ' puan</div></div>').join('') +
+    '<div class="grow"><div class="eyebrow">Toplam</div><div class="num" style="font-family:var(--font-display);font-weight:700;font-size:1.3rem">' + (both.some(b => b.has) ? '−' + n1(Math.max(0, both.reduce((s, b) => s + (b.has ? b.lost : 0), 0))) + ' kg' : '—') + '</div></div></div></div>');
 }
 function chartSvg(c, wl, today, endPlan) {
   const W = 360, H = 210, L = 38, R = 14, T = 14, B = 28;
@@ -1015,7 +1044,7 @@ async function restoreBackup(text) {
   let n = 0;
   for (const k of Object.keys(data.logs)) { const l = normLog(data.logs[k]); if (!l) continue; const id = logId(l.person, l.date), cur = state.logs[id]; if (cur && (cur.updatedAt || '') >= (l.updatedAt || '')) continue; state.logs[id] = l; n++; if (canDb()) { try { await state.db.doc('logs/' + id).set(l); } catch (e) {} } }
   if (data.settings && typeof data.settings === 'object') for (const p of ['E', 'K']) if (data.settings[p] && typeof data.settings[p] === 'object') { state.settings[p] = data.settings[p]; await writeDoc('settings/' + p, state.settings[p]); }
-  if (data.rewards) { const inc = normRewards(data.rewards); const ids = new Set(state.rewards.items.map(r => r.id)); inc.items.forEach(r => { if (!ids.has(r.id)) state.rewards.items.push(r); }); await saveRewards(); }
+  if (data.rewards && typeof data.rewards === 'object') { const inc = normRewards(data.rewards); ['E', 'K'].forEach(q => { Object.assign(inc.claimed[q], state.rewards.claimed[q], inc.claimed[q]); }); state.rewards = inc; await saveRewards(); }
   if (data.recipes && typeof data.recipes === 'object') for (const id of Object.keys(data.recipes)) if (!state.recipes[id]) await saveRecipe(id, normRecipe(data.recipes[id]));
   if (data.analysis && typeof data.analysis === 'object') for (const k of Object.keys(data.analysis)) if (!state.analysis[k] && data.analysis[k] && typeof data.analysis[k].text === 'string') await saveAnalysis(k, data.analysis[k]);
   if (!canDb()) persistLocal();
@@ -1027,7 +1056,7 @@ function renderSettings() {
   const daySel = '<div class="field"><label for="sWeigh">Tartı günü</label><select id="sWeigh">' + [1, 2, 3, 4, 5, 6, 0].map(d => '<option value="' + d + '"' + (d === c.weighDay ? ' selected' : '') + '>' + DAY_NAMES[d] + '</option>').join('') + '</select></div>';
   const cycle = p === 'K' ? '<div class="card"><div class="card-h"><h2>Döngü ayarları</h2></div><div class="three">' + fld('sCycleStart', 'Son adet başlangıcı', 'date', c.cycleStart, ' max="' + state.today + '"') + fld('sCycleLen', 'Döngü (gün)', 'number', c.cycleLen, ' min="20" max="45" step="1" inputmode="numeric"') + fld('sPeriodLen', 'Adet süresi (gün)', 'number', c.periodLen, ' min="2" max="10" step="1" inputmode="numeric"') + '</div>' +
     (c.cycleHistory.length ? '<p class="tiny">Önceki başlangıçlar: ' + c.cycleHistory.slice(-6).map(fmtD).join(', ') + '. İki döngüden sonra süre otomatik güncellenir.</p>' : '<p class="tiny">"Adet başladı" düğmesi Bugün sekmesinde; her kullanımda geçmiş birikir ve döngü süresi kendini düzeltir.</p>') + '<div class="row"><button type="button" class="btn ghost" id="saveCycle">Döngüyü kaydet</button><span class="tiny" id="cycleStatus"></span></div></div>' : '';
-  const rewards = state.rewards.items.map(r => '<div class="listrow"><span class="grow">' + esc(r.title) + ' <span class="tiny">· ' + (r.who === 'B' ? 'ortak' : cfg(r.who).name) + ' · ' + r.points + ' puan' + (r.claimed ? ' · alındı ' + fmtD(r.claimed.date) : '') + '</span></span><button type="button" class="linkbtn" data-delreward="' + r.id + '">sil</button></div>').join('');
+  const ladderRows = state.rewards.ladder[p].map(r => '<div class="listrow"><span class="tiny" style="width:64px;flex:none">' + RUNG_LABELS[r.weeks] + '</span><input type="text" id="li' + r.weeks + '" value="' + esc(r.icon) + '" maxlength="4" aria-label="Simge" style="width:52px;text-align:center;flex:none"><input type="text" id="lw' + r.weeks + '" value="' + esc(r.title) + '" maxlength="80" aria-label="Ödül" class="grow">' + (state.rewards.claimed[p]['w' + r.weeks] ? '<span class="tiny" style="flex:none">alındı ' + fmtD(state.rewards.claimed[p]['w' + r.weeks]) + '</span>' : '') + '</div>').join('');
   $('#view-ayarlar').innerHTML =
     '<div class="card"><div class="card-h"><h2>' + esc(c.name) + ' · plan ayarları</h2></div>' + fld('sName', 'Görünen ad', 'text', c.name, ' maxlength="20"') +
     '<div class="two">' + fld('sStart', 'Başlangıç kilosu (kg)', 'number', c.startWeight, ' step="0.1" inputmode="decimal"') + fld('sGoal', 'Hedef kilo (kg)', 'number', c.goalWeight, ' step="0.1" inputmode="decimal"') + '</div>' +
@@ -1035,10 +1064,10 @@ function renderSettings() {
     '<div class="three">' + fld('sWater', 'Su hedefi (bardak)', 'number', c.waterGoal, ' step="1" min="4" max="20" inputmode="numeric"') + fld('sKcal', 'Günlük kcal', 'number', c.kcal, ' step="50" min="1200" max="3000" inputmode="numeric"') + daySel + '</div>' +
     '<div class="row"><button type="button" class="btn" id="saveSettings">Kaydet</button><span class="tiny" id="settingsStatus"></span></div>' +
     '<p class="tiny">Güvenli tempo: erkek 0,6–0,8, kadın 0,5 kg/hafta. Kadın için 62 kg bu tempoyla yaklaşık 24 haftada gelir; 3 ay sonunda 67–68 kg ara hedeftir.</p></div>' + cycle +
-    '<div class="card"><div class="card-h"><h2>Ödüller</h2><span class="meta">Sırayla kullanılır</span></div>' + (rewards ? '<div>' + rewards + '</div>' : '<p class="muted">Henüz ödül yok.</p>') +
-    '<div class="field"><label for="rTitle">Yeni ödül</label><input type="text" id="rTitle" maxlength="80" placeholder="Örn. Pazar brunch, masaj, yeni koşu ayakkabısı"></div>' +
-    '<div class="two"><div class="field"><label for="rWho">Kimin</label><select id="rWho"><option value="B">Ortak</option><option value="E">' + esc(cfg('E').name) + '</option><option value="K">' + esc(cfg('K').name) + '</option></select></div><div class="field"><label for="rPts">Gereken puan (10–75)</label><input type="number" id="rPts" min="10" max="75" step="5" value="' + REWARD_DEFAULT_POINTS + '" inputmode="numeric"></div></div>' +
-    '<div class="row"><button type="button" class="btn ghost" id="addRewardBtn">Ödül ekle</button></div><p class="tiny">Puanlar: her öğün 1 (günde 5), su hedefi 2, koşu 1, öğle ve akşam yürüyüşü 1+1 → günde 10; haftalık tartı +5. Haftada en çok 75. 55 puan, haftanın yaklaşık dörtte üçünün programda geçtiği anlamına gelir.</p></div>' +
+    '<div class="card"><div class="card-h"><h2>' + esc(c.name) + ' · ödül merdiveni</h2><span class="meta">Simge ve ödül düzenlenebilir</span></div><div>' + ladderRows + '</div>' +
+    '<div class="field"><label for="rTh">Başarılı hafta eşiği (puan, 20–75; ikiniz için ortak)</label><input type="number" id="rTh" min="20" max="75" step="5" value="' + state.rewards.threshold + '" inputmode="numeric"></div>' +
+    '<div class="row"><button type="button" class="btn ghost" id="saveLadder">Ödülleri kaydet</button><span class="tiny" id="ladderStatus"></span></div>' +
+    '<p class="tiny">Puanlar: her öğün 1 (günde 5), su hedefi 2, koşu 1, öğle ve akşam yürüyüşü 1+1 → günde 10; haftalık tartı +5, haftada en çok 75. Haftada ' + state.rewards.threshold + ' puan = başarılı hafta; başarılı haftalar birikir (2 hafta, 1 ay = 4, 2 ay = 8, 3 ay = 13, 6 ay = 26). Haftalık ödül her başarılı haftada yenilenir.</p></div>' +
     '<div class="card"><div class="card-h"><h2>Kayıt durumu</h2></div><p>' + (state.mode === 'db' ? 'Paylaşımlı kayıt açık: iki telefonda da aynı veriler görünür.' : state.mode === 'local' ? 'Girdiler yalnızca bu cihazda saklanıyor.' : 'Bağlanıyor…') + '</p>' +
     (STATIC_HOST ? '<div class="note">Bu adreste girdiler telefonun kendi tarayıcı hafızasında tutulur ve iki telefon arasında eşzamanlanmaz. Her kişi kendi telefonundan girsin; tarayıcı verilerini silmek kayıtları siler, arada yedek alın.</div>' : (state.modeNote ? '<p class="tiny">' + esc(state.modeNote) + '</p>' : '') + '<div class="note">İki telefonda ortak takip için aynı Claude hesabıyla açın ya da sayfayı Paylaş menüsünden "Düzenleyici" veya "Katkıda bulunan" olarak e-posta ile davet edin. Yalnızca görüntüleme bağlantısıyla açan kişi veri giremez.</div>') + '</div>' +
     '<div class="card"><div class="card-h"><h2>Yedek</h2><span class="meta">Kopyala, sakla, gerekirse geri yükle</span></div><div class="row"><button type="button" class="btn ghost" id="copyBackup">Yedeği kopyala</button><span class="tiny" id="backupStatus"></span></div><textarea id="backupText" placeholder="Geri yüklemek için yedek metnini buraya yapıştırın" rows="3"></textarea><div class="row"><button type="button" class="btn ghost" id="restoreBackup">Yedeği geri yükle</button></div><p class="tiny">Yedek iki kişinin tüm kayıtlarını, ödülleri, tarif puanlarını ve ayarları içerir. Başka telefona taşımak için orada geri yükleyin; aynı günün daha yeni kaydı korunur.</p></div>';
@@ -1053,8 +1082,7 @@ function bindSettings() {
       await saveSettings(p, s); renderHeader(); $('#settingsStatus').textContent = 'Kaydedildi ' + nowHM(); return;
     }
     if (e.target.closest('#saveCycle')) { const s = Object.assign({}, c, { cycleStart: isDate($('#sCycleStart').value) && $('#sCycleStart').value <= state.today ? $('#sCycleStart').value : '', cycleLen: Math.round(numv('#sCycleLen', c.cycleLen, 20, 45)), periodLen: Math.round(numv('#sPeriodLen', c.periodLen, 2, 10)) }); await saveSettings('K', s); $('#cycleStatus').textContent = 'Kaydedildi ' + nowHM(); return; }
-    if (e.target.closest('#addRewardBtn')) { const title = $('#rTitle').value.trim(); if (!title) return; state.rewards.items.push({ id: uid(), title: title, who: $('#rWho').value, points: Math.round(numv('#rPts', REWARD_DEFAULT_POINTS, 10, 75)), claimed: null }); await saveRewards(); renderSettings(); return; }
-    const del = e.target.closest('[data-delreward]'); if (del) { state.rewards.items = state.rewards.items.filter(r => r.id !== del.dataset.delreward); await saveRewards(); renderSettings(); return; }
+    if (e.target.closest('#saveLadder')) { state.rewards.ladder[p] = RUNG_WEEKS.map((w, i) => ({ weeks: w, icon: ($('#li' + w).value.trim() || LADDER_DEFAULT[p][i].icon).slice(0, 4), title: ($('#lw' + w).value.trim() || LADDER_DEFAULT[p][i].title).slice(0, 80) })); state.rewards.threshold = Math.round(numv('#rTh', state.rewards.threshold, 20, 75)); await saveRewards(); renderSettings(); $('#ladderStatus').textContent = 'Kaydedildi ' + nowHM(); return; }
     if (e.target.closest('#copyBackup')) { const json = backupJson(), ta = $('#backupText'), st = $('#backupStatus'); ta.value = json; try { await navigator.clipboard.writeText(json); st.textContent = 'Panoya kopyalandı ' + nowHM(); } catch (err) { ta.focus(); ta.select(); st.textContent = 'Metin seçildi; basılı tutup Kopyala deyin.'; } return; }
     if (e.target.closest('#restoreBackup')) { const st = $('#backupStatus'), txt = $('#backupText').value.trim(); if (!txt) { st.textContent = 'Önce yedek metnini yapıştırın.'; return; } st.textContent = 'Geri yükleniyor…'; const msg = await restoreBackup(txt); const st2 = $('#backupStatus'); if (st2) st2.textContent = msg; }
   });
@@ -1063,7 +1091,10 @@ function bindSettings() {
 // ---------- shell ----------
 const TABS = ['bugun', 'gelisim', 'program', 'tarifler', 'ayarlar'];
 function focusedInput() { const a = document.activeElement; return !!(a && $('#view-bugun').contains(a) && /^(INPUT|TEXTAREA)$/.test(a.tagName)); }
-function renderHeader() { ['E', 'K'].forEach(p => { const b = $('#seg' + p), c = cfg(p); b.classList.toggle('on', state.person === p); b.innerHTML = esc(c.name) + '<span class="k">' + n1(c.startWeight) + ' → ' + n1(c.goalWeight) + ' kg</span>'; }); }
+function renderHeader() {
+  ['E', 'K'].forEach(p => { const b = $('#seg' + p), c = cfg(p); b.classList.toggle('on', state.person === p); b.innerHTML = esc(c.name) + '<span class="k">' + n1(c.startWeight) + ' → ' + n1(c.goalWeight) + ' kg</span>'; });
+  if (PERSON_LOCK) { const c = cfg(PERSON_LOCK); $('#personSeg').hidden = true; $('.brand small').textContent = esc(c.name) + ' · ' + n1(c.startWeight) + ' → ' + n1(c.goalWeight) + ' kg · ' + c.kcal + ' kcal'; }
+}
 function renderTab() {
   TABS.forEach(t => { $('#view-' + t).hidden = state.tab !== t; $('#tab-' + t).classList.toggle('on', state.tab === t); });
   if (state.tab === 'bugun') { if (!focusedInput()) renderToday(); }
@@ -1082,7 +1113,7 @@ function refreshNext() {
 function boot() {
   $('.tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
   window.addEventListener('hashchange', () => { const t = location.hash.replace('#', ''); if (t !== state.tab) setTab(t); });
-  $('#personSeg').addEventListener('click', e => { const b = e.target.closest('[data-person]'); if (b && b.dataset.person !== state.person) { state.person = b.dataset.person; state.showWeight = false; lsSet('bt_person', state.person); renderAll(); } });
+  $('#personSeg').addEventListener('click', e => { const b = e.target.closest('[data-person]'); if (b && !PERSON_LOCK && b.dataset.person !== state.person) { state.person = b.dataset.person; state.showWeight = false; lsSet('bt_person', state.person); renderAll(); } });
   bindToday(); bindProgress(); bindRecipes(); bindSettings();
   const h = location.hash.replace('#', ''); state.tab = TABS.indexOf(h) >= 0 ? h : 'bugun';
   setInterval(refreshNext, 60000);
