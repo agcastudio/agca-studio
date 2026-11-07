@@ -25,7 +25,7 @@
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 img { max-width: 100%; }
 [hidden] { display: none !important; }
-/* Layout: one 560px column; sticky person switch on top, 5-tab bar pinned to the bottom. */
+/* Layout: one 560px column, no header or footer. A game-card hero (points ring, reward bars), the day's quest list, then collapsible sections for everything else. */
 :root {
   --bg: #F2F3EE;
   --surface: #FFFFFF;
@@ -42,11 +42,13 @@ img { max-width: 100%; }
   --good-soft: #E3EED6;
   --warn: #B4660C;
   --warn-soft: #FBE9D2;
+  --water: #2F6F9F;
   --chart-area: rgba(155, 47, 69, 0.12);
+  --hero: linear-gradient(135deg, #FBE9EC 0%, #FFFFFF 55%, #EDF2E4 100%);
   --shadow: 0 1px 2px rgba(30, 34, 27, 0.06), 0 6px 20px rgba(30, 34, 27, 0.05);
   --font-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
   --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  --radius: 14px;
+  --radius: 16px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -54,7 +56,8 @@ img { max-width: 100%; }
     --ink: #EEEDE6; --ink-2: #B7BAAF; --ink-3: #80857A;
     --accent: #E6808F; --accent-ink: #1E0A0E; --accent-soft: #3B2229;
     --good: #9FC86B; --good-ink: #10200A; --good-soft: #263A18; --warn: #E9AA5B; --warn-soft: #3D2C13;
-    --chart-area: rgba(230, 128, 143, 0.16);
+    --water: #7FB3DC; --chart-area: rgba(230, 128, 143, 0.16);
+    --hero: linear-gradient(135deg, #332026 0%, #1F2319 55%, #1F2A17 100%);
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
     color-scheme: dark;
   }
@@ -64,7 +67,8 @@ img { max-width: 100%; }
   --ink: #EEEDE6; --ink-2: #B7BAAF; --ink-3: #80857A;
   --accent: #E6808F; --accent-ink: #1E0A0E; --accent-soft: #3B2229;
   --good: #9FC86B; --good-ink: #10200A; --good-soft: #263A18; --warn: #E9AA5B; --warn-soft: #3D2C13;
-  --chart-area: rgba(230, 128, 143, 0.16);
+  --water: #7FB3DC; --chart-area: rgba(230, 128, 143, 0.16);
+  --hero: linear-gradient(135deg, #332026 0%, #1F2319 55%, #1F2A17 100%);
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
   color-scheme: dark;
 }
@@ -74,31 +78,18 @@ body {
   font-family: var(--font-body); font-size: 16px; line-height: 1.45;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 0 calc(84px + env(safe-area-inset-bottom, 0px));
+  padding-block: 12px 28px;
   -webkit-tap-highlight-color: transparent;
 }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
 h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
-h1 { font-size: 1.2rem; font-weight: 700; }
 h2 { font-size: 1.1rem; font-weight: 700; }
 h3 { font-size: 0.95rem; font-weight: 700; }
 p { margin: 0; }
 button { font: inherit; color: inherit; cursor: pointer; }
 input, textarea, select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 16px; min-width: 0; max-width: 100%; }
 input:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.wrap { max-width: 560px; margin: 0 auto; }
-.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9; background: var(--bg); padding-block: 10px 8px; display: flex; flex-direction: column; gap: 10px; }
-.brand { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.brand small { color: var(--ink-3); font-size: 0.8rem; display: block; }
-.sync { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--ink-2); white-space: nowrap; }
-.sync i { width: 9px; height: 9px; border-radius: 50%; background: var(--ink-3); display: inline-block; }
-.sync.ok i { background: var(--good); }
-.sync.local i { background: var(--warn); }
-.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface-2); border-radius: 12px; padding: 4px; gap: 4px; }
-.seg button { border: 0; background: transparent; border-radius: 9px; padding: 9px 8px; font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--ink-2); }
-.seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
-.seg button .k { display: block; font-family: var(--font-body); font-weight: 400; font-size: 0.75rem; color: var(--ink-3); }
-main { display: flex; flex-direction: column; gap: 14px; padding-top: 8px; }
+.wrap { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
 .view { display: flex; flex-direction: column; gap: 14px; }
 .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .card-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
@@ -107,41 +98,107 @@ main { display: flex; flex-direction: column; gap: 14px; padding-top: 8px; }
 .muted { color: var(--ink-2); font-size: 0.9rem; }
 .tiny { color: var(--ink-3); font-size: 0.8rem; }
 .num { font-variant-numeric: tabular-nums; }
-.daterow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.daterow .d { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; text-align: center; flex: 1; }
-.daterow .d small { display: block; font-family: var(--font-body); font-weight: 400; font-size: 0.8rem; color: var(--ink-3); }
-.iconbtn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: 1.1rem; display: grid; place-items: center; flex: none; }
-.iconbtn:disabled { opacity: 0.35; cursor: default; }
-.next { display: flex; align-items: center; gap: 10px; background: var(--accent-soft); color: var(--ink); border-radius: 12px; padding: 10px 12px; font-size: 0.92rem; }
-.next b { font-family: var(--font-display); color: var(--accent); white-space: nowrap; }
-.flash { background: var(--surface-2); border-left: 3px solid var(--accent); padding: 8px 12px; border-radius: 10px; font-size: 0.9rem; color: var(--ink-2); }
-.flash b { color: var(--ink); }
 .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .grow { flex: 1; min-width: 0; }
+/* hero */
+.hero { background: var(--hero); border-radius: 20px; box-shadow: var(--shadow); padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 12px; }
+.hero-top { display: flex; align-items: center; gap: 12px; }
+.avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; font-size: 1.7rem; box-shadow: var(--shadow); flex: none; }
+.hname { font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; line-height: 1.1; }
+.hsub { font-size: 0.82rem; color: var(--ink-2); }
+.pchips { display: flex; gap: 6px; flex: none; }
+.pchip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 10px; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); }
+.pchip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.ringrow { display: flex; align-items: center; gap: 14px; }
+.ring { width: 96px; height: 96px; flex: none; }
+.ring circle { fill: none; stroke-width: 9; stroke-linecap: round; }
+.ring .bg { stroke: var(--surface-2); }
+.ring .fg { stroke: var(--accent); transition: stroke-dasharray 0.4s; }
+.ring.full .fg { stroke: var(--good); }
+.ring text { font-family: var(--font-display); font-weight: 800; fill: var(--ink); }
+.hstats { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
+.hstat { display: flex; align-items: center; gap: 8px; font-size: 0.92rem; }
+.hstat b { font-family: var(--font-display); }
+.wbar { display: flex; align-items: center; gap: 8px; }
+.wbar .bar { flex: 1; height: 12px; border-radius: 8px; }
+.wbar .em { font-size: 1.3rem; flex: none; filter: grayscale(1); opacity: 0.6; }
+.wbar.done .em { filter: none; opacity: 1; }
+.wlabel { display: flex; justify-content: space-between; gap: 8px; font-size: 0.82rem; color: var(--ink-2); }
+.lvl { background: var(--surface); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.lvl .t { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.lvl .t b { font-family: var(--font-display); font-size: 1rem; }
+.motto { font-style: italic; color: var(--ink-2); font-size: 0.92rem; }
+.celebrate { background: var(--good-soft); color: var(--ink); border-radius: 12px; padding: 10px 12px; font-weight: 600; text-align: center; animation: pop 0.5s ease-out; }
+@keyframes pop { from { transform: scale(0.96); opacity: 0.4; } to { transform: scale(1); opacity: 1; } }
+.bar { height: 8px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 6px; transition: width 0.25s; }
+.bar.good i { background: var(--good); }
+.bar.big { height: 14px; border-radius: 8px; }
+/* quests */
+.daterow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.daterow .d { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; text-align: center; flex: 1; }
+.daterow .d small { display: block; font-family: var(--font-body); font-weight: 400; font-size: 0.78rem; color: var(--ink-3); }
+.iconbtn { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: 1.1rem; display: grid; place-items: center; flex: none; }
+.iconbtn:disabled { opacity: 0.35; cursor: default; }
+.next { display: flex; align-items: center; gap: 10px; background: var(--accent-soft); color: var(--ink); border-radius: 12px; padding: 8px 12px; font-size: 0.9rem; }
+.next b { font-family: var(--font-display); color: var(--accent); white-space: nowrap; }
+.qlist { display: flex; flex-direction: column; }
+.q { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); cursor: pointer; }
+.q:first-child { border-top: 0; }
+.q .em { width: 42px; height: 42px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-size: 1.3rem; border: 2px solid transparent; }
+.q.on .em { background: var(--good-soft); border-color: var(--good); }
+.q.on .nm { text-decoration: line-through; color: var(--ink-2); }
+.q .nm { font-family: var(--font-display); font-weight: 700; }
+.q .tm { font-size: 0.78rem; color: var(--ink-3); margin-left: 6px; font-weight: 400; font-family: var(--font-body); }
+.q .mn { font-size: 0.84rem; color: var(--ink-2); }
+.q .pr { font-size: 0.82rem; color: var(--ink); background: var(--surface-2); border-radius: 8px; padding: 2px 8px; display: inline-block; margin-top: 3px; }
+.q .pt { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; color: var(--ink-3); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+.q.on .pt { background: var(--good); border-color: var(--good); color: var(--good-ink); }
+.q.zero .pt { opacity: 0.6; }
+.rl { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+.rlink { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 3px 9px; font-size: 0.78rem; color: var(--accent); font-weight: 600; }
+.q.sleepq { cursor: default; }
+.q.sleepq .row { margin-top: 6px; gap: 12px; }
+.q.sleepq input[type="time"] { padding: 4px 6px; font-size: 0.95rem; margin-left: 4px; }
+.drops { display: flex; flex-wrap: wrap; gap: 2px; }
+.drop { background: none; border: 0; font-size: 1.45rem; line-height: 1; padding: 3px; filter: grayscale(1); opacity: 0.35; }
+.drop.on { filter: none; opacity: 1; }
+.waterline { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.waterline b { font-family: var(--font-display); color: var(--water); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 12px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; }
+.chip.on { background: var(--good-soft); border-color: var(--good); color: var(--ink); }
+.chip.on::before { content: "✓"; color: var(--good); font-weight: 700; }
+/* sections */
+.sec { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); min-width: 0; }
+.sec > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 13px 16px; }
+.sec > summary::-webkit-details-marker { display: none; }
+.sec > summary::after { content: "+"; color: var(--ink-3); font-size: 1.4rem; font-weight: 300; }
+.sec[open] > summary::after { content: "−"; }
+.sec[open] > summary { border-bottom: 1px solid var(--line); }
+.sec .ic { font-size: 1.45rem; width: 36px; text-align: center; flex: none; }
+.sec .st { flex: 1; min-width: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+.sec .sub { display: block; font-family: var(--font-body); font-weight: 400; font-size: 0.8rem; color: var(--ink-3); white-space: normal; }
+.sec > .view { padding: 12px 10px 14px; background: var(--bg); border-radius: 0 0 var(--radius) var(--radius); }
+.sub-sec { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); }
+.sub-sec > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
+.sub-sec > summary::-webkit-details-marker { display: none; }
+.sub-sec > summary::after { content: "+"; color: var(--ink-3); font-size: 1.3rem; font-weight: 300; }
+.sub-sec[open] > summary::after { content: "−"; }
+.sub-sec .ic { font-size: 1.25rem; width: 30px; text-align: center; flex: none; }
+.sub-sec .st { flex: 1; min-width: 0; font-family: var(--font-display); font-weight: 700; }
+.sub-sec .sub { display: block; font-family: var(--font-body); font-weight: 400; font-size: 0.8rem; color: var(--ink-3); }
+.sub-sec > .body { padding: 0 16px 14px; display: flex; flex-direction: column; gap: 10px; }
+.foot { text-align: center; font-size: 0.78rem; color: var(--ink-3); display: flex; justify-content: center; align-items: center; gap: 6px; }
+.sync i { width: 9px; height: 9px; border-radius: 50%; background: var(--ink-3); display: inline-block; }
+.sync.ok i { background: var(--good); }
+.sync.local i { background: var(--warn); }
+/* generic pieces */
 .weightline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .weightline input { width: 110px; font-family: var(--font-display); font-weight: 700; font-size: 1.4rem; text-align: center; padding: 6px 8px; }
 .delta { font-size: 0.9rem; color: var(--ink-2); }
 .delta b { color: var(--ink); }
 .linkbtn { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 600; text-decoration: underline; font-size: 0.9rem; }
-.stepper { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.stepper button { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface-2); font-size: 1.5rem; line-height: 1; flex: none; }
-.stepper .val { font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; min-width: 70px; text-align: center; }
-.bar { height: 8px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
-.bar i { display: block; height: 100%; background: var(--accent); border-radius: 6px; transition: width 0.25s; }
-.bar.good i { background: var(--good); }
-.meal { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; padding: 8px 0; border-top: 1px solid var(--line); cursor: pointer; }
-.meal:first-child { border-top: 0; }
-.meal .box { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; font-size: 0.95rem; color: var(--good-ink); margin-top: 2px; }
-.meal.on .box { background: var(--good); border-color: var(--good); }
-.meal .t { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
-.meal .t b { font-family: var(--font-display); }
-.meal .t span { color: var(--ink-3); font-size: 0.8rem; white-space: nowrap; }
-.meal .m { color: var(--ink-2); font-size: 0.88rem; }
-.meal .p { color: var(--ink); font-size: 0.85rem; background: var(--surface-2); border-radius: 8px; padding: 4px 8px; margin-top: 4px; display: inline-block; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 12px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; }
-.chip.on { background: var(--good-soft); border-color: var(--good); color: var(--ink); }
-.chip.on::before { content: "✓"; color: var(--good); font-weight: 700; }
 .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .field label { font-size: 0.82rem; color: var(--ink-2); font-weight: 600; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -158,17 +215,12 @@ textarea { width: 100%; min-height: 64px; resize: vertical; }
 .pill.good { background: var(--good-soft); color: var(--good); }
 .pill.warn { background: var(--warn-soft); color: var(--warn); }
 .pill.accent { background: var(--accent-soft); color: var(--accent); }
-.reward .big { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; }
-.bar.big { height: 14px; border-radius: 8px; }
 .ladder { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .rung { text-align: center; font-size: 0.68rem; color: var(--ink-3); line-height: 1.2; }
 .rung .ic { display: block; font-size: 1.35rem; line-height: 1.3; }
 .rung.done { color: var(--good); font-weight: 600; }
 .rung.next { color: var(--accent); font-weight: 700; }
 .rung.lock { opacity: 0.55; }
-.weekly { border-top: 1px solid var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 6px; }
-.reward .pts { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; }
-.reward .pts small { font-size: 0.9rem; color: var(--ink-2); font-weight: 500; }
 .food { display: grid; grid-template-columns: 56px 1fr; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); align-items: start; }
 .food img, .food .ph { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; background: var(--surface-2); display: grid; place-items: center; color: var(--ink-3); font-size: 1.3rem; }
 .food .hd { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
@@ -178,7 +230,7 @@ textarea { width: 100%; min-height: 64px; resize: vertical; }
 .food .busy { font-size: 0.86rem; color: var(--ink-3); font-style: italic; }
 .food .del { background: none; border: 0; color: var(--ink-3); font-size: 0.8rem; padding: 0; text-decoration: underline; }
 .addfood { display: flex; gap: 8px; align-items: center; }
-.addfood input[type="text"] { flex: 1; min-width: 0; }
+.addfood input[type="text"], .addfood input[type="date"] { flex: 1; min-width: 0; }
 .filebtn { position: relative; overflow: hidden; flex: none; }
 .filebtn input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; font-size: 0; }
 .chart { width: 100%; height: auto; display: block; }
@@ -205,12 +257,12 @@ td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
 .tl b { font-family: var(--font-display); font-variant-numeric: tabular-nums; color: var(--ink-2); }
 .tl.now { background: var(--accent-soft); margin: 0 -8px; padding-inline: 8px; border-radius: 8px; }
 .tl.now b { color: var(--accent); }
-details { border-top: 1px solid var(--line); padding: 6px 0; }
-details:first-of-type { border-top: 0; }
-summary { cursor: pointer; font-family: var(--font-display); font-weight: 700; padding: 6px 0; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-summary::-webkit-details-marker { display: none; }
-summary::after { content: "+"; color: var(--ink-3); font-size: 1.2rem; flex: none; }
-details[open] summary::after { content: "−"; }
+.view details.item, .card details { border-top: 1px solid var(--line); padding: 6px 0; }
+.view details.item:first-of-type, .card details:first-of-type { border-top: 0; }
+.card details summary, .view details.item summary { cursor: pointer; font-family: var(--font-display); font-weight: 700; padding: 6px 0; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.card details summary::-webkit-details-marker, .view details.item summary::-webkit-details-marker { display: none; }
+.card details summary::after, .view details.item summary::after { content: "+"; color: var(--ink-3); font-size: 1.2rem; flex: none; }
+.card details[open] summary::after, .view details.item[open] summary::after { content: "−"; }
 summary .sub { font-family: var(--font-body); font-weight: 400; font-size: 0.8rem; color: var(--ink-3); display: block; }
 .mlist { display: flex; flex-direction: column; gap: 8px; padding-bottom: 6px; }
 .mi { font-size: 0.9rem; }
@@ -230,43 +282,18 @@ ul.plain, ol.plain { margin: 0; padding-left: 18px; font-size: 0.9rem; color: va
 .analysis { font-size: 0.92rem; display: flex; flex-direction: column; gap: 6px; white-space: pre-wrap; }
 .listrow { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); font-size: 0.9rem; }
 .listrow:first-child { border-top: 0; }
-.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--surface); border-top: 1px solid var(--line);
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px); }
-.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
-.tabs button { border: 0; background: transparent; padding: 10px 2px 9px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.72rem; color: var(--ink-3); font-weight: 600; }
-.tabs button .ic { font-size: 1.25rem; line-height: 1; }
-.tabs button.on { color: var(--accent); }
-@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .bar i, .ring .fg { transition: none; } .celebrate { animation: none; } }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div class="brand">
-      <div><h1>Beslenme Takip Defteri</h1><small>Kış programı · 1 800 / 1 450 kcal</small></div>
-      <span class="sync" id="sync"><i></i><span id="syncText">Bağlanıyor</span></span>
-    </div>
-    <div class="seg" id="personSeg">
-      <button type="button" data-person="E" id="segE">Erkek<span class="k">87 → 78 kg</span></button>
-      <button type="button" data-person="K" id="segK">Kadın<span class="k">74 → 62 kg</span></button>
-    </div>
-  </header>
-  <main>
-    <section class="view" id="view-bugun"></section>
-    <section class="view" id="view-gelisim" hidden></section>
-    <section class="view" id="view-program" hidden></section>
-    <section class="view" id="view-tarifler" hidden></section>
-    <section class="view" id="view-ayarlar" hidden></section>
-  </main>
-</div>
-<nav class="tabs" aria-label="Bölümler"><div class="in">
-  <button type="button" data-tab="bugun" id="tab-bugun"><span class="ic">☑</span>Bugün</button>
-  <button type="button" data-tab="gelisim" id="tab-gelisim"><span class="ic">◢</span>Gelişim</button>
-  <button type="button" data-tab="program" id="tab-program"><span class="ic">☰</span>Program</button>
-  <button type="button" data-tab="tarifler" id="tab-tarifler"><span class="ic">♥</span>Tarifler</button>
-  <button type="button" data-tab="ayarlar" id="tab-ayarlar"><span class="ic">⚙</span>Ayarlar</button>
-</div></nav>
+<main class="wrap">
+  <section class="view" id="view-bugun"></section>
+  <details class="sec" id="sec-gelisim"><summary><span class="ic">📈</span><span class="st">Gelişim<span class="sub">Kilo eğrisi, tempo, haftalık analiz</span></span></summary><div class="view" id="view-gelisim"></div></details>
+  <details class="sec" id="sec-program"><summary><span class="ic">📋</span><span class="st">Program<span class="sub">Günlük ritim, haftalık menü, içecekler</span></span></summary><div class="view" id="view-program"></div></details>
+  <details class="sec" id="sec-tarifler"><summary><span class="ic">👩‍🍳</span><span class="st">Tarifler<span class="sub">16 pratik tarif, yıldızla ve favorile</span></span></summary><div class="view" id="view-tarifler"></div></details>
+  <details class="sec" id="sec-ayarlar"><summary><span class="ic">⚙️</span><span class="st">Ayarlar<span class="sub">Plan, ödüller, yedek</span></span></summary><div class="view" id="view-ayarlar"></div></details>
+  <p class="foot">Kayıtlar <span id="syncText">bağlanıyor</span><span id="sync" class="sync"><i></i></span></p>
+</main>
 <script>
 'use strict';
 const DEFAULTS = {
@@ -380,8 +407,38 @@ const RULES = [
   'Keten tohumu öğütülmüş; sarımsak ezip 10 dk bekletilmiş; brokoli 3–4 dk buharda + çiğ turp',
   'Soğutulmuş bulgur/patates ve dondurulup tost edilmiş ekmek: dirençli nişasta, daha düşük glisemik yanıt'
 ];
+// Haftalık menüdeki yemeklerin tarif bağlantıları (gün → öğün → tarif id'leri)
+const MENU_RECIPES = {
+  1: { k: ['omlet'], o: ['mercimek'], ak: ['firintavuk'] },
+  2: { k: ['yulaf'], o: ['kissalata'], ak: ['hamsi'] },
+  3: { k: ['cilbir'], o: ['kurufasulye'], ak: ['kofte', 'firinsebze'] },
+  4: { k: ['lorkase'], o: ['kofte'], a2: ['humus'], ak: ['kabak', 'omlet'] },
+  5: { o: ['yesilmercimek', 'mercimek'], ak: ['somon'] },
+  6: { o: ['kisir'], a2: ['ayva'], ak: ['sote'] },
+  0: { o: ['etlikereviz'], ak: ['mercimek', 'karnabahar'] }
+};
 // 2 kişilik tarifler. kcal: porsiyon başına yaklaşık (E / K porsiyonu).
 const RECIPES = [
+  { id: 'yulaf', name: 'Sıcak yulaf kasesi', time: 10, kcal: { E: 420, K: 330 }, tags: ['kahvaltı', 'tahıl', 'hızlı'],
+    ing: ['yulaf (E 40 g / K 30 g)', 'su veya süt', '1 yk öğütülmüş keten tohumu', '½ elma (rendelenmiş)', 'ceviz', 'tarçın', 'üstüne yoğurt', 'yanına 1 haşlanmış yumurta'],
+    steps: ['Yulafı 1 su bardağı su (K isterse süt) ile 4–5 dk pişir.', 'Ocaktan alınca keten, rendelenmiş elma ve tarçını karıştır.', 'Kasede üstüne yoğurt ve ceviz; yanında haşlanmış yumurta.'],
+    por: { E: '40 g yulaf, 150 g yoğurt, 6 ceviz yarımı, 1 yumurta', K: '30 g yulaf, 150 ml süt veya 100 g yoğurt, 4 ceviz yarımı, 1 yumurta' }, tip: 'Yumurta olmadan protein 15 g\'da kalır; yumurta tokluğu öğleye taşır.' },
+  { id: 'firintavuk', name: 'Fırında baharatlı tavuk ve fırın sebze', time: 45, kcal: { E: 420, K: 330 }, tags: ['akşam', 'tavuk', 'hazırlık'],
+    ing: ['1 kg derisiz tavuk but veya göğüs', '400 g bal kabağı', '3 havuç', '1 brokoli', '2 yk zeytinyağı', 'kekik, zerdeçal, karabiber, pul biber, sarımsak'],
+    steps: ['Tavuğu baharat, ezilmiş sarımsak ve 1 yk zeytinyağıyla 20 dk marine et.', 'Sebzeleri 1 yk zeytinyağı ve zerdeçal-karabiberle harmanla.', 'Tavuk 200 °C\'de 35 dk; sebzeler son 25 dk aynı fırında ayrı tepside.'],
+    por: { E: '150 g tavuk + 1 yk yağlı sebze', K: '120 g tavuk + 2 tk yağlı sebze' }, tip: 'Pazar iki kat yap: Pazartesi öğle kasesi ve Salı salatası hazır olur.' },
+  { id: 'kurufasulye', name: 'Kuru fasulye (az etli)', time: 60, kcal: { E: 340, K: 230 }, tags: ['öğle', 'baklagil', 'hazırlık'],
+    ing: ['2 su bardağı kuru fasulye (bir gece ıslatılmış)', '150 g yağsız kuşbaşı (isteğe bağlı)', '1 soğan, 1 havuç', '1 yk ev salçası', '1 yk zeytinyağı', '1 tk kimyon, pul biber'],
+    steps: ['Islatma suyunu dök; fasulyeyi taze suda 10 dk haşlayıp köpüğünü al, süz.', 'Soğan ve eti zeytinyağında çevir, salça ve havucu ekle.', 'Fasulye, kimyon ve 4 su bardağı sıcak suyla düdüklüde 25 dk (tencerede 50 dk).'],
+    por: { E: '1,5 kepçe + 4 yk bulgur', K: '1 kepçe + 2–3 yk bulgur' }, tip: 'Porsiyonla dondur. Şişkinlik olursa o hafta porsiyonu 1 kepçede tut, yanına turşu ve kimyon.' },
+  { id: 'etlikereviz', name: 'Etli veya tavuklu kereviz', time: 50, kcal: { E: 330, K: 240 }, tags: ['öğle', 'hafta sonu', 'mevsim'],
+    ing: ['3 kereviz (küp)', '300 g yağsız kuşbaşı veya tavuk', '2 havuç', '1 soğan', '1 portakal + ½ limon suyu', '1,5 yk zeytinyağı', 'dereotu'],
+    steps: ['Soğanı ve eti zeytinyağında kavur; havucu ekle.', 'Kereviz, portakal-limon suyu ve 1 su bardağı su; kapaklı 35 dk.', 'Dereotuyla, ılık servis et.'],
+    por: { E: '1,5 kepçe + 4 yk bulgur', K: '1 kepçe + 3 yk bulgur' }, tip: 'Pazar öğle aile yemeği. Kerevizin potasyumu ve lifi tansiyon ve bağırsak için iyi.' },
+  { id: 'karnabahar', name: 'Fırında karnabahar-brokoli', time: 35, kcal: { E: 260, K: 200 }, tags: ['akşam', 'sebze', 'peynir'],
+    ing: ['1 karnabahar, 1 brokoli', '2 yumurta', '200 g yoğurt', '40 g rendelenmiş kaşar veya lor', '1 diş sarımsak', 'karabiber, muskat'],
+    steps: ['Çiçekleri 3 dk buharda pişir, fırın kabına diz.', 'Yumurta, yoğurt, sarımsak ve baharatı çırp; üstüne dök, peyniri serp.', '190 °C\'de 25 dk, üstü kızarana kadar.'],
+    por: { E: 'Büyük porsiyon + 1 kase çorba', K: 'Orta porsiyon + 1 kase çorba' }, tip: 'Pazar akşamı hafif ve turpgil ağırlıklı: karaciğer enzimleri için haftanın kapanışı.' },
   { id: 'hamsi', name: 'Fırında hamsi', time: 20, kcal: { E: 260, K: 195 }, tags: ['akşam', 'balık', 'omega-3'],
     ing: ['600 g temizlenmiş hamsi', '1 limon', '½ demet dereotu', '1 yk zeytinyağı', 'pul biber, az tuz'],
     steps: ['Fırını 200 °C\'ye ısıt; tepsiye pişirme kağıdı ser.', 'Hamsileri tek sıra diz, zeytinyağı, limon suyu, dereotu ve pul biberi gezdir.', '12–15 dk pişir; un ve kızartma yok.', 'Roka, kırmızı soğan ve turp salatasıyla, bol limonla servis et.'],
@@ -484,13 +541,13 @@ const state = {
   logs: {}, settings: { E: null, K: null }, rewards: null, recipes: {}, analysis: {},
   mode: 'loading', db: null, sample: null, assets: null, imgOk: false,
   dirty: new Set(), pendingLocal: new Set(), timers: new Map(), inflight: new Map(),
-  busy: new Set(), showWeight: false, modeNote: ''
+  busy: new Set(), open: new Set(), showWeight: false, modeNote: ''
 };
 const STATIC_HOST = !(window.claude && typeof window.claude.use === 'function');
 function logId(p, d) { return p + '_' + d; }
 function emptyLog(p, d) {
   return { person: p, date: d, weight: null, water: 0, meals: { k: false, a1: false, o: false, a2: false, ak: false }, vinegar: false,
-    run: false, walkNoon: false, walkEve: false, strength: false, bed: '', sleep: null, note: '', foods: [], updatedAt: '' };
+    run: false, walkNoon: false, walkEve: false, strength: false, bed: '', wake: '', sleep: null, note: '', foods: [], updatedAt: '' };
 }
 function normFood(f) {
   if (!f || typeof f !== 'object') return null;
@@ -507,7 +564,8 @@ function normLog(l) {
   e.water = Math.round(num(l.water, 0, 30) || 0);
   MEAL_KEYS.forEach(k => { e.meals[k] = !!(l.meals && l.meals[k]); });
   ['vinegar', 'run', 'walkNoon', 'walkEve', 'strength'].forEach(k => { e[k] = !!l[k]; });
-  e.bed = typeof l.bed === 'string' ? l.bed.slice(0, 5) : '';
+  e.bed = /^\d{2}:\d{2}$/.test(String(l.bed)) ? l.bed : '';
+  e.wake = /^\d{2}:\d{2}$/.test(String(l.wake)) ? l.wake : '';
   e.sleep = num(l.sleep, 0, 14);
   e.note = typeof l.note === 'string' ? l.note.slice(0, 1000) : '';
   e.foods = Array.isArray(l.foods) ? l.foods.map(normFood).filter(Boolean).slice(0, 12) : [];
@@ -568,16 +626,21 @@ function logsOf(p) { return Object.values(state.logs).filter(l => l && l.person 
 function canDb() { return !!state.db && state.mode !== 'local'; }
 
 // ---------- points, rewards, cycle ----------
+const DAY_MAX = 11, DAY_WIN = 10, WEEK_MAX = 82;
+function wakeLimit(date) { const d = parseD(date).getDay(); return (d === 0 || d === 6) ? '07:30' : '06:30'; }
+function sleepOk(L) { if (!L.bed || !L.wake) return false; return L.bed >= '20:00' && L.bed <= '23:15' && L.wake >= '04:00' && L.wake <= wakeLimit(L.date); }
+function sleepHours(bed, wake) { if (!bed || !wake) return null; const b = Number(bed.slice(0, 2)) * 60 + Number(bed.slice(3, 5)), w = Number(wake.slice(0, 2)) * 60 + Number(wake.slice(3, 5)); return Math.round(((w - b + 1440) % 1440) / 30) / 2; }
 function dayPoints(L, c) {
   let p = MEAL_KEYS.filter(k => L.meals[k]).length;
   if (L.water >= c.waterGoal) p += 2;
   if (L.run) p += 1; if (L.walkNoon) p += 1; if (L.walkEve) p += 1;
+  if (sleepOk(L)) p += 1;
   return p;
 }
 function weekPoints(p, ws) {
   const c = cfg(p); let pts = 0, weighed = false;
   for (let i = 0; i < 7; i++) { const d = addDays(ws, i); const L = state.logs[logId(p, d)]; if (!L) continue; pts += dayPoints(L, c); if (L.weight != null) weighed = true; }
-  return { points: pts + (weighed ? 5 : 0), weighed: weighed, max: 75 };
+  return { points: pts + (weighed ? 5 : 0), weighed: weighed, max: WEEK_MAX };
 }
 function cycleInfo(c, date) {
   if (!c.cycleStart) return null;
@@ -606,7 +669,7 @@ function loadLocal() {
   state.analysis = lsGet('bt_analysis_v1', {}) || {};
 }
 function persistLocal() { lsSet('bt_logs_v1', state.logs); lsSet('bt_settings_v1', state.settings); lsSet('bt_rewards_v1', state.rewards); lsSet('bt_recipes_v1', state.recipes); lsSet('bt_analysis_v1', state.analysis); }
-function setMode(m, text) { state.mode = m; const el = $('#sync'); el.className = 'sync ' + (m === 'db' ? 'ok' : m === 'local' ? 'local' : ''); $('#syncText').textContent = text; }
+function setMode(m, text) { state.mode = m; const el = $('#sync'); if (el) el.className = 'sync ' + (m === 'db' ? 'ok' : m === 'local' ? 'local' : ''); const t = $('#syncText'); if (t) t.textContent = text; }
 function setStatus(t) { const st = $('#saveStatus'); if (st) st.textContent = t; }
 function saveLog(doc) {
   doc.updatedAt = new Date().toISOString();
@@ -634,15 +697,15 @@ async function saveRecipe(id, patch) { const cur = state.recipes[id] || normReci
 async function saveAnalysis(key, doc) { state.analysis[key] = doc; return writeDoc('analysis/' + key, doc); }
 async function connect() {
   loadLocal(); renderAll();
-  if (STATIC_HOST) { setMode('local', 'Bu cihazda'); state.modeNote = 'Girdiler yalnızca bu cihazda saklanıyor.'; renderAll(); return; }
+  if (STATIC_HOST) { setMode('local', 'bu cihazda saklanıyor'); state.modeNote = 'Girdiler yalnızca bu cihazda saklanıyor.'; renderAll(); return; }
   let db = null;
   try { db = await window.claude.use('db'); } catch (e) { db = null; }
   window.claude.use('sample').then(async s => { state.sample = s; if (s && s.limits) { try { const lim = await s.limits(); state.imgOk = !!(lim && lim.images); } catch (e) { state.imgOk = false; } } renderAll(); }).catch(() => {});
   window.claude.use('assets').then(a => { state.assets = a; renderAll(); }).catch(() => {});
-  if (!db) { setMode('local', 'Bu cihazda'); state.modeNote = 'Paylaşımlı kayıt bu görünümde kapalı; girdiler yalnızca bu cihazda saklanıyor.'; renderAll(); return; }
+  if (!db) { setMode('local', 'bu cihazda saklanıyor'); state.modeNote = 'Paylaşımlı kayıt bu görünümde kapalı; girdiler yalnızca bu cihazda saklanıyor.'; renderAll(); return; }
   state.db = db;
   let loaded = false;
-  const timer = setTimeout(() => { if (!loaded) setMode('loading', 'Veriye ulaşılamıyor'); }, 10000);
+  const timer = setTimeout(() => { if (!loaded) setMode('loading', 'veriye ulaşılamıyor'); }, 10000);
   db.collection('logs').limit(1000).onSnapshot(snap => {
     loaded = true; clearTimeout(timer);
     const next = {};
@@ -651,24 +714,38 @@ async function connect() {
     state.pendingLocal.forEach(id => { if (state.logs[id]) { next[id] = state.logs[id]; state.dirty.add(id); clearTimeout(state.timers.get(id)); state.timers.set(id, setTimeout(() => flush(id), 300)); } });
     state.pendingLocal.clear();
     state.logs = next;
-    setMode('db', snap.metadata.fromCache ? 'Önbellek' : 'Paylaşımlı');
+    setMode('db', snap.metadata.fromCache ? 'önbellekten' : 'paylaşımlı, ikinizde de görünür');
     renderAll();
   }, err => { clearTimeout(timer); fallbackLocal('Paylaşımlı veriye ulaşılamadı (' + (err && err.code ? err.code : 'hata') + '); girdiler bu cihazda saklanıyor.'); renderAll(); });
   db.collection('settings').onSnapshot(snap => { snap.docs.forEach(d => { if (d.id === 'E' || d.id === 'K') state.settings[d.id] = d.data(); else if (d.id === 'rewards') state.rewards = normRewards(d.data()); }); renderAll(); }, () => {});
-  db.collection('recipes').onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { next[d.id] = normRecipe(d.data()); }); state.recipes = next; if (state.tab === 'tarifler') renderAll(); }, () => {});
-  db.collection('analysis').limit(200).onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { const a = d.data(); if (a && typeof a.text === 'string') next[d.id] = { text: a.text.slice(0, 4000), at: String(a.at || '').slice(0, 30), points: Number(a.points) || 0 }; }); state.analysis = next; if (state.tab === 'gelisim') renderAll(); }, () => {});
+  db.collection('recipes').onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { next[d.id] = normRecipe(d.data()); }); state.recipes = next; if (isOpen('sec-tarifler')) renderAll(); }, () => {});
+  db.collection('analysis').limit(200).onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { const a = d.data(); if (a && typeof a.text === 'string') next[d.id] = { text: a.text.slice(0, 4000), at: String(a.at || '').slice(0, 30), points: Number(a.points) || 0 }; }); state.analysis = next; if (isOpen('sec-gelisim')) renderAll(); }, () => {});
 }
 </script>
 
 <script>
 'use strict';
-// ---------- today: render ----------
+// ---------- today: hero, quests, sub-sections ----------
+const EMOJI = { run: '🏃', k: '🍳', a1: '🍎', o: '🥗', a2: '🥛', ak: '🍲', walkNoon: '🚶', walkEve: '🌙', vinegar: '🍶', strength: '💪', weigh: '⚖️', sleep: '😴' };
+function recipeLinks(dow, mealKey) {
+  const ids = (MENU_RECIPES[dow] && MENU_RECIPES[dow][mealKey]) || [];
+  const html = ids.map(id => { const r = RECIPES.find(x => x.id === id); return r ? '<button type="button" class="rlink" data-recipe="' + id + '">📖 ' + esc(r.name) + '</button>' : ''; }).join('');
+  return html ? '<div class="rl">' + html + '</div>' : '';
+}
+const LEVELS = [[26, 'Efsane'], [13, 'Usta'], [8, 'Demir irade'], [4, 'Kararlı'], [2, 'Düzenli'], [1, 'Isınmış'], [0, 'Çaylak']];
+function levelName(n) { for (const l of LEVELS) if (n >= l[0]) return l[1]; return 'Çaylak'; }
 function nextRhythm() { const hm = nowHM(); for (const r of RHYTHM) if (r[0] > hm) return r; return null; }
 function chip(field, on, label) { return '<button type="button" class="chip' + (on ? ' on' : '') + '" data-toggle="' + field + '" aria-pressed="' + on + '">' + label + '</button>'; }
 function weightDelta(L, c, prev) {
   if (L.weight != null) { const a = L.weight - c.startWeight, b = prev ? L.weight - prev.weight : null; return 'Başlangıca göre <b>' + sgn(a) + ' kg</b>' + (b != null ? ' · önceki tartıya göre ' + sgn(b) : ''); }
   if (prev) return 'Son tartı <b>' + n1(prev.weight) + ' kg</b> · ' + fmtD(prev.date);
   return 'Başlangıç <b>' + n1(c.startWeight) + ' kg</b>';
+}
+function dayStreak(p) {
+  const c = cfg(p); let d = state.today, n = 0;
+  const Lt = state.logs[logId(p, d)]; if (!Lt || dayPoints(Lt, c) < DAY_WIN) d = addDays(d, -1);
+  while (n < 400) { const L = state.logs[logId(p, d)]; if (!L || dayPoints(L, c) < DAY_WIN) break; n++; d = addDays(d, -1); }
+  return n;
 }
 function gidisat(L, c) {
   const hm = nowHM(), miss = [];
@@ -677,85 +754,103 @@ function gidisat(L, c) {
   if (hm > '13:30' && !L.walkNoon) miss.push('öğle yürüyüşü');
   if (hm > '20:00' && !L.walkEve) miss.push('akşam yürüyüşü');
   const h = Number(hm.slice(0, 2)), expected = Math.min(c.waterGoal, Math.round(c.waterGoal * Math.max(0, h - 6) / 15));
-  const water = L.water < expected ? 'su ' + L.water + '/' + c.waterGoal + ' (saat ' + h + ' için ' + expected + ' bardak bekleniyordu)' : null;
-  const pts = dayPoints(L, c);
-  let t = 'Bugün <b>' + pts + '/10 puan</b>.';
-  if (!miss.length && !water) t += hm < '12:00' ? ' Şimdilik her şey yolunda.' : ' Gün planda gidiyor.';
-  else { t += ' Eksik: ' + miss.concat(water ? [water] : []).join(', ') + '.'; }
-  return t;
+  if (L.water < expected) miss.push('su ' + L.water + '/' + c.waterGoal);
+  return miss;
 }
-function rewardCard(p) {
-  const lp = ladderProgress(p), ladder = state.rewards.ladder[p], th = lp.threshold, name = cfg(p).name;
-  const weekly = ladder[0], cw = lp.current, left = Math.max(0, th - cw.points), daysLeft = 6 - daysBetween(cw.ws, state.today);
-  const track = ladder.map(r => { const done = r.weeks === 1 ? cw.ok : lp.count >= r.weeks, isNext = lp.next && r.weeks === lp.next.weeks; return '<div class="rung' + (done ? ' done' : isNext ? ' next' : ' lock') + '" title="' + esc(r.title) + '"><span class="ic">' + esc(r.icon) + '</span>' + RUNG_LABELS[r.weeks] + (done ? ' ✓' : '') + '</div>'; }).join('');
-  let main;
-  if (lp.warmup) main = '<p class="muted">Program ' + fmtD(mondayOf(cfg(p).startDate)) + ' Pazartesi başlıyor; bu hafta ısınma turu. Puanlar o gün sayılmaya başlar, bar o günden itibaren dolar.</p>';
+function motto(L, c, pts, p, lp) {
+  const h = Number(nowHM().slice(0, 2)), meals = MEAL_KEYS.filter(k => L.meals[k]).length;
+  if (pts >= DAY_MAX) return 'On bir üzerinden on bir. Bugün efsane yazıldı 🏆';
+  if (pts >= DAY_WIN) return 'Gün kazanıldı. Mutfak kapandı, şampiyon 🥇';
+  if (h < 9 && !L.run) return 'Koşu seni bekliyor; sabah ışığı en iyi antidepresan 🌤';
+  if (h >= 14 && L.water < c.waterGoal * 0.4) return 'Su! Kaktüs değilsin 🌵';
+  if (p === 'K') { const ci = cycleInfo(c, state.date); if (ci && ci.pms) return 'PMS haftası: tatlı isteği normal, planlı tatlı cebinde 🍐'; }
+  if (meals === 5) return 'Beş öğün tamam, kan şekeri dümdüz 📈';
+  if (lp.streak >= 2) return lp.streak + ' haftalık seri sürüyor, zincir kırılmasın 🔗';
+  if (pts >= 8) return 'Bir iki adım kaldı: yürüyüş, su ya da erken yatış, gün senin 🚶';
+  const pool = ['Küçük adımlar, büyük merdiven 🪜', 'Bugünün puanı yarının ödülü 🎁', 'Önce salata, sonra protein, en son bulgur 🥗', 'Yemek sonrası 10 dakika yürüyüş, kan şekerine en ucuz ilaç 🚶', 'Kefir gece dostudur, cips değil 🥛', 'Haftada bir tartı yeter; günlük dalga sudur 🌊', 'Zerdeçala karabiber, emilim 20 kat 🌶'];
+  return pool[parseD(state.date).getDay()];
+}
+function heroHtml(p, L, c) {
+  const lp = ladderProgress(p), pts = dayPoints(L, c), th = lp.threshold, cw = lp.current, isToday = state.date === state.today;
+  const circ = 2 * Math.PI * 40, dash = (Math.min(DAY_MAX, pts) / DAY_MAX * circ).toFixed(1);
+  const streak = dayStreak(p), daysLeft = 6 - daysBetween(cw.ws, state.today), weekly = state.rewards.ladder[p][0];
+  const chips = PERSON_LOCK ? '' : '<div class="pchips">' + ['E', 'K'].map(q => '<button type="button" class="pchip' + (q === state.person ? ' on' : '') + '" data-person="' + q + '">' + esc(cfg(q).name) + '</button>').join('') + '</div>';
+  let lvl;
+  if (lp.warmup) lvl = '<div class="lvl"><div class="t"><b>Program ' + fmtD(mondayOf(c.startDate)) + ' Pazartesi başlıyor</b></div><p class="tiny">Bu hafta ısınma turu; puanlar ve ödül merdiveni o gün çalışmaya başlar.</p></div>';
   else if (lp.next) {
     const pct = Math.min(100, lp.progress / lp.next.weeks * 100), remainW = lp.next.weeks - lp.count;
-    main = '<div class="row"><div class="grow"><div class="eyebrow">Sıradaki büyük ödül · ' + RUNG_LABELS[lp.next.weeks] + '</div><div class="big">' + esc(lp.next.icon) + ' ' + esc(lp.next.title) + '</div></div><div class="pts num">' + lp.count + '<small> / ' + lp.next.weeks + ' hafta</small></div></div>' +
-      '<div class="bar big"><i style="width:' + pct + '%"></i></div>' +
-      '<p class="tiny">' + (remainW === 1 ? 'Bu hafta da tutarsa ' + esc(lp.next.title) + ' cebinde! ' : remainW + ' başarılı hafta kaldı. ') + 'Bar her gün puanla dolar; hafta ' + th + ' puana ulaşınca bir basamak çıkılır.' + (lp.streak >= 2 ? ' Seri: ' + lp.streak + ' hafta 🔥' : '') + '</p>';
-  } else main = '<p class="muted">Merdiven tamamlandı 🏆 ' + esc(name) + ', 6 aylık ödül dahil hepsi hak edildi.</p>';
-  const earned = lp.earned.map(r => '<div class="row"><span class="grow">🎉 ' + esc(r.icon) + ' <b>' + esc(r.title) + '</b> hak edildi!</span><button type="button" class="btn small" data-action="claimRung" data-w="' + r.weeks + '">Ödülü aldım</button></div>').join('');
-  const weeklyHtml = lp.warmup ? '' : '<div class="weekly"><div class="row"><span class="grow"><b>' + esc(weekly.icon) + ' ' + esc(weekly.title) + '</b> <span class="tiny">· haftalık ödül</span></span><span class="num tiny">' + cw.points + ' / ' + th + ' puan</span></div><div class="bar' + (cw.ok ? ' good' : '') + '"><i style="width:' + Math.min(100, cw.points / th * 100) + '%"></i></div>' +
-    '<p class="tiny">' + (cw.ok ? 'Bu haftanın ödülü hak edildi: hafta sonu ' + esc(weekly.title.toLocaleLowerCase('tr-TR')) + ' zamanı.' : left + ' puan daha gerek; Pazar\'a ' + daysLeft + ' gün var, günde en çok 10 puan + haftalık tartı 5.') + '</p></div>';
-  return '<div class="card reward"><div class="card-h"><h2>Ödül merdiveni</h2><span class="meta">' + lp.count + ' başarılı hafta' + (lp.streak >= 2 ? ' · seri ' + lp.streak : '') + '</span></div><div class="ladder">' + track + '</div>' + main + earned + weeklyHtml + '</div>';
+    lvl = '<div class="lvl"><div class="t"><b>Sıradaki: ' + esc(lp.next.icon) + ' ' + esc(lp.next.title) + '</b><span class="tiny num">' + lp.count + ' / ' + lp.next.weeks + ' hafta</span></div><div class="bar big"><i style="width:' + pct + '%"></i></div><p class="tiny">' + (remainW === 1 ? 'Bu hafta da tutarsa senin! ' : remainW + ' başarılı hafta kaldı. ') + 'Seviye: <b>' + levelName(lp.count) + '</b>' + (lp.streak >= 2 ? ' · seri ' + lp.streak + ' hafta 🔥' : '') + '</p></div>';
+  } else lvl = '<div class="lvl"><div class="t"><b>Merdiven tamamlandı 🏆</b></div><p class="tiny">6 aylık ödül dahil hepsi hak edildi. Seviye: Efsane.</p></div>';
+  const earned = lp.earned.map(r => '<div class="celebrate">🎉 ' + esc(r.icon) + ' ' + esc(r.title) + ' hak edildi! <button type="button" class="btn small" data-action="claimRung" data-w="' + r.weeks + '">Ödülü aldım</button></div>').join('');
+  const wbar = lp.warmup ? '' : '<div><div class="wlabel"><span>' + esc(weekly.icon) + ' <b>' + esc(weekly.title) + '</b> · haftalık ödül</span><span class="num">' + cw.points + ' / ' + th + ' puan</span></div><div class="wbar' + (cw.ok ? ' done' : '') + '"><div class="bar' + (cw.ok ? ' good' : '') + '"><i style="width:' + Math.min(100, cw.points / th * 100) + '%"></i></div><span class="em">' + esc(weekly.icon) + '</span></div><p class="tiny">' + (cw.ok ? 'Bu haftanın ödülü hak edildi; hafta sonu keyfini çıkar.' : (th - cw.points) + ' puan kaldı · Pazar\'a ' + daysLeft + ' gün' + (lp.current.ok ? '' : (weekPoints(p, cw.ws).weighed ? '' : ' · tartı +5 bekliyor'))) + '</p></div>';
+  return '<div class="hero">' +
+    '<div class="hero-top"><div class="avatar">' + (p === 'E' ? '🧔' : '👩') + '</div><div class="grow"><div class="hname">' + esc(c.name) + '</div><div class="hsub">' + n1(c.startWeight) + ' → ' + n1(c.goalWeight) + ' kg · ' + c.kcal + ' kcal · ' + levelName(lp.count) + '</div></div>' + chips + '</div>' +
+    '<div class="ringrow"><svg class="ring' + (pts >= DAY_WIN ? ' full' : '') + '" viewBox="0 0 96 96" role="img" aria-label="Günün puanı ' + pts + ' / ' + DAY_MAX + '"><circle class="bg" cx="48" cy="48" r="40"/><circle class="fg" cx="48" cy="48" r="40" transform="rotate(-90 48 48)" stroke-dasharray="' + dash + ' ' + circ.toFixed(1) + '"/><text x="48" y="44" text-anchor="middle" font-size="22">' + pts + '</text><text x="48" y="62" text-anchor="middle" font-size="11" fill="var(--ink-3)">/ ' + DAY_MAX + ' puan</text></svg>' +
+    '<div class="hstats"><div class="hstat">🔥 <b>' + streak + '</b> günlük seri <span class="tiny">(' + DAY_WIN + '+ puanlı günler)</span></div><div class="hstat">⭐ Hafta <b class="num">' + cw.points + '</b> / ' + th + '</div><div class="hstat">🪜 <b>' + lp.count + '</b> başarılı hafta</div>' + (isToday ? '' : '<div class="hstat tiny">' + fmtD(state.date) + ' günü gösteriliyor</div>') + '</div></div>' +
+    (isToday && pts >= DAY_WIN ? '<div class="celebrate">' + (pts >= DAY_MAX ? 'Mükemmel gün! 11/11 🏆' : 'Gün kazanıldı! ' + pts + '/11 🎉') + ' Yarın aynı saatte.</div>' : '') + wbar + lvl + earned +
+    '<p class="motto">' + esc(motto(L, c, pts, p, lp)) + '</p></div>';
 }
-function cycleCard(c) {
-  const ci = cycleInfo(c, state.date);
-  if (!ci) return '<div class="card"><div class="card-h"><h2>Döngü</h2><span class="meta">Adet takibi</span></div><p class="muted">Son adetin başladığı günü girin; döngü günü, PMS haftası ve tahmini sonraki tarih burada görünür.</p>' +
-    '<div class="addfood"><input type="date" id="cycleDate" max="' + state.today + '"><button type="button" class="btn small" data-action="cycleSave">Kaydet</button></div></div>';
-  return '<div class="card"><div class="card-h"><h2>Döngü · ' + ci.day + '. gün</h2><span class="pill' + (ci.pms ? ' warn' : ci.phase === 'Adet' ? ' accent' : ' good') + '">' + ci.phase + '</span></div>' +
-    '<p class="muted">' + esc(ci.tip) + '</p><div class="row"><span class="tiny grow">Tahmini sonraki adet: ' + fmtD(ci.next) + ' · döngü ' + c.cycleLen + ' gün</span><button type="button" class="btn ghost small" data-action="cycleStart">Adet başladı</button></div></div>';
+function questsHtml(p, L, c) {
+  const d = state.date, dow = parseD(d).getDay(), menu = MENU[dow], isToday = d === state.today, nx = isToday ? nextRhythm() : null;
+  const items = [{ id: 'run', f: 'run', t: '06:15', name: 'Sabah koşusu', pts: 1, on: L.run, kind: 'toggle' }];
+  menu.meals.filter(m => m.k !== 'g').forEach(m => items.push({ id: m.k, k: m.k, t: MEAL_TIMES[m.k], name: MEAL_NAMES[m.k], pts: 1, on: !!L.meals[m.k], kind: 'meal', menu: m.t, por: m[p], rl: recipeLinks(dow, m.k) }));
+  items.push({ id: 'sleep', t: '23:00', name: 'Uyku düzeni', pts: 1, on: sleepOk(L), kind: 'sleep', menu: 'Yatış en geç 23:15, kalkış en geç ' + wakeLimit(d) + (L.sleep != null ? ' · ' + n1(L.sleep) + ' saat uyku' : '') });
+  items.push({ id: 'vinegar', f: 'vinegar', t: '12:15', name: 'Sirkeli su', pts: 0, on: L.vinegar, kind: 'toggle', menu: '1 yk elma sirkesi + 1 bardak su, öğleden önce' });
+  items.push({ id: 'walkNoon', f: 'walkNoon', t: '13:15', name: 'Öğle yürüyüşü', pts: 1, on: L.walkNoon, kind: 'toggle', menu: '10–15 dk dışarıda, gün ışığı' });
+  items.push({ id: 'walkEve', f: 'walkEve', t: '19:45', name: 'Akşam yürüyüşü', pts: 1, on: L.walkEve, kind: 'toggle', menu: '10 dk, sonra mutfak kapanır' });
+  items.push({ id: 'strength', f: 'strength', t: '20:00', name: 'Kuvvet 15 dk', pts: 0, on: L.strength, kind: 'toggle', menu: '3 tur: 15 squat, 10 şınav, 30 sn plank, 10 köprü · haftada 2' });
+  if (dow === c.weighDay) items.push({ id: 'weigh', t: '06:05', name: 'Haftalık tartı', pts: 5, on: L.weight != null, kind: 'weigh', menu: 'Tuvaletten sonra, kahvaltıdan önce' });
+  items.sort((a, b) => a.t < b.t ? -1 : 1);
+  const rows = items.map(q => {
+    const body = '<div class="em">' + EMOJI[q.id] + '</div><div class="grow"><div class="nm">' + q.name + '<span class="tm">' + q.t + '</span></div>' + (q.menu ? '<div class="mn">' + esc(q.menu) + '</div>' : '') + (q.por ? '<div class="pr">' + esc(q.por) + '</div>' : '') + (q.rl || '');
+    if (q.kind === 'sleep') return '<div class="q sleepq' + (q.on ? ' on' : '') + '">' + body + '<div class="row"><label class="tiny">Yatış <input type="time" id="bedInput" value="' + esc(L.bed) + '"></label><label class="tiny">Kalkış <input type="time" id="wakeInput" value="' + esc(L.wake) + '"></label></div></div><div class="pt">+1</div></div>';
+    const attr = q.kind === 'meal' ? 'data-meal="' + q.k + '"' : q.kind === 'toggle' ? 'data-toggle="' + q.f + '"' : 'data-action="openWeight"';
+    return '<div class="q' + (q.on ? ' on' : '') + (q.pts ? '' : ' zero') + '" ' + attr + ' role="checkbox" aria-checked="' + q.on + '" tabindex="0">' + body + '</div><div class="pt">' + (q.pts ? '+' + q.pts : '✓') + '</div></div>';
+  }).join('');
+  const goal = c.waterGoal, nDrops = Math.max(goal, L.water);
+  let drops = ''; for (let i = 1; i <= nDrops; i++) drops += '<button type="button" class="drop' + (i <= L.water ? ' on' : '') + '" data-action="drop" data-n="' + i + '" aria-label="' + i + '. bardak">💧</button>';
+  if (L.water >= goal && L.water < 30) drops += '<button type="button" class="drop on" data-action="drop" data-n="' + (L.water + 1) + '" aria-label="Bir bardak daha" style="filter:none;opacity:.7">➕</button>';
+  const miss = isToday ? gidisat(L, c) : [];
+  return '<div class="card"><div class="daterow"><button type="button" class="iconbtn" data-action="prevday" aria-label="Önceki gün">‹</button><div class="d">' + (isToday ? 'Bugünün görevleri' : fmtD(d)) + '<small>' + fmtDL(d) + ' · ' + menu.name + '</small></div><button type="button" class="iconbtn" data-action="nextday" aria-label="Sonraki gün"' + (isToday ? ' disabled' : '') + '>›</button></div>' +
+    (nx ? '<div class="next"><b>' + nx[0] + '</b><span>Sırada: ' + esc(nx[1]) + '</span></div>' : '') +
+    (miss.length ? '<p class="tiny">Saate göre eksik: ' + esc(miss.join(', ')) + '</p>' : '') +
+    '<div class="qlist">' + rows + '</div>' +
+    '<div><div class="waterline"><b>💧 Su ' + L.water + ' / ' + goal + ' bardak</b><span class="tiny num">' + n1(L.water * 0.25) + ' L · hedefte +2 puan</span></div><div class="drops">' + drops + '</div></div>' +
+    '<div class="tipbox">' + esc(menu.tip) + '</div></div>';
 }
-function foodsHtml(L, p) {
-  const total = L.foods.reduce((s, f) => s + (f.kcal || 0), 0), prot = L.foods.reduce((s, f) => s + (f.protein || 0), 0);
+function foodsBody(L, p) {
   const rows = L.foods.map(f => {
-    const img = f.photo && !STATIC_HOST ? '<img src="/_blob/' + f.photo + '" alt="">' : '<div class="ph">' + (f.meal === 'x' ? '🍽' : '🍽') + '</div>';
+    const img = f.photo && !STATIC_HOST ? '<img src="/_blob/' + f.photo + '" alt="">' : '<div class="ph">🍽</div>';
     const busy = state.busy.has(f.id);
     const head = '<div class="hd"><b>' + (MEAL_NAMES[f.meal] || 'Öğün') + (f.t ? ' <span class="tiny">' + f.t + '</span>' : '') + '</b>' + (f.kcal != null ? '<span class="kc num">' + Math.round(f.kcal) + ' kcal' + (f.protein != null ? ' · ' + Math.round(f.protein) + ' g pr.' : '') + '</span>' : '') + '</div>';
-    const txt = f.text ? '<div>' + esc(f.text) + '</div>' : '';
     const cm = busy ? '<div class="busy">Claude yorumluyor…</div>' : (f.comment ? '<div class="cm">' + esc(f.comment) + '</div>' : (state.sample && !STATIC_HOST ? '<div class="cm"><button type="button" class="linkbtn" data-action="foodRetry" data-id="' + f.id + '">Yorum ve kalori iste</button></div>' : ''));
-    return '<div class="food">' + img + '<div>' + head + txt + cm + '<button type="button" class="del" data-action="foodDel" data-id="' + f.id + '">sil</button></div></div>';
+    return '<div class="food">' + img + '<div>' + head + (f.text ? '<div>' + esc(f.text) + '</div>' : '') + cm + '<button type="button" class="del" data-action="foodDel" data-id="' + f.id + '">sil</button></div></div>';
   }).join('');
   const canPhoto = !STATIC_HOST && state.assets && state.imgOk;
   const add = '<div class="addfood">' + (canPhoto ? '<label class="filebtn btn ghost small" aria-label="Fotoğraf ekle">📷<input type="file" id="foodPhoto" accept="image/*" capture="environment"></label>' : '') +
     '<input type="text" id="foodText" placeholder="Ne yediniz? (örn. 1 kase mercimek, 1 dilim ekmek)" maxlength="300"><button type="button" class="btn small" data-action="foodAdd">Ekle</button></div>';
   const note = STATIC_HOST ? '<p class="tiny">Bu adreste yazılı kayıt tutulur; fotoğraf ve kalori yorumu Claude sürümünde.</p>' : (state.sample ? '<p class="tiny">Fotoğraf veya yazı ekleyin; Claude porsiyonu tahmin edip kalori ve kısa yorum yazar. Tahminidir, ±%20 sapma normaldir.</p>' : '<p class="tiny">Claude yorumu bu görünümde kapalı; yazılı kayıt tutulur.</p>');
-  return '<div class="card"><div class="card-h"><h2>Ne yedik?</h2><span class="meta num">' + (total ? Math.round(total) + ' kcal' + (prot ? ' · ' + Math.round(prot) + ' g protein' : '') + ' / hedef ' + cfg(p).kcal : 'hedef ' + cfg(p).kcal + ' kcal') + '</span></div>' + (rows ? '<div>' + rows + '</div>' : '') + add + note + '</div>';
+  return (rows ? '<div>' + rows + '</div>' : '') + add + note;
 }
+function subSec(id, icon, title, sub, body) { return '<details class="sub-sec" id="' + id + '"' + (state.open.has(id) ? ' open' : '') + '><summary><span class="ic">' + icon + '</span><span class="st">' + title + '<span class="sub">' + sub + '</span></span></summary><div class="body">' + body + '</div></details>'; }
 function renderToday() {
   const p = state.person, d = state.date, L = getLog(p, d), c = cfg(p);
-  const dow = parseD(d).getDay(), menu = MENU[dow], isToday = d === state.today;
   const earlier = logsOf(p).filter(l => l.weight != null && l.date < d), prev = earlier.length ? earlier[earlier.length - 1] : null;
-  const nx = isToday ? nextRhythm() : null;
-  const doneMeals = MEAL_KEYS.filter(k => L.meals[k]).length;
-  const mealsHtml = menu.meals.filter(m => m.k !== 'g').map(m => {
-    const on = !!L.meals[m.k], portion = m[p];
-    return '<div class="meal' + (on ? ' on' : '') + '" data-meal="' + m.k + '" role="checkbox" aria-checked="' + on + '" tabindex="0"><div class="box">' + (on ? '✓' : '') + '</div><div><div class="t"><b>' + MEAL_NAMES[m.k] + '</b><span>' + MEAL_TIMES[m.k] + '</span></div><div class="m">' + esc(m.t) + '</div>' + (portion ? '<div class="p">' + esc(portion) + '</div>' : '') + '</div></div>';
-  }).join('');
-  const night = menu.meals.find(m => m.k === 'g');
-  const pct = Math.min(100, c.waterGoal ? L.water / c.waterGoal * 100 : 0);
-  const weighDay = dow === c.weighDay, showW = weighDay || L.weight != null || state.showWeight;
-  const weightCard = showW ?
-    '<div class="card"><div class="card-h"><h2>Haftalık tartı</h2><span class="meta">' + (weighDay ? 'Tartı günü · sabah, kahvaltıdan önce' : 'Ek ölçüm') + '</span></div><div class="weightline"><input type="number" id="weightInput" inputmode="decimal" step="0.1" min="30" max="250" value="' + (L.weight == null ? '' : L.weight) + '" placeholder="—" aria-label="Kilo"><span>kg</span><div class="delta grow" id="weightDelta">' + weightDelta(L, c, prev) + '</div></div>' + (weighDay ? '<p class="tiny">Haftada bir tartı yeter; günlük dalgalanma 1–2 kg su kaynaklıdır. Haftalık tartı +5 puan.</p>' : '') + '</div>' :
-    '<div class="card"><div class="row"><div class="grow"><div class="eyebrow">Haftalık tartı</div><div class="muted">Tartı günü <b>' + DAY_NAMES[c.weighDay] + '</b>' + (prev ? ' · son ' + n1(prev.weight) + ' kg (' + fmtD(prev.date) + ')' : '') + '</div></div><button type="button" class="linkbtn" data-action="showWeight">Bugün tart</button></div></div>';
+  const total = L.foods.reduce((s, f) => s + (f.kcal || 0), 0);
+  const weightBody = '<div class="weightline"><input type="number" id="weightInput" inputmode="decimal" step="0.1" min="30" max="250" value="' + (L.weight == null ? '' : L.weight) + '" placeholder="—" aria-label="Kilo"><span>kg</span><div class="delta grow" id="weightDelta">' + weightDelta(L, c, prev) + '</div></div><p class="tiny">Tartı günü ' + DAY_NAMES[c.weighDay] + '; haftada bir yeter, günlük dalgalanma 1–2 kg su kaynaklıdır. Haftada bir tartı +5 puan.</p>';
+  let cycleBody = '', cycleSub = '';
+  if (p === 'K') {
+    const ci = cycleInfo(c, d);
+    if (!ci) { cycleSub = 'Son adet tarihini girin'; cycleBody = '<p class="muted">Son adetin başladığı günü girin; döngü günü, PMS haftası ve tahmini sonraki tarih burada görünür.</p><div class="addfood"><input type="date" id="cycleDate" max="' + state.today + '"><button type="button" class="btn small" data-action="cycleSave">Kaydet</button></div>'; }
+    else { cycleSub = ci.day + '. gün · ' + ci.phase + ' · sonraki ' + fmtD(ci.next); cycleBody = '<div class="row"><span class="pill' + (ci.pms ? ' warn' : ci.phase === 'Adet' ? ' accent' : ' good') + '">' + ci.phase + '</span><span class="tiny">döngü ' + c.cycleLen + ' gün</span></div><p class="muted">' + esc(ci.tip) + '</p><div class="row"><button type="button" class="btn ghost small" data-action="cycleStart">Adet başladı</button></div>'; }
+  }
   const status = state.mode === 'db' ? (state.dirty.size ? 'Kaydediliyor…' : (L.updatedAt ? 'Son kayıt ' + localTime(L.updatedAt) + ' · ikinizde de görünür' : 'Henüz girdi yok')) : (state.mode === 'local' ? 'Girdiler bu cihazda saklanıyor' : 'Bağlanıyor…');
-  $('#view-bugun').innerHTML =
-    '<div class="card"><div class="daterow"><button type="button" class="iconbtn" data-action="prevday" aria-label="Önceki gün">‹</button><div class="d">' + (isToday ? 'Bugün' : fmtD(d)) + '<small>' + fmtDL(d) + ' · ' + menu.name + '</small></div><button type="button" class="iconbtn" data-action="nextday" aria-label="Sonraki gün"' + (isToday ? ' disabled' : '') + '>›</button></div>' +
-    (nx ? '<div class="next"><b>' + nx[0] + '</b><span>Sırada: ' + esc(nx[1]) + '</span></div>' : (isToday ? '<div class="next"><b>23:00</b><span>Günün programı tamamlandı. İyi uykular.</span></div>' : '')) +
-    (isToday ? '<div class="flash" id="flash">' + gidisat(L, c) + '</div>' : '<div class="flash">O gün <b>' + dayPoints(L, c) + '/10 puan</b>.</div>') + '</div>' +
-    rewardCard(p) + (p === 'K' ? cycleCard(c) : '') + weightCard +
-    '<div class="card"><div class="card-h"><h2>Su</h2><span class="meta">Hedef ' + c.waterGoal + ' bardak · ' + n1(c.waterGoal * 0.25) + ' L</span></div>' +
-    '<div class="stepper"><button type="button" data-action="water" data-n="-1" aria-label="Bir bardak çıkar">−</button><div class="val num">' + L.water + '<small> / ' + c.waterGoal + '</small></div><button type="button" data-action="water" data-n="1" aria-label="Bir bardak ekle">+</button><div class="grow"><div class="bar' + (L.water >= c.waterGoal ? ' good' : '') + '"><i style="width:' + pct + '%"></i></div><div class="tiny">' + n1(L.water * 0.25) + ' L · 1 bardak = 250 ml · hedefe ulaşınca +2 puan</div></div></div>' +
-    '<div class="chips">' + chip('vinegar', L.vinegar, 'Sirkeli su (öğle öncesi)') + '</div></div>' +
-    '<div class="card"><div class="card-h"><h2>Öğünler</h2><span class="meta">' + doneMeals + '/5 · her öğün 1 puan</span></div><div>' + mealsHtml + '</div>' +
-    (night ? '<div class="tiny">21:30 Gece: ' + esc(night.t) + '</div>' : '') + '<div class="tipbox">' + esc(menu.tip) + '</div></div>' +
-    foodsHtml(L, p) +
-    '<div class="card"><div class="card-h"><h2>Hareket ve uyku</h2><span class="meta">Koşu 1 · yürüyüşler 1+1 puan</span></div><div class="chips">' + chip('run', L.run, 'Sabah koşusu') + chip('walkNoon', L.walkNoon, 'Öğle yürüyüşü') + chip('walkEve', L.walkEve, 'Akşam yürüyüşü') + chip('strength', L.strength, 'Kuvvet 15 dk') + '</div>' +
-    '<div class="two"><div class="field"><label>Yatış saati (hedef 23:00)</label><input type="time" id="bedInput" value="' + esc(L.bed) + '"></div><div class="field"><label>Uyku (saat)</label><input type="number" id="sleepInput" inputmode="decimal" min="0" max="14" step="0.5" value="' + (L.sleep == null ? '' : L.sleep) + '" placeholder="7"></div></div></div>' +
-    '<div class="card"><div class="card-h"><h2>Not</h2><span class="meta">Şişkinlik, tatlı krizi, dışarıda yemek</span></div><textarea id="noteInput" placeholder="Örn. 14:00 kuru fasulyeden sonra şişkinlik">' + esc(L.note) + '</textarea>' +
-    '<div class="status" id="saveStatus">' + status + '</div><div class="tiny" id="modeNote">' + esc(state.modeNote) + '</div></div>';
+  const noteBody = '<textarea id="noteInput" placeholder="Örn. 14:00 kuru fasulyeden sonra şişkinlik">' + esc(L.note) + '</textarea><div class="status" id="saveStatus">' + status + '</div><div class="tiny" id="modeNote">' + esc(state.modeNote) + '</div>';
+  $('#view-bugun').innerHTML = heroHtml(p, L, c) + questsHtml(p, L, c) +
+    subSec('sub-yemek', '🍽', 'Ne yedik?', (L.foods.length ? L.foods.length + ' kayıt' + (total ? ' · ' + Math.round(total) + ' kcal' : '') : 'Fotoğraf veya yazıyla öğün kaydı') + ' · hedef ' + c.kcal + ' kcal', foodsBody(L, p)) +
+    subSec('sub-tarti', '⚖️', 'Haftalık tartı', L.weight != null ? n1(L.weight) + ' kg girildi' : (prev ? 'Son ' + n1(prev.weight) + ' kg · ' + fmtD(prev.date) : 'Tartı günü ' + DAY_NAMES[c.weighDay]), weightBody) +
+    (p === 'K' ? subSec('sub-dongu', '🌙', 'Döngü', cycleSub, cycleBody) : '') +
+    subSec('sub-not', '📝', 'Not', (L.note ? L.note.slice(0, 40) + (L.note.length > 40 ? '…' : '') : 'Şişkinlik, tatlı krizi, dışarıda yemek'), noteBody);
 }
 </script>
 
@@ -832,13 +927,15 @@ async function addFood(text, file) {
 function bindToday() {
   const v = $('#view-bugun');
   v.addEventListener('click', async e => {
-    const act = e.target.closest('[data-action]'), tog = e.target.closest('[data-toggle]'), meal = e.target.closest('[data-meal]');
+    const act = e.target.closest('[data-action]'), tog = e.target.closest('[data-toggle]'), meal = e.target.closest('[data-meal]'), pc = e.target.closest('[data-person]');
+    if (pc) { if (!PERSON_LOCK && pc.dataset.person !== state.person) { state.person = pc.dataset.person; lsSet('bt_person', state.person); renderAll(); } return; }
     if (act) {
       const a = act.dataset.action;
-      if (a === 'prevday') { state.date = addDays(state.date, -1); state.showWeight = false; renderToday(); }
-      else if (a === 'nextday' && state.date < state.today) { state.date = addDays(state.date, 1); state.showWeight = false; renderToday(); }
+      if (a === 'prevday') { state.date = addDays(state.date, -1); renderToday(); }
+      else if (a === 'nextday' && state.date < state.today) { state.date = addDays(state.date, 1); renderToday(); }
       else if (a === 'water') { editLog(L => { L.water = Math.max(0, Math.min(30, L.water + Number(act.dataset.n))); }); renderToday(); }
-      else if (a === 'showWeight') { state.showWeight = true; renderToday(); const w = $('#weightInput'); if (w) w.focus(); }
+      else if (a === 'drop') { const n = Number(act.dataset.n); editLog(L => { L.water = Math.max(0, Math.min(30, n === L.water ? n - 1 : n)); }); renderToday(); }
+      else if (a === 'openWeight') { state.open.add('sub-tarti'); lsSet('bt_open', Array.from(state.open)); renderToday(); const w = $('#weightInput'); if (w) { w.scrollIntoView({ block: 'center' }); w.focus(); } }
       else if (a === 'foodAdd') { const t = $('#foodText'); await addFood(t ? t.value : '', null); }
       else if (a === 'foodDel') { const id = act.dataset.id; editLog(L => { L.foods = L.foods.filter(x => x.id !== id); }); renderToday(); }
       else if (a === 'foodRetry') { analyzeFood(state.person, state.date, act.dataset.id, null); }
@@ -857,12 +954,15 @@ function bindToday() {
     const meal = e.target.closest('[data-meal]'); if (meal && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); meal.click(); return; }
     if (e.target.id === 'foodText' && e.key === 'Enter') { e.preventDefault(); addFood(e.target.value, null); }
   });
-  v.addEventListener('change', e => { if (e.target.id === 'foodPhoto' && e.target.files && e.target.files[0]) { const t = $('#foodText'); addFood(t ? t.value : '', e.target.files[0]); e.target.value = ''; } });
+  v.addEventListener('change', e => {
+    if (e.target.id === 'foodPhoto' && e.target.files && e.target.files[0]) { const t = $('#foodText'); addFood(t ? t.value : '', e.target.files[0]); e.target.value = ''; }
+    else if (e.target.id === 'bedInput' || e.target.id === 'wakeInput') { e.target.blur(); renderToday(); }
+  });
   v.addEventListener('input', e => {
     const id = e.target.id;
     if (id === 'weightInput') { const w = parseFloat(String(e.target.value).replace(',', '.')); const L = editLog(L => { L.weight = (isFinite(w) && w > 30 && w < 250) ? Math.round(w * 10) / 10 : null; }); const earlier = logsOf(state.person).filter(l => l.weight != null && l.date < state.date); const el = $('#weightDelta'); if (el) el.innerHTML = weightDelta(L, cfg(state.person), earlier.length ? earlier[earlier.length - 1] : null); }
-    else if (id === 'sleepInput') editLog(L => { const s = parseFloat(String(e.target.value).replace(',', '.')); L.sleep = isFinite(s) ? Math.max(0, Math.min(14, s)) : null; });
-    else if (id === 'bedInput') editLog(L => { L.bed = e.target.value || ''; });
+    else if (id === 'bedInput') editLog(L => { L.bed = e.target.value || ''; L.sleep = sleepHours(L.bed, L.wake); });
+    else if (id === 'wakeInput') editLog(L => { L.wake = e.target.value || ''; L.sleep = sleepHours(L.bed, L.wake); });
     else if (id === 'noteInput') editLog(L => { L.note = e.target.value.slice(0, 1000); });
   });
 }
@@ -891,7 +991,8 @@ function weekSummary(p, ws) {
 function ruleAnalysis(p, s, prevS) {
   const c = cfg(p), out = [], denom = s.logged * 5;
   if (!s.logged) return ['Bu hafta için kayıt yok. Bugün sekmesinden işaretlemeye başlayın; analiz kayıtla birlikte oluşur.'];
-  out.push('Puan: ' + s.points.points + '/75 (' + Math.round(s.points.points / 75 * 100) + '%). ' + (s.points.points >= 60 ? 'Çok iyi bir hafta.' : s.points.points >= 45 ? 'Program büyük ölçüde tuttu.' : 'Hafta zorlu geçmiş; aşağıdaki tek odağa bakın.'));
+  const won = [0, 1, 2, 3, 4, 5, 6].filter(i => { const L = state.logs[logId(p, addDays(s.ws, i))]; return L && dayPoints(L, c) >= DAY_WIN; }).length;
+  out.push('Puan: ' + s.points.points + '/' + WEEK_MAX + ' (' + Math.round(s.points.points / WEEK_MAX * 100) + '%), kazanılan gün ' + won + '/' + s.logged + '. ' + (s.points.points >= 65 ? 'Çok iyi bir hafta.' : s.points.points >= 50 ? 'Program büyük ölçüde tuttu.' : 'Hafta zorlu geçmiş; aşağıdaki tek odağa bakın.'));
   const adh = denom ? Math.round(s.mealsDone / denom * 100) : 0;
   const worst = MEAL_KEYS.slice().sort((a, b) => s.meals[a] - s.meals[b])[0];
   out.push('Öğün uyumu %' + adh + (s.meals[worst] < s.logged ? '; en çok atlanan: ' + MEAL_NAMES[worst] + ' (' + s.meals[worst] + '/' + s.logged + ' gün).' : '; hiçbir öğün atlanmamış.'));
@@ -948,7 +1049,7 @@ function renderProgress() {
     '<div class="card"><div class="card-h"><h2>Tempo</h2><span class="meta">Son 28 gün</span></div>' +
     (pace == null ? '<p class="muted">Tempo için en az 7 güne yayılmış 3 tartı gerekiyor; haftada bir tartı 3 haftada yeter.</p>' : '<p>Mevcut tempo <b class="num">' + sgn(pace) + ' kg/hafta</b> (plan ' + n1(-c.rate) + ').</p>' + (eta ? '<p>Bu tempoyla hedefe varış: <b>' + fmtDL(eta) + '</b> (plan: ' + fmtDL(endPlan) + ').</p>' : '<p>Bu tempoyla hedefe yaklaşılmıyor; porsiyon, zeytinyağı ve ekmek ölçülerini kontrol edin.</p>') + (pace < -1.2 ? '<p class="muted">Haftada 1 kg\'dan hızlı kayıp kas kaybettirir; porsiyonları kısmayın.</p>' : '')) +
     '<p class="tiny">Plan: ' + n1(c.startWeight) + ' → ' + n1(c.goalWeight) + ' kg, ' + fmtDL(c.startDate) + ' başlangıç, ' + n1(c.rate) + ' kg/hafta, tartı günü ' + DAY_NAMES[c.weighDay] + '.</p></div>' +
-    '<div class="card"><div class="card-h"><h2>Haftalık özet</h2><span class="meta">Ortalamalar</span></div>' + table + '<p class="tiny">Puan haftalık /75 · su bardak/gün · öğün % = işaretlenen / 5 · kcal kayıtlı öğünlerden günlük ortalama</p></div>' +
+    '<div class="card"><div class="card-h"><h2>Haftalık özet</h2><span class="meta">Ortalamalar</span></div>' + table + '<p class="tiny">Puan haftalık /' + WEEK_MAX + ' · su bardak/gün · öğün % = işaretlenen / 5 · kcal kayıtlı öğünlerden günlük ortalama</p></div>' +
     (PERSON_LOCK ? '' : '<div class="card"><div class="card-h"><h2>Birlikte</h2><span class="meta">Bu hafta</span></div><div class="row">' + both.map(b => '<div class="grow"><div class="eyebrow">' + esc(b.name) + '</div><div class="num" style="font-family:var(--font-display);font-weight:700;font-size:1.3rem">' + (b.has ? (b.lost > 0.049 ? '−' : b.lost < -0.049 ? '+' : '') + n1(Math.abs(b.lost)) + ' kg' : '—') + '</div><div class="tiny">' + b.pts + ' puan</div></div>').join('') +
     '<div class="grow"><div class="eyebrow">Toplam</div><div class="num" style="font-family:var(--font-display);font-weight:700;font-size:1.3rem">' + (both.some(b => b.has) ? '−' + n1(Math.max(0, both.reduce((s, b) => s + (b.has ? b.lost : 0), 0))) + ' kg' : '—') + '</div></div></div></div>');
 }
@@ -988,7 +1089,7 @@ async function claudeAnalysis(p, ws) {
   const btn = $('[data-action="claudeAnalyze"]'); if (btn) btn.disabled = true;
   try { const r = await state.sample(prompt, { modelTier: 'default', cache: false }); await saveAnalysis(p + '_' + ws, { text: r.text.slice(0, 4000), at: new Date().toISOString(), points: s.points.points }); }
   catch (e) { const code = e && e.code ? e.code : 'hata'; if (code === 'not_granted' || code === 'sampling_disabled') state.sample = null; const st2 = $('#anStatus'); if (st2) st2.textContent = code === 'rate_limited' ? 'Şu an çok istek var; birazdan deneyin.' : 'Yorum alınamadı (' + code + ').'; }
-  if (state.tab === 'gelisim') renderProgress();
+  renderProgress();
 }
 function bindProgress() {
   $('#view-gelisim').addEventListener('click', e => {
@@ -1000,7 +1101,7 @@ function renderProgram() {
   const p = state.person, name = cfg(p).name, dow = parseD(state.today).getDay(), hm = nowHM();
   let curI = -1; RHYTHM.forEach((r, i) => { if (r[0] <= hm) curI = i; });
   const tl = RHYTHM.map((r, i) => '<div class="tl' + (i === curI ? ' now' : '') + '"><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>').join('');
-  const days = [1, 2, 3, 4, 5, 6, 0].map(k => { const m = MENU[k]; return '<details' + (k === dow ? ' open' : '') + '><summary>' + m.name + (k === dow ? ' · bugün' : '') + '</summary><div class="mlist">' + m.meals.map(x => '<div class="mi"><b>' + MEAL_NAMES[x.k] + ' ' + MEAL_TIMES[x.k] + '</b> · ' + esc(x.t) + (x[p] ? '<span class="p">' + esc(name) + ': ' + esc(x[p]) + '</span>' : '') + '</div>').join('') + '<div class="tipbox">' + esc(m.tip) + '</div></div></details>'; }).join('');
+  const days = [1, 2, 3, 4, 5, 6, 0].map(k => { const m = MENU[k]; return '<details' + (k === dow ? ' open' : '') + '><summary>' + m.name + (k === dow ? ' · bugün' : '') + '</summary><div class="mlist">' + m.meals.map(x => '<div class="mi"><b>' + MEAL_NAMES[x.k] + ' ' + MEAL_TIMES[x.k] + '</b> · ' + esc(x.t) + (x[p] ? '<span class="p">' + esc(name) + ': ' + esc(x[p]) + '</span>' : '') + recipeLinks(k, x.k) + '</div>').join('') + '<div class="tipbox">' + esc(m.tip) + '</div></div></details>'; }).join('');
   $('#view-program').innerHTML =
     '<div class="card"><div class="card-h"><h2>Günlük ritim</h2><span class="meta">Hafta içi · hafta sonu koşu 07:00, kahvaltı 08:30</span></div><div class="timeline">' + tl + '</div></div>' +
     '<div class="card"><div class="card-h"><h2>Haftalık menü</h2><span class="meta">' + esc(name) + ' porsiyonları</span></div><div>' + days + '</div></div>' +
@@ -1018,7 +1119,7 @@ function renderRecipes() {
   const list = RECIPES.map((r, i) => ({ r: r, i: i, d: rc(r.id) })).sort((a, b) => (b.d.fav[p] - a.d.fav[p]) || (b.d.rating[p] - a.d.rating[p]) || (a.i - b.i));
   const stars = (id, v) => '<span class="stars" data-rate="' + id + '">' + [1, 2, 3, 4, 5].map(n => '<button type="button" data-v="' + n + '"' + (n <= v ? ' class="on"' : '') + ' aria-label="' + n + ' yıldız">★</button>').join('') + '</span>';
   const items = list.map(x => { const r = x.r, d = x.d, other = p === 'E' ? 'K' : 'E';
-    return '<details><summary><span>' + (d.fav[p] ? '♥ ' : '') + esc(r.name) + '<span class="sub">' + r.time + ' dk · ' + r.kcal.E + ' / ' + r.kcal.K + ' kcal (E / K) · ' + r.tags.join(', ') + (d.rating[p] ? ' · ' + '★'.repeat(d.rating[p]) : '') + '</span></span></summary>' +
+    return '<details id="rec-' + r.id + '"' + (state.open.has('rec-' + r.id) ? ' open' : '') + '><summary><span>' + (d.fav[p] ? '♥ ' : '') + esc(r.name) + '<span class="sub">' + r.time + ' dk · ' + r.kcal.E + ' / ' + r.kcal.K + ' kcal (E / K) · ' + r.tags.join(', ') + (d.rating[p] ? ' · ' + '★'.repeat(d.rating[p]) : '') + '</span></span></summary>' +
       '<div class="mlist"><div class="rec-h">' + stars(r.id, d.rating[p]) + '<button type="button" class="chip' + (d.fav[p] ? ' on' : '') + '" data-fav="' + r.id + '">' + (d.fav[p] ? 'Favori' : 'Favorilere ekle') + '</button></div>' +
       (d.rating[other] || d.fav[other] ? '<p class="tiny">' + esc(cfg(other).name) + ': ' + (d.rating[other] ? '★'.repeat(d.rating[other]) : '') + (d.fav[other] ? ' ♥' : '') + '</p>' : '') +
       '<div><div class="eyebrow">Malzeme (2 kişilik)</div><ul class="plain">' + r.ing.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
@@ -1067,7 +1168,7 @@ function renderSettings() {
     '<div class="card"><div class="card-h"><h2>' + esc(c.name) + ' · ödül merdiveni</h2><span class="meta">Simge ve ödül düzenlenebilir</span></div><div>' + ladderRows + '</div>' +
     '<div class="field"><label for="rTh">Başarılı hafta eşiği (puan, 20–75; ikiniz için ortak)</label><input type="number" id="rTh" min="20" max="75" step="5" value="' + state.rewards.threshold + '" inputmode="numeric"></div>' +
     '<div class="row"><button type="button" class="btn ghost" id="saveLadder">Ödülleri kaydet</button><span class="tiny" id="ladderStatus"></span></div>' +
-    '<p class="tiny">Puanlar: her öğün 1 (günde 5), su hedefi 2, koşu 1, öğle ve akşam yürüyüşü 1+1 → günde 10; haftalık tartı +5, haftada en çok 75. Haftada ' + state.rewards.threshold + ' puan = başarılı hafta; başarılı haftalar birikir (2 hafta, 1 ay = 4, 2 ay = 8, 3 ay = 13, 6 ay = 26). Haftalık ödül her başarılı haftada yenilenir.</p></div>' +
+    '<p class="tiny">Puanlar: her öğün 1 (günde 5), su hedefi 2, koşu 1, öğle ve akşam yürüyüşü 1+1, uyku düzeni 1 (yatış en geç 23:15, kalkış en geç 06:30, hafta sonu 07:30) → günde 11; 10 puan alan gün kazanılmış sayılır. Haftalık tartı +5, haftada en çok ' + WEEK_MAX + '. Haftada ' + state.rewards.threshold + ' puan = başarılı hafta; başarılı haftalar birikir (2 hafta, 1 ay = 4, 2 ay = 8, 3 ay = 13, 6 ay = 26). Haftalık ödül her başarılı haftada yenilenir.</p></div>' +
     '<div class="card"><div class="card-h"><h2>Kayıt durumu</h2></div><p>' + (state.mode === 'db' ? 'Paylaşımlı kayıt açık: iki telefonda da aynı veriler görünür.' : state.mode === 'local' ? 'Girdiler yalnızca bu cihazda saklanıyor.' : 'Bağlanıyor…') + '</p>' +
     (STATIC_HOST ? '<div class="note">Bu adreste girdiler telefonun kendi tarayıcı hafızasında tutulur ve iki telefon arasında eşzamanlanmaz. Her kişi kendi telefonundan girsin; tarayıcı verilerini silmek kayıtları siler, arada yedek alın.</div>' : (state.modeNote ? '<p class="tiny">' + esc(state.modeNote) + '</p>' : '') + '<div class="note">İki telefonda ortak takip için aynı Claude hesabıyla açın ya da sayfayı Paylaş menüsünden "Düzenleyici" veya "Katkıda bulunan" olarak e-posta ile davet edin. Yalnızca görüntüleme bağlantısıyla açan kişi veri giremez.</div>') + '</div>' +
     '<div class="card"><div class="card-h"><h2>Yedek</h2><span class="meta">Kopyala, sakla, gerekirse geri yükle</span></div><div class="row"><button type="button" class="btn ghost" id="copyBackup">Yedeği kopyala</button><span class="tiny" id="backupStatus"></span></div><textarea id="backupText" placeholder="Geri yüklemek için yedek metnini buraya yapıştırın" rows="3"></textarea><div class="row"><button type="button" class="btn ghost" id="restoreBackup">Yedeği geri yükle</button></div><p class="tiny">Yedek iki kişinin tüm kayıtlarını, ödülleri, tarif puanlarını ve ayarları içerir. Başka telefona taşımak için orada geri yükleyin; aynı günün daha yeni kaydı korunur.</p></div>';
@@ -1079,7 +1180,7 @@ function bindSettings() {
     if (e.target.closest('#saveSettings')) {
       const s = Object.assign({}, c, { name: ($('#sName').value.trim() || c.name).slice(0, 20), startWeight: numv('#sStart', c.startWeight, 30, 250), goalWeight: numv('#sGoal', c.goalWeight, 30, 250), startDate: isDate($('#sDate').value) ? $('#sDate').value : c.startDate, rate: numv('#sRate', c.rate, 0.2, 1), waterGoal: Math.round(numv('#sWater', c.waterGoal, 4, 20)), kcal: Math.round(numv('#sKcal', c.kcal, 1200, 3000)), weighDay: Number($('#sWeigh').value) });
       if (s.goalWeight >= s.startWeight) { $('#settingsStatus').textContent = 'Hedef kilo başlangıçtan küçük olmalı.'; return; }
-      await saveSettings(p, s); renderHeader(); $('#settingsStatus').textContent = 'Kaydedildi ' + nowHM(); return;
+      await saveSettings(p, s); renderToday(); $('#settingsStatus').textContent = 'Kaydedildi ' + nowHM(); return;
     }
     if (e.target.closest('#saveCycle')) { const s = Object.assign({}, c, { cycleStart: isDate($('#sCycleStart').value) && $('#sCycleStart').value <= state.today ? $('#sCycleStart').value : '', cycleLen: Math.round(numv('#sCycleLen', c.cycleLen, 20, 45)), periodLen: Math.round(numv('#sPeriodLen', c.periodLen, 2, 10)) }); await saveSettings('K', s); $('#cycleStatus').textContent = 'Kaydedildi ' + nowHM(); return; }
     if (e.target.closest('#saveLadder')) { state.rewards.ladder[p] = RUNG_WEEKS.map((w, i) => ({ weeks: w, icon: ($('#li' + w).value.trim() || LADDER_DEFAULT[p][i].icon).slice(0, 4), title: ($('#lw' + w).value.trim() || LADDER_DEFAULT[p][i].title).slice(0, 80) })); state.rewards.threshold = Math.round(numv('#rTh', state.rewards.threshold, 20, 75)); await saveRewards(); renderSettings(); $('#ladderStatus').textContent = 'Kaydedildi ' + nowHM(); return; }
@@ -1088,34 +1189,44 @@ function bindSettings() {
   });
 }
 
-// ---------- shell ----------
-const TABS = ['bugun', 'gelisim', 'program', 'tarifler', 'ayarlar'];
-function focusedInput() { const a = document.activeElement; return !!(a && $('#view-bugun').contains(a) && /^(INPUT|TEXTAREA)$/.test(a.tagName)); }
-function renderHeader() {
-  ['E', 'K'].forEach(p => { const b = $('#seg' + p), c = cfg(p); b.classList.toggle('on', state.person === p); b.innerHTML = esc(c.name) + '<span class="k">' + n1(c.startWeight) + ' → ' + n1(c.goalWeight) + ' kg</span>'; });
-  if (PERSON_LOCK) { const c = cfg(PERSON_LOCK); $('#personSeg').hidden = true; $('.brand small').textContent = esc(c.name) + ' · ' + n1(c.startWeight) + ' → ' + n1(c.goalWeight) + ' kg · ' + c.kcal + ' kcal'; }
+// ---------- shell: one page, collapsible sections ----------
+const SECS = { 'sec-gelisim': renderProgress, 'sec-program': renderProgram, 'sec-tarifler': renderRecipes, 'sec-ayarlar': renderSettings };
+function isOpen(id) { const el = document.getElementById(id); return !!(el && el.open); }
+function focusedInput() { const a = document.activeElement; return !!(a && a.closest && a.closest('#view-bugun') && /^(INPUT|TEXTAREA)$/.test(a.tagName)); }
+function renderHeader() { if (!focusedInput()) renderToday(); }
+function renderAll() {
+  if (!focusedInput()) renderToday();
+  Object.keys(SECS).forEach(id => {
+    if (!isOpen(id)) return;
+    const a = document.activeElement;
+    if (a && a.closest && a.closest('#' + id) && /^(INPUT|TEXTAREA)$/.test(a.tagName)) return;
+    SECS[id]();
+  });
 }
-function renderTab() {
-  TABS.forEach(t => { $('#view-' + t).hidden = state.tab !== t; $('#tab-' + t).classList.toggle('on', state.tab === t); });
-  if (state.tab === 'bugun') { if (!focusedInput()) renderToday(); }
-  else if (state.tab === 'gelisim') renderProgress();
-  else if (state.tab === 'program') renderProgram();
-  else if (state.tab === 'tarifler') { if (!(document.activeElement && $('#view-tarifler').contains(document.activeElement) && document.activeElement.tagName === 'INPUT')) renderRecipes(); }
-  else renderSettings();
-}
-function renderAll() { renderHeader(); renderTab(); }
-function setTab(t) { if (TABS.indexOf(t) < 0) t = 'bugun'; state.tab = t; if (location.hash.replace('#', '') !== t) { try { location.hash = t; } catch (e) {} } renderTab(); window.scrollTo(0, 0); }
 function refreshNext() {
   const t = todayStr();
-  if (state.today !== t) { if (state.date === state.today) state.date = t; state.today = t; if (state.tab === 'bugun' && !focusedInput()) renderToday(); return; }
-  if (state.tab === 'bugun' && state.date === t && !focusedInput()) { const el = $('#view-bugun .next'), nx = nextRhythm(); if (el && nx) el.innerHTML = '<b>' + nx[0] + '</b><span>Sırada: ' + esc(nx[1]) + '</span>'; const fl = $('#flash'); if (fl) fl.innerHTML = gidisat(getLog(state.person, t), cfg(state.person)); }
+  if (state.today !== t) { if (state.date === state.today) state.date = t; state.today = t; if (!focusedInput()) renderToday(); return; }
+  if (state.date === t && !focusedInput()) renderToday();
+}
+function openRecipe(id) {
+  if (!RECIPES.find(r => r.id === id)) return;
+  const sec = document.getElementById('sec-tarifler');
+  state.open.add('sec-tarifler'); state.open.add('rec-' + id); lsSet('bt_open', Array.from(state.open));
+  if (sec && !sec.open) sec.open = true;
+  renderRecipes();
+  const d = document.getElementById('rec-' + id); if (d) { d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
 function boot() {
-  $('.tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
-  window.addEventListener('hashchange', () => { const t = location.hash.replace('#', ''); if (t !== state.tab) setTab(t); });
-  $('#personSeg').addEventListener('click', e => { const b = e.target.closest('[data-person]'); if (b && !PERSON_LOCK && b.dataset.person !== state.person) { state.person = b.dataset.person; state.showWeight = false; lsSet('bt_person', state.person); renderAll(); } });
+  state.open = new Set(lsGet('bt_open', []) || []);
+  document.addEventListener('click', e => { const r = e.target.closest('[data-recipe]'); if (r) { e.preventDefault(); e.stopPropagation(); openRecipe(r.dataset.recipe); } }, true);
+  document.addEventListener('toggle', e => {
+    const el = e.target; if (!el || el.tagName !== 'DETAILS' || !el.id) return;
+    if (el.open) state.open.add(el.id); else state.open.delete(el.id);
+    lsSet('bt_open', Array.from(state.open));
+    if (el.open && SECS[el.id]) SECS[el.id]();
+  }, true);
+  Object.keys(SECS).forEach(id => { const el = document.getElementById(id); if (el && state.open.has(id)) el.open = true; });
   bindToday(); bindProgress(); bindRecipes(); bindSettings();
-  const h = location.hash.replace('#', ''); state.tab = TABS.indexOf(h) >= 0 ? h : 'bugun';
   setInterval(refreshNext, 60000);
   connect();
 }
