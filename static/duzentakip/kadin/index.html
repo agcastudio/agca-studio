@@ -160,6 +160,13 @@ input:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus
 .q.sleepq { cursor: default; }
 .q.sleepq .row { margin-top: 6px; gap: 12px; }
 .q.sleepq input[type="time"] { padding: 4px 6px; font-size: 0.95rem; margin-left: 4px; }
+.card.water { gap: 8px; }
+.shopgrp { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
+.shop { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--line); font-size: 0.92rem; cursor: pointer; }
+.shop input { width: 20px; height: 20px; margin: 0; accent-color: var(--good); flex: none; }
+.shop.on .grow { text-decoration: line-through; color: var(--ink-3); }
+.shop.have { opacity: 0.6; }
+.waterslider { width: 100%; accent-color: var(--water); height: 32px; margin: 0; padding: 0; background: transparent; border: 0; }
 .drops { display: flex; flex-wrap: wrap; gap: 2px; }
 .drop { background: none; border: 0; font-size: 1.45rem; line-height: 1; padding: 3px; filter: grayscale(1); opacity: 0.35; }
 .drop.on { filter: none; opacity: 1; }
@@ -425,8 +432,160 @@ const MENU_RECIPES = {
   6: { o: ['kisir'], a2: ['ayva'], ak: ['sote'] },
   0: { o: ['etlikereviz'], ak: ['mercimek', 'karnabahar'] }
 };
+// Haftaya özel menüler (Pazartesi tarihi → gün → öğünler). Buzdolabı: kereviz, taze fasulye, közlenmiş patlıcan.
+const WEEK_MENUS = {
+  '2026-11-09': {
+    1: { name: 'Pazartesi', tip: 'Pazar pişen taze fasulye ve kereviz haftanın yarısını taşır; zeytinyağlılar soğuk daha lezzetli. Tavuğu fırına atıp 40 dk unut.', meals: [
+      { k: 'k', t: 'Yoğurt + yulaf + meyve kasesi (elma veya nar, ceviz, tarçın) + 1 haşlanmış yumurta', E: '150 g yoğurt · 40 g yulaf · 6 ceviz yarımı · 1 yumurta', K: '120 g yoğurt · 30 g yulaf · 4 ceviz yarımı · 1 yumurta', r: ['yulaf'] },
+      { k: 'a1', t: '1 mandalina + badem', E: '8 badem', K: '5 badem' },
+      { k: 'o', t: 'Zeytinyağlı taze fasulye (soğuk) + yoğurt + bulgur', E: '1,5 kepçe · 150 g yoğurt · 4 yk bulgur', K: '1 kepçe · 100 g yoğurt · 2 yk bulgur', r: ['tazefasulye'] },
+      { k: 'a2', t: 'Kefir + tarçın', E: '200 ml', K: '200 ml' },
+      { k: 'ak', t: 'Fırında baharatlı tavuk but + yoğurtlu közlenmiş patlıcan salatası + roka', E: '150 g tavuk · 3 yk patlıcan salatası', K: '120 g tavuk · 2 yk patlıcan salatası', r: ['firintavuk', 'patlicansalata'] },
+      { k: 'g', t: 'Papatya çayı', E: '', K: '' }] },
+    2: { name: 'Salı', tip: 'Yumurtalar Pazar\'dan haşlı; kahvaltı 3 dakika. Akşam hamsi kağıtta 15 dk, bulaşık yok.', meals: [
+      { k: 'k', t: '2 haşlanmış yumurta + beyaz peynir + 5 zeytin + roka-turp', E: '2 yumurta · 30 g peynir · 1 dilim ekmek', K: '2 yumurta · 30 g peynir · ekmeksiz' },
+      { k: 'a1', t: '1 armut + fındık', E: '8 fındık', K: '6 fındık' },
+      { k: 'o', t: 'Zeytinyağlı portakallı kereviz + dünkü tavuk (soğuk) + yoğurt', E: '1,5 kepçe · 80 g tavuk · 150 g yoğurt', K: '1 kepçe · 60 g tavuk · 100 g yoğurt', r: ['zkereviz'] },
+      { k: 'a2', t: '1 haşlanmış yumurta + havuç çubukları', E: '', K: '' },
+      { k: 'ak', t: 'Fırında hamsi + roka-kırmızı soğan-turp salatası', E: '200 g hamsi · 1 ince dilim mısır ekmeği (isteğe bağlı)', K: '150 g hamsi', r: ['hamsi'] },
+      { k: 'g', t: 'Rezene çayı', E: '', K: '' }] },
+    3: { name: 'Çarşamba', tip: 'Közlenmiş patlıcan akşam yemeğini 10 dakikaya indirir: doğra, biberle çevir, yumurtayı kır.', meals: [
+      { k: 'k', t: 'Yoğurt + yulaf + nar + ceviz + tarçın', E: '150 g yoğurt · 40 g yulaf · 6 ceviz yarımı', K: '120 g yoğurt · 30 g yulaf · 4 ceviz yarımı', r: ['yulaf'] },
+      { k: 'a1', t: '1 portakal + ceviz', E: '5 yarım', K: '4 yarım' },
+      { k: 'o', t: 'Kırmızı mercimek çorbası + zeytinyağlı taze fasulye + yoğurt', E: '1 kase · 1 kepçe · 100 g yoğurt · 1 dilim ekmek', K: '1 kase · 1 kepçe · 100 g yoğurt', r: ['mercimek', 'tazefasulye'] },
+      { k: 'a2', t: 'Yoğurt + 1 yk öğütülmüş keten tohumu + tarçın', E: '150 g', K: '100 g' },
+      { k: 'ak', t: 'Közlenmiş patlıcanlı yumurta (tavada, biberli) + yoğurt + yeşil salata', E: '2 yumurta · 1 patlıcan · 100 g yoğurt', K: '2 yumurta · ½ patlıcan · 100 g yoğurt', r: ['patlicanliyumurta'] },
+      { k: 'g', t: 'Melisa çayı', E: '', K: '' }] },
+    4: { name: 'Perşembe', tip: 'Öğle tamamen hazırdan: kereviz, haşlanmış yumurta, yoğurt. Akşam sote 20 dakika.', meals: [
+      { k: 'k', t: 'Lor-yoğurt kasesi (yulaf, nar, ceviz, tarçın)', E: '150 g yoğurt · 70 g lor · 3 yk yulaf · 5 ceviz yarımı', K: '120 g yoğurt · 50 g lor · 2 yk yulaf · 4 ceviz yarımı', r: ['lorkase'] },
+      { k: 'a1', t: 'Kivi + badem', E: '1 kivi · 8 badem', K: '2 kivi · 6 badem' },
+      { k: 'o', t: 'Zeytinyağlı kereviz + 1 haşlanmış yumurta + yoğurt', E: '1,5 kepçe · 1 yumurta · 100 g yoğurt · 3 yk bulgur', K: '1 kepçe · 1 yumurta · 100 g yoğurt', r: ['zkereviz'] },
+      { k: 'a2', t: 'Humus + havuç çubukları (E şişkinse kefir)', E: '3 yk', K: '2 yk', r: ['humus'] },
+      { k: 'ak', t: 'Sebzeli tavuk sote (mantar, kapya biber, brokoli) + roka', E: '150 g tavuk · 1 yk yağ', K: '120 g tavuk · 2 tk yağ', r: ['sote'] },
+      { k: 'g', t: 'Ihlamur', E: '', K: '' }] },
+    5: { name: 'Cuma', tip: 'Tartı günü: sabah, tuvaletten sonra, kahvaltıdan önce. Kereviz salatası 10 dakikada rendeyle hazır.', meals: [
+      { k: 'k', t: '2 haşlanmış yumurta + ½ avokado + roka + limon', E: '2 yumurta · ¼–½ avokado · 1 dilim ekmek', K: '2 yumurta · ½ avokado · 1 ince dilim' },
+      { k: 'a1', t: '1 elma + ceviz', E: '5 yarım', K: '4 yarım' },
+      { k: 'o', t: 'Mercimek çorbası + yoğurtlu kereviz salatası + beyaz peynir', E: '1 kase · 1 kase salata · 40 g peynir · 1 dilim ekmek', K: '1 kase · 1 kase salata · 30 g peynir', r: ['mercimek', 'kerevizsalata'] },
+      { k: 'a2', t: 'Kefir', E: '200 ml + 20 g kabak çekirdeği', K: '200 ml' },
+      { k: 'ak', t: 'Fırında somon veya levrek + buharda brokoli-karnabahar', E: '170 g balık · 1 yk yağ', K: '130 g balık · 2 tk yağ', r: ['somon'] },
+      { k: 'g', t: 'Papatya çayı', E: '', K: '' }] },
+    6: { name: 'Cumartesi', tip: 'Haftanın serbest kahvaltısı; közlenmiş patlıcan ezmesi sofraya renk katar. Öğle kısır, akşam köfte.', meals: [
+      { k: 'k', t: 'Hafta sonu kahvaltısı (08:30): sahanda yumurta, beyaz peynir, zeytin, sarımsaklı yoğurtlu közlenmiş patlıcan ezmesi, bol yeşillik, ekmek, kahve', E: '2 yumurta · 40 g peynir · 1 tk tahin · 1–2 dilim ekmek', K: '2 yumurta · 40 g peynir · 1 tk tahin + 1 tk pekmez · 1 dilim ekmek', r: ['patlicansalata'] },
+      { k: 'a1', t: 'Atla; 11:30\'da açlık olursa 1 meyve', E: '', K: '' },
+      { k: 'o', t: 'Narlı kısır + yoğurt + marul (13:30)', E: '6 yk kısır · 150 g yoğurt', K: '4 yk kısır · 100 g yoğurt', r: ['kisir'] },
+      { k: 'a2', t: 'Planlı tatlı: fırında tarçınlı elma veya ayva + yoğurt + ceviz', E: '1 adet', K: '1 adet', r: ['ayva'] },
+      { k: 'ak', t: 'Fırında köfte + fırın sebze + yoğurt sos', E: '150 g köfte · 1 yk yağ', K: '110 g köfte · 2 tk yağ', r: ['kofte', 'firinsebze'] },
+      { k: 'g', t: 'Melisa çayı', E: '', K: '' }] },
+    0: { name: 'Pazar', tip: 'Hazırlık günü (2 saat): mercimek çorbası, zeytinyağlı bir sebze, fırın tavuk, 6 haşlanmış yumurta, bulgur, yıkanmış yeşillik.', meals: [
+      { k: 'k', t: 'Yoğurt + yulaf + meyve (K isterse kefirli hafif kase)', E: '150 g yoğurt · 40 g yulaf · 1 meyve · 6 ceviz yarımı', K: '120 g yoğurt veya 200 ml kefir · 30 g yulaf · 1 meyve · 4 ceviz yarımı', r: ['yulaf'] },
+      { k: 'a1', t: '1 elma + kuşburnu çayı', E: '', K: '' },
+      { k: 'o', t: 'Nohutlu-tavuklu kış salatası (dünkü köfte de olur) + ayran', E: '4 yk nohut · 80 g tavuk · 1 dilim ekmek', K: '3 yk nohut · 60 g tavuk', r: ['kissalata'] },
+      { k: 'a2', t: 'Kefir + közlenmiş kestane', E: '200 ml · 6 kestane', K: '200 ml · 5 kestane' },
+      { k: 'ak', t: 'Mercimek çorbası + fırında karnabahar-brokoli (yoğurt-yumurta soslu)', E: '1 kase · büyük porsiyon', K: '1 kase · orta porsiyon', r: ['mercimek', 'karnabahar'] },
+      { k: 'g', t: 'Papatya veya ıhlamur · 23:00 uyku', E: '', K: '' }] }
+  }
+};
+// Alışveriş kalemleri (2 kişi): [ad, miktar, birim, kategori, evdeVar]. Kategoriler: sebze, et, sut, kiler, firin.
+const SHOP_CATS = { sebze: 'Sebze ve meyve', et: 'Et, tavuk, balık', sut: 'Süt ürünleri ve yumurta', firin: 'Fırın', kiler: 'Kiler (stokta yoksa)' };
+const SHOP_DEFAULT = {
+  1: { k: [['Yumurta', 4, 'adet', 'sut'], ['Ispanak', 300, 'g', 'sebze'], ['Sivri biber', 2, 'adet', 'sebze'], ['Beyaz peynir', 60, 'g', 'sut'], ['Zeytin', 50, 'g', 'kiler'], ['Roka', 1, 'demet', 'sebze'], ['Turp', 1, 'demet', 'sebze'], ['Avokado', 1, 'adet', 'sebze'], ['Ekşi mayalı ekmek', 1, 'adet', 'firin']],
+      a1: [['Mandalina', 2, 'adet', 'sebze'], ['Badem', 15, 'g', 'kiler'], ['Elma', 1, 'adet', 'sebze']],
+      o: [['Kırmızı mercimek', 200, 'g', 'kiler'], ['Soğan', 2, 'adet', 'sebze'], ['Havuç', 3, 'adet', 'sebze'], ['Limon', 2, 'adet', 'sebze'], ['Beyaz lahana', 1, 'adet', 'sebze'], ['Yoğurt', 250, 'g', 'sut'], ['Bulgur', 100, 'g', 'kiler']],
+      a2: [['Kefir', 400, 'ml', 'sut']],
+      ak: [['Tavuk but (derisiz)', 1000, 'g', 'et'], ['Bal kabağı', 500, 'g', 'sebze'], ['Havuç', 2, 'adet', 'sebze'], ['Brokoli', 1, 'adet', 'sebze'], ['Roka', 1, 'demet', 'sebze']] },
+  2: { k: [['Yulaf', 70, 'g', 'kiler'], ['Keten tohumu', 20, 'g', 'kiler'], ['Elma', 1, 'adet', 'sebze'], ['Ceviz', 30, 'g', 'kiler'], ['Yoğurt', 250, 'g', 'sut'], ['Süt', 200, 'ml', 'sut'], ['Yumurta', 2, 'adet', 'sut']],
+      a1: [['Armut', 2, 'adet', 'sebze'], ['Fındık', 10, 'g', 'kiler'], ['Beyaz peynir', 20, 'g', 'sut']],
+      o: [['Nohut', 150, 'g', 'kiler'], ['Beyaz lahana', 1, 'adet', 'sebze'], ['Havuç', 1, 'adet', 'sebze'], ['Maydanoz', 1, 'demet', 'sebze'], ['Nar', 1, 'adet', 'sebze'], ['Limon', 1, 'adet', 'sebze'], ['Ayran', 1, 'adet', 'sut']],
+      a2: [['Yumurta', 2, 'adet', 'sut'], ['Havuç', 1, 'adet', 'sebze']],
+      ak: [['Hamsi (temizlenmiş)', 600, 'g', 'et'], ['Limon', 1, 'adet', 'sebze'], ['Dereotu', 1, 'demet', 'sebze'], ['Roka', 1, 'demet', 'sebze'], ['Kırmızı soğan', 1, 'adet', 'sebze'], ['Turp', 1, 'demet', 'sebze'], ['Mısır ekmeği', 1, 'adet', 'firin']] },
+  3: { k: [['Yumurta', 4, 'adet', 'sut'], ['Yoğurt', 300, 'g', 'sut'], ['Sarımsak', 1, 'baş', 'sebze'], ['Roka', 1, 'demet', 'sebze'], ['Ekşi mayalı ekmek', 1, 'adet', 'firin']],
+      a1: [['Portakal', 2, 'adet', 'sebze'], ['Ceviz', 25, 'g', 'kiler']],
+      o: [['Kuru fasulye', 300, 'g', 'kiler'], ['Soğan', 1, 'adet', 'sebze'], ['Havuç', 1, 'adet', 'sebze'], ['Bulgur', 80, 'g', 'kiler'], ['Ev turşusu', 1, 'kavanoz', 'kiler'], ['Roka', 1, 'demet', 'sebze'], ['Ayran', 1, 'adet', 'sut']],
+      a2: [['Yoğurt', 250, 'g', 'sut'], ['Keten tohumu', 20, 'g', 'kiler']],
+      ak: [['Yağsız dana kıyma', 500, 'g', 'et'], ['Soğan', 1, 'adet', 'sebze'], ['Maydanoz', 1, 'demet', 'sebze'], ['Kereviz', 2, 'adet', 'sebze'], ['Pırasa', 2, 'adet', 'sebze'], ['Havuç', 3, 'adet', 'sebze'], ['Yoğurt', 200, 'g', 'sut'], ['Dereotu', 1, 'demet', 'sebze']] },
+  4: { k: [['Yoğurt', 270, 'g', 'sut'], ['Lor peyniri', 120, 'g', 'sut'], ['Yulaf', 50, 'g', 'kiler'], ['Nar', 1, 'adet', 'sebze'], ['Ceviz', 25, 'g', 'kiler']],
+      a1: [['Kivi', 3, 'adet', 'sebze'], ['Fındık', 10, 'g', 'kiler'], ['Badem', 10, 'g', 'kiler']],
+      o: [['Pancar', 3, 'adet', 'sebze'], ['Havuç', 1, 'adet', 'sebze'], ['Maydanoz', 1, 'demet', 'sebze'], ['Yoğurt', 250, 'g', 'sut'], ['Ekşi mayalı ekmek', 1, 'adet', 'firin']],
+      a2: [['Nohut', 150, 'g', 'kiler'], ['Tahin', 50, 'g', 'kiler'], ['Limon', 1, 'adet', 'sebze'], ['Havuç', 2, 'adet', 'sebze'], ['Kereviz sapı', 1, 'demet', 'sebze']],
+      ak: [['Bal kabağı', 600, 'g', 'sebze'], ['Soğan', 1, 'adet', 'sebze'], ['Taze zencefil', 1, 'adet', 'sebze'], ['Süt', 100, 'ml', 'sut'], ['Yumurta', 4, 'adet', 'sut'], ['Ispanak', 150, 'g', 'sebze'], ['Mantar', 150, 'g', 'sebze'], ['Lor peyniri', 40, 'g', 'sut'], ['Marul', 1, 'adet', 'sebze']] },
+  5: { k: [['Ekşi mayalı ekmek', 1, 'adet', 'firin'], ['Avokado', 1, 'adet', 'sebze'], ['Yumurta', 4, 'adet', 'sut'], ['Limon', 1, 'adet', 'sebze'], ['Roka', 1, 'demet', 'sebze']],
+      a1: [['Elma', 1, 'adet', 'sebze'], ['Trabzon hurması', 1, 'adet', 'sebze'], ['Ceviz', 25, 'g', 'kiler']],
+      o: [['Tarhana', 100, 'g', 'kiler'], ['Yeşil mercimek', 200, 'g', 'kiler'], ['Kırmızı lahana', 1, 'adet', 'sebze'], ['Havuç', 1, 'adet', 'sebze'], ['Maydanoz', 1, 'demet', 'sebze'], ['Taze soğan', 1, 'demet', 'sebze'], ['Nar', 1, 'adet', 'sebze'], ['Limon', 2, 'adet', 'sebze'], ['Beyaz peynir', 70, 'g', 'sut']],
+      a2: [['Kefir', 400, 'ml', 'sut'], ['Kabak çekirdeği', 20, 'g', 'kiler']],
+      ak: [['Somon veya levrek', 300, 'g', 'et'], ['Limon', 1, 'adet', 'sebze'], ['Dereotu', 1, 'demet', 'sebze'], ['Brokoli', 1, 'adet', 'sebze'], ['Karnabahar', 1, 'adet', 'sebze'], ['Pancar', 2, 'adet', 'sebze'], ['Yoğurt', 200, 'g', 'sut']] },
+  6: { k: [['Yumurta', 4, 'adet', 'sut'], ['Sivri biber', 2, 'adet', 'sebze'], ['Mantar', 100, 'g', 'sebze'], ['Beyaz peynir', 80, 'g', 'sut'], ['Zeytin', 60, 'g', 'kiler'], ['Ceviz', 20, 'g', 'kiler'], ['Roka', 1, 'demet', 'sebze'], ['Turp', 1, 'demet', 'sebze'], ['Nar', 1, 'adet', 'sebze'], ['Ekşi mayalı ekmek', 1, 'adet', 'firin'], ['Tahin', 20, 'g', 'kiler'], ['Pekmez', 20, 'g', 'kiler']],
+      a1: [],
+      o: [['Kereviz', 1, 'adet', 'sebze'], ['Pırasa', 1, 'adet', 'sebze'], ['Havuç', 2, 'adet', 'sebze'], ['İnce bulgur', 150, 'g', 'kiler'], ['Maydanoz', 1, 'demet', 'sebze'], ['Taze nane', 1, 'demet', 'sebze'], ['Taze soğan', 1, 'demet', 'sebze'], ['Nar', 1, 'adet', 'sebze'], ['Limon', 1, 'adet', 'sebze'], ['Yoğurt', 250, 'g', 'sut'], ['Marul', 1, 'adet', 'sebze']],
+      a2: [['Ayva', 2, 'adet', 'sebze'], ['Ceviz', 15, 'g', 'kiler'], ['Yoğurt', 50, 'g', 'sut']],
+      ak: [['Hindi veya tavuk göğsü', 400, 'g', 'et'], ['Mantar', 200, 'g', 'sebze'], ['Kapya biber', 1, 'adet', 'sebze'], ['Brokoli', 1, 'adet', 'sebze'], ['Soğan', 1, 'adet', 'sebze'], ['Roka', 1, 'demet', 'sebze'], ['Ayran', 2, 'adet', 'sut']] },
+  0: { k: [['Kefir', 200, 'ml', 'sut'], ['Keten tohumu', 10, 'g', 'kiler'], ['Kivi', 1, 'adet', 'sebze'], ['Badem', 10, 'g', 'kiler'], ['Yumurta', 2, 'adet', 'sut'], ['Beyaz peynir', 30, 'g', 'sut'], ['Avokado', 1, 'adet', 'sebze']],
+      a1: [['Elma', 1, 'adet', 'sebze'], ['Kuşburnu', 10, 'g', 'kiler']],
+      o: [['Yağsız kuşbaşı veya tavuk', 300, 'g', 'et'], ['Kereviz', 3, 'adet', 'sebze'], ['Havuç', 2, 'adet', 'sebze'], ['Soğan', 1, 'adet', 'sebze'], ['Portakal', 1, 'adet', 'sebze'], ['Limon', 1, 'adet', 'sebze'], ['Bulgur', 80, 'g', 'kiler'], ['Beyaz lahana', 1, 'adet', 'sebze'], ['Yoğurt', 250, 'g', 'sut']],
+      a2: [['Kefir', 400, 'ml', 'sut'], ['Kestane', 300, 'g', 'sebze']],
+      ak: [['Kırmızı mercimek', 200, 'g', 'kiler'], ['Karnabahar', 1, 'adet', 'sebze'], ['Brokoli', 1, 'adet', 'sebze'], ['Yumurta', 2, 'adet', 'sut'], ['Yoğurt', 200, 'g', 'sut'], ['Kaşar', 40, 'g', 'sut'], ['Roka', 1, 'demet', 'sebze'], ['Turp', 1, 'demet', 'sebze']] }
+};
+const SHOP_WEEK = {
+  '2026-11-09': {
+    1: { k: [['Yoğurt', 270, 'g', 'sut'], ['Yulaf', 70, 'g', 'kiler'], ['Elma', 1, 'adet', 'sebze'], ['Ceviz', 30, 'g', 'kiler'], ['Yumurta', 2, 'adet', 'sut']],
+        a1: [['Mandalina', 2, 'adet', 'sebze'], ['Badem', 15, 'g', 'kiler']],
+        o: [['Taze fasulye', 750, 'g', 'sebze', true], ['Soğan', 1, 'adet', 'sebze'], ['Havuç', 1, 'adet', 'sebze'], ['Domates', 2, 'adet', 'sebze'], ['Yoğurt', 250, 'g', 'sut'], ['Bulgur', 60, 'g', 'kiler']],
+        a2: [['Kefir', 400, 'ml', 'sut']],
+        ak: [['Tavuk but (derisiz)', 1000, 'g', 'et'], ['Közlenmiş patlıcan', 2, 'adet', 'sebze', true], ['Süzme yoğurt', 200, 'g', 'sut'], ['Sarımsak', 1, 'baş', 'sebze'], ['Limon', 1, 'adet', 'sebze'], ['Roka', 1, 'demet', 'sebze'], ['Maydanoz', 1, 'demet', 'sebze']] },
+    2: { k: [['Yumurta', 4, 'adet', 'sut'], ['Beyaz peynir', 60, 'g', 'sut'], ['Zeytin', 50, 'g', 'kiler'], ['Roka', 1, 'demet', 'sebze'], ['Turp', 1, 'demet', 'sebze'], ['Ekşi mayalı ekmek', 1, 'adet', 'firin']],
+        a1: [['Armut', 2, 'adet', 'sebze'], ['Fındık', 15, 'g', 'kiler']],
+        o: [['Kereviz', 3, 'adet', 'sebze', true], ['Havuç', 2, 'adet', 'sebze'], ['Soğan', 1, 'adet', 'sebze'], ['Portakal', 1, 'adet', 'sebze'], ['Limon', 1, 'adet', 'sebze'], ['Dereotu', 1, 'demet', 'sebze'], ['Yoğurt', 250, 'g', 'sut']],
+        a2: [['Yumurta', 2, 'adet', 'sut'], ['Havuç', 1, 'adet', 'sebze']],
+        ak: [['Hamsi (temizlenmiş)', 600, 'g', 'et'], ['Limon', 1, 'adet', 'sebze'], ['Dereotu', 1, 'demet', 'sebze'], ['Roka', 1, 'demet', 'sebze'], ['Kırmızı soğan', 1, 'adet', 'sebze'], ['Turp', 1, 'demet', 'sebze']] },
+    3: { k: [['Yoğurt', 270, 'g', 'sut'], ['Yulaf', 70, 'g', 'kiler'], ['Nar', 1, 'adet', 'sebze'], ['Ceviz', 30, 'g', 'kiler']],
+        a1: [['Portakal', 2, 'adet', 'sebze'], ['Ceviz', 25, 'g', 'kiler']],
+        o: [['Kırmızı mercimek', 200, 'g', 'kiler'], ['Soğan', 1, 'adet', 'sebze'], ['Havuç', 1, 'adet', 'sebze'], ['Limon', 1, 'adet', 'sebze'], ['Yoğurt', 200, 'g', 'sut'], ['Ekşi mayalı ekmek', 1, 'adet', 'firin']],
+        a2: [['Yoğurt', 250, 'g', 'sut'], ['Keten tohumu', 20, 'g', 'kiler']],
+        ak: [['Közlenmiş patlıcan', 2, 'adet', 'sebze', true], ['Kapya biber', 1, 'adet', 'sebze'], ['Soğan', 1, 'adet', 'sebze'], ['Yumurta', 4, 'adet', 'sut'], ['Yoğurt', 200, 'g', 'sut'], ['Marul', 1, 'adet', 'sebze'], ['Roka', 1, 'demet', 'sebze']] },
+    4: { k: [['Yoğurt', 270, 'g', 'sut'], ['Lor peyniri', 120, 'g', 'sut'], ['Yulaf', 50, 'g', 'kiler'], ['Nar', 1, 'adet', 'sebze'], ['Ceviz', 25, 'g', 'kiler']],
+        a1: [['Kivi', 3, 'adet', 'sebze'], ['Badem', 30, 'g', 'kiler']],
+        o: [['Yumurta', 2, 'adet', 'sut'], ['Yoğurt', 200, 'g', 'sut'], ['Bulgur', 45, 'g', 'kiler']],
+        a2: [['Nohut', 150, 'g', 'kiler'], ['Tahin', 50, 'g', 'kiler'], ['Limon', 1, 'adet', 'sebze'], ['Havuç', 2, 'adet', 'sebze']],
+        ak: [['Tavuk göğsü', 400, 'g', 'et'], ['Mantar', 200, 'g', 'sebze'], ['Kapya biber', 1, 'adet', 'sebze'], ['Brokoli', 1, 'adet', 'sebze'], ['Soğan', 1, 'adet', 'sebze'], ['Roka', 1, 'demet', 'sebze']] },
+    5: { k: [['Yumurta', 4, 'adet', 'sut'], ['Avokado', 1, 'adet', 'sebze'], ['Roka', 1, 'demet', 'sebze'], ['Limon', 1, 'adet', 'sebze'], ['Ekşi mayalı ekmek', 1, 'adet', 'firin']],
+        a1: [['Elma', 2, 'adet', 'sebze'], ['Ceviz', 25, 'g', 'kiler']],
+        o: [['Kereviz', 1, 'adet', 'sebze', true], ['Havuç', 1, 'adet', 'sebze'], ['Yoğurt', 200, 'g', 'sut'], ['Ceviz', 15, 'g', 'kiler'], ['Dereotu', 1, 'demet', 'sebze'], ['Beyaz peynir', 70, 'g', 'sut']],
+        a2: [['Kefir', 400, 'ml', 'sut'], ['Kabak çekirdeği', 20, 'g', 'kiler']],
+        ak: [['Somon veya levrek', 300, 'g', 'et'], ['Limon', 1, 'adet', 'sebze'], ['Dereotu', 1, 'demet', 'sebze'], ['Brokoli', 1, 'adet', 'sebze'], ['Karnabahar', 1, 'adet', 'sebze']] },
+    6: { k: [['Yumurta', 4, 'adet', 'sut'], ['Beyaz peynir', 80, 'g', 'sut'], ['Zeytin', 60, 'g', 'kiler'], ['Közlenmiş patlıcan', 1, 'adet', 'sebze', true], ['Yoğurt', 100, 'g', 'sut'], ['Roka', 1, 'demet', 'sebze'], ['Turp', 1, 'demet', 'sebze'], ['Ekşi mayalı ekmek', 1, 'adet', 'firin'], ['Tahin', 20, 'g', 'kiler'], ['Pekmez', 20, 'g', 'kiler']],
+        a1: [],
+        o: [['İnce bulgur', 150, 'g', 'kiler'], ['Maydanoz', 1, 'demet', 'sebze'], ['Taze nane', 1, 'demet', 'sebze'], ['Taze soğan', 1, 'demet', 'sebze'], ['Nar', 1, 'adet', 'sebze'], ['Limon', 1, 'adet', 'sebze'], ['Yoğurt', 250, 'g', 'sut'], ['Marul', 1, 'adet', 'sebze']],
+        a2: [['Ayva', 2, 'adet', 'sebze'], ['Ceviz', 15, 'g', 'kiler'], ['Yoğurt', 50, 'g', 'sut']],
+        ak: [['Yağsız dana kıyma', 500, 'g', 'et'], ['Soğan', 1, 'adet', 'sebze'], ['Maydanoz', 1, 'demet', 'sebze'], ['Sakız kabağı', 2, 'adet', 'sebze'], ['Kapya biber', 1, 'adet', 'sebze'], ['Mantar', 200, 'g', 'sebze'], ['Yoğurt', 200, 'g', 'sut'], ['Dereotu', 1, 'demet', 'sebze']] },
+    0: { k: [['Yoğurt', 270, 'g', 'sut'], ['Kefir', 200, 'ml', 'sut'], ['Yulaf', 70, 'g', 'kiler'], ['Elma', 1, 'adet', 'sebze'], ['Ceviz', 30, 'g', 'kiler']],
+        a1: [['Elma', 2, 'adet', 'sebze'], ['Kuşburnu', 10, 'g', 'kiler']],
+        o: [['Nohut', 150, 'g', 'kiler'], ['Beyaz lahana', 1, 'adet', 'sebze'], ['Havuç', 1, 'adet', 'sebze'], ['Maydanoz', 1, 'demet', 'sebze'], ['Nar', 1, 'adet', 'sebze'], ['Limon', 1, 'adet', 'sebze'], ['Ayran', 2, 'adet', 'sut']],
+        a2: [['Kefir', 400, 'ml', 'sut'], ['Kestane', 300, 'g', 'sebze']],
+        ak: [['Kırmızı mercimek', 200, 'g', 'kiler'], ['Karnabahar', 1, 'adet', 'sebze'], ['Brokoli', 1, 'adet', 'sebze'], ['Yumurta', 2, 'adet', 'sut'], ['Yoğurt', 200, 'g', 'sut'], ['Kaşar', 40, 'g', 'sut'], ['Sarımsak', 1, 'baş', 'sebze'], ['Roka', 1, 'demet', 'sebze']] }
+  }
+};
 // 2 kişilik tarifler. kcal: porsiyon başına yaklaşık (E / K porsiyonu).
 const RECIPES = [
+  { id: 'tazefasulye', name: 'Zeytinyağlı taze fasulye', time: 40, kcal: { E: 180, K: 130 }, tags: ['öğle', 'sebze', 'hazırlık'],
+    ing: ['750 g taze fasulye (kılçığı alınmış, ikiye kırılmış)', '1 soğan', '1 havuç (küçük küp; tatlılık için şeker yerine)', '2 domates rendesi veya 1 yk ev salçası', '2 yk zeytinyağı', '1 su bardağı sıcak su, az tuz'],
+    steps: ['Soğanı zeytinyağında 3 dk, havucu 2 dk çevir.', 'Fasulye ve domatesi ekle, 2 dk karıştır.', 'Sıcak suyu koy, kapağı kapat, kısık ateşte 30 dk. Soğuk servis et.'],
+    por: { E: '1,5 kepçe + 150 g yoğurt', K: '1 kepçe + 100 g yoğurt' }, tip: 'Buzdolabında 4 gün durur; Pazartesi ve Çarşamba öğlesi hazır.' },
+  { id: 'zkereviz', name: 'Zeytinyağlı portakallı kereviz', time: 40, kcal: { E: 170, K: 130 }, tags: ['öğle', 'sebze', 'mevsim'],
+    ing: ['3 kereviz (küp, limonlu suda beklet)', '2 havuç', '1 soğan', '1 portakalın suyu + ½ limon', '2 yk zeytinyağı', '1 su bardağı su', 'dereotu'],
+    steps: ['Soğanı zeytinyağında çevir; havuç ve kerevizi ekle, 3 dk karıştır.', 'Portakal-limon suyu ve suyu koy; kapaklı kısık ateşte 30 dk.', 'Dereotuyla soğuk ya da ılık ye.'],
+    por: { E: '1,5 kepçe', K: '1 kepçe' }, tip: 'Salı ve Perşembe öğlesi; yanına haşlanmış yumurta ve yoğurt eklenince tam öğün.' },
+  { id: 'patlicansalata', name: 'Yoğurtlu közlenmiş patlıcan salatası', time: 10, kcal: { E: 120, K: 90 }, tags: ['akşam', 'pişirmesiz', 'meze'],
+    ing: ['2 közlenmiş patlıcan (soyulmuş, doğranmış)', '200 g süzme yoğurt', '1 diş sarımsak', '1 yk zeytinyağı', '½ limon', 'maydanoz, pul biber'],
+    steps: ['Patlıcanı bıçakla ince kıy, limonu sık.', 'Yoğurt, ezilmiş sarımsak ve zeytinyağıyla karıştır.', 'Üstüne maydanoz ve pul biber.'],
+    por: { E: '3 yk', K: '2 yk' }, tip: 'Közlenmiş patlıcan hazır olduğunda 5 dakikalık meze; fırın tavuğun yanında Pazartesi akşamı.' },
+  { id: 'patlicanliyumurta', name: 'Közlenmiş patlıcanlı yumurta', time: 12, kcal: { E: 330, K: 300 }, tags: ['akşam', 'yumurta', 'hızlı'],
+    ing: ['2 közlenmiş patlıcan (doğranmış)', '1 kapya biber', '1 küçük soğan', '4 yumurta', '1 yk zeytinyağı', 'pul biber, karabiber'],
+    steps: ['Soğan ve biberi zeytinyağında 4 dk sote et.', 'Patlıcanı ekle, 2 dk ısıt.', 'Yumurtaları kır, kapaklı kısık ateşte 4–5 dk pişir.'],
+    por: { E: '2 yumurta + 1 patlıcan', K: '2 yumurta + ½ patlıcan' }, tip: 'Menemenin kışlık hâli: domatessiz, közlenmiş patlıcanla. Yanına yoğurt ve yeşil salata.' },
+  { id: 'kerevizsalata', name: 'Yoğurtlu kereviz salatası', time: 10, kcal: { E: 140, K: 110 }, tags: ['öğle', 'pişirmesiz', 'mevsim'],
+    ing: ['1 kereviz (rendelenmiş)', '1 havuç (rendelenmiş)', '200 g yoğurt', '1 diş sarımsak', '4 ceviz yarımı', 'dereotu, limon, 1 tk zeytinyağı'],
+    steps: ['Kereviz ve havucu rendele, limonu hemen sık (kararmasın).', 'Yoğurt, sarımsak ve zeytinyağıyla karıştır.', 'Ceviz ve dereotu serp.'],
+    por: { E: '1 kase', K: '1 kase' }, tip: 'Çiğ kereviz lif ve potasyum deposu; Cuma öğle mercimek çorbasının yanında.' },
   { id: 'yulaf', name: 'Sıcak yulaf kasesi', time: 10, kcal: { E: 420, K: 330 }, tags: ['kahvaltı', 'tahıl', 'hızlı'],
     ing: ['yulaf (E 40 g / K 30 g)', 'su veya süt', '1 yk öğütülmüş keten tohumu', '½ elma (rendelenmiş)', 'ceviz', 'tarçın', 'üstüne yoğurt', 'yanına 1 haşlanmış yumurta'],
     steps: ['Yulafı 1 su bardağı su (K isterse süt) ile 4–5 dk pişir.', 'Ocaktan alınca keten, rendelenmiş elma ve tarçını karıştır.', 'Kasede üstüne yoğurt ve ceviz; yanında haşlanmış yumurta.'],
@@ -540,6 +699,35 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
 function num(v, lo, hi) { if (v == null || v === '') return null; const n = Number(v); return isFinite(n) && n >= lo && n <= hi ? n : null; }
 function avg(a) { return a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; }
 const isDate = s => /^\d{4}-\d{2}-\d{2}$/.test(String(s));
+function menuFor(date) { const w = WEEK_MENUS[mondayOf(date)], dow = parseD(date).getDay(); return (w && w[dow]) || MENU[dow]; }
+function weekMenuLabel(date) { const ws = mondayOf(date); return WEEK_MENUS[ws] ? ws : null; }
+function shopItemsFor(date, mealKey) { const w = SHOP_WEEK[mondayOf(date)], dow = parseD(date).getDay(); const src = (w && w[dow]) || SHOP_DEFAULT[dow] || {}; return src[mealKey] || []; }
+// Pazar günleri Çarşamba (3) ve Cuma (5). Çarşamba pazarı: Çar akşam → Cum öğle. Cuma pazarı: Cum akşam → Çar öğle.
+function nextMarketDays(from) {
+  const out = []; let d = from;
+  for (let i = 0; i < 14 && out.length < 2; i++) { const dow = parseD(d).getDay(); if (dow === 3 || dow === 5) out.push(d); d = addDays(d, 1); }
+  return out;
+}
+function shoppingWindow(marketDate) {
+  const dow = parseD(marketDate).getDay(), span = dow === 3 ? 2 : 5, days = [];
+  days.push({ d: marketDate, meals: ['ak'] });
+  for (let i = 1; i < span; i++) days.push({ d: addDays(marketDate, i), meals: ['k', 'a1', 'o', 'a2', 'ak'] });
+  days.push({ d: addDays(marketDate, span), meals: ['k', 'a1', 'o'] });
+  return days;
+}
+function aggregateShopping(days) {
+  const map = new Map();
+  days.forEach(day => day.meals.forEach(mk => shopItemsFor(day.d, mk).forEach(it => {
+    const key = it[0] + '|' + it[2], cur = map.get(key) || { name: it[0], q: 0, u: it[2], c: it[3], have: false };
+    cur.q += it[1]; if (it[4]) cur.have = true; map.set(key, cur);
+  })));
+  return Array.from(map.values());
+}
+function fmtQty(q, u) {
+  if (u === 'g' && q >= 1000) return n1(q / 1000) + ' kg';
+  if (u === 'ml' && q >= 1000) return n1(q / 1000) + ' L';
+  return (Number.isInteger(q) ? q : n1(q)) + ' ' + u;
+}
 
 // ---------- state ----------
 const PERSON_LOCK = (window.PERSON_LOCK === 'E' || window.PERSON_LOCK === 'K') ? window.PERSON_LOCK : null;
@@ -730,17 +918,16 @@ async function connect() {
 
 <script>
 'use strict';
-// ---------- today: hero, quests, sub-sections ----------
+// ---------- today: hero, water, quests, archive, sub-sections ----------
 const EMOJI = { run: '🏃', k: '🍳', a1: '🍎', o: '🥗', a2: '🥛', ak: '🍲', walkNoon: '🚶', walkEve: '🌙', vinegar: '🍶', strength: '💪', weigh: '⚖️', sleep: '😴' };
-function recipeLinks(dow, mealKey) {
-  const ids = (MENU_RECIPES[dow] && MENU_RECIPES[dow][mealKey]) || [];
+const LEVELS = [[26, 'Efsane'], [13, 'Usta'], [8, 'Demir irade'], [4, 'Kararlı'], [2, 'Düzenli'], [1, 'Isınmış'], [0, 'Çaylak']];
+function levelName(n) { for (const l of LEVELS) if (n >= l[0]) return l[1]; return 'Çaylak'; }
+function recipeLinks(dow, mealKey, meal) {
+  const ids = (meal && meal.r) || (MENU_RECIPES[dow] && MENU_RECIPES[dow][mealKey]) || [];
   const html = ids.map(id => { const r = RECIPES.find(x => x.id === id); return r ? '<button type="button" class="rlink" data-recipe="' + id + '">📖 ' + esc(r.name) + '</button>' : ''; }).join('');
   return html ? '<div class="rl">' + html + '</div>' : '';
 }
-const LEVELS = [[26, 'Efsane'], [13, 'Usta'], [8, 'Demir irade'], [4, 'Kararlı'], [2, 'Düzenli'], [1, 'Isınmış'], [0, 'Çaylak']];
-function levelName(n) { for (const l of LEVELS) if (n >= l[0]) return l[1]; return 'Çaylak'; }
 function nextRhythm() { const hm = nowHM(); for (const r of RHYTHM) if (r[0] > hm) return r; return null; }
-function chip(field, on, label) { return '<button type="button" class="chip' + (on ? ' on' : '') + '" data-toggle="' + field + '" aria-pressed="' + on + '">' + label + '</button>'; }
 function weightDelta(L, c, prev) {
   if (L.weight != null) { const a = L.weight - c.startWeight, b = prev ? L.weight - prev.weight : null; return 'Başlangıca göre <b>' + sgn(a) + ' kg</b>' + (b != null ? ' · önceki tartıya göre ' + sgn(b) : ''); }
   if (prev) return 'Son tartı <b>' + n1(prev.weight) + ' kg</b> · ' + fmtD(prev.date);
@@ -751,16 +938,6 @@ function dayStreak(p) {
   const Lt = state.logs[logId(p, d)]; if (!Lt || dayPoints(Lt, c) < DAY_WIN) d = addDays(d, -1);
   while (n < 400) { const L = state.logs[logId(p, d)]; if (!L || dayPoints(L, c) < DAY_WIN) break; n++; d = addDays(d, -1); }
   return n;
-}
-function gidisat(L, c) {
-  const hm = nowHM(), miss = [];
-  MEAL_KEYS.forEach(k => { if (MEAL_TIMES[k] < hm && !L.meals[k]) miss.push(MEAL_NAMES[k]); });
-  if (hm > '07:30' && !L.run) miss.push('koşu');
-  if (hm > '13:30' && !L.walkNoon) miss.push('öğle yürüyüşü');
-  if (hm > '20:00' && !L.walkEve) miss.push('akşam yürüyüşü');
-  const h = Number(hm.slice(0, 2)), expected = Math.min(c.waterGoal, Math.round(c.waterGoal * Math.max(0, h - 6) / 15));
-  if (L.water < expected) miss.push('su ' + L.water + '/' + c.waterGoal);
-  return miss;
 }
 function motto(L, c, pts, p, lp) {
   const h = Number(nowHM().slice(0, 2)), meals = MEAL_KEYS.filter(k => L.meals[k]).length;
@@ -787,7 +964,7 @@ function heroHtml(p, L, c) {
     lvl = '<div class="lvl"><div class="t"><b>Sıradaki: ' + esc(lp.next.icon) + ' ' + esc(lp.next.title) + '</b><span class="tiny num">' + lp.count + ' / ' + lp.next.weeks + ' hafta</span></div><div class="bar big"><i style="width:' + pct + '%"></i></div><p class="tiny">' + (remainW === 1 ? 'Bu hafta da tutarsa senin! ' : remainW + ' başarılı hafta kaldı. ') + 'Seviye: <b>' + levelName(lp.count) + '</b>' + (lp.streak >= 2 ? ' · seri ' + lp.streak + ' hafta 🔥' : '') + '</p></div>';
   } else lvl = '<div class="lvl"><div class="t"><b>Merdiven tamamlandı 🏆</b></div><p class="tiny">6 aylık ödül dahil hepsi hak edildi. Seviye: Efsane.</p></div>';
   const earned = lp.earned.map(r => '<div class="celebrate">🎉 ' + esc(r.icon) + ' ' + esc(r.title) + ' hak edildi! <button type="button" class="btn small" data-action="claimRung" data-w="' + r.weeks + '">Ödülü aldım</button></div>').join('');
-  const wbar = lp.warmup ? '' : '<div><div class="wlabel"><span>' + esc(weekly.icon) + ' <b>' + esc(weekly.title) + '</b> · haftalık ödül</span><span class="num">' + cw.points + ' / ' + th + ' puan</span></div><div class="wbar' + (cw.ok ? ' done' : '') + '"><div class="bar' + (cw.ok ? ' good' : '') + '"><i style="width:' + Math.min(100, cw.points / th * 100) + '%"></i></div><span class="em">' + esc(weekly.icon) + '</span></div><p class="tiny">' + (cw.ok ? 'Bu haftanın ödülü hak edildi; hafta sonu keyfini çıkar.' : (th - cw.points) + ' puan kaldı · Pazar\'a ' + daysLeft + ' gün' + (lp.current.ok ? '' : (weekPoints(p, cw.ws).weighed ? '' : ' · tartı +5 bekliyor'))) + '</p></div>';
+  const wbar = lp.warmup ? '' : '<div><div class="wlabel"><span>' + esc(weekly.icon) + ' <b>' + esc(weekly.title) + '</b> · haftalık ödül</span><span class="num">' + cw.points + ' / ' + th + ' puan</span></div><div class="wbar' + (cw.ok ? ' done' : '') + '"><div class="bar' + (cw.ok ? ' good' : '') + '"><i style="width:' + Math.min(100, cw.points / th * 100) + '%"></i></div><span class="em">' + esc(weekly.icon) + '</span></div><p class="tiny">' + (cw.ok ? 'Bu haftanın ödülü hak edildi; hafta sonu keyfini çıkar.' : (th - cw.points) + ' puan kaldı · Pazar\'a ' + daysLeft + ' gün' + (weekPoints(p, cw.ws).weighed ? '' : ' · tartı +5 bekliyor')) + '</p></div>';
   return '<div class="hero">' +
     '<div class="hero-top"><div class="avatar">' + (p === 'E' ? '🧔' : '👩') + '</div><div class="grow"><div class="hname">' + esc(c.name) + '</div><div class="hsub">' + n1(c.startWeight) + ' → ' + n1(c.goalWeight) + ' kg · ' + c.kcal + ' kcal · ' + levelName(lp.count) + '</div></div>' + chips + '</div>' +
     '<div class="ringrow"><svg class="ring' + (pts >= DAY_WIN ? ' full' : '') + '" viewBox="0 0 96 96" role="img" aria-label="Günün puanı ' + pts + ' / ' + DAY_MAX + '"><circle class="bg" cx="48" cy="48" r="40"/><circle class="fg" cx="48" cy="48" r="40" transform="rotate(-90 48 48)" stroke-dasharray="' + dash + ' ' + circ.toFixed(1) + '"/><text x="48" y="44" text-anchor="middle" font-size="22">' + pts + '</text><text x="48" y="62" text-anchor="middle" font-size="11" fill="var(--ink-3)">/ ' + DAY_MAX + ' puan</text></svg>' +
@@ -795,32 +972,45 @@ function heroHtml(p, L, c) {
     (isToday && pts >= DAY_WIN ? '<div class="celebrate">' + (pts >= DAY_MAX ? 'Mükemmel gün! 11/11 🏆' : 'Gün kazanıldı! ' + pts + '/11 🎉') + ' Yarın aynı saatte.</div>' : '') + wbar + lvl + earned +
     '<p class="motto">' + esc(motto(L, c, pts, p, lp)) + '</p></div>';
 }
+function waterHtml(L, c) {
+  const goal = c.waterGoal, max = Math.max(goal + 4, L.water), nDrops = Math.max(goal, L.water);
+  let drops = ''; for (let i = 1; i <= nDrops; i++) drops += '<button type="button" class="drop' + (i <= L.water ? ' on' : '') + '" data-action="drop" data-n="' + i + '" aria-label="' + i + '. bardak">💧</button>';
+  return '<div class="card water"><div class="waterline"><b>💧 Su <span id="waterCount">' + L.water + '</span> / ' + goal + ' bardak</b><span class="tiny num" id="waterLitre">' + n1(L.water * 0.25) + ' L · hedefte +2 puan</span></div>' +
+    '<input type="range" id="waterRange" class="waterslider" min="0" max="' + max + '" step="1" value="' + L.water + '" aria-label="Su bardak sayısı">' +
+    '<div class="drops" id="drops">' + drops + '</div><p class="tiny">Kaydırarak ya da damlalara dokunarak işaretle · 1 bardak = 250 ml</p></div>';
+}
+function updateWaterUI(L, c) {
+  const cnt = $('#waterCount'), lit = $('#waterLitre'); if (cnt) cnt.textContent = L.water; if (lit) lit.textContent = n1(L.water * 0.25) + ' L · hedefte +2 puan';
+  const drops = document.querySelectorAll('#drops .drop'); drops.forEach(d => d.classList.toggle('on', Number(d.dataset.n) <= L.water));
+}
+function questRow(q, L) {
+  const body = '<div class="em">' + EMOJI[q.id] + '</div><div class="grow"><div class="nm">' + q.name + '<span class="tm">' + q.t + '</span></div>' + (q.menu ? '<div class="mn">' + esc(q.menu) + '</div>' : '') + (q.por ? '<div class="pr">' + esc(q.por) + '</div>' : '') + (q.rl || '');
+  if (q.kind === 'sleep') return '<div class="q sleepq' + (q.on ? ' on' : '') + '">' + body + '<div class="row"><label class="tiny">Yatış <input type="time" id="bedInput" value="' + esc(L.bed) + '"></label><label class="tiny">Kalkış <input type="time" id="wakeInput" value="' + esc(L.wake) + '"></label></div></div><div class="pt">+1</div></div>';
+  if (q.kind === 'weigh') return '<div class="q sleepq' + (q.on ? ' on' : '') + '">' + body + '<div class="row"><input type="number" id="weightInput" inputmode="decimal" step="0.1" min="30" max="250" value="' + (L.weight == null ? '' : L.weight) + '" placeholder="kg" aria-label="Kilo" style="width:96px;font-weight:700"><span class="tiny" id="weightDelta">' + q.delta + '</span></div></div><div class="pt">+5</div></div>';
+  const attr = q.kind === 'meal' ? 'data-meal="' + q.k + '"' : 'data-toggle="' + q.f + '"';
+  return '<div class="q' + (q.on ? ' on' : '') + (q.pts ? '' : ' zero') + '" ' + attr + ' role="checkbox" aria-checked="' + q.on + '" tabindex="0">' + body + '</div><div class="pt">' + (q.pts ? '+' + q.pts : '✓') + '</div></div>';
+}
 function questsHtml(p, L, c) {
-  const d = state.date, dow = parseD(d).getDay(), menu = MENU[dow], isToday = d === state.today, nx = isToday ? nextRhythm() : null;
+  const d = state.date, dow = parseD(d).getDay(), menu = menuFor(d), isToday = d === state.today, nx = isToday ? nextRhythm() : null, hm = nowHM();
+  const earlier = logsOf(p).filter(l => l.weight != null && l.date < d), prev = earlier.length ? earlier[earlier.length - 1] : null;
   const items = [{ id: 'run', f: 'run', t: '06:15', name: 'Sabah koşusu', pts: 1, on: L.run, kind: 'toggle' }];
-  menu.meals.filter(m => m.k !== 'g').forEach(m => items.push({ id: m.k, k: m.k, t: MEAL_TIMES[m.k], name: MEAL_NAMES[m.k], pts: 1, on: !!L.meals[m.k], kind: 'meal', menu: m.t, por: m[p], rl: recipeLinks(dow, m.k) }));
-  items.push({ id: 'sleep', t: '23:00', name: 'Uyku düzeni', pts: 1, on: sleepOk(L), kind: 'sleep', menu: 'Yatış en geç 23:15, kalkış en geç ' + wakeLimit(d) + (L.sleep != null ? ' · ' + n1(L.sleep) + ' saat uyku' : '') });
+  if (dow === c.weighDay) items.push({ id: 'weigh', t: '06:05', name: 'Haftalık tartı', pts: 5, on: L.weight != null, kind: 'weigh', menu: 'Tuvaletten sonra, kahvaltıdan önce', delta: weightDelta(L, c, prev) });
+  menu.meals.filter(m => m.k !== 'g').forEach(m => items.push({ id: m.k, k: m.k, t: MEAL_TIMES[m.k], name: MEAL_NAMES[m.k], pts: 1, on: !!L.meals[m.k], kind: 'meal', menu: m.t, por: m[p], rl: recipeLinks(dow, m.k, m) }));
   items.push({ id: 'vinegar', f: 'vinegar', t: '12:15', name: 'Sirkeli su', pts: 0, on: L.vinegar, kind: 'toggle', menu: '1 yk elma sirkesi + 1 bardak su, öğleden önce' });
   items.push({ id: 'walkNoon', f: 'walkNoon', t: '13:15', name: 'Öğle yürüyüşü', pts: 1, on: L.walkNoon, kind: 'toggle', menu: '10–15 dk dışarıda, gün ışığı' });
   items.push({ id: 'walkEve', f: 'walkEve', t: '19:45', name: 'Akşam yürüyüşü', pts: 1, on: L.walkEve, kind: 'toggle', menu: '10 dk, sonra mutfak kapanır' });
   items.push({ id: 'strength', f: 'strength', t: '20:00', name: 'Kuvvet 15 dk', pts: 0, on: L.strength, kind: 'toggle', menu: '3 tur: 15 squat, 10 şınav, 30 sn plank, 10 köprü · haftada 2' });
-  if (dow === c.weighDay) items.push({ id: 'weigh', t: '06:05', name: 'Haftalık tartı', pts: 5, on: L.weight != null, kind: 'weigh', menu: 'Tuvaletten sonra, kahvaltıdan önce' });
+  items.push({ id: 'sleep', t: '23:00', name: 'Uyku düzeni', pts: 1, on: sleepOk(L), kind: 'sleep', menu: 'Yatış en geç 23:15, kalkış en geç ' + wakeLimit(d) + (L.sleep != null ? ' · ' + n1(L.sleep) + ' saat uyku' : '') });
   items.sort((a, b) => a.t < b.t ? -1 : 1);
-  const rows = items.map(q => {
-    const body = '<div class="em">' + EMOJI[q.id] + '</div><div class="grow"><div class="nm">' + q.name + '<span class="tm">' + q.t + '</span></div>' + (q.menu ? '<div class="mn">' + esc(q.menu) + '</div>' : '') + (q.por ? '<div class="pr">' + esc(q.por) + '</div>' : '') + (q.rl || '');
-    if (q.kind === 'sleep') return '<div class="q sleepq' + (q.on ? ' on' : '') + '">' + body + '<div class="row"><label class="tiny">Yatış <input type="time" id="bedInput" value="' + esc(L.bed) + '"></label><label class="tiny">Kalkış <input type="time" id="wakeInput" value="' + esc(L.wake) + '"></label></div></div><div class="pt">+1</div></div>';
-    const attr = q.kind === 'meal' ? 'data-meal="' + q.k + '"' : q.kind === 'toggle' ? 'data-toggle="' + q.f + '"' : 'data-action="openWeight"';
-    return '<div class="q' + (q.on ? ' on' : '') + (q.pts ? '' : ' zero') + '" ' + attr + ' role="checkbox" aria-checked="' + q.on + '" tabindex="0">' + body + '</div><div class="pt">' + (q.pts ? '+' + q.pts : '✓') + '</div></div>';
-  }).join('');
-  const goal = c.waterGoal, nDrops = Math.max(goal, L.water);
-  let drops = ''; for (let i = 1; i <= nDrops; i++) drops += '<button type="button" class="drop' + (i <= L.water ? ' on' : '') + '" data-action="drop" data-n="' + i + '" aria-label="' + i + '. bardak">💧</button>';
-  if (L.water >= goal && L.water < 30) drops += '<button type="button" class="drop on" data-action="drop" data-n="' + (L.water + 1) + '" aria-label="Bir bardak daha" style="filter:none;opacity:.7">➕</button>';
-  const miss = isToday ? gidisat(L, c) : [];
-  return '<div class="card"><div class="daterow"><button type="button" class="iconbtn" data-action="prevday" aria-label="Önceki gün">‹</button><div class="d">' + (isToday ? 'Bugünün görevleri' : fmtD(d)) + '<small>' + fmtDL(d) + ' · ' + menu.name + '</small></div><button type="button" class="iconbtn" data-action="nextday" aria-label="Sonraki gün"' + (isToday ? ' disabled' : '') + '>›</button></div>' +
+  const expired = q => { if (!isToday) return false; if (q.kind === 'sleep') return !!(L.bed && L.wake); const lim = (Number(q.t.slice(0, 2)) * 60 + Number(q.t.slice(3, 5)) + 90); return (Number(hm.slice(0, 2)) * 60 + Number(hm.slice(3, 5))) > lim; };
+  const active = isToday ? items.filter(q => !q.on && !expired(q)) : items;
+  const archived = isToday ? items.filter(q => q.on || expired(q)) : [];
+  const doneCount = items.filter(q => q.on).length, missed = archived.filter(q => !q.on && q.pts);
+  const archiveHtml = archived.length ? '<details class="item" id="sub-arsiv"' + (state.open.has('sub-arsiv') ? ' open' : '') + '><summary>Arşiv<span class="sub">' + doneCount + ' tamamlandı' + (missed.length ? ' · ' + missed.length + ' kaçtı (geç de işaretlenebilir)' : '') + '</span></summary><div class="qlist">' + archived.map(q => questRow(q, L)).join('') + '</div></details>' : '';
+  return '<div class="card"><div class="daterow"><button type="button" class="iconbtn" data-action="prevday" aria-label="Önceki gün">‹</button><div class="d">' + (isToday ? 'Bugünün görevleri' : fmtD(d)) + '<small>' + fmtDL(d) + ' · ' + menu.name + (isToday ? ' · ' + active.length + ' görev kaldı' : '') + '</small></div><button type="button" class="iconbtn" data-action="nextday" aria-label="Sonraki gün"' + (isToday ? ' disabled' : '') + '>›</button></div>' +
     (nx ? '<div class="next"><b>' + nx[0] + '</b><span>Sırada: ' + esc(nx[1]) + '</span></div>' : '') +
-    (miss.length ? '<p class="tiny">Saate göre eksik: ' + esc(miss.join(', ')) + '</p>' : '') +
-    '<div class="qlist">' + rows + '</div>' +
-    '<div><div class="waterline"><b>💧 Su ' + L.water + ' / ' + goal + ' bardak</b><span class="tiny num">' + n1(L.water * 0.25) + ' L · hedefte +2 puan</span></div><div class="drops">' + drops + '</div></div></div>';
+    (active.length ? '<div class="qlist">' + active.map(q => questRow(q, L)).join('') + '</div>' : '<div class="celebrate">Bugünün tüm görevleri arşivde. ' + (doneCount >= 9 ? 'Harika gün 🎉' : 'Kaçanları arşivden geç de işaretleyebilirsin.') + '</div>') +
+    archiveHtml + '<div class="status" id="saveStatus"></div></div>';
 }
 function foodsBody(L, p) {
   const rows = L.foods.map(f => {
@@ -839,22 +1029,17 @@ function foodsBody(L, p) {
 function subSec(id, icon, title, sub, body) { return '<details class="sub-sec" id="' + id + '"' + (state.open.has(id) ? ' open' : '') + '><summary><span class="ic">' + icon + '</span><span class="st">' + title + '<span class="sub">' + sub + '</span></span></summary><div class="body">' + body + '</div></details>'; }
 function renderToday() {
   const p = state.person, d = state.date, L = getLog(p, d), c = cfg(p);
-  const earlier = logsOf(p).filter(l => l.weight != null && l.date < d), prev = earlier.length ? earlier[earlier.length - 1] : null;
   const total = L.foods.reduce((s, f) => s + (f.kcal || 0), 0);
-  const weightBody = '<div class="weightline"><input type="number" id="weightInput" inputmode="decimal" step="0.1" min="30" max="250" value="' + (L.weight == null ? '' : L.weight) + '" placeholder="—" aria-label="Kilo"><span>kg</span><div class="delta grow" id="weightDelta">' + weightDelta(L, c, prev) + '</div></div><p class="tiny">Tartı günü ' + DAY_NAMES[c.weighDay] + '; haftada bir yeter, günlük dalgalanma 1–2 kg su kaynaklıdır. Haftada bir tartı +5 puan.</p>';
   let cycleBody = '', cycleSub = '';
   if (p === 'K') {
     const ci = cycleInfo(c, d);
     if (!ci) { cycleSub = 'Son adet tarihini girin'; cycleBody = '<p class="muted">Son adetin başladığı günü girin; döngü günü, PMS haftası ve tahmini sonraki tarih burada görünür.</p><div class="addfood"><input type="date" id="cycleDate" max="' + state.today + '"><button type="button" class="btn small" data-action="cycleSave">Kaydet</button></div>'; }
     else { cycleSub = ci.day + '. gün · ' + ci.phase + ' · sonraki ' + fmtD(ci.next); cycleBody = '<div class="row"><span class="pill' + (ci.pms ? ' warn' : ci.phase === 'Adet' ? ' accent' : ' good') + '">' + ci.phase + '</span><span class="tiny">döngü ' + c.cycleLen + ' gün</span></div><p class="muted">' + esc(ci.tip) + '</p><div class="row"><button type="button" class="btn ghost small" data-action="cycleStart">Adet başladı</button></div>'; }
   }
-  const status = state.mode === 'db' ? (state.dirty.size ? 'Kaydediliyor…' : (L.updatedAt ? 'Son kayıt ' + localTime(L.updatedAt) + ' · ikinizde de görünür' : 'Henüz girdi yok')) : (state.mode === 'local' ? 'Girdiler bu cihazda saklanıyor' : 'Bağlanıyor…');
-  const noteBody = '<textarea id="noteInput" placeholder="Örn. 14:00 kuru fasulyeden sonra şişkinlik">' + esc(L.note) + '</textarea><div class="status" id="saveStatus">' + status + '</div><div class="tiny" id="modeNote">' + esc(state.modeNote) + '</div>';
-  $('#view-bugun').innerHTML = heroHtml(p, L, c) + questsHtml(p, L, c) +
+  $('#view-bugun').innerHTML = heroHtml(p, L, c) + waterHtml(L, c) + questsHtml(p, L, c) +
     subSec('sub-yemek', '🍽', 'Ne yedik?', (L.foods.length ? L.foods.length + ' kayıt' + (total ? ' · ' + Math.round(total) + ' kcal' : '') : 'Fotoğraf veya yazıyla öğün kaydı') + ' · hedef ' + c.kcal + ' kcal', foodsBody(L, p)) +
-    subSec('sub-tarti', '⚖️', 'Haftalık tartı', L.weight != null ? n1(L.weight) + ' kg girildi' : (prev ? 'Son ' + n1(prev.weight) + ' kg · ' + fmtD(prev.date) : 'Tartı günü ' + DAY_NAMES[c.weighDay]), weightBody) +
-    (p === 'K' ? subSec('sub-dongu', '🌙', 'Döngü', cycleSub, cycleBody) : '') +
-    subSec('sub-not', '📝', 'Not', (L.note ? L.note.slice(0, 40) + (L.note.length > 40 ? '…' : '') : 'Şişkinlik, tatlı krizi, dışarıda yemek'), noteBody);
+    (p === 'K' ? subSec('sub-dongu', '🌙', 'Döngü', cycleSub, cycleBody) : '');
+  const st = $('#saveStatus'); if (st) st.textContent = state.mode === 'db' ? (state.dirty.size ? 'Kaydediliyor…' : (L.updatedAt ? 'Son kayıt ' + localTime(L.updatedAt) + ' · ikinizde de görünür' : '')) : (state.mode === 'local' ? 'Girdiler bu cihazda saklanıyor' : '');
 }
 </script>
 
@@ -939,7 +1124,6 @@ function bindToday() {
       else if (a === 'nextday' && state.date < state.today) { state.date = addDays(state.date, 1); renderToday(); }
       else if (a === 'water') { editLog(L => { L.water = Math.max(0, Math.min(30, L.water + Number(act.dataset.n))); }); renderToday(); }
       else if (a === 'drop') { const n = Number(act.dataset.n); editLog(L => { L.water = Math.max(0, Math.min(30, n === L.water ? n - 1 : n)); }); renderToday(); }
-      else if (a === 'openWeight') { state.open.add('sub-tarti'); lsSet('bt_open', Array.from(state.open)); renderToday(); const w = $('#weightInput'); if (w) { w.scrollIntoView({ block: 'center' }); w.focus(); } }
       else if (a === 'foodAdd') { const t = $('#foodText'); await addFood(t ? t.value : '', null); }
       else if (a === 'foodDel') { const id = act.dataset.id; editLog(L => { L.foods = L.foods.filter(x => x.id !== id); }); renderToday(); }
       else if (a === 'foodRetry') { analyzeFood(state.person, state.date, act.dataset.id, null); }
@@ -961,10 +1145,12 @@ function bindToday() {
   v.addEventListener('change', e => {
     if (e.target.id === 'foodPhoto' && e.target.files && e.target.files[0]) { const t = $('#foodText'); addFood(t ? t.value : '', e.target.files[0]); e.target.value = ''; }
     else if (e.target.id === 'bedInput' || e.target.id === 'wakeInput') { e.target.blur(); renderToday(); }
+    else if (e.target.id === 'waterRange') { e.target.blur(); renderToday(); }
   });
   v.addEventListener('input', e => {
     const id = e.target.id;
-    if (id === 'weightInput') { const w = parseFloat(String(e.target.value).replace(',', '.')); const L = editLog(L => { L.weight = (isFinite(w) && w > 30 && w < 250) ? Math.round(w * 10) / 10 : null; }); const earlier = logsOf(state.person).filter(l => l.weight != null && l.date < state.date); const el = $('#weightDelta'); if (el) el.innerHTML = weightDelta(L, cfg(state.person), earlier.length ? earlier[earlier.length - 1] : null); }
+    if (id === 'waterRange') { const n = Math.max(0, Math.min(30, parseInt(e.target.value, 10) || 0)); const L = editLog(L => { L.water = n; }); updateWaterUI(L, cfg(state.person)); }
+    else if (id === 'weightInput') { const w = parseFloat(String(e.target.value).replace(',', '.')); const L = editLog(L => { L.weight = (isFinite(w) && w > 30 && w < 250) ? Math.round(w * 10) / 10 : null; }); const earlier = logsOf(state.person).filter(l => l.weight != null && l.date < state.date); const el = $('#weightDelta'); if (el) el.innerHTML = weightDelta(L, cfg(state.person), earlier.length ? earlier[earlier.length - 1] : null); }
     else if (id === 'bedInput') editLog(L => { L.bed = e.target.value || ''; L.sleep = sleepHours(L.bed, L.wake); });
     else if (id === 'wakeInput') editLog(L => { L.wake = e.target.value || ''; L.sleep = sleepHours(L.bed, L.wake); });
     else if (id === 'noteInput') editLog(L => { L.note = e.target.value.slice(0, 1000); });
@@ -974,14 +1160,48 @@ function bindToday() {
 
 <script>
 'use strict';
-// ---------- menu tab: rhythm, weekly menu, snacks, drinks ----------
+// ---------- menu tab: this week's menu, standard menu, rhythm, snacks, drinks ----------
+function menuDays(src, p, name, openDow) {
+  return [1, 2, 3, 4, 5, 6, 0].map(k => { const m = src[k]; if (!m) return ''; return '<details' + (k === openDow ? ' open' : '') + '><summary>' + m.name + (k === openDow ? ' · bugün' : '') + '</summary><div class="mlist">' + m.meals.map(x => '<div class="mi"><b>' + MEAL_NAMES[x.k] + ' ' + MEAL_TIMES[x.k] + '</b> · ' + esc(x.t) + (x[p] ? '<span class="p">' + esc(name) + ': ' + esc(x[p]) + '</span>' : '') + recipeLinks(k, x.k, x) + '</div>').join('') + '<div class="tipbox">' + esc(m.tip) + '</div></div></details>'; }).join('');
+}
+function shoppingListHtml(title, sub, days, storeKey) {
+  const items = aggregateShopping(days), checked = new Set(lsGet(storeKey, []) || []);
+  const order = ['sebze', 'et', 'sut', 'firin', 'kiler'];
+  const groups = order.map(c => {
+    const rows = items.filter(i => i.c === c).sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+    if (!rows.length) return '';
+    return '<div class="shopgrp"><div class="eyebrow">' + SHOP_CATS[c] + '</div>' + rows.map(i => { const key = i.name + '|' + i.u, on = checked.has(key) || i.have; return '<label class="shop' + (on ? ' on' : '') + (i.have ? ' have' : '') + '"><input type="checkbox" data-shop="' + esc(storeKey) + '" data-key="' + esc(key) + '"' + (on ? ' checked' : '') + (i.have ? ' disabled' : '') + '><span class="grow">' + esc(i.name) + (i.have ? ' <span class="tiny">· evde var</span>' : '') + '</span><span class="num tiny">' + fmtQty(i.q, i.u) + '</span></label>'; }).join('') + '</div>';
+  }).join('');
+  const text = order.map(c => { const rows = items.filter(i => i.c === c && !i.have); return rows.length ? SHOP_CATS[c] + ':\n' + rows.map(i => '- ' + i.name + ' ' + fmtQty(i.q, i.u)).join('\n') : ''; }).filter(Boolean).join('\n');
+  return '<details class="item" id="shop-' + storeKey + '"' + (state.open.has('shop-' + storeKey) ? ' open' : '') + '><summary>' + title + '<span class="sub">' + sub + '</span></summary><div class="mlist">' + groups + '<div class="row"><button type="button" class="btn ghost small" data-copyshop="' + esc(storeKey) + '">Listeyi kopyala</button><span class="tiny" id="shopmsg-' + esc(storeKey) + '"></span></div><textarea id="shoptext-' + esc(storeKey) + '" hidden>' + esc(title + ' (' + sub + ')\n' + text) + '</textarea></div></details>';
+}
+function shoppingCard() {
+  const today = state.today, dow = parseD(today).getDay();
+  const lists = [];
+  if (dow !== 3 && dow !== 5) {
+    const nxt = nextMarketDays(today)[0];
+    const days = [{ d: today, meals: ['k', 'a1', 'o', 'a2', 'ak'].filter(mk => MEAL_TIMES[mk] > nowHM()) }];
+    for (let d = addDays(today, 1); d < nxt; d = addDays(d, 1)) days.push({ d: d, meals: ['k', 'a1', 'o', 'a2', 'ak'] });
+    days.push({ d: nxt, meals: ['k', 'a1', 'o'] });
+    lists.push(shoppingListHtml('Şimdi lazım olanlar', fmtD(today) + ' → ' + fmtD(nxt) + ' öğle · pazara kadar', days, 'now_' + today));
+  }
+  nextMarketDays(today).forEach(m => { const dowM = parseD(m).getDay(); const win = shoppingWindow(m); lists.push(shoppingListHtml((dowM === 3 ? 'Çarşamba' : 'Cuma') + ' pazarı · ' + fmtD(m), fmtD(m) + ' akşam → ' + fmtD(win[win.length - 1].d) + ' öğle', win, 'market_' + m)); });
+  return '<div class="card"><div class="card-h"><h2>Pazar alışverişi</h2><span class="meta">Menüden hesaplanır · 2 kişi</span></div><p class="tiny">Pazar Çarşamba ve Cuma kuruluyor: Çarşamba listesi Cuma öğleye, Cuma listesi Çarşamba öğleye kadar yeter. Kiler kalemleri stokta yoksa alınır; "evde var" olanlar düşüldü.</p><div>' + lists.join('') + '</div></div>';
+}
+function bindProgram() {
+  $('#view-program').addEventListener('change', e => { const cb = e.target.closest('input[data-shop]'); if (!cb) return; const key = cb.dataset.shop, set = new Set(lsGet(key, []) || []); if (cb.checked) set.add(cb.dataset.key); else set.delete(cb.dataset.key); lsSet(key, Array.from(set)); cb.closest('.shop').classList.toggle('on', cb.checked); });
+  $('#view-program').addEventListener('click', async e => { const b = e.target.closest('[data-copyshop]'); if (!b) return; const ta = $('#shoptext-' + b.dataset.copyshop), msg = $('#shopmsg-' + b.dataset.copyshop); if (!ta) return; try { await navigator.clipboard.writeText(ta.value); if (msg) msg.textContent = 'Kopyalandı ' + nowHM(); } catch (err) { ta.hidden = false; ta.focus(); ta.select(); if (msg) msg.textContent = 'Metin seçildi; kopyalayın.'; } });
+}
 function renderProgram() {
   const p = state.person, name = cfg(p).name, dow = parseD(state.today).getDay(), hm = nowHM();
   let curI = -1; RHYTHM.forEach((r, i) => { if (r[0] <= hm) curI = i; });
   const tl = RHYTHM.map((r, i) => '<div class="tl' + (i === curI ? ' now' : '') + '"><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>').join('');
-  const days = [1, 2, 3, 4, 5, 6, 0].map(k => { const m = MENU[k]; return '<details' + (k === dow ? ' open' : '') + '><summary>' + m.name + (k === dow ? ' · bugün' : '') + '</summary><div class="mlist">' + m.meals.map(x => '<div class="mi"><b>' + MEAL_NAMES[x.k] + ' ' + MEAL_TIMES[x.k] + '</b> · ' + esc(x.t) + (x[p] ? '<span class="p">' + esc(name) + ': ' + esc(x[p]) + '</span>' : '') + recipeLinks(k, x.k) + '</div>').join('') + '</div></details>'; }).join('');
-  $('#view-program').innerHTML =
-    '<div class="card"><div class="card-h"><h2>Haftalık menü</h2><span class="meta">' + esc(name) + ' porsiyonları · 📖 tarife gider</span></div><div>' + days + '</div></div>' +
+  const ws = weekMenuLabel(state.today), nextWs = weekMenuLabel(addDays(state.today, 7));
+  let weekCard = '';
+  if (ws) weekCard = '<div class="card"><div class="card-h"><h2>Bu haftanın menüsü</h2><span class="meta">' + fmtD(ws) + ' – ' + fmtD(addDays(ws, 6)) + ' · buzdolabına göre</span></div><div>' + menuDays(WEEK_MENUS[ws], p, name, dow) + '</div></div>';
+  else if (nextWs) weekCard = '<div class="card"><div class="card-h"><h2>Gelecek haftanın menüsü</h2><span class="meta">' + fmtD(nextWs) + ' – ' + fmtD(addDays(nextWs, 6)) + ' · buzdolabına göre</span></div><div>' + menuDays(WEEK_MENUS[nextWs], p, name, -1) + '</div></div>';
+  $('#view-program').innerHTML = shoppingCard() + weekCard +
+    '<div class="card"><div class="card-h"><h2>' + (weekCard ? 'Standart haftalık menü' : 'Haftalık menü') + '</h2><span class="meta">' + esc(name) + ' porsiyonları · 📖 tarife gider</span></div><div>' + menuDays(MENU, p, name, weekCard ? -1 : dow) + '</div></div>' +
     '<div class="card"><div class="card-h"><h2>Günlük ritim</h2><span class="meta">Hafta içi · hafta sonu koşu 07:00, kahvaltı 08:30</span></div><div class="timeline">' + tl + '</div></div>' +
     '<div class="card"><div class="card-h"><h2>Ara öğün havuzu</h2><span class="meta">100–150 kcal</span></div><ul class="plain">' + SNACKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
     '<div class="card"><div class="card-h"><h2>İçecekler</h2></div><ul class="plain">' + DRINKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>';
@@ -1102,7 +1322,7 @@ function boot() {
   $('.tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
   window.addEventListener('hashchange', () => { const t = location.hash.replace('#', ''); if (t !== state.tab) setTab(t); });
   const h = location.hash.replace('#', ''); state.tab = TABS[h] ? h : 'bugun';
-  bindToday(); bindRecipes(); bindSettings();
+  bindToday(); bindProgram(); bindRecipes(); bindSettings();
   setInterval(refreshNext, 60000);
   connect();
 }
