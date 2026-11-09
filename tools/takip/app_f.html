@@ -1,0 +1,131 @@
+<script>
+'use strict';
+// ---------- weekly planner: reads tracked inputs, asks Claude, saves plan and every change ----------
+function uniq(a) { return Array.from(new Set(a)); }
+function weekFeedback(ws) {
+  const since = addDays(state.today, -13), out = {};
+  ['E', 'K'].forEach(p => {
+    const c = cfg(p), logs = logsOf(p).filter(l => l.date >= since && l.date <= state.today), n = logs.length;
+    const skip = { k: 0, a1: 0, o: 0, a2: 0, ak: 0 }; let water = 0, won = 0, runs = 0;
+    logs.forEach(L => { MEAL_KEYS.forEach(k => { if (!L.meals[k]) skip[k]++; }); water += L.water; if (dayPoints(L, c) >= DAY_WIN) won++; if (L.run) runs++; });
+    const foods = logs.flatMap(L => L.foods.map(f => (f.text || '').slice(0, 60) + (f.kcal ? ' (' + Math.round(f.kcal) + ' kcal)' : ''))).filter(s => s.trim()).slice(-20);
+    const worst = MEAL_KEYS.slice().sort((a, b) => skip[b] - skip[a])[0];
+    out[p] = { ad: c.name, kayitli_gun: n, atlanan_ogun_sayisi: skip, en_cok_atlanan: n ? MEAL_NAMES[worst] : null, su_ortalama_bardak: n ? Math.round(water / n * 10) / 10 : null, su_hedef: c.waterGoal, kazanilan_gun: won, kosu_gunu: runs, kaydedilen_yemekler: foods, kcal_hedef: c.kcal };
+    if (p === 'K') { const ci = cycleInfo(c, addDays(ws, 3)); if (ci) out[p].gelecek_hafta_dongu = ci.phase + ', ~' + ci.day + '. gün'; }
+  });
+  const liked = [], disliked = [], favs = [];
+  allRecipes().forEach(r => { const d = state.recipes[r.id]; if (!d) return; ['E', 'K'].forEach(p => { if (d.fav[p]) favs.push(r.name); if (d.rating[p] >= 4) liked.push(r.name); if (d.rating[p] && d.rating[p] <= 2) disliked.push(r.name); }); });
+  const cur = mondayOf(state.today), dishes = [];
+  for (let i = 0; i < 7; i++) menuFor(addDays(cur, i)).meals.forEach(x => { if (x.k === 'o' || x.k === 'ak') dishes.push(x.t.slice(0, 70)); });
+  return { kisiler: out, begenilen_tarifler: uniq(liked), favori_tarifler: uniq(favs), begenilmeyen_tarifler: uniq(disliked), bu_haftanin_ogle_ve_aksamlari: dishes };
+}
+function planInputs() { return lsGet('bt_plan_inputs', { fridge: '', avoid: '', notes: '' }) || { fridge: '', avoid: '', notes: '' }; }
+const PLAN_RULES = 'Program kuralları: Akdeniz tipi, paketli gıda yok, mevsim ürünleri (Kasım–Şubat: lahana, karnabahar, brokoli, pırasa, kereviz, ıspanak, pancar, bal kabağı, havuç, turp, roka; elma, armut, nar, mandalina, portakal, kivi, ayva, Trabzon hurması). E: 35 yaş erkek, 1800 kcal, protein 130 g, ailede tip 2 diyabet, bazen şişkinlik → baklagiller öğle öğününde, günde en fazla 1 baklagil öğünü, iyi pişmiş. K: 37 yaş kadın, 1450 kcal, protein 100 g, süt ürünlerini sever, dönemsel tatlı isteği (PMS haftasında planlı tatlı ve magnezyum). Öğünler: 07:30 kahvaltı, 10:30 ara 1, 12:30 öğle (günün karbonhidratı burada), 16:00 ara 2 (proteinli), 19:00 akşam (protein + sebze, tahıl az veya yok), 21:30 gece bitki çayı. Haftada 2 balık (hamsi, palamut, levrek, çipura, somon), kırmızı et en fazla 1–2, tavuk/hindi 2–3, yumurta günde ≤2, baklagil 3 öğle. Kahvaltılar kolay: yoğurt + yulaf + meyve, haşlanmış yumurta + peynir, lor kasesi, çılbır; hafta sonu daha zengin. Pişirme kolay: hafta içi akşam ≤25 dk, Pazar hazırlık günü (çorba, zeytinyağlı sebze, haşlanmış yumurta, fırın tavuk) ile öğleler hazırdan. Cumartesi 16:00 planlı tatlı (şekersiz fırın meyve vb.). Kahve günde en fazla 2. Çeşitlilik: bu haftanın öğle ve akşamlarını tekrarlama, protein kaynaklarını dönüşümlü kullan, aynı sebzeyi üst üste iki gün verme. Porsiyonlar: E 150–170 g et/balık, K 120–130 g; E 1,5 kepçe baklagil, K 1 kepçe; bulgur E 4–5 yk öğle, K 3 yk; yoğurt E 150 g, K 100–120 g. PİŞİRME DÜZENİ: sebze yemekleri (zeytinyağlılar, etli sebze, baklagil yemekleri) ve çorbalar 4 porsiyon pişer ve ardışık iki günde yenir: aynı yemeği iki güne yaz (ör. Pzt öğle + Sal öğle, Çar akşam + Cum öğle), ikinci günün metnine "(2. gün)" ekle, alışveriş kalemlerini ("s") yalnızca pişirildiği güne yaz; ana protein (balık, şiş, köfte) taze pişer. Yeni tarifler 4 porsiyonluk malzeme ile yazılır ("servings": 4), kcal porsiyon başına verilir.';
+function planSchema() {
+  const ids = allRecipes().map(r => r.id + ': ' + r.name).join('; ');
+  return 'Yalnızca şu JSON nesnesini döndür (başka metin yok): {"days": {"1": {"tip": "o güne özel 1 cümle püf noktası", "meals": [{"k": "k", "t": "yemek adı ve kısa içerik", "E": "E porsiyonu", "K": "K porsiyonu", "r": ["tarif_id"], "s": [["Malzeme adı", miktar, "birim", "kategori", evdeVar]]}, ... k, a1, o, a2, ak, g sırasıyla 6 öğün]}, "2": {...}, "3": {...}, "4": {...}, "5": {...}, "6": {...}, "0": {...}}, "recipes": [{"id": "kucuk-harf-kisa", "name": "...", "time": dakika, "kcal": {"E": sayı, "K": sayı}, "tags": ["öğle"], "ing": ["2 kişilik malzeme satırları"], "steps": ["adımlar"], "por": {"E": "...", "K": "..."}, "tip": "..."}], "rationale": "3–4 cümle: protein dağılımı, balık/baklagil/et sayısı, geçen haftaya göre çeşitlilik, kişiye özel notlar"}. Kurallar: gün anahtarları 1=Pazartesi … 6=Cumartesi, 0=Pazar. "s" her öğünün 2 kişilik alışveriş kalemleri: birim yalnızca adet, g, ml, demet, baş, kavanoz; kategori yalnızca sebze, et, sut, firin, kiler; evdeVar true ise buzdolabında zaten var. Baharat, tuz, zeytinyağı gibi temel kiler kalemlerini yazma. "r": yemek mevcut tariflerden biriyle eşleşiyorsa o id; eşleşmiyorsa yeni tarifi "recipes" içine ekle (en fazla 8 yeni tarif) ve id\'sini "r" içine yaz. Gece (g) için yalnızca bitki çayı. Mevcut tarifler: ' + ids;
+}
+async function generatePlan(ws) {
+  if (!state.sample || STATIC_HOST) return;
+  const inp = planInputs(), fb = weekFeedback(ws);
+  const prompt = 'Sen deneyimli bir beslenme uzmanısın; iki kişilik bir ev için ' + fmtDL(ws) + ' Pazartesi başlayan haftanın yeme planını hazırla. ' + PLAN_RULES + '\n\nSistemden gelen girdiler (son 14 gün, JSON): ' + JSON.stringify(fb) + '\nBu girdileri kullan: en çok atlanan öğünü daha pratik yap, beğenilen ve favori tarifleri uygun yerlerde kullan, beğenilmeyenleri koyma, su ortalaması düşükse çorba ve sulu sebze yemeklerini artır, kaydedilen yemeklerde program dışı şeyler varsa onların sağlıklı karşılığını plana koy.\nBuzdolabında olanlar (önce bunları tüket, alışverişte evdeVar=true): ' + (inp.fridge || 'belirtilmedi') + '\nİstenmeyenler: ' + (inp.avoid || 'yok') + '\nNotlar: ' + (inp.notes || 'yok') + '\n\n' + planSchema();
+  state.plan.busy = true; state.plan.msg = 'Claude planlıyor… (30–90 saniye)'; renderProgram();
+  try {
+    const r = await state.sample.json(prompt, { modelTier: 'default', effort: 'high', cache: false });
+    const doc = normWeekMenu({ days: r && r.days, recipes: r && r.recipes, meta: { createdAt: new Date().toISOString(), by: state.person, source: 'claude', rationale: r && r.rationale, inputs: inp } }, ws);
+    if (!doc || Object.keys(doc.days).length < 7) { state.plan.msg = 'Plan eksik geldi (' + (doc ? Object.keys(doc.days).length : 0) + ' gün). Tekrar deneyin.'; state.plan.draft = doc; }
+    else { state.plan.draft = doc; state.plan.msg = 'Taslak hazır; inceleyin, isterseniz öğün değiştirin, sonra kaydedin.'; }
+  } catch (e) {
+    const code = e && e.code ? e.code : 'hata';
+    if (code === 'not_granted' || code === 'sampling_disabled') state.sample = null;
+    state.plan.msg = code === 'invalid_json' ? 'Yanıt okunamadı; tekrar deneyin.' : code === 'rate_limited' ? 'Şu an çok istek var; birkaç dakika sonra deneyin.' : 'Plan alınamadı (' + code + ').';
+  }
+  state.plan.busy = false; renderProgram();
+}
+function planDoc(scope, ws) { return scope === 'draft' ? state.plan.draft : (state.weekmenus[ws] || codeWeekDoc(ws)); }
+function planWeek() { return state.plan.ws && isDate(state.plan.ws) ? state.plan.ws : nextPlanWeek(); }
+async function swapMeal(scope, ws, dow, k) {
+  const doc = planDoc(scope, ws); if (!doc || !doc.days[dow] || !state.sample) return;
+  const meal = doc.days[dow].meals.find(m => m.k === k); if (!meal) return;
+  const others = []; Object.keys(doc.days).forEach(dd => doc.days[dd].meals.forEach(m => { if (!(dd == dow && m.k === k) && (m.k === 'o' || m.k === 'ak')) others.push(DAY_NAMES[dd] + ' ' + MEAL_NAMES[m.k] + ': ' + m.t.slice(0, 60)); }));
+  const prompt = 'Sen beslenme uzmanısın. ' + PLAN_RULES + '\nHaftalık planda ' + DAY_NAMES[dow] + ' ' + MEAL_NAMES[k] + ' öğününü değiştir. Mevcut: "' + meal.t + '". Haftanın diğer öğle/akşamları (tekrar etme): ' + others.join(' | ') + '\nBuzdolabı: ' + (planInputs().fridge || 'belirtilmedi') + '. İstenmeyenler: ' + (planInputs().avoid || 'yok') + '.\nYalnızca şu JSON\'u döndür: {"t": "yemek ve içerik", "E": "E porsiyonu", "K": "K porsiyonu", "r": ["mevcut tarif id\'leri"], "s": [["Malzeme", miktar, "birim", "kategori", false]], "recipe": null veya {"id": "...", "name": "...", "time": 20, "kcal": {"E": 0, "K": 0}, "tags": [], "ing": [], "steps": [], "por": {"E": "", "K": ""}, "tip": ""}}. Birimler: adet, g, ml, demet, baş; kategoriler: sebze, et, sut, firin, kiler. Mevcut tarifler: ' + allRecipes().map(r => r.id + ': ' + r.name).join('; ');
+  state.plan.busy = true; state.plan.msg = DAY_NAMES[dow] + ' ' + MEAL_NAMES[k] + ' için alternatif isteniyor…'; renderProgram();
+  try {
+    const r = await state.sample.json(prompt, { modelTier: 'default', cache: false });
+    const rec = r && r.recipe ? normRecipeDef(r.recipe) : null;
+    const next = JSON.parse(JSON.stringify(doc));
+    if (rec && !findRecipe(rec.id) && !next.recipes.find(x => x.id === rec.id)) next.recipes.push(rec);
+    const nm = next.days[dow].meals.find(m => m.k === k);
+    const old = nm.t; nm.t = str(r && r.t, 240) || nm.t; nm.E = str(r && r.E, 120) || nm.E; nm.K = str(r && r.K, 120) || nm.K;
+    const known = new Set(allRecipes().map(x => x.id).concat(next.recipes.map(x => x.id)));
+    nm.r = Array.isArray(r && r.r) ? r.r.filter(id => known.has(id)).slice(0, 4) : []; if (rec && !nm.r.includes(rec.id)) nm.r.push(rec.id);
+    nm.s = Array.isArray(r && r.s) ? r.s.map(normShopItem).filter(Boolean).slice(0, 20) : [];
+    const normalized = normWeekMenu(next, ws);
+    if (scope === 'draft') { state.plan.draft = normalized; state.plan.msg = 'Öğün değiştirildi (taslak).'; }
+    else { normalized.meta.updatedAt = new Date().toISOString(); await saveWeekMenu(normalized, DAY_NAMES[dow] + ' ' + MEAL_NAMES[k] + ' değiştirildi: "' + old.slice(0, 40) + '" → "' + nm.t.slice(0, 40) + '"'); state.plan.msg = 'Öğün değiştirildi ve kaydedildi.'; }
+  } catch (e) { state.plan.msg = 'Alternatif alınamadı (' + (e && e.code ? e.code : 'hata') + ').'; }
+  state.plan.busy = false; renderProgram();
+}
+async function saveDraft(ws) {
+  const d = state.plan.draft; if (!d) return;
+  const existed = !!state.weekmenus[ws];
+  await saveWeekMenu(d, (existed ? 'Haftalık plan yeniden oluşturuldu' : 'Haftalık plan oluşturuldu') + ' (' + fmtD(ws) + ' haftası, ' + (d.meta.source === 'claude' ? 'Claude' : 'elle') + ')');
+  state.plan.draft = null; state.plan.msg = 'Plan kaydedildi; Bugün sekmesi ve alışveriş listesi bu plana göre çalışır.'; renderProgram();
+}
+async function manualEdit(scope, ws, dow, k, vals) {
+  const doc = planDoc(scope, ws); if (!doc || !doc.days[dow]) return;
+  const next = JSON.parse(JSON.stringify(doc)); const m = next.days[dow].meals.find(x => x.k === k); if (!m) return;
+  const old = m.t; m.t = vals.t.slice(0, 240) || m.t; m.E = vals.E.slice(0, 120); m.K = vals.K.slice(0, 120);
+  const normalized = normWeekMenu(next, ws); state.plan.edit = null;
+  if (scope === 'draft') { state.plan.draft = normalized; }
+  else { normalized.meta.updatedAt = new Date().toISOString(); await saveWeekMenu(normalized, DAY_NAMES[dow] + ' ' + MEAL_NAMES[k] + ' elle düzenlendi: "' + old.slice(0, 40) + '" → "' + m.t.slice(0, 40) + '"'); }
+  renderProgram();
+}
+function planDaysHtml(doc, scope, ws) {
+  const p = state.person, name = cfg(p).name, ed = state.plan.edit, todayDow = parseD(state.today).getDay(), isThisWeek = ws === mondayOf(state.today);
+  if (!state.plan.openDays) state.plan.openDays = new Set(['saved:' + todayDow, 'draft:1']);
+  return [1, 2, 3, 4, 5, 6, 0].map(dow => {
+    const key = scope + ':' + dow, d = doc.days[dow];
+    if (!d) return '<details data-plan-day="' + key + '"><summary>' + DAY_NAMES[dow] + '<span class="sub">plan yok</span></summary></details>';
+    const today = scope === 'saved' && isThisWeek && dow === todayDow;
+    return '<details data-plan-day="' + key + '"' + (state.plan.openDays.has(key) ? ' open' : '') + '><summary>' + d.name + (today ? ' · bugün' : '') + '<span class="sub">' + esc((d.meals.find(m => m.k === 'ak') || {}).t || '').slice(0, 60) + '</span></summary><div class="mlist">' + d.meals.map(m => {
+      const editing = ed && ed.scope === scope && ed.ws === ws && ed.dow == dow && ed.k === m.k;
+      const acts = m.k === 'g' ? '' : '<div class="acts">' + (state.sample && !STATIC_HOST ? '<button type="button" data-plan="swap" data-scope="' + scope + '" data-ws="' + ws + '" data-dow="' + dow + '" data-k="' + m.k + '" title="Claude alternatif önersin">↻</button>' : '') + '<button type="button" data-plan="edit" data-scope="' + scope + '" data-ws="' + ws + '" data-dow="' + dow + '" data-k="' + m.k + '" title="Elle düzenle">✎</button></div>';
+      const body = '<div><b>' + MEAL_NAMES[m.k] + ' ' + MEAL_TIMES[m.k] + '</b> · ' + esc(m.t) + (m[p] ? '<span class="p" style="display:block;color:var(--ink-2);font-size:.85rem">' + esc(name) + ': ' + esc(m[p]) + '</span>' : '') + recipeLinks(dow, m.k, m) + '</div>';
+      const editor = editing ? '<div class="edit"><input type="text" id="pe-t" value="' + esc(m.t) + '" maxlength="240" placeholder="Yemek ve içerik"><input type="text" id="pe-E" value="' + esc(m.E) + '" maxlength="120" placeholder="E porsiyonu"><input type="text" id="pe-K" value="' + esc(m.K) + '" maxlength="120" placeholder="K porsiyonu"><div class="row"><button type="button" class="btn small" data-plan="editsave" data-scope="' + scope + '" data-ws="' + ws + '" data-dow="' + dow + '" data-k="' + m.k + '">Kaydet</button><button type="button" class="btn ghost small" data-plan="editcancel">Vazgeç</button></div></div>' : '';
+      return '<div class="planmeal">' + body + acts + editor + '</div>'; }).join('') + (d.tip ? '<div class="tipbox">' + esc(d.tip) + '</div>' : '') + '</div></details>'; }).join('');
+}
+function planSourceLabel(doc) { const s = doc && doc.meta ? doc.meta.source : ''; return s === 'claude' ? 'Claude planı' : s === 'seed' ? 'Uzman planı' : s === 'code' ? 'Hazır plan' : s === 'standard' ? 'Standart menü' : 'Elle düzenlendi'; }
+// One week only: the current week, today open. Next week is planned (Claude, artifact only) from a collapsed section.
+function plannerCard() {
+  const ws = mondayOf(state.today), nws = addDays(ws, 7), saved = state.weekmenus[ws] || codeWeekDoc(ws), draft = state.plan.draft && state.plan.draft.ws === nws ? state.plan.draft : null, inp = planInputs();
+  const canPlan = !STATIC_HOST && !!state.sample;
+  const head = '<div class="card-h"><h2>Haftalık plan</h2><span class="meta">' + fmtD(ws) + ' – ' + fmtD(addDays(ws, 6)) + ' · ' + planSourceLabel(saved) + '</span></div>';
+  const days = saved ? '<div>' + planDaysHtml(saved, 'saved', ws) + '</div>' : '<p class="muted">Bu hafta için plan yok.</p>';
+  const nextSaved = state.weekmenus[nws];
+  let tail = nextSaved ? '<p class="tiny">Gelecek hafta planlı · ' + fmtD(nws) + ' – ' + fmtD(addDays(nws, 6)) + (nextSaved.meta.approved ? ' · onaylı' : '') + '</p>' : '';
+  if (canPlan) {
+    const inputs = '<div class="field"><label for="plFridge">Buzdolabında / elde olanlar</label><textarea id="plFridge" rows="2" placeholder="Örn. 1 kg ıspanak, 6 yumurta, kalan tavuk, közlenmiş biber">' + esc(inp.fridge) + '</textarea></div><div class="two"><div class="field"><label for="plAvoid">İstenmeyenler</label><input type="text" id="plAvoid" value="' + esc(inp.avoid) + '" maxlength="300" placeholder="Örn. kuru fasulye, karnabahar"></div><div class="field"><label for="plNotes">Notlar</label><input type="text" id="plNotes" value="' + esc(inp.notes) + '" maxlength="300" placeholder="Örn. Çarşamba akşam dışarıda"></div></div>';
+    const genBtn = '<div class="row"><button type="button" class="btn" data-plan="generate" data-ws="' + nws + '"' + (state.plan.busy ? ' disabled' : '') + '>' + (nextSaved ? 'Yeniden planla' : 'Claude ile planla') + '</button><span class="tiny">' + esc(state.plan.msg) + '</span></div>';
+    const draftHtml = draft ? '<div class="note"><b>Taslak · ' + fmtD(nws) + ' – ' + fmtD(addDays(nws, 6)) + '</b>' + (draft.meta.rationale ? '<details><summary>Gerekçe</summary><p class="muted">' + esc(draft.meta.rationale) + '</p></details>' : '') + '</div><div>' + planDaysHtml(draft, 'draft', nws) + '</div>' + (draft.recipes.length ? '<p class="tiny">Yeni tarifler: ' + esc(draft.recipes.map(r => r.name).join(', ')) + '</p>' : '') + '<div class="row"><button type="button" class="btn" data-plan="save" data-ws="' + nws + '">Planı kaydet</button><button type="button" class="btn ghost" data-plan="discard">Vazgeç</button></div>' : '';
+    tail = '<details class="item" id="plan-next"' + (state.open.has('plan-next') || draft ? ' open' : '') + '><summary>Gelecek haftayı planla<span class="sub">' + fmtD(nws) + ' – ' + fmtD(addDays(nws, 6)) + (nextSaved ? ' · planlı' : '') + '</span></summary><div class="mlist">' + inputs + genBtn + draftHtml + '</div></details>';
+  }
+  return '<div class="card">' + head + days + tail + '</div>';
+}
+function bindPlanner() {
+  const v = $('#view-program');
+  v.addEventListener('input', e => { if (['plFridge', 'plAvoid', 'plNotes'].indexOf(e.target.id) >= 0) { const inp = planInputs(); inp.fridge = ($('#plFridge') || {}).value || ''; inp.avoid = ($('#plAvoid') || {}).value || ''; inp.notes = ($('#plNotes') || {}).value || ''; lsSet('bt_plan_inputs', inp); } });
+  v.addEventListener('toggle', e => { const el = e.target, key = el && el.dataset ? el.dataset.planDay : null; if (!key || !state.plan.openDays) return; if (el.open) state.plan.openDays.add(key); else state.plan.openDays.delete(key); }, true);
+  document.addEventListener('click', async e => {
+    const b = e.target.closest('[data-plan]'); if (!b) return;
+    const a = b.dataset.plan, ws = b.dataset.ws, dow = b.dataset.dow, k = b.dataset.k, scope = b.dataset.scope;
+    if (a === 'generate') { if (!state.plan.busy) generatePlan(ws); }
+    else if (a === 'save') saveDraft(ws);
+    else if (a === 'discard') { state.plan.draft = null; state.plan.msg = ''; renderProgram(); }
+    else if (a === 'swap') { if (!state.plan.busy) swapMeal(scope, ws, Number(dow), k); }
+    else if (a === 'edit') { state.plan.edit = { scope: scope, ws: ws, dow: Number(dow), k: k }; renderProgram(); const t = $('#pe-t'); if (t) t.focus(); }
+    else if (a === 'editcancel') { state.plan.edit = null; renderProgram(); }
+    else if (a === 'editsave') manualEdit(scope, ws, Number(dow), k, { t: ($('#pe-t') || {}).value || '', E: ($('#pe-E') || {}).value || '', K: ($('#pe-K') || {}).value || '' });
+  });
+}
+</script>

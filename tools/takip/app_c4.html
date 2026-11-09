@@ -1,0 +1,91 @@
+<script>
+'use strict';
+// ---------- recipe ingredient parser and recipe–shopping consistency audit (pure functions; also run in node) ----------
+const PANTRY_RE = /(zeytinya|tereya|^tuz$|\btuz\b|karabiber|pul biber|kimyon|zerde|kekik|tarçın|defne|sirke|\bsu\b|sıcak su|ılık su|baharat|toz biber|muskat|karanfil|hardal|şeker|salça|nar ekşisi|^un$|\bun\b|nane\b|limon suyu|karışım)/;
+const DESCRIPTORS = ['temizlenmiş', 'rendelenmiş', 'haşlanmış', 'pişmiş', 'doğranmış', 'soyulmuş', 'yıkanmış', 'kıyılmış', 'küp', 'derisiz', 'ezilmiş', 'iri', 'küçük', 'büyük', 'dilimlenmiş', 'ev', 'sıcak', 'ılık', 'dünden', 'kalan', 'pilavlık', 'köftelik', 'öğütülmüş', 'çırpılmış', 'ikiye', 'kırılmış', 'kılçığı', 'alınmış', 'suyu', 'sıkılmış', 'rende', 'taneleri', 'yarımı', 'yeni', 'toplam', 'üstüne', 'yanına', 'yanında', 'olursa', 'isterse'];
+const SEBZE_WORDS = ['kabak', 'kabağ', 'lahana', 'ıspanak', 'ıspanağ', 'havuç', 'pırasa', 'kereviz', 'brokoli', 'karnabahar', 'soğan', 'sarımsak', 'biber', 'mantar', 'domates', 'patlıcan', 'pancar', 'turp', 'roka', 'maydanoz', 'dereotu', 'marul', 'limon', 'elma', 'armut', 'nar', 'mandalina', 'portakal', 'kivi', 'ayva', 'hurması', 'muz', 'avokado', 'zencefil', 'taze fasulye', 'kestane', 'salatalık', 'semizotu', 'tere', 'patates', 'enginar', 'bezelye', 'bamya', 'üzüm', 'çilek', 'greyfurt', 'kuşkonmaz'];
+const LEFTOVER_RE = /(dünkü|önceki gün|akşamının|akşamından|'nin |'nın |'ın |'dan |'den |kalan)/;
+const SECOND_DAY_RE = /2\. gün/;
+const UNIT_ALIASES = { kg: 'kg', g: 'g', gr: 'g', ml: 'ml', l: 'L', lt: 'L', adet: 'adet', demet: 'demet', baş: 'baş', diş: 'diş', dilim: 'dilim', kavanoz: 'kavanoz', parmak: 'adet', 'su bardağı': 'su bardağı', 'çay bardağı': 'çay bardağı', yk: 'yk', 'yemek kaşığı': 'yk', tk: 'tk', 'tatlı kaşığı': 'tk', avuç: 'avuç', kase: 'kase', kepçe: 'kepçe', porsiyon: 'porsiyon' };
+const CUP_G = { mercimek: 200, bulgur: 180, nohut: 180, fasulye: 190, yulaf: 90, pirinç: 200, barbunya: 190, tarhana: 150 };
+const HERBS = ['dereotu', 'maydanoz', 'nane', 'roka', 'taze soğan', 'tere', 'fesleğen', 'semizotu'];
+const CAT_WORDS = {
+  sut: ['yoğurt', 'kefir', 'peynir', 'lor', 'süt', 'yumurta', 'ayran', 'kaşar', 'labne'],
+  et: ['tavuk', 'hindi', 'kıyma', 'kuşbaşı', 'hamsi', 'palamut', 'levrek', 'çipura', 'somon', 'balık', 'dana', 'sardalya', 'uskumru', 'istavrit'],
+  firin: ['ekmek', 'lavaş', 'pide'],
+  kiler: ['mercimek', 'bulgur', 'nohut', 'kuru fasulye', 'barbunya', 'yulaf', 'keten', 'ceviz', 'badem', 'fındık', 'kabak çekirdeği', 'tahin', 'pekmez', 'hurma', 'tarhana', 'şehriye', 'pirinç', 'zeytin', 'turşu', 'kuşburnu', 'bal', 'incir', 'kayısı', 'kinoa', 'karabuğday', 'susam', 'çikolata', 'kuru']
+};
+function trLower(s) { return String(s || '').toLocaleLowerCase('tr-TR'); }
+function fracNum(s) { s = String(s).replace(',', '.').trim(); if (s === '½') return 0.5; if (s === '¼') return 0.25; if (s === '¾') return 0.75; const m = s.match(/^(\d+)\s*½$/); if (m) return Number(m[1]) + 0.5; const n = parseFloat(s); return isFinite(n) ? n : null; }
+function normName(s) {
+  let t = trLower(s).replace(/\([^)]*\)/g, ' ').replace(/\s+veya\s+.*$/, ' ').replace(/[+/].*$/, ' ');
+  t = t.replace(/\d+(?:[,.]\d+)?\s*(kg|gr|g|ml|lt|l)\b/g, ' ').replace(/[½¼¾]/g, ' ').replace(/\b\d+(?:[,.]\d+)?\b/g, ' ');
+  t = t.replace(/\b(su bardağı|çay bardağı|yemek kaşığı|tatlı kaşığı|yk|tk|adet|demet|baş|diş|dilim|kavanoz|parmak|avuç|kase|kepçe|porsiyon)\b/g, ' ');
+  t = t.replace(/(ın|in|un|ün)\s+suyu\b/g, ' ').replace(/[^a-zçğıöşü\s]/g, ' ');
+  const words = t.split(/\s+/).filter(w => w && DESCRIPTORS.indexOf(w) < 0 && w.length > 1);
+  return words.join(' ').trim();
+}
+function altNames(s) { return trLower(s).replace(/\([^)]*\)/g, ' ').split(/\s+veya\s+|\s*\/\s*/).map(x => normName(x)).filter(Boolean); }
+function sameOne(na, nb) { if (!na || !nb) return false; if (na === nb) return true; if (na.length >= 3 && nb.length >= 3 && (na.includes(nb) || nb.includes(na))) return true; const wa = na.split(' '), wb = nb.split(' '); const last = (w) => w[w.length - 1]; return wa.length > 1 && wb.length > 1 && last(wa) === last(wb) && wa[0] === wb[0]; }
+function sameItem(a, b) { const as = altNames(a), bs = altNames(b); return as.some(x => bs.some(y => sameOne(x, y))); }
+function hasWord(text, w) { return new RegExp('(^|\\s)' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(\\s|$)').test(text) || (w.length > 4 && text.includes(w)); }
+function guessCat(name) { const n = normName(name); if (SEBZE_WORDS.some(w => hasWord(n, w))) return 'sebze'; for (const c of ['sut', 'et', 'firin', 'kiler']) if (CAT_WORDS[c].some(w => hasWord(n, w))) return c; return 'sebze'; }
+function capFirst(s) { return s ? s.charAt(0).toLocaleUpperCase('tr-TR') + s.slice(1) : s; }
+function parseIng(line) {
+  const out = [];
+  if (!line || /isteğe bağlı|istersen|isterse/.test(trLower(line))) return out;
+  let txt = trLower(line).replace(/\([^)]*\)/g, ' ').trim();
+  if (!txt) return out;
+  const parts = txt.split(/\s*(?:,|\+|;)\s*/).filter(Boolean);
+  for (let p0 of parts) {
+    const alts = altNames(p0.replace(/^\s*(üstüne|yanına|yanında|içine)\s+/, ''));
+    let p = p0.replace(/\s+veya\s+.*$/, '').replace(/^\s*(üstüne|yanına|yanında|içine)\s+/, '').trim();
+    if (!p || PANTRY_RE.test(p)) continue;
+    const m = p.match(/^(\d+(?:[,.]\d+)?\s*½?|[½¼¾])\s*(kg|gr|g|ml|lt|l|su bardağı|çay bardağı|yemek kaşığı|tatlı kaşığı|yk|tk|adet|demet|baş|diş|dilim|kavanoz|parmak|avuç|kase|kepçe|porsiyon)?\s*(.*)$/);
+    let q = null, u = null, rest = p;
+    if (m) { q = fracNum(m[1]); u = m[2] ? (UNIT_ALIASES[m[2]] || m[2]) : null; rest = m[3]; }
+    const name = normName(rest); if (!name || name.length < 2 || PANTRY_RE.test(name)) continue;
+    if (q == null) { q = 1; u = HERBS.some(h => name.includes(h)) ? 'demet' : name.includes('sarımsak') ? 'baş' : 'adet'; }
+    if (name.includes('sarımsak') && u !== 'baş') { q = 1; u = 'baş'; }
+    if (u === 'kg') { q = q * 1000; u = 'g'; } else if (u === 'L') { q = q * 1000; u = 'ml'; }
+    else if (u === 'su bardağı') { const key = Object.keys(CUP_G).find(k => name.includes(k)); q = Math.round(q * (key ? CUP_G[key] : 200)); u = 'g'; }
+    else if (u === 'çay bardağı') { q = Math.round(q * 100); u = 'g'; }
+    else if (u === 'yk') { q = Math.round(q * 10); u = 'g'; } else if (u === 'tk') { q = Math.round(q * 5); u = 'g'; }
+    else if (u === 'diş') { q = 1; u = 'baş'; } else if (u === 'dilim' || u === 'avuç' || u === 'kase' || u === 'kepçe' || u === 'porsiyon') { u = 'adet'; }
+    else if (!u) u = HERBS.some(h => name.includes(h)) ? 'demet' : 'adet';
+    if (u === 'demet' || u === 'adet' || u === 'baş' || u === 'kavanoz') q = Math.max(1, Math.ceil(q));
+    out.push({ name: capFirst(name), q: q, u: u, c: guessCat(name), alts: alts.length ? alts : [name] });
+  }
+  return out;
+}
+function itemMatches(it, shopName) { const bs = altNames(shopName); return (it.alts || [normName(it.name)]).some(a => bs.some(y => sameOne(a, y))); }
+function recipeItems(r) { const items = []; (r.ing || []).forEach(line => parseIng(line).forEach(it => { const ex = items.find(x => sameItem(x.name, it.name) && x.u === it.u); if (ex) ex.q += it.q; else items.push(it); })); return items; }
+// Audit: every item of every linked recipe must appear in the shopping items of some meal of that week that links the same recipe (the batch is bought once).
+function auditWeekDoc(doc) {
+  const rows = [], seen = new Set(); if (!doc || !doc.days) return rows;
+  const dows = [1, 2, 3, 4, 5, 6, 0].filter(d => doc.days[d]);
+  const coverage = {}, all = []; dows.forEach(d => doc.days[d].meals.forEach(m => { all.push.apply(all, m.s || []); (m.r || []).forEach(id => { coverage[id] = (coverage[id] || []).concat(m.s || []); }); }));
+  dows.forEach(d => doc.days[d].meals.forEach(m => (m.r || []).forEach(id => {
+    const r = findRecipe(id); if (!r) return;
+    const text = trLower(m.t || '');
+    if (SECOND_DAY_RE.test(text)) return; // batch cooked earlier; bought when cooked
+    const pool = LEFTOVER_RE.test(text) ? (coverage[id] || []).concat(all) : (coverage[id] || []);
+    recipeItems(r).forEach(it => {
+      const key = id + '|' + normName(it.name); if (seen.has(key)) return;
+      const hits = pool.filter(s => itemMatches(it, s[0])), mine = it.alts || [normName(it.name)], exact = hits.filter(s => altNames(s[0]).some(y => mine.indexOf(y) >= 0)), use = exact.length ? exact : hits, hit = use[0], have = use.filter(s => s[2] === it.u).reduce((sum, s) => sum + Number(s[1]), 0);
+      if (!hit) { seen.add(key); rows.push({ dow: d, k: m.k, recipe: r.name, rid: id, item: it, kind: 'missing' }); }
+      else if (hit[2] === it.u && have < it.q * 0.6) { seen.add(key); rows.push({ dow: d, k: m.k, recipe: r.name, rid: id, item: it, have: [hit[0], have, hit[2]], kind: 'low' }); }
+    });
+  })));
+  return rows;
+}
+function codeWeekDoc(ws) {
+  const meta = (typeof WEEK_META !== 'undefined' && WEEK_META[ws]) ? WEEK_META[ws] : null;
+  const w = WEEK_MENUS[ws]; const days = {};
+  for (let i = 0; i < 7; i++) {
+    const date = addDays(ws, i), dow = parseD(date).getDay(), src = w && w[dow] ? w[dow] : MENU[dow]; if (!src) continue;
+    days[dow] = { tip: src.tip, meals: src.meals.map(m => ({ k: m.k, t: m.t, E: m.E, K: m.K, r: m.r || ((MENU_RECIPES[dow] && MENU_RECIPES[dow][m.k]) || []), s: shopItemsFor(date, m.k) })) };
+  }
+  return normWeekMenu({ days: days, recipes: [], meta: Object.assign({ source: w ? 'code' : 'standard' }, meta || {}) }, ws);
+}
+</script>

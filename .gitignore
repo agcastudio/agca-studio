@@ -6,3 +6,5 @@ assets/projeler/*/_manifest.txt
 .DS_Store
 Thumbs.db
 .wrangler/
+tools/takip/dist/
+tools/takip/work/

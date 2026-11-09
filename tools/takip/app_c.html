@@ -1,0 +1,302 @@
+<script>
+'use strict';
+// ---------- utilities ----------
+const $ = (s, r) => (r || document).querySelector(s);
+const pad = n => String(n).padStart(2, '0');
+function dstr(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function todayStr() { return dstr(new Date()); }
+function parseD(s) { const a = s.split('-').map(Number); return new Date(a[0], a[1] - 1, a[2]); }
+function addDays(s, n) { const d = parseD(s); d.setDate(d.getDate() + n); return dstr(d); }
+function daysBetween(a, b) { return Math.round((parseD(b) - parseD(a)) / 86400000); }
+function mondayOf(s) { const d = parseD(s); const k = (d.getDay() + 6) % 7; d.setDate(d.getDate() - k); return dstr(d); }
+const DAYS_TR = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+const MONTHS_TR = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+function fmtD(s) { const d = parseD(s); return DAYS_TR[d.getDay()] + ' ' + d.getDate() + ' ' + MONTHS_TR[d.getMonth()]; }
+function fmtDL(s) { const d = parseD(s); return d.getDate() + ' ' + MONTHS_TR[d.getMonth()] + ' ' + d.getFullYear(); }
+function n1(x) { return (Math.round(x * 10) / 10).toLocaleString('tr-TR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+function sgn(x) { return (x > 0 ? '+' : '') + n1(x); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function nowHM() { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function lsGet(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function num(v, lo, hi) { if (v == null || v === '') return null; const n = Number(v); return isFinite(n) && n >= lo && n <= hi ? n : null; }
+function avg(a) { return a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; }
+const isDate = s => /^\d{4}-\d{2}-\d{2}$/.test(String(s));
+const SHOP_UNITS = ['adet', 'g', 'ml', 'demet', 'baş', 'kavanoz', 'paket', 'dilim', 'su bardağı'];
+function str(v, n) { return typeof v === 'string' ? v.slice(0, n) : ''; }
+function normShopItem(it) {
+  if (!Array.isArray(it) || it.length < 4) return null;
+  const name = str(it[0], 40).trim(), q = Number(it[1]), u = SHOP_UNITS.indexOf(it[2]) >= 0 ? it[2] : 'adet', c = SHOP_CATS[it[3]] ? it[3] : 'kiler';
+  if (!name || !isFinite(q) || q <= 0 || q > 10000) return null;
+  return [name, Math.round(q * 100) / 100, u, c, !!it[4]];
+}
+function normRecipeDef(r) {
+  if (!r || typeof r !== 'object') return null;
+  const id = str(r.id, 24).toLowerCase().replace(/[^a-z0-9-]/g, ''); const name = str(r.name, 60).trim(); if (!id || !name) return null;
+  const kc = r.kcal && typeof r.kcal === 'object' ? r.kcal : {}, por = r.por && typeof r.por === 'object' ? r.por : {};
+  const arr = (a, n, len) => Array.isArray(a) ? a.filter(x => typeof x === 'string').map(x => x.slice(0, len)).slice(0, n) : [];
+  const out = { id: id, name: name, time: Math.round(num(r.time, 1, 240) || 20), kcal: { E: Math.round(num(kc.E, 0, 1500) || 0), K: Math.round(num(kc.K, 0, 1500) || 0) }, tags: arr(r.tags, 4, 20), ing: arr(r.ing, 14, 80), steps: arr(r.steps, 8, 200), por: { E: str(por.E, 120), K: str(por.K, 120) }, tip: str(r.tip, 200) };
+  const sv = num(r.servings, 2, 8); if (sv) out.servings = Math.round(sv);
+  return out;
+}
+function normWeekMenu(doc, ws) {
+  if (!doc || typeof doc !== 'object' || !isDate(ws)) return null;
+  const out = { ws: ws, days: {}, recipes: [], meta: {} };
+  out.recipes = Array.isArray(doc.recipes) ? doc.recipes.map(normRecipeDef).filter(Boolean).slice(0, 14) : [];
+  const known = new Set(RECIPES.map(r => r.id).concat(out.recipes.map(r => r.id)));
+  const days = doc.days && typeof doc.days === 'object' ? doc.days : {};
+  for (let dow = 0; dow <= 6; dow++) {
+    const d = days[dow] || days[String(dow)]; if (!d || typeof d !== 'object' || !Array.isArray(d.meals)) continue;
+    const meals = ['k', 'a1', 'o', 'a2', 'ak', 'g'].map(k => { const m = d.meals.find(x => x && x.k === k); if (!m) return null; const r = Array.isArray(m.r) ? m.r.filter(id => known.has(id)).slice(0, 4) : []; const s = Array.isArray(m.s) ? m.s.map(normShopItem).filter(Boolean).slice(0, 20) : []; return { k: k, t: str(m.t, 240), E: str(m.E, 120), K: str(m.K, 120), r: r, s: s }; }).filter(Boolean);
+    if (!meals.length) continue;
+    out.days[dow] = { name: DAY_NAMES[dow], tip: str(d.tip, 300), meals: meals };
+  }
+  const meta = doc.meta && typeof doc.meta === 'object' ? doc.meta : {}, inp = meta.inputs && typeof meta.inputs === 'object' ? meta.inputs : {};
+  out.meta = { createdAt: str(meta.createdAt, 30), updatedAt: str(meta.updatedAt, 30), by: meta.by === 'K' ? 'K' : meta.by === 'E' ? 'E' : '', source: str(meta.source, 20), rationale: str(meta.rationale, 1500), inputs: { fridge: str(inp.fridge, 500), avoid: str(inp.avoid, 300), notes: str(inp.notes, 300) } };
+  if (meta.approved && typeof meta.approved === 'object' && meta.approved.at) out.meta.approved = { at: str(meta.approved.at, 30), by: meta.approved.by === 'K' ? 'K' : 'E' };
+  return Object.keys(out.days).length ? out : null;
+}
+function allRecipes() { const ids = new Set(RECIPES.map(r => r.id)), extra = []; Object.values(state.weekmenus).forEach(w => (w.recipes || []).forEach(r => { if (!ids.has(r.id)) { ids.add(r.id); extra.push(r); } })); return RECIPES.concat(extra); }
+function findRecipe(id) { return allRecipes().find(r => r.id === id) || null; }
+function savedDay(date) { const wm = state.weekmenus[mondayOf(date)], dow = parseD(date).getDay(); return wm && wm.days[dow] ? wm.days[dow] : null; }
+function menuFor(date) { const sd = savedDay(date); if (sd) return sd; const w = WEEK_MENUS[mondayOf(date)], dow = parseD(date).getDay(); return (w && w[dow]) || MENU[dow]; }
+function weekMenuLabel(date) { const ws = mondayOf(date); return (state.weekmenus[ws] || WEEK_MENUS[ws]) ? ws : null; }
+function shopItemsFor(date, mealKey) {
+  const sd = savedDay(date); if (sd) { const m = sd.meals.find(x => x.k === mealKey); if (m && m.s && m.s.length) return m.s; }
+  const ws = mondayOf(date), dow = parseD(date).getDay(), cw = WEEK_MENUS[ws];
+  let base = null;
+  if (cw && cw[dow]) { const m = cw[dow].meals.find(x => x.k === mealKey); if (m && Array.isArray(m.s)) base = m.s; }
+  if (!base) { const w = SHOP_WEEK[ws]; const src = (w && w[dow]) || SHOP_DEFAULT[dow] || {}; base = src[mealKey] || []; }
+  const patchKey = (cw || SHOP_WEEK[ws]) ? ws : 'default';
+  const patch = (typeof SHOP_PATCH !== 'undefined' && SHOP_PATCH[patchKey] && SHOP_PATCH[patchKey][dow] && SHOP_PATCH[patchKey][dow][mealKey]) || [];
+  return patch.length ? base.concat(patch.filter(p => !base.some(b => b[0] === p[0] && b[2] === p[2]))) : base;
+}
+function nextPlanWeek() { const ws = mondayOf(state.today); return addDays(ws, 7); }
+// Pazar günleri Çarşamba (3) ve Cuma (5). Çarşamba pazarı: Çar akşam → Cum öğle. Cuma pazarı: Cum akşam → Çar öğle.
+function nextMarketDays(from) {
+  const out = []; let d = from;
+  for (let i = 0; i < 14 && out.length < 2; i++) { const dow = parseD(d).getDay(); if (dow === 3 || dow === 5) out.push(d); d = addDays(d, 1); }
+  return out;
+}
+function shoppingWindow(marketDate) {
+  const dow = parseD(marketDate).getDay(), span = dow === 3 ? 2 : 5, days = [];
+  days.push({ d: marketDate, meals: ['ak'] });
+  for (let i = 1; i < span; i++) days.push({ d: addDays(marketDate, i), meals: ['k', 'a1', 'o', 'a2', 'ak'] });
+  days.push({ d: addDays(marketDate, span), meals: ['k', 'a1', 'o'] });
+  return days;
+}
+function aggregateShopping(days) {
+  const map = new Map();
+  const add = (name, q, u, c, have) => { const key = name + '|' + u, cur = map.get(key) || { name: name, q: 0, u: u, c: c, have: false }; cur.q += q; if (have) cur.have = true; map.set(key, cur); };
+  days.forEach(day => day.meals.forEach(mk => shopItemsFor(day.d, mk).forEach(it => add(it[0], it[1], it[2], it[3], it[4]))));
+  // Recipe ingredients missing from a meal's list are added here, every week, without a manual check step.
+  if (typeof auditWeekDoc === 'function') {
+    const weeks = {}; days.forEach(day => { weeks[mondayOf(day.d)] = true; });
+    Object.keys(weeks).forEach(ws => { const doc = state.weekmenus[ws] || codeWeekDoc(ws); if (!doc) return; auditWeekDoc(doc).forEach(r => { const hit = days.find(day => mondayOf(day.d) === ws && parseD(day.d).getDay() === r.dow && day.meals.indexOf(r.k) >= 0); if (!hit) return; const q = r.kind === 'low' ? Math.max(0.5, Math.ceil(r.item.q - Number(r.have[1]))) : r.item.q; add(r.item.name, q, r.item.u, r.item.c, false); }); });
+  }
+  return Array.from(map.values());
+}
+function fmtQty(q, u) {
+  if (u === 'g' && q >= 1000) return n1(q / 1000) + ' kg';
+  if (u === 'ml' && q >= 1000) return n1(q / 1000) + ' L';
+  return (Number.isInteger(q) ? q : n1(q)) + ' ' + u;
+}
+
+// ---------- state ----------
+const PERSON_LOCK = (window.PERSON_LOCK === 'E' || window.PERSON_LOCK === 'K') ? window.PERSON_LOCK : null;
+const state = {
+  person: PERSON_LOCK || (lsGet('bt_person', 'E') === 'K' ? 'K' : 'E'),
+  date: todayStr(), today: todayStr(), tab: 'bugun',
+  logs: {}, settings: { E: null, K: null }, rewards: null, recipes: {}, weekmenus: {}, changelog: [], plan: { draft: null, busy: false, msg: '' },
+  mode: 'loading', db: null, sample: null, assets: null, imgOk: false,
+  dirty: new Set(), pendingLocal: new Set(), timers: new Map(), inflight: new Map(),
+  busy: new Set(), open: new Set(), pane: 0, showWeight: false, modeNote: ''
+};
+const STATIC_HOST = !(window.claude && typeof window.claude.use === 'function');
+function logId(p, d) { return p + '_' + d; }
+function emptyLog(p, d) {
+  return { person: p, date: d, weight: null, water: 0, meals: { k: false, a1: false, o: false, a2: false, ak: false }, vinegar: false,
+    run: false, walkNoon: false, walkEve: false, strength: false, bed: '', wake: '', sleep: null, note: '', foods: [], updatedAt: '' };
+}
+function normFood(f) {
+  if (!f || typeof f !== 'object') return null;
+  const meal = ['k', 'a1', 'o', 'a2', 'ak', 'x'].indexOf(f.meal) >= 0 ? f.meal : 'x';
+  return { id: String(f.id || uid()).slice(0, 24), t: /^\d{2}:\d{2}$/.test(String(f.t)) ? f.t : '', meal: meal,
+    text: typeof f.text === 'string' ? f.text.slice(0, 300) : '', photo: /^[0-9a-f]{32}$/.test(String(f.photo)) ? f.photo : null,
+    kcal: num(f.kcal, 0, 3000), protein: num(f.protein, 0, 300), comment: typeof f.comment === 'string' ? f.comment.slice(0, 400) : '',
+    status: f.status === 'ok' ? 'ok' : 'none' };
+}
+function normLog(l) {
+  if (!l || (l.person !== 'E' && l.person !== 'K') || !isDate(l.date)) return null;
+  const e = emptyLog(l.person, l.date);
+  e.weight = num(l.weight, 30, 250);
+  e.water = Math.round(num(l.water, 0, 30) || 0);
+  MEAL_KEYS.forEach(k => { e.meals[k] = !!(l.meals && l.meals[k]); });
+  ['vinegar', 'run', 'walkNoon', 'walkEve', 'strength'].forEach(k => { e[k] = !!l[k]; });
+  e.bed = /^\d{2}:\d{2}$/.test(String(l.bed)) ? l.bed : '';
+  e.wake = /^\d{2}:\d{2}$/.test(String(l.wake)) ? l.wake : '';
+  e.sleep = num(l.sleep, 0, 14);
+  e.note = typeof l.note === 'string' ? l.note.slice(0, 1000) : '';
+  e.foods = Array.isArray(l.foods) ? l.foods.map(normFood).filter(Boolean).slice(0, 12) : [];
+  e.updatedAt = typeof l.updatedAt === 'string' ? l.updatedAt.slice(0, 30) : '';
+  return e;
+}
+function getLog(p, d) { const l = state.logs[logId(p, d)]; return l ? clone(l) : emptyLog(p, d); }
+function cfg(p) {
+  const s = Object.assign({}, DEFAULTS[p], state.settings[p] || {});
+  ['startWeight', 'goalWeight', 'rate', 'waterGoal', 'kcal', 'height'].forEach(k => { const v = Number(s[k]); s[k] = isFinite(v) && v > 0 ? v : DEFAULTS[p][k]; });
+  s.name = String(s.name || DEFAULTS[p].name).slice(0, 20);
+  if (!isDate(s.startDate)) s.startDate = DEFAULTS[p].startDate;
+  const wd = Number(s.weighDay); s.weighDay = isFinite(wd) && wd >= 0 && wd <= 6 ? Math.round(wd) : 5;
+  if (p === 'K') {
+    s.cycleStart = isDate(s.cycleStart) ? s.cycleStart : '';
+    s.cycleLen = Math.round(num(s.cycleLen, 20, 45) || 28);
+    s.periodLen = Math.round(num(s.periodLen, 2, 10) || 5);
+    s.cycleHistory = Array.isArray(s.cycleHistory) ? s.cycleHistory.filter(isDate).slice(-12) : [];
+  }
+  return s;
+}
+const RUNG_WEEKS = [1, 2, 4, 8, 13, 26];
+const RUNG_LABELS = { 1: 'Her hafta', 2: '2 hafta', 4: '1 ay', 8: '2 ay', 13: '3 ay', 26: '6 ay' };
+const LADDER_DEFAULT = {
+  E: [{ weeks: 1, icon: '🕌', title: 'Camii gezisi' }, { weeks: 2, icon: '🩸', title: 'Detaylı kan tahlili' }, { weeks: 4, icon: '🦷', title: 'Diş temizletme' }, { weeks: 8, icon: '👟', title: 'Koşu ekipmanı' }, { weeks: 13, icon: '🎿', title: 'Kayak tatili' }, { weeks: 26, icon: '✨', title: 'Tüm eşyalarımı sıfırlama' }],
+  K: [{ weeks: 1, icon: '📍', title: 'Yeni bir mekân gezisi' }, { weeks: 2, icon: '🍽️', title: 'AKM\'de yemek' }, { weeks: 4, icon: '📖', title: 'Kubi bir kitap okuyacak' }, { weeks: 8, icon: '📱', title: 'Telefon yenileme' }, { weeks: 13, icon: '🎿', title: '3–4 gün kayak tatili' }, { weeks: 26, icon: '🏝️', title: 'Girit adası tatili' }]
+};
+function normRewards(doc) {
+  const d = doc && typeof doc === 'object' ? doc : {};
+  const out = { threshold: Math.round(num(d.threshold, 20, 75) || REWARD_DEFAULT_POINTS), ladder: { E: [], K: [] }, claimed: { E: {}, K: {} } };
+  ['E', 'K'].forEach(p => {
+    const src = d.ladder && Array.isArray(d.ladder[p]) ? d.ladder[p] : [];
+    out.ladder[p] = RUNG_WEEKS.map((w, i) => { const r = src.find(x => x && Number(x.weeks) === w) || {}; const def = LADDER_DEFAULT[p][i]; return { weeks: w, icon: String(r.icon || def.icon).slice(0, 4), title: String(r.title || def.title).slice(0, 80) }; });
+    const cl = d.claimed && d.claimed[p] && typeof d.claimed[p] === 'object' ? d.claimed[p] : {};
+    Object.keys(cl).forEach(k => { if (/^w(2|4|8|13|26)$/.test(k) && isDate(cl[k])) out.claimed[p][k] = cl[k]; });
+  });
+  return out;
+}
+state.rewards = normRewards(null);
+function ladderProgress(p) {
+  const c = cfg(p), th = state.rewards.threshold, start = mondayOf(c.startDate), cur = mondayOf(state.today);
+  const weeks = []; let count = 0, streak = 0;
+  for (let ws = start; ws <= cur; ws = addDays(ws, 7)) { const pts = weekPoints(p, ws).points, ok = pts >= th; weeks.push({ ws: ws, points: pts, ok: ok }); if (ok) { count++; streak++; } else if (ws !== cur) streak = 0; }
+  const curW = weeks.length ? weeks[weeks.length - 1] : { ws: cur, points: weekPoints(p, cur).points, ok: false };
+  const frac = curW.ok ? 0 : Math.min(0.99, curW.points / th);
+  const ladder = state.rewards.ladder[p], claimed = state.rewards.claimed[p];
+  const next = ladder.find(r => r.weeks > 1 && count < r.weeks) || null;
+  const earned = ladder.filter(r => r.weeks > 1 && count >= r.weeks && !claimed['w' + r.weeks]);
+  return { weeks: weeks, count: count, streak: streak, current: curW, progress: count + frac, next: next, earned: earned, warmup: cur < start, threshold: th };
+}
+function normRecipe(doc) {
+  const r = doc && typeof doc === 'object' ? doc : {};
+  const rt = r.rating && typeof r.rating === 'object' ? r.rating : {}, fv = r.fav && typeof r.fav === 'object' ? r.fav : {};
+  return { rating: { E: Math.round(num(rt.E, 0, 5) || 0), K: Math.round(num(rt.K, 0, 5) || 0) }, fav: { E: !!fv.E, K: !!fv.K }, note: typeof r.note === 'string' ? r.note.slice(0, 300) : '' };
+}
+function localTime(iso) { const d = new Date(iso); return isNaN(d) ? '' : pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function logsOf(p) { return Object.values(state.logs).filter(l => l && l.person === p).sort((a, b) => (a.date < b.date ? -1 : 1)); }
+function canDb() { return !!state.db && state.mode !== 'local'; }
+
+// ---------- points, rewards, cycle ----------
+const DAY_MAX = 11, DAY_WIN = 10, WEEK_MAX = 82;
+function wakeLimit(date) { const d = parseD(date).getDay(); return (d === 0 || d === 6) ? '07:30' : '06:30'; }
+function sleepOk(L) { if (!L.bed || !L.wake) return false; return L.bed >= '20:00' && L.bed <= '23:15' && L.wake >= '04:00' && L.wake <= wakeLimit(L.date); }
+function sleepHours(bed, wake) { if (!bed || !wake) return null; const b = Number(bed.slice(0, 2)) * 60 + Number(bed.slice(3, 5)), w = Number(wake.slice(0, 2)) * 60 + Number(wake.slice(3, 5)); return Math.round(((w - b + 1440) % 1440) / 30) / 2; }
+function dayPoints(L, c) {
+  let p = MEAL_KEYS.filter(k => L.meals[k]).length;
+  if (L.water >= c.waterGoal) p += 2;
+  if (L.run) p += 1; if (L.walkNoon) p += 1; if (L.walkEve) p += 1;
+  if (sleepOk(L)) p += 1;
+  return p;
+}
+function weekPoints(p, ws) {
+  const c = cfg(p); let pts = 0, weighed = false;
+  for (let i = 0; i < 7; i++) { const d = addDays(ws, i); const L = state.logs[logId(p, d)]; if (!L) continue; pts += dayPoints(L, c); if (L.weight != null) weighed = true; }
+  return { points: pts + (weighed ? 5 : 0), weighed: weighed, max: WEEK_MAX };
+}
+function cycleInfo(c, date) {
+  if (!c.cycleStart) return null;
+  const L = c.cycleLen, P = c.periodLen;
+  let diff = daysBetween(c.cycleStart, date); if (diff < 0) return null;
+  const day = (diff % L) + 1;
+  const next = addDays(c.cycleStart, (Math.floor(diff / L) + 1) * L);
+  let phase, tip;
+  if (day <= P) { phase = 'Adet'; tip = 'Demir için mercimek, ıspanak ve limon; kafeini azalt; hafif koşu uygun. Tartı sonucu bu günlerde yanıltıcı olabilir.'; }
+  else if (day < L - 15) { phase = 'Foliküler'; tip = 'Enerjinin en yüksek dönemi: kuvvet antrenmanı ve kilo hedefi için en verimli hafta.'; }
+  else if (day <= L - 13) { phase = 'Yumurtlama'; tip = 'İştah normal; su ve lifi aksatma.'; }
+  else if (day > L - 10) { phase = 'Luteal · PMS'; tip = 'Tatlı isteği ve 1–2 kg su tutulması normal. Planlı tatlıyı kullan, magnezyum (kabak çekirdeği, ceviz) artır, tartıyı bu hafta yorumlama.'; }
+  else { phase = 'Luteal'; tip = 'İştah hafif artar; proteinli ara öğünleri atlama, uykuyu koru.'; }
+  return { day: day, phase: phase, tip: tip, next: next, pms: day > L - 10 };
+}
+
+// ---------- storage ----------
+function loadLocal() {
+  const raw = lsGet('bt_logs_v1', {}) || {};
+  state.logs = {};
+  Object.keys(raw).forEach(id => { const l = normLog(raw[id]); if (l) state.logs[logId(l.person, l.date)] = l; });
+  const s = lsGet('bt_settings_v1', {}) || {};
+  state.settings.E = s.E || null; state.settings.K = s.K || null;
+  state.rewards = normRewards(lsGet('bt_rewards_v1', null));
+  const rc = lsGet('bt_recipes_v1', {}) || {}; state.recipes = {}; Object.keys(rc).forEach(id => { state.recipes[id] = normRecipe(rc[id]); });
+  const wm = lsGet('bt_weekmenus_v1', {}) || {}; state.weekmenus = {}; Object.keys(wm).forEach(ws => { const w = normWeekMenu(wm[ws], ws); if (w) state.weekmenus[ws] = w; });
+  state.changelog = (lsGet('bt_changelog_v1', []) || []).filter(e => e && typeof e === 'object').slice(0, 200);
+}
+function persistLocal() { lsSet('bt_logs_v1', state.logs); lsSet('bt_settings_v1', state.settings); lsSet('bt_rewards_v1', state.rewards); lsSet('bt_recipes_v1', state.recipes); lsSet('bt_weekmenus_v1', state.weekmenus); lsSet('bt_changelog_v1', state.changelog); }
+async function saveWeekMenu(doc, logText) { state.weekmenus[doc.ws] = doc; const ok = await writeDoc('weekmenus/' + doc.ws, doc); if (logText) await addChangelog('plan', logText, doc.ws); return ok; }
+async function addChangelog(kind, text, ws) {
+  const e = { id: uid(), at: new Date().toISOString(), by: state.person, kind: String(kind).slice(0, 20), text: String(text).slice(0, 200), ws: ws || '' };
+  state.changelog.unshift(e); state.changelog = state.changelog.slice(0, 200);
+  if (canDb()) { try { await state.db.doc('changelog/' + e.id).set(e); } catch (err) {} } else { persistLocal(); remoteMark('changelog/' + e.id, e.at); }
+}
+function setMode(m, text) { state.mode = m; const el = $('#sync'); if (el) el.className = 'sync ' + (m === 'db' || m === 'remote' ? 'ok' : m === 'local' ? 'local' : ''); const t = $('#syncText'); if (t) t.textContent = text; }
+function setStatus(t) { const st = $('#saveStatus'); if (st) st.textContent = t; }
+function saveLog(doc) {
+  doc.updatedAt = new Date().toISOString();
+  const id = logId(doc.person, doc.date);
+  state.logs[id] = doc;
+  if (canDb()) { state.dirty.add(id); clearTimeout(state.timers.get(id)); state.timers.set(id, setTimeout(() => flush(id), 700)); setStatus('Kaydediliyor…'); }
+  else { persistLocal(); if (state.mode === 'loading') state.pendingLocal.add(id); setStatus('Bu cihaza kaydedildi ' + nowHM()); remoteMark('logs/' + id, doc.updatedAt); }
+}
+function flush(id) {
+  state.timers.delete(id);
+  const doc = state.logs[id]; if (!doc || !state.db) return;
+  const prev = state.inflight.get(id) || Promise.resolve();
+  const p = prev.then(() => state.db.doc('logs/' + id).set(doc)).then(() => { if (!state.timers.has(id)) state.dirty.delete(id); setStatus('Kaydedildi ' + nowHM() + ' · ikinizde de görünür'); })
+    .catch(err => { state.dirty.delete(id); if (err && err.code === 'invalid_argument') fallbackLocal('Bu hesabın paylaşımlı kayıt yetkisi yok; girdiler bu cihazda saklanıyor.'); else setStatus('Kayıt başarısız (' + (err && err.code ? err.code : 'bağlantı') + '). Birazdan tekrar deneyin.'); });
+  state.inflight.set(id, p);
+}
+function fallbackLocal(msg) { if (state.mode === 'local') return; setMode('local', 'Bu cihazda'); state.modeNote = msg; persistLocal(); const n = $('#modeNote'); if (n) n.textContent = msg; }
+async function writeDoc(path, data) {
+  if (canDb()) { try { await state.db.doc(path).set(data); return true; } catch (err) { if (err && err.code === 'invalid_argument') fallbackLocal('Bu hesabın paylaşımlı kayıt yetkisi yok; veriler bu cihazda saklandı.'); return false; } }
+  persistLocal(); remoteMark(path); return true;
+}
+async function saveSettings(p, s) { state.settings[p] = s; return writeDoc('settings/' + p, s); }
+async function saveRewards() { state.rewards = normRewards(state.rewards); return writeDoc('settings/rewards', state.rewards); }
+async function saveRecipe(id, patch) { const cur = state.recipes[id] || normRecipe(null); const next = normRecipe(Object.assign({}, cur, patch, { rating: Object.assign({}, cur.rating, patch.rating || {}), fav: Object.assign({}, cur.fav, patch.fav || {}) })); state.recipes[id] = next; return writeDoc('recipes/' + id, next); }
+async function connect() {
+  loadLocal(); renderAll();
+  if (STATIC_HOST) { setMode('local', 'bu cihazda'); state.modeNote = 'Girdiler yalnızca bu cihazda saklanıyor.'; renderAll(); remoteBoot(); return; }
+  let db = null;
+  try { db = await window.claude.use('db'); } catch (e) { db = null; }
+  window.claude.use('sample').then(async s => { state.sample = s; if (s && s.limits) { try { const lim = await s.limits(); state.imgOk = !!(lim && lim.images); } catch (e) { state.imgOk = false; } } renderAll(); }).catch(() => {});
+  window.claude.use('assets').then(a => { state.assets = a; renderAll(); }).catch(() => {});
+  if (!db) { setMode('local', 'bu cihazda'); state.modeNote = 'Paylaşımlı kayıt bu görünümde kapalı; girdiler yalnızca bu cihazda saklanıyor.'; renderAll(); return; }
+  state.db = db;
+  let loaded = false;
+  const timer = setTimeout(() => { if (!loaded) setMode('loading', 'veriye ulaşılamıyor'); }, 10000);
+  db.collection('logs').limit(1000).onSnapshot(snap => {
+    loaded = true; clearTimeout(timer);
+    const next = {};
+    snap.docs.forEach(d => { const l = normLog(d.data()); if (l) next[logId(l.person, l.date)] = l; });
+    state.dirty.forEach(id => { if (state.logs[id]) next[id] = state.logs[id]; });
+    state.pendingLocal.forEach(id => { if (state.logs[id]) { next[id] = state.logs[id]; state.dirty.add(id); clearTimeout(state.timers.get(id)); state.timers.set(id, setTimeout(() => flush(id), 300)); } });
+    state.pendingLocal.clear();
+    state.logs = next;
+    setMode('db', snap.metadata.fromCache ? 'önbellekten' : 'ortak kayıt açık');
+    renderAll();
+  }, err => { clearTimeout(timer); fallbackLocal('Paylaşımlı veriye ulaşılamadı (' + (err && err.code ? err.code : 'hata') + '); girdiler bu cihazda saklanıyor.'); renderAll(); });
+  db.collection('settings').onSnapshot(snap => { snap.docs.forEach(d => { if (d.id === 'E' || d.id === 'K') state.settings[d.id] = d.data(); else if (d.id === 'rewards') state.rewards = normRewards(d.data()); }); renderAll(); }, () => {});
+  db.collection('recipes').onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { next[d.id] = normRecipe(d.data()); }); state.recipes = next; if (state.tab === 'tarifler') renderAll(); }, () => {});
+  db.collection('weekmenus').limit(60).onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { const w = normWeekMenu(d.data(), d.id); if (w) next[d.id] = w; }); state.weekmenus = next; renderAll(); }, () => {});
+  db.collection('changelog').orderBy('at', 'desc').limit(100).onSnapshot(snap => { state.changelog = snap.docs.map(d => d.data()).filter(e => e && typeof e.text === 'string'); if (state.tab === 'menu') renderAll(); }, () => {});
+}
+</script>

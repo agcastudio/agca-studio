@@ -1,0 +1,40 @@
+<script>
+'use strict';
+// ---------- Alışveriş tab (shopping lists) and Menü tab (weekly plan, rhythm) ----------
+function shoppingListHtml(title, sub, days, storeKey) {
+  const items = aggregateShopping(days), checked = new Set(lsGet(storeKey, []) || []);
+  const order = ['sebze', 'et', 'sut', 'firin', 'kiler'];
+  const groups = order.map(c => {
+    const rows = items.filter(i => i.c === c).sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+    if (!rows.length) return '';
+    return '<div class="shopgrp"><div class="eyebrow">' + SHOP_CATS[c] + '</div>' + rows.map(i => { const key = i.name + '|' + i.u, on = checked.has(key) || i.have; return '<label class="shop' + (on ? ' on' : '') + (i.have ? ' have' : '') + '"><input type="checkbox" data-shop="' + esc(storeKey) + '" data-key="' + esc(key) + '"' + (on ? ' checked' : '') + (i.have ? ' disabled' : '') + '><span class="grow">' + esc(i.name) + (i.have ? ' <span class="tiny">· evde var</span>' : '') + '</span><span class="num tiny">' + fmtQty(i.q, i.u) + '</span></label>'; }).join('') + '</div>';
+  }).join('');
+  const text = order.map(c => { const rows = items.filter(i => i.c === c && !i.have); return rows.length ? SHOP_CATS[c] + ':\n' + rows.map(i => '- ' + i.name + ' ' + fmtQty(i.q, i.u)).join('\n') : ''; }).filter(Boolean).join('\n');
+  return '<details class="item" id="shop-' + storeKey + '"' + (state.open.has('shop-' + storeKey) ? ' open' : '') + '><summary>' + title + '<span class="sub">' + sub + '</span></summary><div class="mlist">' + groups + '<div class="row"><button type="button" class="btn ghost small" data-copyshop="' + esc(storeKey) + '">Listeyi kopyala</button><span class="tiny" id="shopmsg-' + esc(storeKey) + '"></span></div><textarea id="shoptext-' + esc(storeKey) + '" hidden>' + esc(title + ' (' + sub + ')\n' + text) + '</textarea></div></details>';
+}
+function shoppingCard() {
+  const today = state.today, dow = parseD(today).getDay();
+  const lists = [];
+  if (dow !== 3 && dow !== 5) {
+    const nxt = nextMarketDays(today)[0];
+    const days = [{ d: today, meals: ['k', 'a1', 'o', 'a2', 'ak'].filter(mk => MEAL_TIMES[mk] > nowHM()) }];
+    for (let d = addDays(today, 1); d < nxt; d = addDays(d, 1)) days.push({ d: d, meals: ['k', 'a1', 'o', 'a2', 'ak'] });
+    days.push({ d: nxt, meals: ['k', 'a1', 'o'] });
+    lists.push(shoppingListHtml('Şimdi lazım olanlar', fmtD(today) + ' → ' + fmtD(nxt) + ' öğle · pazara kadar', days, 'now_' + today));
+  }
+  nextMarketDays(today).forEach(m => { const dowM = parseD(m).getDay(); const win = shoppingWindow(m); lists.push(shoppingListHtml((dowM === 3 ? 'Çarşamba' : 'Cuma') + ' pazarı · ' + fmtD(m), fmtD(m) + ' akşam → ' + fmtD(win[win.length - 1].d) + ' öğle', win, 'market_' + m)); });
+  return '<div class="card"><div class="card-h"><h2>Pazar alışverişi</h2><span class="meta">Menüden hesaplanır · 2 kişi · tarif malzemeleri dahil</span></div><div>' + lists.join('') + '</div></div>';
+}
+function bindProgram() {
+  document.addEventListener('change', e => { const cb = e.target.closest('input[data-shop]'); if (!cb) return; const key = cb.dataset.shop, set = new Set(lsGet(key, []) || []); if (cb.checked) set.add(cb.dataset.key); else set.delete(cb.dataset.key); lsSet(key, Array.from(set)); cb.closest('.shop').classList.toggle('on', cb.checked); });
+  document.addEventListener('click', async e => { const b = e.target.closest('[data-copyshop]'); if (!b) return; const ta = $('#shoptext-' + b.dataset.copyshop), msg = $('#shopmsg-' + b.dataset.copyshop); if (!ta) return; try { await navigator.clipboard.writeText(ta.value); if (msg) msg.textContent = 'Kopyalandı ' + nowHM(); } catch (err) { ta.hidden = false; ta.focus(); ta.select(); if (msg) msg.textContent = 'Metin seçildi; kopyalayın.'; } });
+}
+function renderShopping() { $('#view-alisveris').innerHTML = shoppingCard(); }
+function renderProgram() {
+  const hm = nowHM();
+  let curI = -1; RHYTHM.forEach((r, i) => { if (r[0] <= hm) curI = i; });
+  const tl = RHYTHM.map((r, i) => '<div class="tl' + (i === curI ? ' now' : '') + '"><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>').join('');
+  $('#view-program').innerHTML = plannerCard() +
+    '<div class="card"><div class="card-h"><h2>Günlük ritim</h2></div><div class="timeline">' + tl + '</div></div>';
+}
+</script>

@@ -1,0 +1,120 @@
+<script>
+'use strict';
+// ---------- today: events and food logging ----------
+function editLog(fn) { const L = getLog(state.person, state.date); fn(L); saveLog(L); return L; }
+function updateFood(p, d, id, patch) { const L = getLog(p, d); const f = L.foods.find(x => x.id === id); if (!f) return; Object.assign(f, patch); saveLog(L); if (state.person === p && state.date === d && !focusedInput()) renderToday(); }
+function guessMeal() { const hm = nowHM(); if (hm < '09:30') return 'k'; if (hm < '11:45') return 'a1'; if (hm < '15:00') return 'o'; if (hm < '17:30') return 'a2'; if (hm < '21:00') return 'ak'; return 'x'; }
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const max = 1280, s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+      const cv = document.createElement('canvas'); cv.width = Math.round(img.naturalWidth * s); cv.height = Math.round(img.naturalHeight * s);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(url);
+      cv.toBlob(b => b ? resolve(b) : reject(new Error('encode')), 'image/jpeg', 0.82);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
+    img.src = url;
+  });
+}
+function foodPrompt(p, L, f, hasImage) {
+  const c = cfg(p), menu = MENU[parseD(L.date).getDay()], planned = menu.meals.find(m => m.k === f.meal);
+  const who = p === 'E' ? '35 yaşında erkek, 170 cm, hedef 1 800 kcal/gün, ailede tip 2 diyabet öyküsü' : '37 yaşında kadın, 160 cm, hedef 1 450 kcal/gün';
+  const others = L.foods.filter(x => x.id !== f.id && x.kcal != null).reduce((s, x) => s + x.kcal, 0);
+  return 'Sen deneyimli bir diyetisyensin. Kilo verme programındaki bir kişinin öğün kaydını değerlendir.\n' +
+    'Kişi: ' + who + '. Bugüne kadar kayıtlı diğer öğünler: ' + Math.round(others) + ' kcal.\n' +
+    'Öğün: ' + (MEAL_NAMES[f.meal] || 'ek öğün') + (f.t ? ' (' + f.t + ')' : '') + '.\n' +
+    (planned ? 'Programdaki plan: ' + planned.t + ' · porsiyon: ' + (planned[p] || 'belirtilmemiş') + '.\n' : '') +
+    'Kullanıcının yazdığı: ' + (f.text ? '"' + f.text + '"' : 'yok') + '.\n' +
+    (hasImage ? 'Fotoğraftaki yemeği tanı, porsiyonu tabak ve kaşık ölçüsünden tahmin et.\n' : '') +
+    'Yalnızca şu JSON nesnesini döndür, başka metin yazma: {"aciklama": "ne yenmiş, en fazla 12 kelime", "kcal": sayı, "protein_g": sayı, "uyum": "iyi" | "orta" | "zayif", "yorum": "Türkçe, en fazla 2 cümle, somut ve nazik öneri"}\n' +
+    'kcal ve protein_g tek sayı olsun (aralık değil); emin değilsen orta değer ver. Program dışı bir şey yenmişse yargılamadan telafi öner.';
+}
+async function analyzeFood(p, d, id, blob) {
+  if (!state.sample || STATIC_HOST) return;
+  const L = getLog(p, d), f = L.foods.find(x => x.id === id); if (!f) return;
+  state.busy.add(id); if (state.person === p && state.date === d) renderToday();
+  const opts = { modelTier: 'default' }; if (blob && state.imgOk) opts.images = [blob];
+  try {
+    const r = await state.sample.json(foodPrompt(p, L, f, !!opts.images), opts);
+    const kcal = num(r && r.kcal, 0, 3000), prot = num(r && r.protein_g, 0, 300);
+    const desc = r && typeof r.aciklama === 'string' ? r.aciklama.slice(0, 80) : '';
+    const yorum = r && typeof r.yorum === 'string' ? r.yorum.slice(0, 300) : '';
+    const uyum = r && r.uyum === 'iyi' ? 'Uyum iyi. ' : r && r.uyum === 'orta' ? 'Uyum orta. ' : r && r.uyum === 'zayif' ? 'Plan dışı. ' : '';
+    state.busy.delete(id);
+    updateFood(p, d, id, { kcal: kcal, protein: prot, comment: (uyum + yorum).slice(0, 400), text: f.text || desc, status: 'ok' });
+  } catch (e) {
+    state.busy.delete(id);
+    const code = e && e.code ? e.code : 'hata';
+    const msg = code === 'not_granted' || code === 'sampling_disabled' ? 'Claude yorumu bu hesapta kapalı.' : code === 'rate_limited' ? 'Şu an çok istek var; birazdan tekrar deneyin.' : code === 'image_rejected' ? 'Fotoğraf okunamadı; yazıyla deneyin.' : 'Yorum alınamadı (' + code + ').';
+    if (code === 'not_granted' || code === 'sampling_disabled') state.sample = null;
+    updateFood(p, d, id, { comment: msg });
+  }
+}
+async function addFood(text, file) {
+  const p = state.person, d = state.date;
+  const f = { id: uid(), t: d === state.today ? nowHM() : '', meal: d === state.today ? guessMeal() : 'x', text: (text || '').trim().slice(0, 300), photo: null, kcal: null, protein: null, comment: '', status: 'none' };
+  if (!f.text && !file) return;
+  const L = getLog(p, d); if (L.foods.length >= 12) { setStatus('Bir güne en fazla 12 öğün kaydı.'); return; }
+  L.foods.push(f); saveLog(L); renderToday();
+  let blob = null;
+  if (file) {
+    try { blob = await compressImage(file); } catch (e) { updateFood(p, d, f.id, { comment: 'Fotoğraf işlenemedi; yazıyla deneyin.' }); blob = null; }
+    if (blob && state.assets) {
+      try { const up = await state.assets.upload(blob, { type: 'image/jpeg' }); updateFood(p, d, f.id, { photo: up.id }); }
+      catch (e) { updateFood(p, d, f.id, { comment: 'Fotoğraf kaydedilemedi (' + (e && e.code ? e.code : 'hata') + '); yorum yine de isteniyor.' }); }
+    }
+  }
+  if (state.sample) analyzeFood(p, d, f.id, blob);
+}
+function bindToday() {
+  const v = $('#view-bugun');
+  v.addEventListener('click', async e => {
+    const act = e.target.closest('[data-action]'), tog = e.target.closest('[data-toggle]'), meal = e.target.closest('[data-meal]'), pc = e.target.closest('[data-person]'), pb = e.target.closest('[data-pane]');
+    if (pb) { state.pane = Number(pb.dataset.pane) || 0; const el = $('#panes'); if (el) el.scrollTo({ left: state.pane * el.clientWidth, behavior: 'smooth' }); document.querySelectorAll('.panetabs button').forEach((b, i) => b.classList.toggle('on', i === state.pane)); return; }
+    if (pc) { if (!PERSON_LOCK && pc.dataset.person !== state.person) { state.person = pc.dataset.person; lsSet('bt_person', state.person); renderAll(); } return; }
+    if (act) {
+      const a = act.dataset.action;
+      if (a === 'prevday') { state.date = addDays(state.date, -1); renderToday(); }
+      else if (a === 'nextday' && state.date < state.today) { state.date = addDays(state.date, 1); renderToday(); }
+      else if (a === 'water') { editLog(L => { L.water = Math.max(0, Math.min(30, L.water + Number(act.dataset.n))); }); renderToday(); }
+      else if (a === 'drop') { const n = Number(act.dataset.n); editLog(L => { L.water = Math.max(0, Math.min(30, n === L.water ? n - 1 : n)); }); renderToday(); }
+      else if (a === 'foodAdd') { const t = $('#foodText'); await addFood(t ? t.value : '', null); }
+      else if (a === 'foodDel') { const id = act.dataset.id; editLog(L => { L.foods = L.foods.filter(x => x.id !== id); }); renderToday(); }
+      else if (a === 'foodRetry') { analyzeFood(state.person, state.date, act.dataset.id, null); }
+      else if (a === 'claimRung') { const w = Number(act.dataset.w); if (RUNG_WEEKS.indexOf(w) > 0) { state.rewards.claimed[state.person]['w' + w] = state.today; await saveRewards(); renderToday(); } }
+      else if (a === 'cycleSave') { const inp = $('#cycleDate'); if (!inp || !isDate(inp.value) || inp.value > state.today) return; const c = cfg('K'); c.cycleStart = inp.value; await saveSettings('K', c); renderToday(); }
+      else if (a === 'cycleStart') {
+        const c = cfg('K'); const hist = c.cycleHistory.slice(); if (c.cycleStart && c.cycleStart !== state.date) hist.push(c.cycleStart);
+        const starts = hist.concat([state.date]).sort(); const lens = []; for (let i = 1; i < starts.length; i++) { const L = daysBetween(starts[i - 1], starts[i]); if (L >= 20 && L <= 45) lens.push(L); }
+        c.cycleHistory = hist.slice(-12); c.cycleStart = state.date; if (lens.length >= 2) c.cycleLen = Math.round(avg(lens.slice(-4)));
+        await saveSettings('K', c); renderToday();
+      }
+    } else if (tog) { const f = tog.dataset.toggle; editLog(L => { L[f] = !L[f]; }); renderToday(); }
+    else if (meal) { const k = meal.dataset.meal; editLog(L => { L.meals[k] = !L.meals[k]; }); renderToday(); }
+  });
+  let paneRaf = 0;
+  v.addEventListener('scroll', e => {
+    if (e.target.id !== 'panes') return;
+    if (paneRaf) return; paneRaf = requestAnimationFrame(() => { paneRaf = 0; const el = e.target, w = el.clientWidth; if (!w) return; const i = Math.round(el.scrollLeft / w); if (i !== state.pane) { state.pane = i; document.querySelectorAll('.panetabs button').forEach((b, k) => b.classList.toggle('on', k === i)); } });
+  }, true);
+  v.addEventListener('keydown', e => {
+    const meal = e.target.closest('[data-meal]'); if (meal && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); meal.click(); return; }
+    if (e.target.id === 'foodText' && e.key === 'Enter') { e.preventDefault(); addFood(e.target.value, null); }
+  });
+  v.addEventListener('change', e => {
+    if (e.target.id === 'foodPhoto' && e.target.files && e.target.files[0]) { const t = $('#foodText'); addFood(t ? t.value : '', e.target.files[0]); e.target.value = ''; }
+    else if (e.target.id === 'bedInput' || e.target.id === 'wakeInput') { e.target.blur(); renderToday(); }
+    else if (e.target.id === 'waterRange') { e.target.blur(); renderToday(); }
+  });
+  v.addEventListener('input', e => {
+    const id = e.target.id;
+    if (id === 'waterRange') { const n = Math.max(0, Math.min(30, parseInt(e.target.value, 10) || 0)); const L = editLog(L => { L.water = n; }); updateWaterUI(L, cfg(state.person)); }
+    else if (id === 'weightInput') { const w = parseFloat(String(e.target.value).replace(',', '.')); const L = editLog(L => { L.weight = (isFinite(w) && w > 30 && w < 250) ? Math.round(w * 10) / 10 : null; }); const earlier = logsOf(state.person).filter(l => l.weight != null && l.date < state.date); const el = $('#weightDelta'); if (el) el.innerHTML = weightDelta(L, cfg(state.person), earlier.length ? earlier[earlier.length - 1] : null); }
+    else if (id === 'bedInput') editLog(L => { L.bed = e.target.value || ''; L.sleep = sleepHours(L.bed, L.wake); });
+    else if (id === 'wakeInput') editLog(L => { L.wake = e.target.value || ''; L.sleep = sleepHours(L.bed, L.wake); });
+    else if (id === 'noteInput') editLog(L => { L.note = e.target.value.slice(0, 1000); });
+  });
+}
+</script>

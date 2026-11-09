@@ -1,0 +1,7 @@
+<script>
+'use strict';
+// Pazar rutininin (tools/takip/haftalik_plan.md) yazdığı haftalık planlar. apply_week.js bu nesneyi yeniden yazar:
+// yeni hafta eklenir, iki haftadan eski olanlar silinir. Her hafta: { days, recipes, meta }.
+const WEEK_PLANS = {};
+Object.keys(WEEK_PLANS).forEach(ws => { const p = WEEK_PLANS[ws]; WEEK_MENUS[ws] = p.days; WEEK_META[ws] = p.meta; (p.recipes || []).forEach(r => { if (!RECIPES.find(x => x.id === r.id)) RECIPES.push(r); }); });
+</script>

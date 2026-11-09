@@ -302,6 +302,12 @@ ul.plain, ol.plain { margin: 0; padding-left: 18px; font-size: 0.9rem; color: va
 .shop input { width: 22px; height: 22px; min-height: 0; margin: 0; accent-color: var(--good); flex: none; }
 .shop.on .grow { text-decoration: line-through; color: var(--ink-3); }
 .shop.have { opacity: 0.6; }
+/* fun daily tip (top of Tarifler) */
+.tipcard { background: linear-gradient(135deg, var(--accent-soft) 0%, var(--surface) 55%, var(--good-soft) 100%); border-radius: 22px; box-shadow: var(--shadow); padding: 16px; display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: start; }
+.tipcard .em { font-size: 2.2rem; line-height: 1; animation: pop 0.5s var(--pop); }
+.tipcard h2 { font-size: 1rem; margin-bottom: 4px; }
+.tipcard p { font-size: 0.98rem; line-height: 1.45; }
+.tipcard .fact { margin-top: 8px; font-size: 0.86rem; color: var(--ink-2); background: var(--surface); border-radius: 12px; padding: 8px 10px; }
 @media (prefers-reduced-motion: reduce) { .bar i, .ring .fg, .tabs button, .panetabs button { transition: none; } .celebrate, .q.on .em, .drop.on, .ring.full, .reward.done .wlabel .em { animation: none; } }
 </style>
 </head>
@@ -310,6 +316,7 @@ ul.plain, ol.plain { margin: 0; padding-left: 18px; font-size: 0.9rem; color: va
   <section class="view" id="view-bugun"></section>
   <section class="view" id="view-program" hidden></section>
   <section class="view" id="view-tarifler" hidden></section>
+  <section class="view" id="view-alisveris" hidden></section>
   <section class="view" id="view-ayarlar" hidden></section>
   <p class="foot"><span id="sync" class="sync"><i></i></span><span id="syncText">bağlanıyor</span></p>
 </main>
@@ -317,6 +324,7 @@ ul.plain, ol.plain { margin: 0; padding-left: 18px; font-size: 0.9rem; color: va
   <button type="button" data-tab="bugun" id="tab-bugun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><span>Bugün</span></button>
   <button type="button" data-tab="menu" id="tab-menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg><span>Menü</span></button>
   <button type="button" data-tab="tarifler" id="tab-tarifler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M17 21a1 1 0 0 0 1-1v-5.35c0-.457.316-.844.727-1.041a4 4 0 0 0-2.134-7.589 5 5 0 0 0-9.186 0 4 4 0 0 0-2.134 7.588c.411.198.727.585.727 1.041V20a1 1 0 0 0 1 1Z"/><path d="M6 17h12"/></svg><span>Tarifler</span></button>
+  <button type="button" data-tab="alisveris" id="tab-alisveris"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 11-1 9"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4"/><path d="M4.5 15.5h15"/><path d="m5 11 4-7"/><path d="m9 11 1 9"/></svg><span>Alışveriş</span></button>
   <button type="button" data-tab="ayarlar" id="tab-ayarlar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 4h-7"/><path d="M10 4H3"/><path d="M21 12h-9"/><path d="M8 12H3"/><path d="M21 20h-5"/><path d="M12 20H3"/><path d="M14 2v4"/><path d="M8 10v4"/><path d="M16 18v4"/></svg><span>Ayarlar</span></button>
 </nav>
 <script>
@@ -740,7 +748,7 @@ WEEK_MENUS['2026-11-16'] = {
     { k: 'a1', t: '½ nar + badem', E: '8 badem', K: '5 badem', r: [], s: [['Nar', 1, 'adet', 'sebze'], ['Badem', 15, 'g', 'kiler']] },
     { k: 'o', t: 'Mercimekli bulgur pilavı (4 porsiyon, yarısı yarına) + yoğurt + limonlu roka', E: '5 yk · 150 g yoğurt', K: '3 yk · 100 g yoğurt', r: ['mercimeklibulgur'], s: [['Yeşil mercimek', 200, 'g', 'kiler'], ['Bulgur', 200, 'g', 'kiler'], ['Soğan', 1, 'adet', 'sebze'], ['Yoğurt', 250, 'g', 'sut'], ['Roka', 1, 'demet', 'sebze'], ['Limon', 1, 'adet', 'sebze']] },
     { k: 'a2', t: 'Kefir + tarçın', E: '200 ml', K: '200 ml', r: [], s: [['Kefir', 400, 'ml', 'sut']] },
-    { k: 'ak', t: 'Fırında hindi şiş (kapya biber, soğan) + Pazar\'ın fırın karnabaharı (2. gün) + yeşillik', E: '150 g hindi', K: '120 g hindi', r: ['hindisis', 'karnabahar'], s: [['Hindi veya tavuk göğsü', 1000, 'g', 'et'], ['Kapya biber', 2, 'adet', 'sebze'], ['Soğan', 1, 'adet', 'sebze'], ['Yoğurt', 100, 'g', 'sut'], ['Sarımsak', 1, 'baş', 'sebze'], ['Maydanoz', 1, 'demet', 'sebze']] },
+    { k: 'ak', t: 'Fırında hindi şiş (kapya biber, soğan) + bol yeşil salata + yoğurt', E: '150 g hindi', K: '120 g hindi', r: ['hindisis', 'karnabahar'], s: [['Hindi veya tavuk göğsü', 1000, 'g', 'et'], ['Kapya biber', 2, 'adet', 'sebze'], ['Soğan', 1, 'adet', 'sebze'], ['Yoğurt', 100, 'g', 'sut'], ['Sarımsak', 1, 'baş', 'sebze'], ['Maydanoz', 1, 'demet', 'sebze']] },
     { k: 'g', t: 'Papatya çayı', E: '', K: '', r: [], s: [] }] },
   2: { name: 'Salı', tip: 'Öğle tamamen hazırdan: dünkü mercimekli bulgur ve hindi. Akşam palamut kağıtta 20 dakika.', meals: [
     { k: 'k', t: '2 haşlanmış yumurta + lor + 5 zeytin + turp-roka', E: '2 yumurta · 60 g lor · 1 dilim ekmek', K: '2 yumurta · 50 g lor · ekmeksiz', r: [], s: [['Yumurta', 4, 'adet', 'sut'], ['Lor peyniri', 110, 'g', 'sut'], ['Zeytin', 50, 'g', 'kiler'], ['Turp', 1, 'demet', 'sebze'], ['Roka', 1, 'demet', 'sebze'], ['Ekşi mayalı ekmek', 1, 'adet', 'firin']] },
@@ -801,6 +809,14 @@ const WEEK_META = {
 'use strict';
 // Tariflerden türetilen, öğün listelerinde eksik olan alışveriş kalemleri (audit_data.js üretir; elle düzenlemeyin).
 const SHOP_PATCH = {"2026-11-16":{"0":{"ak":[["Sarımsak",1,"baş","sebze"]]},"1":{"k":[["Keten tohumu",10,"g","kiler"]]},"2":{"ak":[["Maydanoz",1,"demet","sebze"]]},"4":{"a2":[["Sarımsak",1,"baş","sebze"]]}},"default":{"0":{"o":[["Dereotu",1,"demet","sebze"]],"ak":[["Sarımsak",1,"baş","sebze"]]},"1":{"k":[["Dereotu",1,"demet","sebze"]],"ak":[["Sarımsak",1,"baş","sebze"]]},"4":{"a2":[["Sarımsak",1,"baş","sebze"]]}}};
+</script>
+
+<script>
+'use strict';
+// Pazar rutininin (tools/takip/haftalik_plan.md) yazdığı haftalık planlar. apply_week.js bu nesneyi yeniden yazar:
+// yeni hafta eklenir, iki haftadan eski olanlar silinir. Her hafta: { days, recipes, meta }.
+const WEEK_PLANS = {};
+Object.keys(WEEK_PLANS).forEach(ws => { const p = WEEK_PLANS[ws]; WEEK_MENUS[ws] = p.days; WEEK_META[ws] = p.meta; (p.recipes || []).forEach(r => { if (!RECIPES.find(x => x.id === r.id)) RECIPES.push(r); }); });
 </script>
 
 <script>
@@ -894,10 +910,13 @@ function shoppingWindow(marketDate) {
 }
 function aggregateShopping(days) {
   const map = new Map();
-  days.forEach(day => day.meals.forEach(mk => shopItemsFor(day.d, mk).forEach(it => {
-    const key = it[0] + '|' + it[2], cur = map.get(key) || { name: it[0], q: 0, u: it[2], c: it[3], have: false };
-    cur.q += it[1]; if (it[4]) cur.have = true; map.set(key, cur);
-  })));
+  const add = (name, q, u, c, have) => { const key = name + '|' + u, cur = map.get(key) || { name: name, q: 0, u: u, c: c, have: false }; cur.q += q; if (have) cur.have = true; map.set(key, cur); };
+  days.forEach(day => day.meals.forEach(mk => shopItemsFor(day.d, mk).forEach(it => add(it[0], it[1], it[2], it[3], it[4]))));
+  // Recipe ingredients missing from a meal's list are added here, every week, without a manual check step.
+  if (typeof auditWeekDoc === 'function') {
+    const weeks = {}; days.forEach(day => { weeks[mondayOf(day.d)] = true; });
+    Object.keys(weeks).forEach(ws => { const doc = state.weekmenus[ws] || codeWeekDoc(ws); if (!doc) return; auditWeekDoc(doc).forEach(r => { const hit = days.find(day => mondayOf(day.d) === ws && parseD(day.d).getDay() === r.dow && day.meals.indexOf(r.k) >= 0); if (!hit) return; const q = r.kind === 'low' ? Math.max(0.5, Math.ceil(r.item.q - Number(r.have[1]))) : r.item.q; add(r.item.name, q, r.item.u, r.item.c, false); }); });
+  }
   return Array.from(map.values());
 }
 function fmtQty(q, u) {
@@ -1716,7 +1735,7 @@ function codeWeekDoc(ws) {
 
 <script>
 'use strict';
-// ---------- shopping lists (shown at the top of Tarifler) and the Menü tab: weekly plan, rhythm, snacks, drinks ----------
+// ---------- Alışveriş tab (shopping lists) and Menü tab (weekly plan, rhythm) ----------
 function shoppingListHtml(title, sub, days, storeKey) {
   const items = aggregateShopping(days), checked = new Set(lsGet(storeKey, []) || []);
   const order = ['sebze', 'et', 'sut', 'firin', 'kiler'];
@@ -1739,19 +1758,19 @@ function shoppingCard() {
     lists.push(shoppingListHtml('Şimdi lazım olanlar', fmtD(today) + ' → ' + fmtD(nxt) + ' öğle · pazara kadar', days, 'now_' + today));
   }
   nextMarketDays(today).forEach(m => { const dowM = parseD(m).getDay(); const win = shoppingWindow(m); lists.push(shoppingListHtml((dowM === 3 ? 'Çarşamba' : 'Cuma') + ' pazarı · ' + fmtD(m), fmtD(m) + ' akşam → ' + fmtD(win[win.length - 1].d) + ' öğle', win, 'market_' + m)); });
-  const thisWs = mondayOf(today), status = [thisWs, addDays(thisWs, 7)].map((w, i) => { const d = state.weekmenus[w]; const ok = d && d.meta && d.meta.approved; return '<span class="pill ' + (ok ? 'good' : 'warn') + '">' + (i ? 'Gelecek hafta' : 'Bu hafta') + ': ' + (ok ? 'onaylı' : 'kontrol edilmedi') + '</span>'; }).join(' ');
-  return '<div class="card"><div class="card-h"><h2>Pazar alışverişi</h2><span class="meta">Menüden hesaplanır · 2 kişi</span></div><div class="row">' + status + '</div><div>' + lists.join('') + '</div>' + auditSectionHtml() + '</div>';
+  return '<div class="card"><div class="card-h"><h2>Pazar alışverişi</h2><span class="meta">Menüden hesaplanır · 2 kişi · tarif malzemeleri dahil</span></div><div>' + lists.join('') + '</div></div>';
 }
 function bindProgram() {
   document.addEventListener('change', e => { const cb = e.target.closest('input[data-shop]'); if (!cb) return; const key = cb.dataset.shop, set = new Set(lsGet(key, []) || []); if (cb.checked) set.add(cb.dataset.key); else set.delete(cb.dataset.key); lsSet(key, Array.from(set)); cb.closest('.shop').classList.toggle('on', cb.checked); });
   document.addEventListener('click', async e => { const b = e.target.closest('[data-copyshop]'); if (!b) return; const ta = $('#shoptext-' + b.dataset.copyshop), msg = $('#shopmsg-' + b.dataset.copyshop); if (!ta) return; try { await navigator.clipboard.writeText(ta.value); if (msg) msg.textContent = 'Kopyalandı ' + nowHM(); } catch (err) { ta.hidden = false; ta.focus(); ta.select(); if (msg) msg.textContent = 'Metin seçildi; kopyalayın.'; } });
 }
+function renderShopping() { $('#view-alisveris').innerHTML = shoppingCard(); }
 function renderProgram() {
   const hm = nowHM();
   let curI = -1; RHYTHM.forEach((r, i) => { if (r[0] <= hm) curI = i; });
   const tl = RHYTHM.map((r, i) => '<div class="tl' + (i === curI ? ' now' : '') + '"><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>').join('');
   $('#view-program').innerHTML = plannerCard() +
-    '<div class="card"><div class="card-h"><h2>Günlük ritim</h2><span class="meta">Hafta sonu: koşu 07:00, kahvaltı 08:30</span></div><div class="timeline">' + tl + '</div></div>';
+    '<div class="card"><div class="card-h"><h2>Günlük ritim</h2></div><div class="timeline">' + tl + '</div></div>';
 }
 </script>
 
@@ -1869,36 +1888,6 @@ function plannerCard() {
   }
   return '<div class="card">' + head + days + tail + '</div>';
 }
-// Recipe–shopping consistency check, shown under the shopping lists (Tarifler) for this or next week.
-function auditSectionHtml() {
-  const thisWs = mondayOf(state.today), nextWs = addDays(thisWs, 7), ws = state.plan.auditWs === nextWs ? nextWs : thisWs;
-  const saved = state.weekmenus[ws] || codeWeekDoc(ws), aud = state.plan.audit && state.plan.audit.ws === ws ? state.plan.audit : null, approved = saved && saved.meta.approved;
-  const segs = '<div class="segs">' + [thisWs, nextWs].map((w, i) => '<button type="button" data-plan="auditweek" data-ws="' + w + '"' + (w === ws ? ' class="on"' : '') + '>' + (i ? 'Gelecek hafta' : 'Bu hafta') + ' · ' + parseD(w).getDate() + ' ' + MONTHS_TR[parseD(w).getMonth()] + '</button>').join('') + '</div>';
-  let body = segs + '<div class="row"><button type="button" class="btn ghost small" data-plan="audit" data-ws="' + ws + '"' + (saved ? '' : ' disabled') + '>Kontrol et</button>' + (approved ? '<span class="pill good">Onaylı · ' + fmtD(approved.at.slice(0, 10)) + ' ' + localTime(approved.at) + '</span>' : '<span class="pill warn">Kontrol edilmedi</span>') + '</div>';
-  if (aud) {
-    if (!aud.rows.length) body += '<div class="celebrate">Uyumlu: tüm tarif malzemeleri alışveriş listesinde ✓</div>' + (approved ? '' : '<div class="row"><button type="button" class="btn small" data-plan="approve" data-ws="' + ws + '">Planı onayla</button></div>');
-    else body += '<div>' + aud.rows.map((r, i) => '<div class="planmeal"><div><b>' + DAY_NAMES[r.dow] + ' ' + MEAL_NAMES[r.k] + '</b> · ' + esc(r.recipe) + '<br><span class="muted">' + esc(r.item.name) + (r.kind === 'low' ? ' <span class="tiny">(listede ' + esc(String(r.have[1])) + ' ' + esc(r.have[2]) + ', tarif ' + r.item.q + ' ' + esc(r.item.u) + ')</span>' : '') + '</span><div class="row" style="margin-top:4px"><input type="number" id="aq-' + i + '" value="' + (r.kind === 'low' ? Math.max(1, Math.ceil(r.item.q - Number(r.have[1]))) : r.item.q) + '" min="0.5" step="0.5" style="width:84px"><span class="tiny">' + esc(r.item.u) + ' · ' + SHOP_CATS[r.item.c] + '</span></div></div><div class="acts"><button type="button" data-plan="auditadd" data-ws="' + ws + '" data-i="' + i + '">Ekle</button></div></div>').join('') + '</div><div class="row"><button type="button" class="btn small" data-plan="auditaddall" data-ws="' + ws + '">Hepsini ekle</button><span class="tiny">' + aud.rows.length + ' eksik</span></div>';
-  }
-  return '<details class="item" id="shop-audit"' + (state.open.has('shop-audit') ? ' open' : '') + '><summary>Tarif–liste uyumu<span class="sub">' + (approved ? 'Onaylı' : aud ? (aud.rows.length ? aud.rows.length + ' eksik kalem' : 'Uyumlu, onay bekliyor') : 'Kontrol edilmedi') + '</span></summary><div class="mlist">' + body + '</div></details>';
-}
-function runAudit(ws) { const doc = planDoc('saved', ws); state.plan.audit = { ws: ws, rows: doc ? auditWeekDoc(doc) : [] }; }
-async function auditAdd(ws, idxs) {
-  const aud = state.plan.audit; if (!aud || aud.ws !== ws) return;
-  let doc = state.weekmenus[ws] || codeWeekDoc(ws); if (!doc) return;
-  const next = JSON.parse(JSON.stringify(doc)); const added = [];
-  idxs.forEach(i => { const r = aud.rows[i]; if (!r) return; const inp = $('#aq-' + i); const q = inp ? Math.max(0.5, parseFloat(String(inp.value).replace(',', '.')) || r.item.q) : r.item.q; const day = next.days[r.dow]; const m = day && day.meals.find(x => x.k === r.k); if (!m) return; m.s = (m.s || []).concat([[r.item.name, q, r.item.u, r.item.c, false]]); added.push(r.item.name + ' ' + q + ' ' + r.item.u); });
-  if (!added.length) return;
-  const normalized = normWeekMenu(next, ws); normalized.meta.updatedAt = new Date().toISOString(); delete normalized.meta.approved;
-  await saveWeekMenu(normalized, 'Alışveriş listesine tariften eklendi: ' + added.join(', ').slice(0, 150));
-  runAudit(ws); renderAll();
-}
-async function approvePlan(ws) {
-  const doc = state.weekmenus[ws] || codeWeekDoc(ws); if (!doc) return;
-  runAudit(ws); if (state.plan.audit.rows.length) { renderAll(); return; }
-  const next = JSON.parse(JSON.stringify(doc)); next.meta.approved = { at: new Date().toISOString(), by: state.person };
-  await saveWeekMenu(normWeekMenu(next, ws), fmtD(ws) + ' haftası planı onaylandı (tarif–liste uyumu tam)');
-  renderAll();
-}
 function bindPlanner() {
   const v = $('#view-program');
   v.addEventListener('input', e => { if (['plFridge', 'plAvoid', 'plNotes'].indexOf(e.target.id) >= 0) { const inp = planInputs(); inp.fridge = ($('#plFridge') || {}).value || ''; inp.avoid = ($('#plAvoid') || {}).value || ''; inp.notes = ($('#plNotes') || {}).value || ''; lsSet('bt_plan_inputs', inp); } });
@@ -1906,12 +1895,7 @@ function bindPlanner() {
   document.addEventListener('click', async e => {
     const b = e.target.closest('[data-plan]'); if (!b) return;
     const a = b.dataset.plan, ws = b.dataset.ws, dow = b.dataset.dow, k = b.dataset.k, scope = b.dataset.scope;
-    if (a === 'auditweek') { state.plan.auditWs = ws; renderAll(); }
-    else if (a === 'audit') { runAudit(ws); state.plan.auditWs = ws; state.open.add('shop-audit'); renderAll(); }
-    else if (a === 'auditadd') auditAdd(ws, [Number(b.dataset.i)]);
-    else if (a === 'auditaddall') auditAdd(ws, (state.plan.audit && state.plan.audit.rows || []).map((_, i) => i));
-    else if (a === 'approve') approvePlan(ws);
-    else if (a === 'generate') { if (!state.plan.busy) generatePlan(ws); }
+    if (a === 'generate') { if (!state.plan.busy) generatePlan(ws); }
     else if (a === 'save') saveDraft(ws);
     else if (a === 'discard') { state.plan.draft = null; state.plan.msg = ''; renderProgram(); }
     else if (a === 'swap') { if (!state.plan.busy) swapMeal(scope, ws, Number(dow), k); }
@@ -1945,12 +1929,28 @@ function recipeCat(r) {
   for (const c of RECIPE_CATS) if (c.words.some(w => n.indexOf(w) >= 0)) return c;
   return RECIPE_CATS[RECIPE_CATS.length - 1];
 }
+const TIP_EMOJI = ['🥗', '🥕', '🍋', '🧄', '🥦', '🐟', '🍲'];
+// One tip per day: the plan's own tip for that day plus the knowledge rule that best matches the day's dishes.
+function dayTipFor(date) {
+  const ws = mondayOf(date), doc = state.weekmenus[ws] || codeWeekDoc(ws), dow = parseD(date).getDay(), day = doc && doc.days[dow];
+  const text = day ? trLower(day.meals.map(m => m.t).join(' ')) : '';
+  const words = s => trLower(s).replace(/[^a-zçğıöşü\s]/g, ' ').split(/\s+/).filter(w => w.length >= 4);
+  let best = null, bestScore = 0;
+  RULES.forEach(r => { const score = words(r).filter(w => text.indexOf(w.slice(0, 5)) >= 0).length; if (score > bestScore) { bestScore = score; best = r; } });
+  if (!best) best = RULES[(daysBetween('2026-01-01', date) % RULES.length + RULES.length) % RULES.length];
+  return { plan: day && day.tip ? day.tip : '', fact: best, dow: dow };
+}
+function tipCardHtml() {
+  const t = dayTipFor(state.today);
+  if (!t.plan && !t.fact) return '';
+  return '<div class="tipcard"><div class="em">' + TIP_EMOJI[t.dow] + '</div><div><h2>Bugünün püf noktası</h2>' + (t.plan ? '<p>' + esc(t.plan) + '</p>' : '') + (t.fact ? '<div class="fact">💡 ' + esc(t.fact) + '</div>' : '') + '</div></div>';
+}
 function renderRecipes() {
   const p = state.person, rc = id => state.recipes[id] || normRecipe(null);
   const ws = mondayOf(state.today), weekDoc = state.weekmenus[ws] || codeWeekDoc(ws), used = new Set();
   if (weekDoc) Object.keys(weekDoc.days).forEach(d => weekDoc.days[d].meals.forEach(m => (m.r || []).forEach(id => used.add(id))));
   const all = allRecipes().map((r, i) => ({ r: r, i: i, d: rc(r.id) })).sort((a, b) => (b.d.fav[p] - a.d.fav[p]) || (b.d.rating[p] - a.d.rating[p]) || (a.i - b.i));
-  const list = all.filter(x => used.has(x.r.id)), rest = all.filter(x => !used.has(x.r.id));
+  const list = all.filter(x => used.has(x.r.id));
   const stars = (id, v) => '<span class="stars" data-rate="' + id + '">' + [1, 2, 3, 4, 5].map(n => '<button type="button" data-v="' + n + '"' + (n <= v ? ' class="on"' : '') + ' aria-label="' + n + ' yıldız">★</button>').join('') + '</span>';
   const item = x => { const r = x.r, d = x.d, other = p === 'E' ? 'K' : 'E';
     return '<details id="rec-' + r.id + '"' + (state.open.has('rec-' + r.id) ? ' open' : '') + '><summary><span>' + (d.fav[p] ? '♥ ' : '') + esc(r.name) + '<span class="sub">' + r.time + ' dk · E ' + r.kcal.E + ' · K ' + r.kcal.K + ' kcal' + (r.servings ? ' · ' + r.servings + ' porsiyon' : '') + (d.rating[p] ? ' · ' + '★'.repeat(d.rating[p]) : '') + '</span></span></summary>' +
@@ -1960,14 +1960,10 @@ function renderRecipes() {
       '<div><div class="eyebrow">Yapılışı</div><ol class="plain">' + r.steps.map(s => '<li>' + esc(s) + '</li>').join('') + '</ol></div>' +
       '<p class="muted"><b>Porsiyon</b> · E: ' + esc(r.por.E) + ' · K: ' + esc(r.por.K) + '</p><div class="tipbox">' + esc(r.tip) + '</div>' +
       '<div class="field"><label for="rn-' + r.id + '">Not</label><input type="text" id="rn-' + r.id + '" data-note="' + r.id + '" value="' + esc(d.note) + '" maxlength="300" placeholder="Örn. kimyonu artırdık"></div></div></details>'; };
-  const groups = RECIPE_CATS.map(c => { const rows = list.filter(x => recipeCat(x.r) === c); if (!rows.length) return ''; const id = 'cat-' + c.id, favs = rows.filter(x => x.d.fav[p]).length; return '<details class="item" id="' + id + '"' + (state.open.has(id) ? ' open' : '') + '><summary>' + c.name + '<span class="sub">' + rows.length + ' tarif' + (favs ? ' · ' + favs + ' favori' : '') + '</span></summary><div class="mlist">' + rows.map(item).join('') + '</div></details>'; }).join('') +
-    (rest.length ? '<details class="item" id="cat-rest"' + (state.open.has('cat-rest') ? ' open' : '') + '><summary>Diğer tarifler<span class="sub">' + rest.length + ' tarif · bu haftanın planında yok</span></summary><div class="mlist">' + rest.map(item).join('') + '</div></details>' : '');
-  const todayDay = weekDoc && weekDoc.days[parseD(state.today).getDay()], todayTip = todayDay && todayDay.tip ? todayDay.tip : '';
-  $('#view-tarifler').innerHTML = shoppingCard() + '<div class="card"><div class="card-h"><h2>Tarifler</h2><span class="meta">' + list.length + ' tarif · bu hafta</span></div><div>' + groups + '</div></div>' +
+  const groups = RECIPE_CATS.map(c => { const rows = list.filter(x => recipeCat(x.r) === c); if (!rows.length) return ''; const id = 'cat-' + c.id, favs = rows.filter(x => x.d.fav[p]).length; return '<details class="item" id="' + id + '"' + (state.open.has(id) ? ' open' : '') + '><summary>' + c.name + '<span class="sub">' + rows.length + ' tarif' + (favs ? ' · ' + favs + ' favori' : '') + '</span></summary><div class="mlist">' + rows.map(item).join('') + '</div></details>'; }).join('');
+  $('#view-tarifler').innerHTML = tipCardHtml() + '<div class="card"><div class="card-h"><h2>Tarifler</h2><span class="meta">' + list.length + ' tarif · bu hafta</span></div><div>' + groups + '</div></div>' +
     '<div class="card"><div class="card-h"><h2>Ara öğün havuzu</h2><span class="meta">100–150 kcal</span></div><ul class="plain">' + SNACKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
-    '<div class="card"><div class="card-h"><h2>İçecekler</h2></div><ul class="plain">' + DRINKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
-    '<div class="card"><div class="card-h"><h2>Püf noktaları</h2><span class="meta">Neyi neyle, nasıl pişir</span></div><ul class="plain">' + RULES.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
-    (todayTip ? '<div class="card"><div class="card-h"><h2>Bugünün püf noktası</h2></div><p class="muted">' + esc(todayTip) + '</p></div>' : '');
+    '<div class="card"><div class="card-h"><h2>İçecekler</h2></div><ul class="plain">' + DRINKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>';
 }
 function bindRecipes() {
   const v = $('#view-tarifler'); const timers = new Map();
@@ -2029,7 +2025,7 @@ function bindSettings() {
 }
 
 // ---------- shell: tabs (in-page views) ----------
-const TABS = { bugun: { view: 'view-bugun', render: null }, menu: { view: 'view-program', render: renderProgram }, tarifler: { view: 'view-tarifler', render: renderRecipes }, ayarlar: { view: 'view-ayarlar', render: renderSettings } };
+const TABS = { bugun: { view: 'view-bugun', render: null }, menu: { view: 'view-program', render: renderProgram }, tarifler: { view: 'view-tarifler', render: renderRecipes }, alisveris: { view: 'view-alisveris', render: renderShopping }, ayarlar: { view: 'view-ayarlar', render: renderSettings } };
 function focusedInput() { const a = document.activeElement; return !!(a && a.closest && a.closest('#view-bugun') && /^(INPUT|TEXTAREA)$/.test(a.tagName)); }
 function renderTab() {
   Object.keys(TABS).forEach(t => { $('#' + TABS[t].view).hidden = state.tab !== t; $('#tab-' + t).classList.toggle('on', state.tab === t); });

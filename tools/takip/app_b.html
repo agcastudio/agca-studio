@@ -1,0 +1,114 @@
+<main class="wrap">
+  <section class="view" id="view-bugun"></section>
+  <section class="view" id="view-program" hidden></section>
+  <section class="view" id="view-tarifler" hidden></section>
+  <section class="view" id="view-alisveris" hidden></section>
+  <section class="view" id="view-ayarlar" hidden></section>
+  <p class="foot"><span id="sync" class="sync"><i></i></span><span id="syncText">bağlanıyor</span></p>
+</main>
+<nav class="tabs" aria-label="Bölümler">
+  <button type="button" data-tab="bugun" id="tab-bugun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><span>Bugün</span></button>
+  <button type="button" data-tab="menu" id="tab-menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg><span>Menü</span></button>
+  <button type="button" data-tab="tarifler" id="tab-tarifler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M17 21a1 1 0 0 0 1-1v-5.35c0-.457.316-.844.727-1.041a4 4 0 0 0-2.134-7.589 5 5 0 0 0-9.186 0 4 4 0 0 0-2.134 7.588c.411.198.727.585.727 1.041V20a1 1 0 0 0 1 1Z"/><path d="M6 17h12"/></svg><span>Tarifler</span></button>
+  <button type="button" data-tab="alisveris" id="tab-alisveris"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 11-1 9"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4"/><path d="M4.5 15.5h15"/><path d="m5 11 4-7"/><path d="m9 11 1 9"/></svg><span>Alışveriş</span></button>
+  <button type="button" data-tab="ayarlar" id="tab-ayarlar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 4h-7"/><path d="M10 4H3"/><path d="M21 12h-9"/><path d="M8 12H3"/><path d="M21 20h-5"/><path d="M12 20H3"/><path d="M14 2v4"/><path d="M8 10v4"/><path d="M16 18v4"/></svg><span>Ayarlar</span></button>
+</nav>
+<script>
+'use strict';
+const DEFAULTS = {
+  E: { name: 'Erkek', startWeight: 87, goalWeight: 78, startDate: '2026-11-09', rate: 0.7, waterGoal: 11, kcal: 1800, height: 170, weighDay: 5 },
+  K: { name: 'Kadın', startWeight: 74, goalWeight: 62, startDate: '2026-11-09', rate: 0.5, waterGoal: 9, kcal: 1450, height: 160, weighDay: 5, cycleStart: '', cycleLen: 28, periodLen: 5, cycleHistory: [] }
+};
+const DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+const REWARD_DEFAULT_POINTS = 55;
+const MEAL_KEYS = ['k', 'a1', 'o', 'a2', 'ak'];
+const MEAL_NAMES = { k: 'Kahvaltı', a1: 'Ara 1', o: 'Öğle', a2: 'Ara 2', ak: 'Akşam', g: 'Gece' };
+const MEAL_TIMES = { k: '07:30', a1: '10:30', o: '12:30', a2: '16:00', ak: '19:00', g: '21:30' };
+const RHYTHM = [
+  ['06:00', 'Kalk, 2 bardak su (biri ılık limonlu)'],
+  ['06:15', 'Hafif tempolu koşu (aç karnına uygun; baş dönmesi olursa ½ muz)'],
+  ['07:30', 'Kahvaltı: 25–35 g protein, koşudan sonraki 1 saat içinde'],
+  ['09:30', 'İlk kahve (kahvaltıdan 1 saat sonra, şekersiz)'],
+  ['10:30', 'Ara 1: meyve + kuruyemiş veya peynir'],
+  ['12:15', 'Sirkeli su: 1 yk elma sirkesi + 1 bardak su'],
+  ['12:30', 'Öğle: önce çorba/salata → protein → en son bulgur/baklagil'],
+  ['13:15', '10–15 dk dışarıda yürüyüş (gün ışığı)'],
+  ['13:30', 'İkinci ve son kahve; sonrası bitki çayı (günde en fazla 2 fincan)'],
+  ['16:00', 'Ara 2: proteinli (kefir, yoğurt, yumurta, humus)'],
+  ['19:00', 'Akşam: protein + sebze; tahıl E 0–3 yk, K 0–2 yk'],
+  ['19:45', '10 dk yürüyüş, mutfak kapanır'],
+  ['21:30', 'Bitki çayı; gerçek açlıkta 1 bardak kefir'],
+  ['22:30', 'Ekranlar kapalı, ışıklar kısık'],
+  ['23:00', 'Uyku']
+];
+const MENU = {
+  1: { name: 'Pazartesi', tip: 'Zerdeçalın yanına karabiber ve biraz yağ: emilim ~20 kat artar. Bal kabağı ve havuçtaki beta-karoten ancak yağla emilir.', meals: [
+    { k: 'k', t: 'Ispanaklı-biberli yumurta (1 tk zeytinyağı), beyaz peynir, 5–6 zeytin, roka-maydanoz-turp, avokado', E: '2 yumurta + 20 g lor · 30 g peynir · ¼ avokado · 1 dilim ekmek', K: '2 yumurta · 30 g peynir · ½ avokado · ekmek yok' },
+    { k: 'a1', t: 'Meyve + kuruyemiş', E: '1 elma (açsa; değilse atla)', K: '1 mandalina + 5 badem' },
+    { k: 'o', t: 'Kırmızı mercimek çorbası (limonlu), fırın tavuk, bulgur pilavı, lahana-havuç salatası, yoğurt', E: '1 kase · 100 g tavuk · 5 yk bulgur · 1 yk yağ · 150 g yoğurt', K: '1 kase · 80 g tavuk · 3 yk bulgur · 2 tk yağ · 100 g yoğurt' },
+    { k: 'a2', t: 'Kefir + tarçın', E: '200 ml', K: '200 ml' },
+    { k: 'ak', t: 'Fırında baharatlı tavuk (derisiz), fırın sebze: bal kabağı, havuç, brokoli (kekik, zerdeçal + karabiber), roka-turp salatası', E: '150 g tavuk · 1 yk yağ', K: '120 g tavuk · 2 tk yağ' },
+    { k: 'g', t: 'Papatya çayı', E: '', K: '' } ] },
+  2: { name: 'Salı', tip: 'Hamsi kasım–ocak arasında en yağlı ve en ucuz; kılçığıyla kalsiyum verir. Kızartma yok: fırında 200 °C, 12–15 dk. Limon demir emilimini artırır.', meals: [
+    { k: 'k', t: 'Sıcak yulaf: yulaf + 1 yk öğütülmüş keten + tarçın + ½ rendelenmiş elma + ceviz; üstüne yoğurt; yanında 1 haşlanmış yumurta', E: '40 g yulaf · 150 g yoğurt · 6 ceviz yarımı · 1 yumurta', K: '30 g yulaf · 150 ml süt veya 100 g yoğurt · 4 ceviz yarımı · 1 yumurta' },
+    { k: 'a1', t: '1 armut +', E: '6 fındık', K: '20 g beyaz peynir' },
+    { k: 'o', t: 'Nohutlu-tavuklu kış salatası: haşlanmış nohut, dünkü tavuk, lahana, havuç, maydanoz, nar, bol limon, zeytinyağı', E: '4 yk nohut · 80 g tavuk · 1 yk yağ · 1 dilim ekmek', K: '3 yk nohut · 60 g tavuk · 2 tk yağ · 1 bardak ayran' },
+    { k: 'a2', t: '1 haşlanmış yumurta + havuç çubukları', E: '', K: '' },
+    { k: 'ak', t: 'Fırında hamsi (kağıtta, limon, dereotu; unsuz), roka-kırmızı soğan-turp salatası', E: '200 g temizlenmiş hamsi · 1 ince dilim mısır ekmeği (isteğe bağlı)', K: '150 g hamsi · ekmek yok' },
+    { k: 'g', t: 'Rezene çayı', E: '', K: '' } ] },
+  3: { name: 'Çarşamba', tip: 'Kuru fasulye: bir gece ıslat, suyunu dök, köpüğünü al, kimyon ekle; düdüklü gazı azaltır. İlk haftalar 1 kepçeyle sınırla.', meals: [
+    { k: 'k', t: 'Çılbır: 2 poşe yumurta, sarımsaklı yoğurt, 1 tk zeytinyağı + pul biber, roka, ekmek', E: '150 g yoğurt · 1 dilim ekmek', K: '120 g yoğurt · ½ dilim ekmek' },
+    { k: 'a1', t: '1 portakal + ceviz', E: '5 yarım', K: '4 yarım' },
+    { k: 'o', t: 'Kuru fasulye (dondurulmuş porsiyon), bulgur pilavı, ev turşusu 2–3 parça, roka-soğan salatası', E: '1,5 kepçe · 4 yk bulgur', K: '1 kepçe · 2–3 yk bulgur · küçük ayran' },
+    { k: 'a2', t: 'Yoğurt + 1 yk öğütülmüş keten tohumu + tarçın', E: '150 g', K: '100 g' },
+    { k: 'ak', t: 'Fırında köfte (yağsız dana, soğan, maydanoz, kimyon; ekmeksiz), fırında kereviz-pırasa-havuç, sarımsaklı-dereotlu yoğurt sos', E: '150 g köfte · 1 yk yağ', K: '110 g köfte · 2 tk yağ · 100 g yoğurt' },
+    { k: 'g', t: 'Melisa çayı', E: '', K: '' } ] },
+  4: { name: 'Perşembe', tip: 'Lor 100 g\'da 12–13 g protein, çok az yağ. Nar ve kivi, kahvaltıdaki demir için C vitamini. Akşam bilerek hafif.', meals: [
+    { k: 'k', t: 'Lor-yoğurt kasesi: yoğurt + lor + yulaf + 2 yk nar + ceviz + tarçın', E: '150 g yoğurt · 70 g lor · 3 yk yulaf · 5 ceviz yarımı', K: '120 g yoğurt · 50 g lor · 2 yk yulaf · 4 ceviz yarımı' },
+    { k: 'a1', t: 'Kivi + kuruyemiş', E: '1 kivi · 8 fındık', K: '2 kivi · 6 badem' },
+    { k: 'o', t: 'Dünkü köfte (soğuk), pancar-havuç-maydanoz salatası (limon, zeytinyağı), yoğurt', E: '2 köfte (100 g) · 1 yk yağ · 150 g yoğurt · 1 dilim ekmek', K: '2 küçük köfte (80 g) · 2 tk yağ · 100 g yoğurt' },
+    { k: 'a2', t: 'Ev yapımı humus + havuç ve kereviz sapı çubukları (E şişkinse humus yerine kefir)', E: '3 yk', K: '2 yk' },
+    { k: 'ak', t: 'Bal kabağı çorbası (az sütlü, zencefilli), ıspanaklı-mantarlı omlet (2 yumurta + 20 g lor), marul-roka salatası', E: '1 kase · 1 yk yağ toplam', K: '1 kase · 2 tk yağ toplam' },
+    { k: 'g', t: 'Ihlamur', E: '', K: '' } ] },
+  5: { name: 'Cuma', tip: 'Brokoliyi 3–4 dk buharda pişir, üstüne çiğ turp veya hardal tohumu. Mercimek salatasına limon ve nar; aynı öğünde çay yok, 1 saat bekle.', meals: [
+    { k: 'k', t: 'Avokadolu yumurtalı ekşi maya tost: 1 dilim ekmek + ezilmiş avokado + 2 haşlanmış/poşe yumurta + limon, pul biber, roka', E: '¼–½ avokado · 1 dilim', K: '½ avokado · 1 ince dilim' },
+    { k: 'a1', t: 'Meyve + 4 ceviz yarımı', E: '1 elma', K: '1 küçük Trabzon hurması' },
+    { k: 'o', t: 'Ezogelin veya tarhana çorbası, yeşil mercimek salatası (kırmızı lahana, havuç, maydanoz, taze soğan, nar, bol limon, zeytinyağı, beyaz peynir küpleri)', E: '1 kase · 5 yk mercimek · 40 g peynir · 1 yk yağ · 1 dilim ekmek', K: '1 kase · 4 yk mercimek · 30 g peynir · 2 tk yağ' },
+    { k: 'a2', t: 'Kefir', E: '200 ml + 20 g tuzsuz kabak çekirdeği', K: '200 ml' },
+    { k: 'ak', t: 'Fırında somon veya levrek (limon, dereotu), buharda brokoli-karnabahar (limon, zeytinyağı, hardal tohumu), sarımsaklı yoğurtlu pancar salatası', E: '170 g balık · 1 yk yağ', K: '130 g balık · 2 tk yağ · 100 g yoğurt' },
+    { k: 'g', t: 'Papatya çayı', E: '', K: '' } ] },
+  6: { name: 'Cumartesi', tip: 'Haftanın serbest öğünü bu kahvaltı: ölçülü ama keyifli. Tatlı isteği yasaklanmaz, saati ve şekli planlanır: fırında ayva + yoğurt + ceviz.', meals: [
+    { k: 'k', t: 'Hafta sonu kahvaltısı (08:30): biberli-mantarlı sahanda yumurta (1 tk zeytinyağı), beyaz peynir, 6–8 zeytin, 3–4 ceviz, bol yeşillik, ekmek, 1 meyve, kahve', E: '2 yumurta · 40 g peynir · 1 tk tahin · 1–2 dilim ekmek', K: '2 yumurta · 40 g peynir · 1 tk tahin + 1 tk pekmez · 1 dilim ekmek' },
+    { k: 'a1', t: 'Atla (kahvaltı geç ve büyük); 11:30\'da açlık olursa 1 meyve', E: '', K: '' },
+    { k: 'o', t: 'Öğle 13:30: kereviz-pırasa-havuç çorbası, narlı kısır (bol maydanoz, nane, nar, limon), yoğurt, marul', E: '1 kase · 6 yk kısır · 150 g yoğurt', K: '1 kase · 4 yk kısır · 100 g yoğurt' },
+    { k: 'a2', t: 'Planlı tatlı: fırında tarçınlı ayva veya elma (şekersiz) + 1 yk yoğurt + 2 ceviz yarımı + bitki çayı. Alternatif: 2 hurma + 2 ceviz yarımı', E: '1 adet', K: '1 adet' },
+    { k: 'ak', t: 'Hindi veya tavuk sote (mantar, kapya biber, brokoli, soğan; zerdeçal + karabiber), roka salatası, ayran veya cacık', E: '150 g · 1 yk yağ', K: '120 g · 2 tk yağ · 1 bardak ayran' },
+    { k: 'g', t: 'Melisa çayı', E: '', K: '' } ] },
+  0: { name: 'Pazar', tip: 'Detoks diye bir diyet yok; karaciğer ve böbrek bu işi her gün yapar. Onları destekleyen şey su, lif, uyku ve turpgiller. Öğleden sonra 2 saat hazırlık: çorba, kuru fasulye, fırın tavuk, bulgur, haşlanmış yumurta, salata bazı.', meals: [
+    { k: 'k', t: 'Kahvaltı 08:30. K seçeneği (ayda 1–2): kefir + 1 yk öğütülmüş keten + 1 kivi veya 2 yk nar + 5 badem. Standart: 2 haşlanmış yumurta + 30 g peynir + yeşillik + ¼ avokado', E: 'Standart', K: 'İstediği seçenek' },
+    { k: 'a1', t: '1 elma + kuşburnu çayı (11:00)', E: '', K: '' },
+    { k: 'o', t: 'Aile yemeği 13:00: etli (yağsız kuşbaşı) veya tavuklu kereviz (havuçlu, portakal-limon sulu), bulgur pilavı, lahana-havuç salatası, yoğurt', E: '1,5 kepçe · 4 yk bulgur · 150 g yoğurt', K: '1 kepçe · 3 yk bulgur · 100 g yoğurt' },
+    { k: 'a2', t: 'Kefir veya yoğurt + tarçın, közlenmiş kestane (mevsimde, meyve yerine)', E: '200 ml · 6 kestane', K: '200 ml · 5 kestane' },
+    { k: 'ak', t: 'Mercimek çorbası, fırında karnabahar-brokoli (yoğurt-yumurta sos, 20 g rendelenmiş kaşar veya lor), roka-turp salatası', E: '1 kase · büyük porsiyon', K: '1 kase · orta porsiyon' },
+    { k: 'g', t: 'Papatya veya ıhlamur · 22:30 ekranlar kapalı · 23:00 uyku', E: '', K: '' } ] }
+};
+const SNACKS = [
+  '1 porsiyon meyve + 6–8 badem veya 4–5 ceviz yarımı',
+  '1 bardak kefir + tarçın',
+  '100–150 g yoğurt + 1 yk öğütülmüş keten tohumu + tarçın',
+  '1 haşlanmış yumurta + havuç/turp çubukları',
+  '30 g lor veya beyaz peynir + 5 zeytin + roka',
+  '2–3 yk ev yapımı humus + havuç ve kereviz sapı',
+  '20 g tuzsuz kabak çekirdeği (E için öncelikli)',
+  '5–6 közlenmiş kestane (meyve yerine)',
+  'Tatlı krizi: fırında tarçınlı elma/ayva + yoğurt; 2 hurma + 2 ceviz; 1 tk tahin + 1 tk pekmez (haftada en fazla 3 kez)'
+];
+const DRINKS = [
+  'Su: E 2,5–3 L · K 2–2,3 L. Sabah 2 bardak, her ana öğünden 15 dk önce 1 bardak',
+  'Sirkeli su: 1 yk doğal elma sirkesi + 1 bardak su, öğleden 10–15 dk önce; en fazla 2 yk/gün',
+  'Kahve: ikiniz için günde en fazla 2 fincan, 09:30 ve en geç 14:00; şekersiz, sütlü olabilir. Üçüncü istek gelirse rooibos veya kuşburnu',
+  'Yeşil çay yerine: rooibos, kuşburnu, papatya, melisa, ıhlamur, rezene, nane, zencefil',
+  'Kaçın: hibiskus (tansiyonu düşürür), meyan kökü (yükseltir), paketli detoks çayları',
+  'Adaçayı haftada en fazla 2 fincan'
+];
+</script>

@@ -1,0 +1,226 @@
+<script>
+'use strict';
+// ---------- online account on the static pages: one account per person (E/K), own password, device token, two-way sync with /api/takip ----------
+// Logs and settings belong to the account; recipes, week menus and the changelog are shared. The Claude artifact keeps its own db.
+const REMOTE_API = '/api/takip';
+const MONTHS_TR_LONG = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+const RK = k => k + '_' + state.person;
+function ownKey(key) {
+  const i = String(key).indexOf('/'); const col = key.slice(0, i), id = key.slice(i + 1);
+  if (col === 'logs') return id.slice(0, 2) === state.person + '_';
+  if (col === 'settings') return id === state.person || id === 'rewards';
+  return col === 'recipes' || col === 'weekmenus' || col === 'changelog';
+}
+const remote = { token: lsGet(RK('bt_token'), null), rev: Number(lsGet(RK('bt_rev'), 0)) || 0, pending: new Map((lsGet(RK('bt_pending'), []) || []).filter(kv => Array.isArray(kv) && ownKey(kv[0]))), lastSync: lsGet(RK('bt_lastsync'), '') || '', hasPassword: null, me: null, busy: false, again: false, error: '', msg: '', timer: 0 };
+function remoteOn() { return STATIC_HOST && !!remote.token; }
+function remoteSavePending() { lsSet(RK('bt_pending'), Array.from(remote.pending.entries())); }
+function fmtTs(iso) { const d = new Date(iso); return isNaN(d) ? '' : fmtD(dstr(d)) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function deviceLabel() {
+  const ua = navigator.userAgent;
+  const dev = /iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) ? 'iPad' : /Android/.test(ua) ? 'Android' : /Windows/.test(ua) ? 'Windows' : /Mac/.test(ua) ? 'Mac' : 'cihaz';
+  const br = /Edg\//.test(ua) ? 'Edge' : /OPR\//.test(ua) ? 'Opera' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : '';
+  return (dev + ' ' + br).trim();
+}
+async function remoteKey(pass) {
+  const enc = new TextEncoder();
+  const base = await crypto.subtle.importKey('raw', enc.encode(String(pass).normalize('NFC')), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: enc.encode('agca.studio/duzentakip/v1'), iterations: 120000 }, base, 256);
+  return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function remoteFetch(path, body, opts) {
+  const o = opts || {}, token = o.token || remote.token;
+  const h = { 'Accept': 'application/json' };
+  if (token) h['Authorization'] = 'Bearer ' + token;
+  if (body !== undefined) h['Content-Type'] = 'application/json';
+  let r;
+  try { r = await fetch(REMOTE_API + path, { method: body !== undefined ? 'POST' : 'GET', headers: h, body: body !== undefined ? JSON.stringify(body) : undefined, cache: 'no-store' }); }
+  catch (e) { const er = new Error('Bağlantı yok'); er.code = 'offline'; throw er; }
+  let data = null; try { data = await r.json(); } catch (e) { data = null; }
+  if (r.status === 401 && remote.token && !o.login && !o.probe) remoteForget('Oturum kapanmış; yeniden giriş yapın.');
+  if (!r.ok) { const er = new Error((data && data.message) || ('Sunucu hatası ' + r.status)); er.code = (data && data.error) || String(r.status); er.status = r.status; throw er; }
+  return data;
+}
+function remoteForget(msg) { remote.token = null; lsSet(RK('bt_token'), null); remote.me = null; remote.rev = 0; lsSet(RK('bt_rev'), 0); remote.error = msg || ''; if (STATIC_HOST) setMode('local', 'bu cihazda'); }
+function remoteMark(key, at) {
+  if (!STATIC_HOST || !ownKey(key)) return;
+  remote.pending.set(key, at || new Date().toISOString()); remoteSavePending();
+  if (remote.token) { setStatus('Kaydedildi · eşitleniyor…'); remoteSchedule(1200); }
+}
+function remoteSchedule(ms) { clearTimeout(remote.timer); remote.timer = setTimeout(() => remoteSync('write'), ms); }
+function remoteDocFor(key, at) {
+  if (!ownKey(key)) return null;
+  const i = key.indexOf('/'); const col = key.slice(0, i), id = key.slice(i + 1); let body = null, when = at;
+  if (col === 'logs') { body = state.logs[id]; when = (body && body.updatedAt) || at; }
+  else if (col === 'settings') body = id === 'rewards' ? state.rewards : state.settings[id];
+  else if (col === 'recipes') body = state.recipes[id];
+  else if (col === 'weekmenus') body = state.weekmenus[id];
+  else if (col === 'changelog') { body = state.changelog.find(e => e && e.id === id) || null; when = (body && body.at) || at; }
+  return body && typeof body === 'object' ? { col: col, id: id, body: body, updatedAt: when } : null;
+}
+// First login on a device that already holds entries: push this account's documents. Settings get an old stamp so an existing server copy wins.
+function remoteMarkAll() {
+  const OLD = '1970-01-01T00:00:00.000Z', p = state.person;
+  Object.keys(state.logs).forEach(id => { if (id.slice(0, 2) === p + '_') remote.pending.set('logs/' + id, state.logs[id].updatedAt || OLD); });
+  if (state.settings[p]) remote.pending.set('settings/' + p, OLD);
+  if (JSON.stringify(state.rewards) !== JSON.stringify(normRewards(null))) remote.pending.set('settings/rewards', OLD);
+  Object.keys(state.recipes).forEach(id => remote.pending.set('recipes/' + id, OLD));
+  Object.keys(state.weekmenus).forEach(ws => remote.pending.set('weekmenus/' + ws, (state.weekmenus[ws].meta && state.weekmenus[ws].meta.updatedAt) || OLD));
+  state.changelog.forEach(e => { if (e && e.id) remote.pending.set('changelog/' + e.id, e.at || OLD); });
+  remoteSavePending();
+}
+function remoteApply(docs) {
+  let changed = 0;
+  docs.forEach(d => {
+    if (!d || typeof d !== 'object') return;
+    const key = d.col + '/' + d.id; remote.pending.delete(key);
+    if (!ownKey(key)) return;
+    if (d.col === 'logs') { const l = normLog(d.body); if (l) { state.logs[logId(l.person, l.date)] = l; changed++; } }
+    else if (d.col === 'settings') { if (d.id === 'rewards') { state.rewards = normRewards(d.body); changed++; } else if (d.body && typeof d.body === 'object') { state.settings[d.id] = d.body; changed++; } }
+    else if (d.col === 'recipes') { state.recipes[d.id] = normRecipe(d.body); changed++; }
+    else if (d.col === 'weekmenus') { const w = normWeekMenu(d.body, d.id); if (w) { state.weekmenus[d.id] = w; changed++; } }
+    else if (d.col === 'changelog') { if (d.body && d.body.id && typeof d.body.text === 'string' && !state.changelog.some(e => e && e.id === d.body.id)) { state.changelog.push(d.body); changed++; } }
+  });
+  if (changed) state.changelog = state.changelog.filter(e => e && typeof e === 'object').sort((a, b) => ((a.at || '') > (b.at || '') ? -1 : 1)).slice(0, 200);
+  return changed;
+}
+async function remoteSync(reason) {
+  if (!remoteOn()) return;
+  if (remote.busy) { remote.again = true; return; }
+  remote.busy = true; clearTimeout(remote.timer);
+  try {
+    const docs = [];
+    Array.from(remote.pending.entries()).forEach(kv => { const d = remoteDocFor(kv[0], kv[1]); if (d) docs.push(d); else remote.pending.delete(kv[0]); });
+    const res = docs.length ? await remoteFetch('/sync', { rev: remote.rev, docs: docs }) : await remoteFetch('/sync?rev=' + remote.rev);
+    if (!remote.token) return;
+    (res.applied || []).concat(res.rejected || []).forEach(k => remote.pending.delete(k));
+    const changed = remoteApply(Array.isArray(res.docs) ? res.docs : []);
+    if (typeof res.rev === 'number') { remote.rev = res.rev; lsSet(RK('bt_rev'), remote.rev); }
+    remote.me = res.me || remote.me; remote.error = '';
+    remote.lastSync = new Date().toISOString(); lsSet(RK('bt_lastsync'), remote.lastSync); remoteSavePending();
+    setMode('remote', 'çevrimiçi kayıt'); setStatus(remote.pending.size ? 'Eşitleniyor…' : 'Eşitlendi ' + nowHM());
+    if (changed || docs.length) persistLocal();
+    if (changed || reason === 'login' || state.tab === 'ayarlar') renderAll();
+  } catch (e) {
+    remote.error = e.code === 'offline' ? 'Çevrimdışı; bağlanınca eşitlenir.' : (e.message || 'Eşitleme hatası');
+    if (remote.token) { setMode('remote', e.code === 'offline' ? 'çevrimdışı' : 'eşitleme hatası'); setStatus(remote.error); }
+  } finally { remote.busy = false; if (remote.again) { remote.again = false; remoteSchedule(800); } }
+}
+async function remoteLogin(pass) {
+  const p = String(pass || ''); if (p.length < 4) return 'Şifre en az 4 karakter olmalı.';
+  remote.msg = 'Giriş yapılıyor…'; renderAll();
+  try {
+    const key = await remoteKey(p);
+    const res = await remoteFetch('/login', { key: key, person: state.person, label: deviceLabel() }, { login: true });
+    remote.token = res.token; lsSet(RK('bt_token'), remote.token); remote.rev = 0; lsSet(RK('bt_rev'), 0); remote.hasPassword = true; remote.error = ''; remote.msg = '';
+    remoteMarkAll();
+    await remoteSync('login');
+    return res.first ? 'Şifre belirlendi; kayıtlar artık çevrimiçi.' : 'Giriş yapıldı; kayıtlar eşitlendi.';
+  } catch (e) { remote.msg = ''; return e.code === 'wrong_password' ? 'Şifre yanlış.' : e.code === 'rate_limited' ? e.message : e.code === 'offline' ? 'Bağlantı yok.' : ('Giriş başarısız: ' + e.message); }
+}
+async function remoteLogout() { try { await remoteFetch('/logout', {}); } catch (e) {} remoteForget(''); renderAll(); }
+async function remoteChangePass(oldP, newP) {
+  if (String(newP || '').length < 4) return 'Yeni şifre en az 4 karakter olmalı.';
+  try {
+    const res = await remoteFetch('/password', { oldKey: await remoteKey(oldP), newKey: await remoteKey(newP) });
+    remote.token = res.token; lsSet(RK('bt_token'), remote.token); await remoteSync('password');
+    return 'Şifre değişti; bu hesabın diğer cihazları yeniden giriş yapacak.';
+  } catch (e) { return e.code === 'wrong_password' ? 'Mevcut şifre yanlış.' : ('Değiştirilemedi: ' + e.message); }
+}
+// One-time: a token from the single-account period is kept only if it belongs to this page's person.
+async function remoteAdoptLegacy() {
+  if (remote.token) return;
+  const legacy = lsGet('bt_token', null); if (!legacy) return;
+  try {
+    const me = await remoteFetch('/me', undefined, { token: legacy, probe: true });
+    if (!me || me.person !== state.person) return;
+    remote.token = legacy; lsSet(RK('bt_token'), legacy); lsSet('bt_token', null);
+    remote.rev = Number(lsGet('bt_rev', 0)) || 0; lsSet(RK('bt_rev'), remote.rev);
+    (lsGet('bt_pending', []) || []).forEach(kv => { if (Array.isArray(kv) && ownKey(kv[0])) remote.pending.set(kv[0], kv[1]); }); remoteSavePending();
+  } catch (e) { if (e.status === 401) lsSet('bt_token', null); }
+}
+async function remoteBoot() {
+  if (!STATIC_HOST) return;
+  try { const s = await remoteFetch('/status?person=' + state.person); remote.hasPassword = !!s.hasPassword; } catch (e) { remote.hasPassword = null; }
+  await remoteAdoptLegacy();
+  if (remote.token) { setMode('remote', 'çevrimiçi kayıt'); await remoteSync('boot'); } else renderAll();
+  setInterval(() => { if (document.visibilityState === 'visible') remoteSync('poll'); }, 45000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') remoteSync('visible'); });
+  window.addEventListener('online', () => remoteSync('online'));
+  window.addEventListener('focus', () => remoteSync('focus'));
+}
+function saveStatusText(L) {
+  if (state.mode === 'db') return state.dirty.size ? 'Kaydediliyor…' : (L.updatedAt ? 'Kaydedildi ' + localTime(L.updatedAt) : '');
+  if (state.mode === 'remote') return remote.pending.size ? 'Eşitleniyor…' : (remote.error ? remote.error : (remote.lastSync ? 'Eşitlendi ' + localTime(remote.lastSync) : ''));
+  if (state.mode === 'local') return 'Bu cihazda saklı';
+  return '';
+}
+// ---------- UI: login card (Bugün + Ayarlar), account card and history (Ayarlar) ----------
+function loginCardHtml() {
+  if (!STATIC_HOST || remote.token) return '';
+  const first = remote.hasPassword === false, who = cfg(state.person).name;
+  return '<div class="card"><div class="card-h"><h2>' + esc(who) + (first ? ' için şifre belirle' : ' girişi') + '</h2><span class="meta">kayıtlar tüm cihazlarda</span></div>' +
+    '<form class="addfood" data-remote="login"><input type="password" id="loginPass" placeholder="' + (first ? 'Yeni şifre (en az 4 karakter)' : 'Şifre') + '" autocomplete="' + (first ? 'new-password' : 'current-password') + '" minlength="4" required aria-label="Şifre"><button type="submit" class="btn">' + (first ? 'Belirle' : 'Giriş') + '</button></form>' +
+    (remote.msg || remote.error ? '<p class="tiny">' + esc(remote.msg || remote.error) + '</p>' : '') + '</div>';
+}
+function accountCardHtml() {
+  if (!STATIC_HOST) return '';
+  if (!remote.token) return loginCardHtml();
+  const me = remote.me, sess = me && Array.isArray(me.sessions) ? me.sessions : [];
+  const rows = sess.map(s => '<div class="listrow"><span>' + esc(s.label || 'cihaz') + (s.current ? ' <span class="pill good">bu cihaz</span>' : '') + '</span><span class="tiny num">' + fmtTs(s.lastSeen) + '</span></div>').join('');
+  const line = (remote.lastSync ? 'Son eşitleme ' + fmtTs(remote.lastSync) : 'Henüz eşitlenmedi') + (remote.pending.size ? ' · ' + remote.pending.size + ' kayıt bekliyor' : '') + (me && me.docs ? ' · ' + me.docs + ' kayıt' : '');
+  return '<div class="card"><div class="card-h"><h2>Hesap · ' + esc(cfg(state.person).name) + '</h2><span class="pill ' + (remote.error ? 'warn' : 'good') + '">' + (remote.error ? 'bağlantı sorunu' : 'çevrimiçi') + '</span></div>' +
+    '<p class="muted">' + esc(line) + (remote.error ? '<br>' + esc(remote.error) : '') + (remote.msg ? '<br>' + esc(remote.msg) : '') + '</p>' +
+    (rows ? '<div><div class="eyebrow">Bu hesabın cihazları</div>' + rows + '</div>' : '') +
+    '<div class="row"><button type="button" class="btn ghost small" data-remote="sync">Şimdi eşitle</button><button type="button" class="btn ghost small" data-remote="logout">Çıkış yap</button><span class="tiny" id="accountMsg"></span></div>' +
+    '<details class="item" id="set-pass"' + (state.open.has('set-pass') ? ' open' : '') + '><summary>Şifreyi değiştir</summary><form class="mlist" data-remote="password"><div class="two"><div class="field"><label for="passOld">Mevcut şifre</label><input type="password" id="passOld" autocomplete="current-password" required></div><div class="field"><label for="passNew">Yeni şifre</label><input type="password" id="passNew" autocomplete="new-password" minlength="4" required></div></div><div class="row"><button type="submit" class="btn ghost small">Değiştir</button><span class="tiny" id="passMsg"></span></div></form></details></div>';
+}
+function histPersons() { return STATIC_HOST ? [state.person] : ['E', 'K']; }
+function histMonth() { return state.histMonth || state.today.slice(0, 7); }
+function histDates(ym) { const y = Number(ym.slice(0, 4)), m = Number(ym.slice(5, 7)); const out = []; for (let d = y + '-' + pad(m) + '-01', last = dstr(new Date(y, m, 0)); d <= last; d = addDays(d, 1)) out.push(d); return out; }
+function historyCardHtml() {
+  const ym = histMonth(), y = Number(ym.slice(0, 4)), m = Number(ym.slice(5, 7)), dates = histDates(ym), persons = histPersons();
+  const has = dates.filter(d => persons.some(p => state.logs[logId(p, d)]));
+  const sum = p => { const c = cfg(p); const ls = dates.map(d => state.logs[logId(p, d)]).filter(Boolean); const pts = ls.map(l => dayPoints(l, c)); const ws = ls.filter(l => l.weight != null); return { n: ls.length, won: pts.filter(x => x >= DAY_WIN).length, avg: pts.length ? avg(pts) : null, w0: ws.length ? ws[0].weight : null, w1: ws.length ? ws[ws.length - 1].weight : null }; };
+  const box = p => { const s = sum(p); return '<div><b>' + esc(cfg(p).name) + '</b>' + (s.n ? s.won + ' kazanılan gün · ort. ' + n1(s.avg) + ' puan' + (s.w0 != null ? '<br>⚖ ' + n1(s.w0) + (s.w1 !== s.w0 ? ' → ' + n1(s.w1) : '') + ' kg' : '') : 'Kayıt yok') + '</div>'; };
+  const cell = (p, d) => { const l = state.logs[logId(p, d)]; if (!l) return '<span class="tiny">—</span>'; const pts = dayPoints(l, cfg(p)); return '<span><span class="num' + (pts >= DAY_WIN ? ' win' : '') + '">' + pts + '/' + DAY_MAX + (pts >= DAY_WIN ? ' ✓' : '') + '</span>' + (l.weight != null ? ' <span class="tiny">⚖ ' + n1(l.weight) + '</span>' : '') + (persons.length === 1 ? ' <span class="tiny">💧 ' + l.water + '</span>' : '') + '</span>'; };
+  const cls = 'hist' + (persons.length === 1 ? ' one' : '');
+  const rows = has.slice().reverse().map(d => '<div class="' + cls + '"><span class="hd">' + fmtD(d) + '</span>' + persons.map(p => cell(p, d)).join('') + '</div>').join('');
+  return '<div class="card"><div class="card-h"><h2>Geçmiş</h2><span class="meta">' + has.length + ' günlük kayıt</span></div>' +
+    '<div class="daterow"><button type="button" class="iconbtn" data-hist="prev" aria-label="Önceki ay">' + svgIcon('prev') + '</button><div class="d">' + MONTHS_TR_LONG[m - 1] + ' ' + y + '</div><button type="button" class="iconbtn" data-hist="next" aria-label="Sonraki ay"' + (ym >= state.today.slice(0, 7) ? ' disabled' : '') + '>' + svgIcon('next') + '</button></div>' +
+    '<div class="feed' + (persons.length === 1 ? ' one' : '') + '">' + persons.map(box).join('') + '</div>' +
+    (rows ? '<div><div class="' + cls + ' head"><span>Gün</span>' + persons.map(p => '<span>' + esc(cfg(p).name) + '</span>').join('') + '</div>' + rows + '</div>' : '<p class="muted">Bu ayda kayıt yok.</p>') +
+    '<div class="row"><button type="button" class="btn ghost small" data-hist="csv"' + (has.length ? '' : ' disabled') + '>Ayı kopyala (CSV)</button><span class="tiny" id="histMsg"></span></div></div>';
+}
+// Ayarlar → Analiz: the last 14 days per person (won days, water, most skipped meal), this week vs last week, recipe likes.
+function analysisCardHtml() {
+  if (typeof weekFeedback !== 'function') return '';
+  const fb = weekFeedback(nextPlanWeek()), persons = histPersons(), thisWs = mondayOf(state.today), lastWs = addDays(thisWs, -7);
+  const boxes = persons.map(p => {
+    const f = fb.kisiler[p], c = cfg(p), w1 = weekPoints(p, thisWs).points, w0 = weekPoints(p, lastWs).points;
+    return '<div><b>' + esc(c.name) + '</b>' + (f.kayitli_gun ? f.kazanilan_gun + '/' + f.kayitli_gun + ' kazanılan gün · su ' + (f.su_ortalama_bardak == null ? '—' : f.su_ortalama_bardak) + '/' + f.su_hedef + ' bardak<br>en çok atlanan: ' + esc(f.en_cok_atlanan || '—') : 'Son 14 günde kayıt yok') +
+      '<br>bu hafta <b class="num">' + w1 + '</b> · geçen hafta <b class="num">' + w0 + '</b> puan' + (f.gelecek_hafta_dongu ? '<br>döngü: ' + esc(f.gelecek_hafta_dongu) : '') + '</div>';
+  }).join('');
+  const liked = uniq(fb.begenilen_tarifler.concat(fb.favori_tarifler));
+  const notes = (liked.length ? 'Beğenilen tarifler: ' + esc(liked.slice(0, 6).join(', ')) + '. ' : '') + (fb.begenilmeyen_tarifler.length ? 'Planlara konmayacak: ' + esc(fb.begenilmeyen_tarifler.join(', ')) + '.' : '');
+  return '<div class="card"><div class="card-h"><h2>Analiz</h2><span class="meta">son 14 gün</span></div><div class="feed' + (persons.length === 1 ? ' one' : '') + '">' + boxes + '</div>' + (notes ? '<p class="tiny">' + notes + '</p>' : '') + '</div>';
+}
+function historyCsv(ym) {
+  const head = 'Tarih;Kişi;Puan;Kazanıldı;Su (bardak);Kilo;Öğün;Koşu;Öğle yürüyüşü;Akşam yürüyüşü;Uyku düzeni;Yatış;Kalkış';
+  const lines = [head];
+  histDates(ym).forEach(d => histPersons().forEach(p => { const l = state.logs[logId(p, d)]; if (!l) return; const c = cfg(p), pts = dayPoints(l, c);
+    lines.push([d, c.name, pts, pts >= DAY_WIN ? 'evet' : 'hayır', l.water, l.weight == null ? '' : String(l.weight).replace('.', ','), MEAL_KEYS.filter(k => l.meals[k]).length, l.run ? 1 : 0, l.walkNoon ? 1 : 0, l.walkEve ? 1 : 0, sleepOk(l) ? 1 : 0, l.bed, l.wake].join(';')); }));
+  return lines.join('\n');
+}
+document.addEventListener('submit', async e => {
+  const f = e.target.closest('form[data-remote]'); if (!f) return; e.preventDefault();
+  if (f.dataset.remote === 'login') { const inp = f.querySelector('#loginPass'); const msg = await remoteLogin(inp ? inp.value : ''); remote.msg = msg; renderAll(); setStatus(msg); setTimeout(() => { remote.msg = ''; }, 8000); }
+  else if (f.dataset.remote === 'password') { const o = f.querySelector('#passOld'), n = f.querySelector('#passNew'); const msg = await remoteChangePass(o ? o.value : '', n ? n.value : ''); const el = $('#passMsg'); if (el) el.textContent = msg; if (o) o.value = ''; if (n) n.value = ''; }
+});
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-remote], [data-hist]'); if (!b || b.tagName !== 'BUTTON') return;
+  if (b.dataset.remote === 'sync') { const el = $('#accountMsg'); if (el) el.textContent = 'Eşitleniyor…'; await remoteSync('manual'); const el2 = $('#accountMsg'); if (el2) el2.textContent = remote.error || ('Eşitlendi ' + nowHM()); }
+  else if (b.dataset.remote === 'logout') await remoteLogout();
+  else if (b.dataset.hist === 'prev' || b.dataset.hist === 'next') { const ym = histMonth(); const d = new Date(Number(ym.slice(0, 4)), Number(ym.slice(5, 7)) - 1 + (b.dataset.hist === 'next' ? 1 : -1), 1); state.histMonth = d.getFullYear() + '-' + pad(d.getMonth() + 1); renderAll(); }
+  else if (b.dataset.hist === 'csv') { const txt = historyCsv(histMonth()), el = $('#histMsg'); try { await navigator.clipboard.writeText(txt); if (el) el.textContent = 'Kopyalandı ' + nowHM(); } catch (err) { if (el) el.textContent = 'Kopyalanamadı; tarayıcı izin vermedi.'; } }
+});
+</script>
