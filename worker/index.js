@@ -1,6 +1,7 @@
 // agca.studio Worker: statik varlıklar (Hugo çıktısı) + /api/takip
-// /api/takip: /duzentakip/ sayfalarının çevrimiçi kaydı. Tek haneli ev hesabı (ortak şifre),
-// veriler SQLite destekli bir Durable Object içinde tutulur; üçüncü taraf servis yok.
+// /api/takip: /duzentakip/ sayfalarının çevrimiçi kaydı. İki hesap (E: erkek sayfası, K: kadın sayfası), her birinin
+// kendi şifresi var. Günlük kayıtlar ve ayarlar hesaba özel; tarifler, haftalık plan ve değişiklik kaydı ortak.
+// Veriler SQLite destekli tek Durable Object içinde tutulur; üçüncü taraf servis yok.
 const API_PREFIX = '/api/takip';
 const COLS = {
   logs: /^[EK]_\d{4}-\d{2}-\d{2}$/,
@@ -9,6 +10,7 @@ const COLS = {
   weekmenus: /^\d{4}-\d{2}-\d{2}$/,
   changelog: /^[a-z0-9]{1,24}$/
 };
+const SHARED = { recipes: true, weekmenus: true, changelog: true };
 const MAX_BODY = 1500000, MAX_DOC = 120000, MAX_DOCS = 600, MAX_SESSIONS = 20;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000, LOGIN_MAX = 12, SESSION_DAYS = 400;
 
@@ -47,7 +49,15 @@ function safeEq(a, b) {
   return r === 0;
 }
 const isKey = k => typeof k === 'string' && /^[0-9a-f]{64}$/.test(k);
+const acctOf = v => (v === 'K' ? 'K' : v === 'E' ? 'E' : null);
 const nowIso = () => new Date().toISOString();
+// Which account may write a document: shared collections → 'S'; logs and settings only the owner's.
+function ownerFor(col, id, acct) {
+  if (SHARED[col]) return 'S';
+  if (col === 'logs') return id.slice(0, 2) === acct + '_' ? acct : null;
+  if (col === 'settings') return (id === acct || id === 'rewards') ? acct : null;
+  return null;
+}
 
 export class TakipStore {
   constructor(ctx, env) { this.ctx = ctx; this.env = env; this.sql = ctx.storage.sql; this.ready = false; }
@@ -55,10 +65,40 @@ export class TakipStore {
     if (this.ready) return;
     this.sql.exec('CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT NOT NULL)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS sessions (th TEXT PRIMARY KEY, person TEXT NOT NULL, label TEXT NOT NULL, created TEXT NOT NULL, last_seen TEXT NOT NULL)');
-    this.sql.exec('CREATE TABLE IF NOT EXISTS docs (col TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, updated_at TEXT NOT NULL, rev INTEGER NOT NULL, PRIMARY KEY (col, id))');
-    this.sql.exec('CREATE INDEX IF NOT EXISTS docs_rev ON docs (rev)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS attempts (ip TEXT PRIMARY KEY, n INTEGER NOT NULL, first_ms INTEGER NOT NULL)');
+    if (Number(this.getMeta('schema') || 1) < 2) this.migrateV2();
+    this.sql.exec('CREATE TABLE IF NOT EXISTS docs (owner TEXT NOT NULL, col TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, updated_at TEXT NOT NULL, rev INTEGER NOT NULL, PRIMARY KEY (owner, col, id))');
+    this.sql.exec('CREATE INDEX IF NOT EXISTS docs_rev ON docs (rev)');
     this.ready = true;
+  }
+  // v1 → v2: one household password and one document table → two accounts. Documents get an owner
+  // (E, K or S for shared); the old rewards document is copied to both accounts; the old password goes to
+  // every account that had a session (both when there were none).
+  migrateV2() {
+    const def = this.sql.exec("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'docs'").toArray();
+    if (def.length) {
+      if (!/\bowner\b/.test(String(def[0].sql || ''))) {
+        this.sql.exec('CREATE TABLE docs_v2 (owner TEXT NOT NULL, col TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, updated_at TEXT NOT NULL, rev INTEGER NOT NULL, PRIMARY KEY (owner, col, id))');
+        const rows = this.sql.exec('SELECT col, id, body, updated_at, rev FROM docs').toArray();
+        for (const r of rows) {
+          const owners = SHARED[r.col] ? ['S'] : r.col === 'logs' ? [r.id.charAt(0)] : r.col === 'settings' ? (r.id === 'rewards' ? ['E', 'K'] : [r.id]) : [];
+          for (const o of owners) this.sql.exec('INSERT OR REPLACE INTO docs_v2 (owner, col, id, body, updated_at, rev) VALUES (?, ?, ?, ?, ?, ?)', o, r.col, r.id, r.body, r.updated_at, r.rev);
+        }
+        this.sql.exec('DROP TABLE docs');
+        this.sql.exec('ALTER TABLE docs_v2 RENAME TO docs');
+      }
+    }
+    const salt = this.getMeta('pass_salt'), hash = this.getMeta('pass_hash');
+    if (salt && hash) {
+      let who = this.sql.exec('SELECT DISTINCT person FROM sessions').toArray().map(r => r.person).filter(p => p === 'E' || p === 'K');
+      if (!who.length) who = ['E', 'K'];
+      for (const p of who) {
+        if (this.getMeta('pass_hash:' + p)) continue;
+        this.setMeta('pass_salt:' + p, salt); this.setMeta('pass_hash:' + p, hash); this.setMeta('pass_set_at:' + p, this.getMeta('pass_set_at') || nowIso());
+      }
+      this.sql.exec("DELETE FROM meta WHERE k IN ('pass_salt', 'pass_hash', 'pass_set_at')");
+    }
+    this.setMeta('schema', '2');
   }
   getMeta(k) { const r = this.sql.exec('SELECT v FROM meta WHERE k = ?', k).toArray(); return r.length ? r[0].v : null; }
   setMeta(k, v) { this.sql.exec('INSERT INTO meta (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v', k, v); }
@@ -86,7 +126,7 @@ export class TakipStore {
     const rows = this.sql.exec('SELECT th, person, label, created, last_seen FROM sessions WHERE th = ?', th).toArray();
     if (!rows.length) return null;
     const row = rows[0];
-    if (Date.now() - Date.parse(row.created) > SESSION_DAYS * 86400000) { this.sql.exec('DELETE FROM sessions WHERE th = ?', th); return null; }
+    if (!acctOf(row.person) || Date.now() - Date.parse(row.created) > SESSION_DAYS * 86400000) { this.sql.exec('DELETE FROM sessions WHERE th = ?', th); return null; }
     if (!row.last_seen || Date.now() - Date.parse(row.last_seen) > 60000) { row.last_seen = nowIso(); this.sql.exec('UPDATE sessions SET last_seen = ? WHERE th = ?', row.last_seen, th); }
     return row;
   }
@@ -101,32 +141,33 @@ export class TakipStore {
     this.sql.exec('UPDATE attempts SET n = n + 1 WHERE ip = ?', ip);
     return true;
   }
-  async verifyKey(key) {
-    const salt = this.getMeta('pass_salt'), hash = this.getMeta('pass_hash');
+  hasPassword(acct) { return !!this.getMeta('pass_hash:' + acct); }
+  async verifyKey(acct, key) {
+    const salt = this.getMeta('pass_salt:' + acct), hash = this.getMeta('pass_hash:' + acct);
     if (!salt || !hash) return false;
     return safeEq(await sha256Hex(salt + ':' + key), hash);
   }
-  async setKey(key) {
+  async setKey(acct, key) {
     const salt = hex(crypto.getRandomValues(new Uint8Array(16)));
-    this.setMeta('pass_salt', salt);
-    this.setMeta('pass_hash', await sha256Hex(salt + ':' + key));
-    this.setMeta('pass_set_at', nowIso());
+    this.setMeta('pass_salt:' + acct, salt);
+    this.setMeta('pass_hash:' + acct, await sha256Hex(salt + ':' + key));
+    this.setMeta('pass_set_at:' + acct, nowIso());
   }
-  async newSession(person, label) {
+  async newSession(acct, label) {
     const token = randomToken(), th = await sha256Hex(token), now = nowIso();
-    this.sql.exec('INSERT INTO sessions (th, person, label, created, last_seen) VALUES (?, ?, ?, ?, ?)', th, person, label, now, now);
-    const extra = this.sql.exec('SELECT th FROM sessions ORDER BY last_seen DESC LIMIT -1 OFFSET ?', MAX_SESSIONS).toArray();
+    this.sql.exec('INSERT INTO sessions (th, person, label, created, last_seen) VALUES (?, ?, ?, ?, ?)', th, acct, label, now, now);
+    const extra = this.sql.exec('SELECT th FROM sessions WHERE person = ? ORDER BY last_seen DESC LIMIT -1 OFFSET ?', acct, MAX_SESSIONS).toArray();
     extra.forEach(r => this.sql.exec('DELETE FROM sessions WHERE th = ?', r.th));
     return token;
   }
   me(row) {
-    const sessions = this.sql.exec('SELECT th, person, label, created, last_seen FROM sessions ORDER BY last_seen DESC LIMIT ?', MAX_SESSIONS).toArray()
+    const sessions = this.sql.exec('SELECT th, person, label, created, last_seen FROM sessions WHERE person = ? ORDER BY last_seen DESC LIMIT ?', row.person, MAX_SESSIONS).toArray()
       .map(s => ({ person: s.person, label: s.label, created: s.created, lastSeen: s.last_seen, current: s.th === row.th }));
-    const docs = this.sql.exec('SELECT COUNT(*) AS n FROM docs').one().n;
-    return { person: row.person, label: row.label, created: row.created, passSetAt: this.getMeta('pass_set_at'), sessions: sessions, docs: docs };
+    const docs = this.sql.exec("SELECT COUNT(*) AS n FROM docs WHERE owner = ? OR owner = 'S'", row.person).one().n;
+    return { person: row.person, label: row.label, created: row.created, passSetAt: this.getMeta('pass_set_at:' + row.person), sessions: sessions, docs: docs };
   }
-  changedSince(rev, skip) {
-    const rows = this.sql.exec('SELECT col, id, body, updated_at, rev FROM docs WHERE rev > ? ORDER BY rev ASC LIMIT 5000', rev).toArray();
+  changedSince(rev, acct, skip) {
+    const rows = this.sql.exec("SELECT col, id, body, updated_at, rev FROM docs WHERE rev > ? AND (owner = ? OR owner = 'S') ORDER BY rev ASC LIMIT 5000", rev, acct).toArray();
     const out = [];
     for (const r of rows) {
       if (skip && skip.has(r.col + '/' + r.id)) continue;
@@ -135,62 +176,70 @@ export class TakipStore {
     }
     return out;
   }
-  upsert(docs) {
-    const applied = [];
+  upsert(docs, acct) {
+    const applied = [], rejected = [];
     for (const d of docs) {
       if (!d || typeof d !== 'object') continue;
       const col = String(d.col || ''), id = String(d.id || '');
-      if (!COLS[col] || !COLS[col].test(id) || !d.body || typeof d.body !== 'object') continue;
+      if (!COLS[col] || !COLS[col].test(id) || !d.body || typeof d.body !== 'object') { rejected.push(col + '/' + id); continue; }
+      const owner = ownerFor(col, id, acct);
+      if (!owner) { rejected.push(col + '/' + id); continue; }
       const body = JSON.stringify(d.body);
-      if (body.length > MAX_DOC) continue;
+      if (body.length > MAX_DOC) { rejected.push(col + '/' + id); continue; }
       const at = typeof d.updatedAt === 'string' && d.updatedAt.length <= 30 ? d.updatedAt : nowIso();
-      const cur = this.sql.exec('SELECT updated_at FROM docs WHERE col = ? AND id = ?', col, id).toArray();
-      if (cur.length && cur[0].updated_at >= at) continue;
+      const cur = this.sql.exec('SELECT updated_at FROM docs WHERE owner = ? AND col = ? AND id = ?', owner, col, id).toArray();
+      if (cur.length && cur[0].updated_at >= at) { rejected.push(col + '/' + id); continue; }
       const rev = this.nextRev();
-      this.sql.exec('INSERT INTO docs (col, id, body, updated_at, rev) VALUES (?, ?, ?, ?, ?) ON CONFLICT(col, id) DO UPDATE SET body = excluded.body, updated_at = excluded.updated_at, rev = excluded.rev', col, id, body, at, rev);
+      this.sql.exec('INSERT INTO docs (owner, col, id, body, updated_at, rev) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(owner, col, id) DO UPDATE SET body = excluded.body, updated_at = excluded.updated_at, rev = excluded.rev', owner, col, id, body, at, rev);
       applied.push(col + '/' + id);
     }
-    return applied;
+    return { applied: applied, rejected: rejected };
   }
   async route(request) {
     const url = new URL(request.url);
     const path = url.pathname.slice(API_PREFIX.length) || '/', method = request.method.toUpperCase();
     const ip = request.headers.get('cf-connecting-ip') || 'local';
-    if (path === '/status' && method === 'GET') return json({ ok: true, hasPassword: !!this.getMeta('pass_hash'), rev: this.curRev(), now: nowIso() });
+    if (path === '/status' && method === 'GET') {
+      const p = acctOf(url.searchParams.get('person'));
+      return json({ ok: true, hasPassword: p ? this.hasPassword(p) : { E: this.hasPassword('E'), K: this.hasPassword('K') }, rev: this.curRev(), now: nowIso() });
+    }
     if (path === '/login' && method === 'POST') {
       if (!this.rateCheck(ip)) return fail(429, 'rate_limited', 'Çok fazla deneme; 15 dakika sonra tekrar deneyin.');
       const b = await this.readJson(request);
+      const acct = acctOf(b.person);
+      if (!acct) return fail(400, 'bad_person', 'Hesap belirtilmedi.');
       if (!isKey(b.key)) return fail(400, 'bad_key', 'Geçersiz anahtar.');
-      const person = b.person === 'K' ? 'K' : 'E', label = String(b.label || 'cihaz').slice(0, 60);
+      const label = String(b.label || 'cihaz').slice(0, 60);
       let first = false;
-      if (!this.getMeta('pass_hash')) { await this.setKey(b.key); first = true; }
-      else if (!(await this.verifyKey(b.key))) return fail(401, 'wrong_password', 'Şifre yanlış.');
+      if (!this.hasPassword(acct)) { await this.setKey(acct, b.key); first = true; }
+      else if (!(await this.verifyKey(acct, b.key))) return fail(401, 'wrong_password', 'Şifre yanlış.');
       this.sql.exec('DELETE FROM attempts WHERE ip = ?', ip);
-      const token = await this.newSession(person, label);
-      return json({ token: token, first: first, rev: this.curRev(), now: nowIso() });
+      const token = await this.newSession(acct, label);
+      return json({ token: token, first: first, person: acct, rev: this.curRev(), now: nowIso() });
     }
     const row = await this.requireSession(request);
     if (!row) return fail(401, 'unauthorized', 'Giriş gerekli.');
+    const acct = row.person;
     if (path === '/me' && method === 'GET') return json(this.me(row));
     if (path === '/logout' && method === 'POST') { this.sql.exec('DELETE FROM sessions WHERE th = ?', row.th); return json({ ok: true }); }
     if (path === '/password' && method === 'POST') {
       const b = await this.readJson(request);
       if (!isKey(b.oldKey) || !isKey(b.newKey)) return fail(400, 'bad_key', 'Geçersiz anahtar.');
-      if (!(await this.verifyKey(b.oldKey))) return fail(401, 'wrong_password', 'Mevcut şifre yanlış.');
-      await this.setKey(b.newKey);
-      this.sql.exec('DELETE FROM sessions');
-      const token = await this.newSession(row.person, row.label);
-      return json({ token: token, now: nowIso() });
+      if (!(await this.verifyKey(acct, b.oldKey))) return fail(401, 'wrong_password', 'Mevcut şifre yanlış.');
+      await this.setKey(acct, b.newKey);
+      this.sql.exec('DELETE FROM sessions WHERE person = ?', acct);
+      const token = await this.newSession(acct, row.label);
+      return json({ token: token, person: acct, now: nowIso() });
     }
     if (path === '/sync' && method === 'GET') {
       const rev = Math.max(0, Number(url.searchParams.get('rev')) || 0);
-      return json({ rev: this.curRev(), docs: this.changedSince(rev), applied: [], me: this.me(row), now: nowIso() });
+      return json({ rev: this.curRev(), person: acct, docs: this.changedSince(rev, acct), applied: [], rejected: [], me: this.me(row), now: nowIso() });
     }
     if (path === '/sync' && method === 'POST') {
       const b = await this.readJson(request);
       const since = Math.max(0, Number(b.rev) || 0), docs = Array.isArray(b.docs) ? b.docs.slice(0, MAX_DOCS) : [];
-      const applied = this.upsert(docs);
-      return json({ rev: this.curRev(), docs: this.changedSince(since, new Set(applied)), applied: applied, me: this.me(row), now: nowIso() });
+      const res = this.upsert(docs, acct);
+      return json({ rev: this.curRev(), person: acct, docs: this.changedSince(since, acct, new Set(res.applied)), applied: res.applied, rejected: res.rejected, me: this.me(row), now: nowIso() });
     }
     return fail(404, 'not_found', 'Böyle bir uç yok.');
   }
