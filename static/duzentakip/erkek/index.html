@@ -1703,10 +1703,7 @@ function codeWeekDoc(ws) {
 
 <script>
 'use strict';
-// ---------- menu tab: this week's menu, standard menu, rhythm, snacks, drinks ----------
-function menuDays(src, p, name, openDow) {
-  return [1, 2, 3, 4, 5, 6, 0].map(k => { const m = src[k]; if (!m) return ''; return '<details' + (k === openDow ? ' open' : '') + '><summary>' + m.name + (k === openDow ? ' · bugün' : '') + '</summary><div class="mlist">' + m.meals.map(x => '<div class="mi"><b>' + MEAL_NAMES[x.k] + ' ' + MEAL_TIMES[x.k] + '</b> · ' + esc(x.t) + (x[p] ? '<span class="p">' + esc(name) + ': ' + esc(x[p]) + '</span>' : '') + recipeLinks(k, x.k, x) + '</div>').join('') + '<div class="tipbox">' + esc(m.tip) + '</div></div></details>'; }).join('');
-}
+// ---------- shopping lists (shown at the top of Tarifler) and the Menü tab: weekly plan, rhythm, snacks, drinks ----------
 function shoppingListHtml(title, sub, days, storeKey) {
   const items = aggregateShopping(days), checked = new Set(lsGet(storeKey, []) || []);
   const order = ['sebze', 'et', 'sut', 'firin', 'kiler'];
@@ -1730,23 +1727,17 @@ function shoppingCard() {
   }
   nextMarketDays(today).forEach(m => { const dowM = parseD(m).getDay(); const win = shoppingWindow(m); lists.push(shoppingListHtml((dowM === 3 ? 'Çarşamba' : 'Cuma') + ' pazarı · ' + fmtD(m), fmtD(m) + ' akşam → ' + fmtD(win[win.length - 1].d) + ' öğle', win, 'market_' + m)); });
   const thisWs = mondayOf(today), status = [thisWs, addDays(thisWs, 7)].map((w, i) => { const d = state.weekmenus[w]; const ok = d && d.meta && d.meta.approved; return '<span class="pill ' + (ok ? 'good' : 'warn') + '">' + (i ? 'Gelecek hafta' : 'Bu hafta') + ': ' + (ok ? 'onaylı' : 'kontrol edilmedi') + '</span>'; }).join(' ');
-  return '<div class="card"><div class="card-h"><h2>Pazar alışverişi</h2><span class="meta">Menüden hesaplanır · 2 kişi</span></div><div class="row">' + status + '</div><div>' + lists.join('') + '</div></div>';
+  return '<div class="card"><div class="card-h"><h2>Pazar alışverişi</h2><span class="meta">Menüden hesaplanır · 2 kişi</span></div><div class="row">' + status + '</div><div>' + lists.join('') + '</div>' + auditSectionHtml() + '</div>';
 }
 function bindProgram() {
-  $('#view-program').addEventListener('change', e => { const cb = e.target.closest('input[data-shop]'); if (!cb) return; const key = cb.dataset.shop, set = new Set(lsGet(key, []) || []); if (cb.checked) set.add(cb.dataset.key); else set.delete(cb.dataset.key); lsSet(key, Array.from(set)); cb.closest('.shop').classList.toggle('on', cb.checked); });
-  $('#view-program').addEventListener('click', async e => { const b = e.target.closest('[data-copyshop]'); if (!b) return; const ta = $('#shoptext-' + b.dataset.copyshop), msg = $('#shopmsg-' + b.dataset.copyshop); if (!ta) return; try { await navigator.clipboard.writeText(ta.value); if (msg) msg.textContent = 'Kopyalandı ' + nowHM(); } catch (err) { ta.hidden = false; ta.focus(); ta.select(); if (msg) msg.textContent = 'Metin seçildi; kopyalayın.'; } });
+  document.addEventListener('change', e => { const cb = e.target.closest('input[data-shop]'); if (!cb) return; const key = cb.dataset.shop, set = new Set(lsGet(key, []) || []); if (cb.checked) set.add(cb.dataset.key); else set.delete(cb.dataset.key); lsSet(key, Array.from(set)); cb.closest('.shop').classList.toggle('on', cb.checked); });
+  document.addEventListener('click', async e => { const b = e.target.closest('[data-copyshop]'); if (!b) return; const ta = $('#shoptext-' + b.dataset.copyshop), msg = $('#shopmsg-' + b.dataset.copyshop); if (!ta) return; try { await navigator.clipboard.writeText(ta.value); if (msg) msg.textContent = 'Kopyalandı ' + nowHM(); } catch (err) { ta.hidden = false; ta.focus(); ta.select(); if (msg) msg.textContent = 'Metin seçildi; kopyalayın.'; } });
 }
 function renderProgram() {
-  const p = state.person, name = cfg(p).name, dow = parseD(state.today).getDay(), hm = nowHM();
+  const hm = nowHM();
   let curI = -1; RHYTHM.forEach((r, i) => { if (r[0] <= hm) curI = i; });
   const tl = RHYTHM.map((r, i) => '<div class="tl' + (i === curI ? ' now' : '') + '"><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>').join('');
-  const ws = weekMenuLabel(state.today), nextWs = weekMenuLabel(addDays(state.today, 7));
-  const srcFor = w => { const o = {}; for (let i = 0; i < 7; i++) { const d = addDays(w, i); o[parseD(d).getDay()] = menuFor(d); } return o; };
-  let weekCard = '';
-  if (ws) weekCard = '<div class="card"><div class="card-h"><h2>Bu haftanın menüsü</h2><span class="meta">' + fmtD(ws) + ' – ' + fmtD(addDays(ws, 6)) + '</span></div><div>' + menuDays(srcFor(ws), p, name, dow) + '</div></div>';
-  if (nextWs && nextWs !== ws) weekCard += '<div class="card"><div class="card-h"><h2>Gelecek haftanın menüsü</h2><span class="meta">' + fmtD(nextWs) + ' – ' + fmtD(addDays(nextWs, 6)) + '</span></div><div>' + menuDays(srcFor(nextWs), p, name, -1) + '</div></div>';
-  $('#view-program').innerHTML = plannerCard() + shoppingCard() + weekCard +
-    '<div class="card"><div class="card-h"><h2>' + (weekCard ? 'Standart haftalık menü' : 'Haftalık menü') + '</h2><span class="meta">' + esc(name) + ' porsiyonları</span></div><div>' + menuDays(MENU, p, name, weekCard ? -1 : dow) + '</div></div>' +
+  $('#view-program').innerHTML = plannerCard() +
     '<div class="card"><div class="card-h"><h2>Günlük ritim</h2><span class="meta">Hafta sonu: koşu 07:00, kahvaltı 08:30</span></div><div class="timeline">' + tl + '</div></div>' +
     '<div class="card"><div class="card-h"><h2>Ara öğün havuzu</h2><span class="meta">100–150 kcal</span></div><ul class="plain">' + SNACKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
     '<div class="card"><div class="card-h"><h2>İçecekler</h2></div><ul class="plain">' + DRINKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>';
@@ -1837,37 +1828,47 @@ async function manualEdit(scope, ws, dow, k, vals) {
   renderProgram();
 }
 function planDaysHtml(doc, scope, ws) {
-  const p = state.person, name = cfg(p).name, ed = state.plan.edit;
-  return [1, 2, 3, 4, 5, 6, 0].map(dow => { const d = doc.days[dow]; if (!d) return '<details><summary>' + DAY_NAMES[dow] + '<span class="sub">plan yok</span></summary></details>';
-    return '<details' + (scope === 'draft' && dow === 1 ? ' open' : '') + '><summary>' + d.name + '<span class="sub">' + esc((d.meals.find(m => m.k === 'ak') || {}).t || '').slice(0, 60) + '</span></summary><div class="mlist">' + d.meals.map(m => {
+  const p = state.person, name = cfg(p).name, ed = state.plan.edit, todayDow = parseD(state.today).getDay(), isThisWeek = ws === mondayOf(state.today);
+  if (!state.plan.openDays) state.plan.openDays = new Set(['saved:' + todayDow, 'draft:1']);
+  return [1, 2, 3, 4, 5, 6, 0].map(dow => {
+    const key = scope + ':' + dow, d = doc.days[dow];
+    if (!d) return '<details data-plan-day="' + key + '"><summary>' + DAY_NAMES[dow] + '<span class="sub">plan yok</span></summary></details>';
+    const today = scope === 'saved' && isThisWeek && dow === todayDow;
+    return '<details data-plan-day="' + key + '"' + (state.plan.openDays.has(key) ? ' open' : '') + '><summary>' + d.name + (today ? ' · bugün' : '') + '<span class="sub">' + esc((d.meals.find(m => m.k === 'ak') || {}).t || '').slice(0, 60) + '</span></summary><div class="mlist">' + d.meals.map(m => {
       const editing = ed && ed.scope === scope && ed.ws === ws && ed.dow == dow && ed.k === m.k;
       const acts = m.k === 'g' ? '' : '<div class="acts">' + (state.sample && !STATIC_HOST ? '<button type="button" data-plan="swap" data-scope="' + scope + '" data-ws="' + ws + '" data-dow="' + dow + '" data-k="' + m.k + '" title="Claude alternatif önersin">↻</button>' : '') + '<button type="button" data-plan="edit" data-scope="' + scope + '" data-ws="' + ws + '" data-dow="' + dow + '" data-k="' + m.k + '" title="Elle düzenle">✎</button></div>';
       const body = '<div><b>' + MEAL_NAMES[m.k] + ' ' + MEAL_TIMES[m.k] + '</b> · ' + esc(m.t) + (m[p] ? '<span class="p" style="display:block;color:var(--ink-2);font-size:.85rem">' + esc(name) + ': ' + esc(m[p]) + '</span>' : '') + recipeLinks(dow, m.k, m) + '</div>';
       const editor = editing ? '<div class="edit"><input type="text" id="pe-t" value="' + esc(m.t) + '" maxlength="240" placeholder="Yemek ve içerik"><input type="text" id="pe-E" value="' + esc(m.E) + '" maxlength="120" placeholder="E porsiyonu"><input type="text" id="pe-K" value="' + esc(m.K) + '" maxlength="120" placeholder="K porsiyonu"><div class="row"><button type="button" class="btn small" data-plan="editsave" data-scope="' + scope + '" data-ws="' + ws + '" data-dow="' + dow + '" data-k="' + m.k + '">Kaydet</button><button type="button" class="btn ghost small" data-plan="editcancel">Vazgeç</button></div></div>' : '';
       return '<div class="planmeal">' + body + acts + editor + '</div>'; }).join('') + (d.tip ? '<div class="tipbox">' + esc(d.tip) + '</div>' : '') + '</div></details>'; }).join('');
 }
+function planSourceLabel(doc) { const s = doc && doc.meta ? doc.meta.source : ''; return s === 'claude' ? 'Claude planı' : s === 'seed' ? 'Uzman planı' : s === 'code' ? 'Hazır plan' : s === 'standard' ? 'Standart menü' : 'Elle düzenlendi'; }
+// One week only: the current week, today open. Next week is planned (Claude, artifact only) from a collapsed section.
 function plannerCard() {
-  const ws = planWeek(), saved = state.weekmenus[ws] || codeWeekDoc(ws), draft = state.plan.draft && state.plan.draft.ws === ws ? state.plan.draft : null, inp = planInputs();
-  const thisWs = mondayOf(state.today), weeks = [thisWs, addDays(thisWs, 7), addDays(thisWs, 14)];
-  const weekSwitch = '<div class="segs">' + weeks.map((w, i) => '<button type="button" data-plan="week" data-ws="' + w + '"' + (w === ws ? ' class="on"' : '') + '>' + (i === 0 ? 'Bu hafta' : i === 1 ? 'Gelecek hafta' : 'Sonraki') + ' · ' + parseD(w).getDate() + ' ' + MONTHS_TR[parseD(w).getMonth()] + '</button>').join('') + '</div>';
-  const inputs = '<div class="field"><label for="plFridge">Buzdolabında / elde olanlar</label><textarea id="plFridge" rows="2" placeholder="Örn. 1 kg ıspanak, 6 yumurta, kalan tavuk, közlenmiş biber">' + esc(inp.fridge) + '</textarea></div><div class="two"><div class="field"><label for="plAvoid">Bu hafta istenmeyenler</label><input type="text" id="plAvoid" value="' + esc(inp.avoid) + '" maxlength="300" placeholder="Örn. kuru fasulye, karnabahar"></div><div class="field"><label for="plNotes">Notlar</label><input type="text" id="plNotes" value="' + esc(inp.notes) + '" maxlength="300" placeholder="Örn. Çarşamba akşam dışarıda, misafir Cumartesi"></div></div>';
-  const genBtn = !STATIC_HOST && state.sample ? '<div class="row"><button type="button" class="btn" data-plan="generate" data-ws="' + ws + '"' + (state.plan.busy ? ' disabled' : '') + '>' + (saved ? 'Claude ile yeniden planla' : 'Claude ile planla') + '</button><span class="tiny">' + esc(state.plan.msg) + '</span></div>' : '';
-  const draftHtml = draft ? '<div class="note"><b>Taslak · ' + fmtD(ws) + ' haftası</b>' + (draft.meta.rationale ? '<details><summary>Gerekçe</summary><p class="muted">' + esc(draft.meta.rationale) + '</p></details>' : '') + '</div><div>' + planDaysHtml(draft, 'draft', ws) + '</div>' + (draft.recipes.length ? '<p class="tiny">Yeni tarifler: ' + esc(draft.recipes.map(r => r.name).join(', ')) + '</p>' : '') + '<div class="row"><button type="button" class="btn" data-plan="save" data-ws="' + ws + '">Planı kaydet</button><button type="button" class="btn ghost" data-plan="discard">Vazgeç</button></div>' : '';
-  const srcLabel = saved ? (saved.meta.source === 'claude' ? 'Claude planı' : saved.meta.source === 'seed' ? 'Uzman planı' : saved.meta.source === 'code' ? 'Hazır plan' : 'Elle düzenlendi') : '';
-  const savedHtml = saved && !draft ? '<div class="row"><span class="pill good">Planlı</span><span class="tiny">' + srcLabel + (saved.meta.createdAt ? ' · ' + fmtD(saved.meta.createdAt.slice(0, 10)) : '') + (saved.meta.updatedAt ? ' · güncellendi ' + fmtD(saved.meta.updatedAt.slice(0, 10)) + ' ' + localTime(saved.meta.updatedAt) : '') + '</span></div><div>' + planDaysHtml(saved, 'saved', ws) + '</div><div class="row"><button type="button" class="btn ghost small" data-plan="copy" data-ws="' + ws + '">Plan kodunu kopyala</button><span class="tiny" id="planCopyMsg"></span></div>' : (!draft ? '<p class="muted">' + fmtD(ws) + ' haftası henüz planlanmadı; standart menü geçerli.</p>' : '');
-  const bridge = '<details class="item" id="plan-load"' + (state.open.has('plan-load') ? ' open' : '') + '><summary>Plan kodu yükle<span class="sub">Claude sürümünden kopyalanan kod</span></summary><div class="mlist"><textarea id="planCode" rows="3" placeholder="{&quot;ws&quot;: ... }"></textarea><div class="row"><button type="button" class="btn ghost small" data-plan="load">Planı yükle</button><span class="tiny" id="planLoadMsg"></span></div></div></details>';
-  const aud = state.plan.audit && state.plan.audit.ws === ws ? state.plan.audit : null;
-  const approved = saved && saved.meta.approved;
-  let audBody = '<div class="row"><button type="button" class="btn ghost small" data-plan="audit" data-ws="' + ws + '"' + (saved ? '' : ' disabled') + '>Kontrol et</button>' + (approved ? '<span class="pill good">Onaylı · ' + fmtD(approved.at.slice(0, 10)) + ' ' + localTime(approved.at) + '</span>' : '<span class="pill warn">Kontrol edilmedi</span>') + '</div>';
-  if (aud) {
-    if (!aud.rows.length) audBody += '<div class="celebrate">Uyumlu: tüm tarif malzemeleri alışveriş listesinde ✓</div>' + (approved ? '' : '<div class="row"><button type="button" class="btn small" data-plan="approve" data-ws="' + ws + '">Planı onayla</button></div>');
-    else audBody += '<div>' + aud.rows.map((r, i) => '<div class="planmeal"><div><b>' + DAY_NAMES[r.dow] + ' ' + MEAL_NAMES[r.k] + '</b> · ' + esc(r.recipe) + '<br><span class="muted">' + esc(r.item.name) + (r.kind === 'low' ? ' <span class="tiny">(listede ' + esc(String(r.have[1])) + ' ' + esc(r.have[2]) + ', tarif ' + r.item.q + ' ' + esc(r.item.u) + ')</span>' : '') + '</span><div class="row" style="margin-top:4px"><input type="number" id="aq-' + i + '" value="' + (r.kind === 'low' ? Math.max(1, Math.ceil(r.item.q - Number(r.have[1]))) : r.item.q) + '" min="0.5" step="0.5" style="width:84px"><span class="tiny">' + esc(r.item.u) + ' · ' + SHOP_CATS[r.item.c] + '</span></div></div><div class="acts"><button type="button" data-plan="auditadd" data-ws="' + ws + '" data-i="' + i + '">Ekle</button></div></div>').join('') + '</div><div class="row"><button type="button" class="btn small" data-plan="auditaddall" data-ws="' + ws + '">Hepsini ekle</button><span class="tiny">' + aud.rows.length + ' eksik</span></div>';
+  const ws = mondayOf(state.today), nws = addDays(ws, 7), saved = state.weekmenus[ws] || codeWeekDoc(ws), draft = state.plan.draft && state.plan.draft.ws === nws ? state.plan.draft : null, inp = planInputs();
+  const canPlan = !STATIC_HOST && !!state.sample;
+  const head = '<div class="card-h"><h2>Haftalık plan</h2><span class="meta">' + fmtD(ws) + ' – ' + fmtD(addDays(ws, 6)) + ' · ' + planSourceLabel(saved) + '</span></div>';
+  const days = saved ? '<div>' + planDaysHtml(saved, 'saved', ws) + '</div>' : '<p class="muted">Bu hafta için plan yok.</p>';
+  const nextSaved = state.weekmenus[nws];
+  let tail = nextSaved ? '<p class="tiny">Gelecek hafta planlı · ' + fmtD(nws) + ' – ' + fmtD(addDays(nws, 6)) + (nextSaved.meta.approved ? ' · onaylı' : '') + '</p>' : '';
+  if (canPlan) {
+    const inputs = '<div class="field"><label for="plFridge">Buzdolabında / elde olanlar</label><textarea id="plFridge" rows="2" placeholder="Örn. 1 kg ıspanak, 6 yumurta, kalan tavuk, közlenmiş biber">' + esc(inp.fridge) + '</textarea></div><div class="two"><div class="field"><label for="plAvoid">İstenmeyenler</label><input type="text" id="plAvoid" value="' + esc(inp.avoid) + '" maxlength="300" placeholder="Örn. kuru fasulye, karnabahar"></div><div class="field"><label for="plNotes">Notlar</label><input type="text" id="plNotes" value="' + esc(inp.notes) + '" maxlength="300" placeholder="Örn. Çarşamba akşam dışarıda"></div></div>';
+    const genBtn = '<div class="row"><button type="button" class="btn" data-plan="generate" data-ws="' + nws + '"' + (state.plan.busy ? ' disabled' : '') + '>' + (nextSaved ? 'Yeniden planla' : 'Claude ile planla') + '</button><span class="tiny">' + esc(state.plan.msg) + '</span></div>';
+    const draftHtml = draft ? '<div class="note"><b>Taslak · ' + fmtD(nws) + ' – ' + fmtD(addDays(nws, 6)) + '</b>' + (draft.meta.rationale ? '<details><summary>Gerekçe</summary><p class="muted">' + esc(draft.meta.rationale) + '</p></details>' : '') + '</div><div>' + planDaysHtml(draft, 'draft', nws) + '</div>' + (draft.recipes.length ? '<p class="tiny">Yeni tarifler: ' + esc(draft.recipes.map(r => r.name).join(', ')) + '</p>' : '') + '<div class="row"><button type="button" class="btn" data-plan="save" data-ws="' + nws + '">Planı kaydet</button><button type="button" class="btn ghost" data-plan="discard">Vazgeç</button></div>' : '';
+    tail = '<details class="item" id="plan-next"' + (state.open.has('plan-next') || draft ? ' open' : '') + '><summary>Gelecek haftayı planla<span class="sub">' + fmtD(nws) + ' – ' + fmtD(addDays(nws, 6)) + (nextSaved ? ' · planlı' : '') + '</span></summary><div class="mlist">' + inputs + genBtn + draftHtml + '</div></details>';
   }
-  const auditHtml = '<details class="item" id="plan-audit"' + (state.open.has('plan-audit') || aud ? ' open' : '') + '><summary>Tarif–liste uyumu<span class="sub">' + (approved ? 'Onaylı' : aud ? (aud.rows.length ? aud.rows.length + ' eksik kalem' : 'Uyumlu, onay bekliyor') : 'Kontrol edilmedi') + '</span></summary><div class="mlist">' + audBody + '</div></details>';
-  const log = state.changelog.slice(0, 30).map(e => '<div class="logrow"><span class="when">' + (e.at ? fmtD(e.at.slice(0, 10)) + ' ' + localTime(e.at) : '') + '</span><span>' + esc(e.text) + (e.by ? ' <span class="tiny">· ' + esc(cfg(e.by).name) + '</span>' : '') + '</span></div>').join('');
-  const logHtml = '<details class="item" id="plan-log"' + (state.open.has('plan-log') ? ' open' : '') + '><summary>Değişiklik kaydı<span class="sub">' + state.changelog.length + ' kayıt</span></summary><div class="mlist">' + (log || '<p class="tiny">Henüz kayıt yok.</p>') + '</div></details>';
-  return '<div class="card"><div class="card-h"><h2>Haftalık plan</h2><span class="meta">' + fmtD(ws) + ' – ' + fmtD(addDays(ws, 6)) + '</span></div>' + weekSwitch +
-    inputs + genBtn + draftHtml + savedHtml + auditHtml + bridge + logHtml + '</div>';
+  return '<div class="card">' + head + days + tail + '</div>';
+}
+// Recipe–shopping consistency check, shown under the shopping lists (Tarifler) for this or next week.
+function auditSectionHtml() {
+  const thisWs = mondayOf(state.today), nextWs = addDays(thisWs, 7), ws = state.plan.auditWs === nextWs ? nextWs : thisWs;
+  const saved = state.weekmenus[ws] || codeWeekDoc(ws), aud = state.plan.audit && state.plan.audit.ws === ws ? state.plan.audit : null, approved = saved && saved.meta.approved;
+  const segs = '<div class="segs">' + [thisWs, nextWs].map((w, i) => '<button type="button" data-plan="auditweek" data-ws="' + w + '"' + (w === ws ? ' class="on"' : '') + '>' + (i ? 'Gelecek hafta' : 'Bu hafta') + ' · ' + parseD(w).getDate() + ' ' + MONTHS_TR[parseD(w).getMonth()] + '</button>').join('') + '</div>';
+  let body = segs + '<div class="row"><button type="button" class="btn ghost small" data-plan="audit" data-ws="' + ws + '"' + (saved ? '' : ' disabled') + '>Kontrol et</button>' + (approved ? '<span class="pill good">Onaylı · ' + fmtD(approved.at.slice(0, 10)) + ' ' + localTime(approved.at) + '</span>' : '<span class="pill warn">Kontrol edilmedi</span>') + '</div>';
+  if (aud) {
+    if (!aud.rows.length) body += '<div class="celebrate">Uyumlu: tüm tarif malzemeleri alışveriş listesinde ✓</div>' + (approved ? '' : '<div class="row"><button type="button" class="btn small" data-plan="approve" data-ws="' + ws + '">Planı onayla</button></div>');
+    else body += '<div>' + aud.rows.map((r, i) => '<div class="planmeal"><div><b>' + DAY_NAMES[r.dow] + ' ' + MEAL_NAMES[r.k] + '</b> · ' + esc(r.recipe) + '<br><span class="muted">' + esc(r.item.name) + (r.kind === 'low' ? ' <span class="tiny">(listede ' + esc(String(r.have[1])) + ' ' + esc(r.have[2]) + ', tarif ' + r.item.q + ' ' + esc(r.item.u) + ')</span>' : '') + '</span><div class="row" style="margin-top:4px"><input type="number" id="aq-' + i + '" value="' + (r.kind === 'low' ? Math.max(1, Math.ceil(r.item.q - Number(r.have[1]))) : r.item.q) + '" min="0.5" step="0.5" style="width:84px"><span class="tiny">' + esc(r.item.u) + ' · ' + SHOP_CATS[r.item.c] + '</span></div></div><div class="acts"><button type="button" data-plan="auditadd" data-ws="' + ws + '" data-i="' + i + '">Ekle</button></div></div>').join('') + '</div><div class="row"><button type="button" class="btn small" data-plan="auditaddall" data-ws="' + ws + '">Hepsini ekle</button><span class="tiny">' + aud.rows.length + ' eksik</span></div>';
+  }
+  return '<details class="item" id="shop-audit"' + (state.open.has('shop-audit') ? ' open' : '') + '><summary>Tarif–liste uyumu<span class="sub">' + (approved ? 'Onaylı' : aud ? (aud.rows.length ? aud.rows.length + ' eksik kalem' : 'Uyumlu, onay bekliyor') : 'Kontrol edilmedi') + '</span></summary><div class="mlist">' + body + '</div></details>';
 }
 function runAudit(ws) { const doc = planDoc('saved', ws); state.plan.audit = { ws: ws, rows: doc ? auditWeekDoc(doc) : [] }; }
 async function auditAdd(ws, idxs) {
@@ -1878,23 +1879,24 @@ async function auditAdd(ws, idxs) {
   if (!added.length) return;
   const normalized = normWeekMenu(next, ws); normalized.meta.updatedAt = new Date().toISOString(); delete normalized.meta.approved;
   await saveWeekMenu(normalized, 'Alışveriş listesine tariften eklendi: ' + added.join(', ').slice(0, 150));
-  runAudit(ws); renderProgram();
+  runAudit(ws); renderAll();
 }
 async function approvePlan(ws) {
   const doc = state.weekmenus[ws] || codeWeekDoc(ws); if (!doc) return;
-  runAudit(ws); if (state.plan.audit.rows.length) { renderProgram(); return; }
+  runAudit(ws); if (state.plan.audit.rows.length) { renderAll(); return; }
   const next = JSON.parse(JSON.stringify(doc)); next.meta.approved = { at: new Date().toISOString(), by: state.person };
   await saveWeekMenu(normWeekMenu(next, ws), fmtD(ws) + ' haftası planı onaylandı (tarif–liste uyumu tam)');
-  renderProgram();
+  renderAll();
 }
 function bindPlanner() {
   const v = $('#view-program');
   v.addEventListener('input', e => { if (['plFridge', 'plAvoid', 'plNotes'].indexOf(e.target.id) >= 0) { const inp = planInputs(); inp.fridge = ($('#plFridge') || {}).value || ''; inp.avoid = ($('#plAvoid') || {}).value || ''; inp.notes = ($('#plNotes') || {}).value || ''; lsSet('bt_plan_inputs', inp); } });
-  v.addEventListener('click', async e => {
+  v.addEventListener('toggle', e => { const el = e.target, key = el && el.dataset ? el.dataset.planDay : null; if (!key || !state.plan.openDays) return; if (el.open) state.plan.openDays.add(key); else state.plan.openDays.delete(key); }, true);
+  document.addEventListener('click', async e => {
     const b = e.target.closest('[data-plan]'); if (!b) return;
     const a = b.dataset.plan, ws = b.dataset.ws, dow = b.dataset.dow, k = b.dataset.k, scope = b.dataset.scope;
-    if (a === 'week') { state.plan.ws = ws; state.plan.edit = null; renderProgram(); }
-    else if (a === 'audit') { runAudit(ws); state.open.add('plan-audit'); renderProgram(); }
+    if (a === 'auditweek') { state.plan.auditWs = ws; renderAll(); }
+    else if (a === 'audit') { runAudit(ws); state.plan.auditWs = ws; state.open.add('shop-audit'); renderAll(); }
     else if (a === 'auditadd') auditAdd(ws, [Number(b.dataset.i)]);
     else if (a === 'auditaddall') auditAdd(ws, (state.plan.audit && state.plan.audit.rows || []).map((_, i) => i));
     else if (a === 'approve') approvePlan(ws);
@@ -1905,8 +1907,6 @@ function bindPlanner() {
     else if (a === 'edit') { state.plan.edit = { scope: scope, ws: ws, dow: Number(dow), k: k }; renderProgram(); const t = $('#pe-t'); if (t) t.focus(); }
     else if (a === 'editcancel') { state.plan.edit = null; renderProgram(); }
     else if (a === 'editsave') manualEdit(scope, ws, Number(dow), k, { t: ($('#pe-t') || {}).value || '', E: ($('#pe-E') || {}).value || '', K: ($('#pe-K') || {}).value || '' });
-    else if (a === 'copy') { const doc = state.weekmenus[ws]; if (!doc) return; const json = JSON.stringify(doc); const msg = $('#planCopyMsg'); try { await navigator.clipboard.writeText(json); if (msg) msg.textContent = 'Kopyalandı; diğer telefonda "Plan kodu yükle" bölümüne yapıştırın.'; } catch (err) { const ta = $('#planCode'); if (ta) { ta.value = json; ta.hidden = false; ta.focus(); ta.select(); } if (msg) msg.textContent = 'Metin aşağıdaki kutuda seçildi; kopyalayın.'; } }
-    else if (a === 'load') { const ta = $('#planCode'), msg = $('#planLoadMsg'); let doc = null; try { const raw = JSON.parse(ta.value); doc = normWeekMenu(raw, isDate(raw && raw.ws) ? raw.ws : ''); } catch (err) { doc = null; } if (!doc) { if (msg) msg.textContent = 'Kod okunamadı; tamamını yapıştırdığınızdan emin olun.'; return; } await saveWeekMenu(doc, fmtD(doc.ws) + ' haftası planı koddan yüklendi'); state.plan.ws = doc.ws; renderAll(); const m2 = $('#planLoadMsg'); if (m2) m2.textContent = fmtD(doc.ws) + ' haftası yüklendi.'; }
   });
 }
 </script>
@@ -1927,7 +1927,7 @@ function renderRecipes() {
       '<p class="muted"><b>Porsiyon</b> · E: ' + esc(r.por.E) + ' · K: ' + esc(r.por.K) + '</p><div class="tipbox">' + esc(r.tip) + '</div>' +
       '<div class="field"><label for="rn-' + r.id + '">Not</label><input type="text" id="rn-' + r.id + '" data-note="' + r.id + '" value="' + esc(d.note) + '" maxlength="300" placeholder="Örn. kimyonu artırdık"></div></div></details>'; }).join('');
   const dayTips = [1, 2, 3, 4, 5, 6, 0].map(k => '<li><b>' + MENU[k].name + ':</b> ' + esc(MENU[k].tip) + '</li>').join('');
-  $('#view-tarifler').innerHTML = '<div class="card"><div class="card-h"><h2>Pratik tarifler</h2><span class="meta">' + list.length + ' tarif</span></div><div>' + items + '</div></div>' +
+  $('#view-tarifler').innerHTML = shoppingCard() + '<div class="card"><div class="card-h"><h2>Pratik tarifler</h2><span class="meta">' + list.length + ' tarif</span></div><div>' + items + '</div></div>' +
     '<div class="card"><div class="card-h"><h2>Püf noktaları</h2><span class="meta">Neyi neyle, nasıl pişir</span></div><ul class="plain">' + RULES.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
     '<div class="card"><div class="card-h"><h2>Günün püf noktası</h2><span class="meta">Haftalık menüye göre</span></div><ul class="plain">' + dayTips + '</ul></div>';
 }
