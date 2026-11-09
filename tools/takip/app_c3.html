@@ -20,7 +20,7 @@ function compressImage(file) {
 }
 function foodPrompt(p, L, f, hasImage) {
   const c = cfg(p), menu = MENU[parseD(L.date).getDay()], planned = menu.meals.find(m => m.k === f.meal);
-  const who = p === 'E' ? '35 yaşında erkek, 170 cm, hedef 1 800 kcal/gün, ailede tip 2 diyabet öyküsü' : '37 yaşında kadın, 160 cm, hedef 1 450 kcal/gün';
+  const who = p === 'E' ? '35 yaşında erkek, 170 cm, hedef 1 800 kcal/gün, ailede tip 2 diyabet öyküsü' : p === 'K' ? '37 yaşında kadın, 160 cm, hedef 1 450 kcal/gün' : 'kadın, hedef ' + cfg(p).kcal + ' kcal/gün';
   const others = L.foods.filter(x => x.id !== f.id && x.kcal != null).reduce((s, x) => s + x.kcal, 0);
   return 'Sen deneyimli bir diyetisyensin. Kilo verme programındaki bir kişinin öğün kaydını değerlendir.\n' +
     'Kişi: ' + who + '. Bugüne kadar kayıtlı diğer öğünler: ' + Math.round(others) + ' kcal.\n' +
@@ -84,12 +84,12 @@ function bindToday() {
       else if (a === 'foodDel') { const id = act.dataset.id; editLog(L => { L.foods = L.foods.filter(x => x.id !== id); }); renderToday(); }
       else if (a === 'foodRetry') { analyzeFood(state.person, state.date, act.dataset.id, null); }
       else if (a === 'claimRung') { const w = Number(act.dataset.w); if (RUNG_WEEKS.indexOf(w) > 0) { state.rewards.claimed[state.person]['w' + w] = state.today; await saveRewards(); renderToday(); } }
-      else if (a === 'cycleSave') { const inp = $('#cycleDate'); if (!inp || !isDate(inp.value) || inp.value > state.today) return; const c = cfg('K'); c.cycleStart = inp.value; await saveSettings('K', c); renderToday(); }
+      else if (a === 'cycleSave') { const inp = $('#cycleDate'); if (!inp || !isDate(inp.value) || inp.value > state.today) return; const c = cfg(state.person); c.cycleStart = inp.value; await saveSettings(state.person, c); renderToday(); }
       else if (a === 'cycleStart') {
-        const c = cfg('K'); const hist = c.cycleHistory.slice(); if (c.cycleStart && c.cycleStart !== state.date) hist.push(c.cycleStart);
+        const c = cfg(state.person); const hist = c.cycleHistory.slice(); if (c.cycleStart && c.cycleStart !== state.date) hist.push(c.cycleStart);
         const starts = hist.concat([state.date]).sort(); const lens = []; for (let i = 1; i < starts.length; i++) { const L = daysBetween(starts[i - 1], starts[i]); if (L >= 20 && L <= 45) lens.push(L); }
         c.cycleHistory = hist.slice(-12); c.cycleStart = state.date; if (lens.length >= 2) c.cycleLen = Math.round(avg(lens.slice(-4)));
-        await saveSettings('K', c); renderToday();
+        await saveSettings(state.person, c); renderToday();
       }
     } else if (tog) { const f = tog.dataset.toggle; editLog(L => { L[f] = !L[f]; }); renderToday(); }
     else if (meal) { const k = meal.dataset.meal; editLog(L => { L.meals[k] = !L.meals[k]; }); renderToday(); }

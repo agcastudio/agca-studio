@@ -17,8 +17,10 @@
 'use strict';
 const DEFAULTS = {
   E: { name: 'Erkek', startWeight: 87, goalWeight: 78, startDate: '2026-11-09', rate: 0.7, waterGoal: 11, kcal: 1800, height: 170, weighDay: 5 },
-  K: { name: 'Kadın', startWeight: 74, goalWeight: 62, startDate: '2026-11-09', rate: 0.5, waterGoal: 9, kcal: 1450, height: 160, weighDay: 5, cycleStart: '', cycleLen: 28, periodLen: 5, cycleHistory: [] }
+  K: { name: 'Selen', female: true, startWeight: 74, goalWeight: 62, startDate: '2026-11-09', rate: 0.5, waterGoal: 9, kcal: 1450, height: 160, weighDay: 5, cycleStart: '', cycleLen: 28, periodLen: 5, cycleHistory: [] },
+  S: { name: 'Sevinç', female: true, startWeight: 70, goalWeight: 65, startDate: '2026-11-09', rate: 0.5, waterGoal: 9, kcal: 1450, height: 160, weighDay: 5, cycleStart: '', cycleLen: 28, periodLen: 5, cycleHistory: [] }
 };
+const PERSONS = ['E', 'K', 'S']; // E erkek sayfası, K Selen (kadin sayfası), S Sevinç (sevinc sayfası)
 const DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 const REWARD_DEFAULT_POINTS = 55;
 const MEAL_KEYS = ['k', 'a1', 'o', 'a2', 'ak'];

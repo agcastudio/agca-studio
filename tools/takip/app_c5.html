@@ -174,7 +174,7 @@ function accountCardHtml() {
     '<div class="row"><button type="button" class="btn ghost small" data-remote="sync">Şimdi eşitle</button><button type="button" class="btn ghost small" data-remote="logout">Çıkış yap</button><span class="tiny" id="accountMsg"></span></div>' +
     '<details class="item" id="set-pass"' + (state.open.has('set-pass') ? ' open' : '') + '><summary>Şifreyi değiştir</summary><form class="mlist" data-remote="password"><div class="two"><div class="field"><label for="passOld">Mevcut şifre</label><input type="password" id="passOld" autocomplete="current-password" required></div><div class="field"><label for="passNew">Yeni şifre</label><input type="password" id="passNew" autocomplete="new-password" minlength="4" required></div></div><div class="row"><button type="submit" class="btn ghost small">Değiştir</button><span class="tiny" id="passMsg"></span></div></form></details></div>';
 }
-function histPersons() { return STATIC_HOST ? [state.person] : ['E', 'K']; }
+function histPersons() { return STATIC_HOST ? [state.person] : PERSONS; }
 function histMonth() { return state.histMonth || state.today.slice(0, 7); }
 function histDates(ym) { const y = Number(ym.slice(0, 4)), m = Number(ym.slice(5, 7)); const out = []; for (let d = y + '-' + pad(m) + '-01', last = dstr(new Date(y, m, 0)); d <= last; d = addDays(d, 1)) out.push(d); return out; }
 function historyCardHtml() {

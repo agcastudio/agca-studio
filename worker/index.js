@@ -1,16 +1,18 @@
 // agca.studio Worker: statik varlıklar (Hugo çıktısı) + /api/takip
-// /api/takip: /duzentakip/ sayfalarının çevrimiçi kaydı. İki hesap (E: erkek sayfası, K: kadın sayfası), her birinin
+// /api/takip: /duzentakip/ sayfalarının çevrimiçi kaydı. Üç hesap (E: erkek, K: kadin/Selen, S: sevinc/Sevinç), her birinin
 // kendi şifresi var. Günlük kayıtlar ve ayarlar hesaba özel; tarifler, haftalık plan ve değişiklik kaydı ortak.
 // Veriler SQLite destekli tek Durable Object içinde tutulur; üçüncü taraf servis yok.
 const API_PREFIX = '/api/takip';
 const COLS = {
-  logs: /^[EK]_\d{4}-\d{2}-\d{2}$/,
-  settings: /^(E|K|rewards)$/,
+  logs: /^[EKS]_\d{4}-\d{2}-\d{2}$/,
+  settings: /^(E|K|S|rewards)$/,
   recipes: /^[a-z0-9-]{1,24}$/,
   weekmenus: /^\d{4}-\d{2}-\d{2}$/,
   changelog: /^[a-z0-9]{1,24}$/
 };
 const SHARED = { recipes: true, weekmenus: true, changelog: true };
+const SHARED_OWNER = '_'; // ortak belgelerin sahibi (kişi kodları E, K, S)
+const ACCOUNTS = ['E', 'K', 'S'];
 const MAX_BODY = 1500000, MAX_DOC = 120000, MAX_DOCS = 600, MAX_SESSIONS = 20;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000, LOGIN_MAX = 12, SESSION_DAYS = 400;
 
@@ -57,11 +59,11 @@ function safeEq(a, b) {
   return r === 0;
 }
 const isKey = k => typeof k === 'string' && /^[0-9a-f]{64}$/.test(k);
-const acctOf = v => (v === 'K' ? 'K' : v === 'E' ? 'E' : null);
+const acctOf = v => (ACCOUNTS.indexOf(v) >= 0 ? v : null);
 const nowIso = () => new Date().toISOString();
 // Which account may write a document: shared collections → 'S'; logs and settings only the owner's.
 function ownerFor(col, id, acct) {
-  if (SHARED[col]) return 'S';
+  if (SHARED[col]) return SHARED_OWNER;
   if (col === 'logs') return id.slice(0, 2) === acct + '_' ? acct : null;
   if (col === 'settings') return (id === acct || id === 'rewards') ? acct : null;
   return null;
@@ -75,6 +77,7 @@ export class TakipStore {
     this.sql.exec('CREATE TABLE IF NOT EXISTS sessions (th TEXT PRIMARY KEY, person TEXT NOT NULL, label TEXT NOT NULL, created TEXT NOT NULL, last_seen TEXT NOT NULL)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS attempts (ip TEXT PRIMARY KEY, n INTEGER NOT NULL, first_ms INTEGER NOT NULL)');
     if (Number(this.getMeta('schema') || 1) < 2) this.migrateV2();
+    if (Number(this.getMeta('schema') || 1) < 3) this.migrateV3();
     this.sql.exec('CREATE TABLE IF NOT EXISTS docs (owner TEXT NOT NULL, col TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, updated_at TEXT NOT NULL, rev INTEGER NOT NULL, PRIMARY KEY (owner, col, id))');
     this.sql.exec('CREATE INDEX IF NOT EXISTS docs_rev ON docs (rev)');
     this.ready = true;
@@ -89,7 +92,7 @@ export class TakipStore {
         this.sql.exec('CREATE TABLE docs_v2 (owner TEXT NOT NULL, col TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, updated_at TEXT NOT NULL, rev INTEGER NOT NULL, PRIMARY KEY (owner, col, id))');
         const rows = this.sql.exec('SELECT col, id, body, updated_at, rev FROM docs').toArray();
         for (const r of rows) {
-          const owners = SHARED[r.col] ? ['S'] : r.col === 'logs' ? [r.id.charAt(0)] : r.col === 'settings' ? (r.id === 'rewards' ? ['E', 'K'] : [r.id]) : [];
+          const owners = SHARED[r.col] ? [SHARED_OWNER] : r.col === 'logs' ? [r.id.charAt(0)] : r.col === 'settings' ? (r.id === 'rewards' ? ['E', 'K'] : [r.id]) : [];
           for (const o of owners) this.sql.exec('INSERT OR REPLACE INTO docs_v2 (owner, col, id, body, updated_at, rev) VALUES (?, ?, ?, ?, ?, ?)', o, r.col, r.id, r.body, r.updated_at, r.rev);
         }
         this.sql.exec('DROP TABLE docs');
@@ -99,6 +102,7 @@ export class TakipStore {
     const salt = this.getMeta('pass_salt'), hash = this.getMeta('pass_hash');
     if (salt && hash) {
       let who = this.sql.exec('SELECT DISTINCT person FROM sessions').toArray().map(r => r.person).filter(p => p === 'E' || p === 'K');
+      // (v2 döneminde yalnız E ve K vardı)
       if (!who.length) who = ['E', 'K'];
       for (const p of who) {
         if (this.getMeta('pass_hash:' + p)) continue;
@@ -107,6 +111,12 @@ export class TakipStore {
       this.sql.exec("DELETE FROM meta WHERE k IN ('pass_salt', 'pass_hash', 'pass_set_at')");
     }
     this.setMeta('schema', '2');
+  }
+  // v2 → v3: ortak belgelerin sahibi 'S' yerine '_' (S artık Sevinç'in kişi kodu).
+  migrateV3() {
+    const hasDocs = this.sql.exec("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'docs'").toArray().length > 0;
+    if (hasDocs) this.sql.exec("UPDATE docs SET owner = ? WHERE owner = 'S'", SHARED_OWNER);
+    this.setMeta('schema', '3');
   }
   getMeta(k) { const r = this.sql.exec('SELECT v FROM meta WHERE k = ?', k).toArray(); return r.length ? r[0].v : null; }
   setMeta(k, v) { this.sql.exec('INSERT INTO meta (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v', k, v); }
@@ -171,11 +181,11 @@ export class TakipStore {
   me(row) {
     const sessions = this.sql.exec('SELECT th, person, label, created, last_seen FROM sessions WHERE person = ? ORDER BY last_seen DESC LIMIT ?', row.person, MAX_SESSIONS).toArray()
       .map(s => ({ person: s.person, label: s.label, created: s.created, lastSeen: s.last_seen, current: s.th === row.th }));
-    const docs = this.sql.exec("SELECT COUNT(*) AS n FROM docs WHERE owner = ? OR owner = 'S'", row.person).one().n;
+    const docs = this.sql.exec('SELECT COUNT(*) AS n FROM docs WHERE owner = ? OR owner = ?', row.person, SHARED_OWNER).one().n;
     return { person: row.person, label: row.label, created: row.created, passSetAt: this.getMeta('pass_set_at:' + row.person), sessions: sessions, docs: docs };
   }
   changedSince(rev, acct, skip) {
-    const rows = this.sql.exec("SELECT col, id, body, updated_at, rev FROM docs WHERE rev > ? AND (owner = ? OR owner = 'S') ORDER BY rev ASC LIMIT 5000", rev, acct).toArray();
+    const rows = this.sql.exec('SELECT col, id, body, updated_at, rev FROM docs WHERE rev > ? AND (owner = ? OR owner = ?) ORDER BY rev ASC LIMIT 5000', rev, acct, SHARED_OWNER).toArray();
     const out = [];
     for (const r of rows) {
       if (skip && skip.has(r.col + '/' + r.id)) continue;
@@ -209,7 +219,8 @@ export class TakipStore {
     const ip = request.headers.get('cf-connecting-ip') || 'local';
     if (path === '/status' && method === 'GET') {
       const p = acctOf(url.searchParams.get('person'));
-      return json({ ok: true, hasPassword: p ? this.hasPassword(p) : { E: this.hasPassword('E'), K: this.hasPassword('K') }, rev: this.curRev(), now: nowIso() });
+      const all = {}; ACCOUNTS.forEach(a => { all[a] = this.hasPassword(a); });
+      return json({ ok: true, hasPassword: p ? this.hasPassword(p) : all, rev: this.curRev(), now: nowIso() });
     }
     if (path === '/login' && method === 'POST') {
       if (!this.rateCheck(ip)) return fail(429, 'rate_limited', 'Çok fazla deneme; 15 dakika sonra tekrar deneyin.');

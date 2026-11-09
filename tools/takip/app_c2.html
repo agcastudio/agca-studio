@@ -45,7 +45,7 @@ function motto(L, c, pts, p, lp) {
   if (pts >= DAY_WIN) return 'Gün kazanıldı. Mutfak kapandı, şampiyon 🥇';
   if (h < 9 && !L.run) return 'Koşu seni bekliyor; sabah ışığı en iyi antidepresan 🌤';
   if (h >= 14 && L.water < c.waterGoal * 0.4) return 'Su! Kaktüs değilsin 🌵';
-  if (p === 'K') { const ci = cycleInfo(c, state.date); if (ci && ci.pms) return 'PMS haftası: tatlı isteği normal, planlı tatlı cebinde 🍐'; }
+  if (c.female) { const ci = cycleInfo(c, state.date); if (ci && ci.pms) return 'PMS haftası: tatlı isteği normal, planlı tatlı cebinde 🍐'; }
   if (meals === 5) return 'Beş öğün tamam, kan şekeri dümdüz 📈';
   if (lp.streak >= 2) return lp.streak + ' haftalık seri sürüyor, zincir kırılmasın 🔗';
   if (pts >= 8) return 'Bir iki adım kaldı: yürüyüş, su ya da erken yatış 🚶';
@@ -56,7 +56,7 @@ function heroHtml(p, L, c) {
   const lp = ladderProgress(p), pts = dayPoints(L, c), th = lp.threshold, cw = lp.current, isToday = state.date === state.today;
   const circ = 2 * Math.PI * 40, dash = (Math.min(DAY_MAX, pts) / DAY_MAX * circ).toFixed(1);
   const streak = dayStreak(p), daysLeft = Math.max(0, 6 - daysBetween(cw.ws, state.today)), weekly = state.rewards.ladder[p][0];
-  const chips = PERSON_LOCK ? '' : '<div class="pchips">' + ['E', 'K'].map(q => '<button type="button" class="pchip' + (q === state.person ? ' on' : '') + '" data-person="' + q + '">' + esc(cfg(q).name) + '</button>').join('') + '</div>';
+  const chips = PERSON_LOCK ? '' : '<div class="pchips">' + PERSONS.map(q => '<button type="button" class="pchip' + (q === state.person ? ' on' : '') + '" data-person="' + q + '">' + esc(cfg(q).name) + '</button>').join('') + '</div>';
   const defaultName = /^(Erkek|Kadın)$/i.test(c.name.trim());
   const greet = isToday ? greeting() + (defaultName ? '' : ', ' + esc(c.name)) + ' 👋' : fmtDL(state.date);
   const sub = '<div class="hsub"><span class="pill accent">⭐ ' + levelName(lp.count) + '</span>' + (lp.warmup ? '' : '<span class="pill">🪜 ' + lp.count + ' başarılı hafta</span>') + '</div>';
@@ -98,7 +98,7 @@ function questsHtml(p, L, c) {
   const earlier = logsOf(p).filter(l => l.weight != null && l.date < d), prev = earlier.length ? earlier[earlier.length - 1] : null;
   const items = [{ id: 'run', f: 'run', t: '06:15', name: 'Sabah koşusu', pts: 1, on: L.run, kind: 'toggle' }];
   if (dow === c.weighDay) items.push({ id: 'weigh', t: '06:05', name: 'Haftalık tartı', pts: 5, on: L.weight != null, kind: 'weigh', menu: 'Tuvaletten sonra, kahvaltıdan önce', delta: weightDelta(L, c, prev) });
-  menu.meals.filter(m => m.k !== 'g').forEach(m => items.push({ id: m.k, k: m.k, t: MEAL_TIMES[m.k], name: MEAL_NAMES[m.k], pts: 1, on: !!L.meals[m.k], kind: 'meal', menu: m.t, por: m[p], rl: recipeLinks(dow, m.k, m) }));
+  menu.meals.filter(m => m.k !== 'g').forEach(m => items.push({ id: m.k, k: m.k, t: MEAL_TIMES[m.k], name: MEAL_NAMES[m.k], pts: 1, on: !!L.meals[m.k], kind: 'meal', menu: m.t, por: portionFor(m, p), rl: recipeLinks(dow, m.k, m) }));
   items.push({ id: 'vinegar', f: 'vinegar', t: '12:15', name: 'Sirkeli su', pts: 0, on: L.vinegar, kind: 'toggle', menu: '1 yk elma sirkesi + 1 bardak su' });
   items.push({ id: 'walkNoon', f: 'walkNoon', t: '13:15', name: 'Öğle yürüyüşü', pts: 1, on: L.walkNoon, kind: 'toggle', menu: '10–15 dk dışarıda' });
   items.push({ id: 'walkEve', f: 'walkEve', t: '19:45', name: 'Akşam yürüyüşü', pts: 1, on: L.walkEve, kind: 'toggle', menu: '10 dk · sonra mutfak kapanır' });
@@ -157,13 +157,13 @@ function renderToday() {
   const p = state.person, d = state.date, L = getLog(p, d), c = cfg(p);
   const total = L.foods.reduce((s, f) => s + (f.kcal || 0), 0);
   let cycleBody = '', cycleSub = '';
-  if (p === 'K') {
+  if (c.female) {
     const ci = cycleInfo(c, d);
     if (!ci) { cycleSub = 'Son adet tarihini gir'; cycleBody = '<div class="field"><label for="cycleDate">Son adetin başladığı gün</label><div class="addfood"><input type="date" id="cycleDate" max="' + state.today + '"><button type="button" class="btn" data-action="cycleSave">Kaydet</button></div></div>'; }
     else { cycleSub = ci.day + '. gün · ' + ci.phase + ' · sonraki ' + fmtD(ci.next); cycleBody = '<div class="row"><span class="pill' + (ci.pms ? ' warn' : ci.phase === 'Adet' ? ' accent' : ' good') + '">' + ci.phase + '</span><span class="tiny">döngü ' + c.cycleLen + ' gün</span></div><p class="muted">' + esc(ci.tip) + '</p><div class="row"><button type="button" class="btn ghost small" data-action="cycleStart">Adet başladı</button></div>'; }
   }
   $('#view-bugun').innerHTML = loginCardHtml() + heroHtml(p, L, c) + questsHtml(p, L, c) +
-    (p === 'K' ? subSec('sub-dongu', '🌙', 'Döngü', cycleSub, cycleBody) : '');
+    (c.female ? subSec('sub-dongu', '🌙', 'Döngü', cycleSub, cycleBody) : '');
   restorePane();
   const st = $('#saveStatus'); if (st) st.textContent = saveStatusText(L);
 }

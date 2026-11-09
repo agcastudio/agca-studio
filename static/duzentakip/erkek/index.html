@@ -332,8 +332,10 @@ ul.plain, ol.plain { margin: 0; padding-left: 18px; font-size: 0.9rem; color: va
 'use strict';
 const DEFAULTS = {
   E: { name: 'Erkek', startWeight: 87, goalWeight: 78, startDate: '2026-11-09', rate: 0.7, waterGoal: 11, kcal: 1800, height: 170, weighDay: 5 },
-  K: { name: 'Kadın', startWeight: 74, goalWeight: 62, startDate: '2026-11-09', rate: 0.5, waterGoal: 9, kcal: 1450, height: 160, weighDay: 5, cycleStart: '', cycleLen: 28, periodLen: 5, cycleHistory: [] }
+  K: { name: 'Selen', female: true, startWeight: 74, goalWeight: 62, startDate: '2026-11-09', rate: 0.5, waterGoal: 9, kcal: 1450, height: 160, weighDay: 5, cycleStart: '', cycleLen: 28, periodLen: 5, cycleHistory: [] },
+  S: { name: 'Sevinç', female: true, startWeight: 70, goalWeight: 65, startDate: '2026-11-09', rate: 0.5, waterGoal: 9, kcal: 1450, height: 160, weighDay: 5, cycleStart: '', cycleLen: 28, periodLen: 5, cycleHistory: [] }
 };
+const PERSONS = ['E', 'K', 'S']; // E erkek sayfası, K Selen (kadin sayfası), S Sevinç (sevinc sayfası)
 const DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 const REWARD_DEFAULT_POINTS = 55;
 const MEAL_KEYS = ['k', 'a1', 'o', 'a2', 'ak'];
@@ -876,8 +878,8 @@ function normWeekMenu(doc, ws) {
     out.days[dow] = { name: DAY_NAMES[dow], tip: str(d.tip, 300), meals: meals };
   }
   const meta = doc.meta && typeof doc.meta === 'object' ? doc.meta : {}, inp = meta.inputs && typeof meta.inputs === 'object' ? meta.inputs : {};
-  out.meta = { createdAt: str(meta.createdAt, 30), updatedAt: str(meta.updatedAt, 30), by: meta.by === 'K' ? 'K' : meta.by === 'E' ? 'E' : '', source: str(meta.source, 20), rationale: str(meta.rationale, 1500), inputs: { fridge: str(inp.fridge, 500), avoid: str(inp.avoid, 300), notes: str(inp.notes, 300) } };
-  if (meta.approved && typeof meta.approved === 'object' && meta.approved.at) out.meta.approved = { at: str(meta.approved.at, 30), by: meta.approved.by === 'K' ? 'K' : 'E' };
+  out.meta = { createdAt: str(meta.createdAt, 30), updatedAt: str(meta.updatedAt, 30), by: PERSONS.indexOf(meta.by) >= 0 ? meta.by : '', source: str(meta.source, 20), rationale: str(meta.rationale, 1500), inputs: { fridge: str(inp.fridge, 500), avoid: str(inp.avoid, 300), notes: str(inp.notes, 300) } };
+  if (meta.approved && typeof meta.approved === 'object' && meta.approved.at) out.meta.approved = { at: str(meta.approved.at, 30), by: PERSONS.indexOf(meta.approved.by) >= 0 ? meta.approved.by : 'E' };
   return Object.keys(out.days).length ? out : null;
 }
 function allRecipes() { const ids = new Set(RECIPES.map(r => r.id)), extra = []; Object.values(state.weekmenus).forEach(w => (w.recipes || []).forEach(r => { if (!ids.has(r.id)) { ids.add(r.id); extra.push(r); } })); return RECIPES.concat(extra); }
@@ -927,11 +929,11 @@ function fmtQty(q, u) {
 }
 
 // ---------- state ----------
-const PERSON_LOCK = (window.PERSON_LOCK === 'E' || window.PERSON_LOCK === 'K') ? window.PERSON_LOCK : null;
+const PERSON_LOCK = PERSONS.indexOf(window.PERSON_LOCK) >= 0 ? window.PERSON_LOCK : null;
 const state = {
-  person: PERSON_LOCK || (lsGet('bt_person', 'E') === 'K' ? 'K' : 'E'),
+  person: PERSON_LOCK || (PERSONS.indexOf(lsGet('bt_person', 'E')) >= 0 ? lsGet('bt_person', 'E') : 'E'),
   date: todayStr(), today: todayStr(), tab: 'bugun',
-  logs: {}, settings: { E: null, K: null }, rewards: null, recipes: {}, weekmenus: {}, changelog: [], plan: { draft: null, busy: false, msg: '' },
+  logs: {}, settings: { E: null, K: null, S: null }, rewards: null, recipes: {}, weekmenus: {}, changelog: [], plan: { draft: null, busy: false, msg: '' },
   mode: 'loading', db: null, sample: null, assets: null, imgOk: false,
   dirty: new Set(), pendingLocal: new Set(), timers: new Map(), inflight: new Map(),
   busy: new Set(), open: new Set(), pane: 0, showWeight: false, modeNote: ''
@@ -951,7 +953,7 @@ function normFood(f) {
     status: f.status === 'ok' ? 'ok' : 'none' };
 }
 function normLog(l) {
-  if (!l || (l.person !== 'E' && l.person !== 'K') || !isDate(l.date)) return null;
+  if (!l || PERSONS.indexOf(l.person) < 0 || !isDate(l.date)) return null;
   const e = emptyLog(l.person, l.date);
   e.weight = num(l.weight, 30, 250);
   e.water = Math.round(num(l.water, 0, 30) || 0);
@@ -965,14 +967,17 @@ function normLog(l) {
   e.updatedAt = typeof l.updatedAt === 'string' ? l.updatedAt.slice(0, 30) : '';
   return e;
 }
+// Portion text for a person; Sevinç (S) uses the women's (K) portion until her own is written.
+function portionFor(m, p) { return (m && m[p]) || (p !== 'E' && m ? (m.K || '') : ''); }
 function getLog(p, d) { const l = state.logs[logId(p, d)]; return l ? clone(l) : emptyLog(p, d); }
 function cfg(p) {
   const s = Object.assign({}, DEFAULTS[p], state.settings[p] || {});
   ['startWeight', 'goalWeight', 'rate', 'waterGoal', 'kcal', 'height'].forEach(k => { const v = Number(s[k]); s[k] = isFinite(v) && v > 0 ? v : DEFAULTS[p][k]; });
-  s.name = String(s.name || DEFAULTS[p].name).slice(0, 20);
+  s.name = String(s.name || DEFAULTS[p].name).slice(0, 20); if (s.name === 'Kadın') s.name = DEFAULTS[p].name;
+  s.female = !!DEFAULTS[p].female;
   if (!isDate(s.startDate)) s.startDate = DEFAULTS[p].startDate;
   const wd = Number(s.weighDay); s.weighDay = isFinite(wd) && wd >= 0 && wd <= 6 ? Math.round(wd) : 5;
-  if (p === 'K') {
+  if (s.female) {
     s.cycleStart = isDate(s.cycleStart) ? s.cycleStart : '';
     s.cycleLen = Math.round(num(s.cycleLen, 20, 45) || 28);
     s.periodLen = Math.round(num(s.periodLen, 2, 10) || 5);
@@ -984,14 +989,16 @@ const RUNG_WEEKS = [1, 2, 4, 8, 13, 26];
 const RUNG_LABELS = { 1: 'Her hafta', 2: '2 hafta', 4: '1 ay', 8: '2 ay', 13: '3 ay', 26: '6 ay' };
 const LADDER_DEFAULT = {
   E: [{ weeks: 1, icon: '🕌', title: 'Camii gezisi' }, { weeks: 2, icon: '🩸', title: 'Detaylı kan tahlili' }, { weeks: 4, icon: '🦷', title: 'Diş temizletme' }, { weeks: 8, icon: '👟', title: 'Koşu ekipmanı' }, { weeks: 13, icon: '🎿', title: 'Kayak tatili' }, { weeks: 26, icon: '✨', title: 'Tüm eşyalarımı sıfırlama' }],
-  K: [{ weeks: 1, icon: '📍', title: 'Yeni bir mekân gezisi' }, { weeks: 2, icon: '🍽️', title: 'AKM\'de yemek' }, { weeks: 4, icon: '📖', title: 'Kubi bir kitap okuyacak' }, { weeks: 8, icon: '📱', title: 'Telefon yenileme' }, { weeks: 13, icon: '🎿', title: '3–4 gün kayak tatili' }, { weeks: 26, icon: '🏝️', title: 'Girit adası tatili' }]
+  K: [{ weeks: 1, icon: '📍', title: 'Yeni bir mekân gezisi' }, { weeks: 2, icon: '🍽️', title: 'AKM\'de yemek' }, { weeks: 4, icon: '📖', title: 'Kubi bir kitap okuyacak' }, { weeks: 8, icon: '📱', title: 'Telefon yenileme' }, { weeks: 13, icon: '🎿', title: '3–4 gün kayak tatili' }, { weeks: 26, icon: '🏝️', title: 'Girit adası tatili' }],
+  S: [{ weeks: 1, icon: '☕', title: 'Keyifli bir kahve molası' }, { weeks: 2, icon: '🎬', title: 'Sinema veya tiyatro' }, { weeks: 4, icon: '💆', title: 'Masaj veya spa günü' }, { weeks: 8, icon: '👟', title: 'Yeni spor kıyafeti' }, { weeks: 13, icon: '🧳', title: 'Hafta sonu kaçamağı' }, { weeks: 26, icon: '🎁', title: 'Büyük hediye' }]
 };
 function normRewards(doc) {
   const d = doc && typeof doc === 'object' ? doc : {};
-  const out = { threshold: Math.round(num(d.threshold, 20, 75) || REWARD_DEFAULT_POINTS), ladder: { E: [], K: [] }, claimed: { E: {}, K: {} } };
-  ['E', 'K'].forEach(p => {
+  const out = { threshold: Math.round(num(d.threshold, 20, 75) || REWARD_DEFAULT_POINTS), ladder: {}, claimed: {} };
+  PERSONS.forEach(p => {
+    out.claimed[p] = {};
     const src = d.ladder && Array.isArray(d.ladder[p]) ? d.ladder[p] : [];
-    out.ladder[p] = RUNG_WEEKS.map((w, i) => { const r = src.find(x => x && Number(x.weeks) === w) || {}; const def = LADDER_DEFAULT[p][i]; return { weeks: w, icon: String(r.icon || def.icon).slice(0, 4), title: String(r.title || def.title).slice(0, 80) }; });
+    out.ladder[p] = RUNG_WEEKS.map((w, i) => { const r = src.find(x => x && Number(x.weeks) === w) || {}; const def = (LADDER_DEFAULT[p] || LADDER_DEFAULT.K)[i]; return { weeks: w, icon: String(r.icon || def.icon).slice(0, 4), title: String(r.title || def.title).slice(0, 80) }; });
     const cl = d.claimed && d.claimed[p] && typeof d.claimed[p] === 'object' ? d.claimed[p] : {};
     Object.keys(cl).forEach(k => { if (/^w(2|4|8|13|26)$/.test(k) && isDate(cl[k])) out.claimed[p][k] = cl[k]; });
   });
@@ -1116,7 +1123,7 @@ async function connect() {
     setMode('db', snap.metadata.fromCache ? 'önbellekten' : 'ortak kayıt açık');
     renderAll();
   }, err => { clearTimeout(timer); fallbackLocal('Paylaşımlı veriye ulaşılamadı (' + (err && err.code ? err.code : 'hata') + '); girdiler bu cihazda saklanıyor.'); renderAll(); });
-  db.collection('settings').onSnapshot(snap => { snap.docs.forEach(d => { if (d.id === 'E' || d.id === 'K') state.settings[d.id] = d.data(); else if (d.id === 'rewards') state.rewards = normRewards(d.data()); }); renderAll(); }, () => {});
+  db.collection('settings').onSnapshot(snap => { snap.docs.forEach(d => { if (PERSONS.indexOf(d.id) >= 0) state.settings[d.id] = d.data(); else if (d.id === 'rewards') state.rewards = normRewards(d.data()); }); renderAll(); }, () => {});
   db.collection('recipes').onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { next[d.id] = normRecipe(d.data()); }); state.recipes = next; if (state.tab === 'tarifler') renderAll(); }, () => {});
   db.collection('weekmenus').limit(60).onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { const w = normWeekMenu(d.data(), d.id); if (w) next[d.id] = w; }); state.weekmenus = next; renderAll(); }, () => {});
   db.collection('changelog').orderBy('at', 'desc').limit(100).onSnapshot(snap => { state.changelog = snap.docs.map(d => d.data()).filter(e => e && typeof e.text === 'string'); if (state.tab === 'menu') renderAll(); }, () => {});
@@ -1299,7 +1306,7 @@ function accountCardHtml() {
     '<div class="row"><button type="button" class="btn ghost small" data-remote="sync">Şimdi eşitle</button><button type="button" class="btn ghost small" data-remote="logout">Çıkış yap</button><span class="tiny" id="accountMsg"></span></div>' +
     '<details class="item" id="set-pass"' + (state.open.has('set-pass') ? ' open' : '') + '><summary>Şifreyi değiştir</summary><form class="mlist" data-remote="password"><div class="two"><div class="field"><label for="passOld">Mevcut şifre</label><input type="password" id="passOld" autocomplete="current-password" required></div><div class="field"><label for="passNew">Yeni şifre</label><input type="password" id="passNew" autocomplete="new-password" minlength="4" required></div></div><div class="row"><button type="submit" class="btn ghost small">Değiştir</button><span class="tiny" id="passMsg"></span></div></form></details></div>';
 }
-function histPersons() { return STATIC_HOST ? [state.person] : ['E', 'K']; }
+function histPersons() { return STATIC_HOST ? [state.person] : PERSONS; }
 function histMonth() { return state.histMonth || state.today.slice(0, 7); }
 function histDates(ym) { const y = Number(ym.slice(0, 4)), m = Number(ym.slice(5, 7)); const out = []; for (let d = y + '-' + pad(m) + '-01', last = dstr(new Date(y, m, 0)); d <= last; d = addDays(d, 1)) out.push(d); return out; }
 function historyCardHtml() {
@@ -1397,7 +1404,7 @@ function motto(L, c, pts, p, lp) {
   if (pts >= DAY_WIN) return 'Gün kazanıldı. Mutfak kapandı, şampiyon 🥇';
   if (h < 9 && !L.run) return 'Koşu seni bekliyor; sabah ışığı en iyi antidepresan 🌤';
   if (h >= 14 && L.water < c.waterGoal * 0.4) return 'Su! Kaktüs değilsin 🌵';
-  if (p === 'K') { const ci = cycleInfo(c, state.date); if (ci && ci.pms) return 'PMS haftası: tatlı isteği normal, planlı tatlı cebinde 🍐'; }
+  if (c.female) { const ci = cycleInfo(c, state.date); if (ci && ci.pms) return 'PMS haftası: tatlı isteği normal, planlı tatlı cebinde 🍐'; }
   if (meals === 5) return 'Beş öğün tamam, kan şekeri dümdüz 📈';
   if (lp.streak >= 2) return lp.streak + ' haftalık seri sürüyor, zincir kırılmasın 🔗';
   if (pts >= 8) return 'Bir iki adım kaldı: yürüyüş, su ya da erken yatış 🚶';
@@ -1408,7 +1415,7 @@ function heroHtml(p, L, c) {
   const lp = ladderProgress(p), pts = dayPoints(L, c), th = lp.threshold, cw = lp.current, isToday = state.date === state.today;
   const circ = 2 * Math.PI * 40, dash = (Math.min(DAY_MAX, pts) / DAY_MAX * circ).toFixed(1);
   const streak = dayStreak(p), daysLeft = Math.max(0, 6 - daysBetween(cw.ws, state.today)), weekly = state.rewards.ladder[p][0];
-  const chips = PERSON_LOCK ? '' : '<div class="pchips">' + ['E', 'K'].map(q => '<button type="button" class="pchip' + (q === state.person ? ' on' : '') + '" data-person="' + q + '">' + esc(cfg(q).name) + '</button>').join('') + '</div>';
+  const chips = PERSON_LOCK ? '' : '<div class="pchips">' + PERSONS.map(q => '<button type="button" class="pchip' + (q === state.person ? ' on' : '') + '" data-person="' + q + '">' + esc(cfg(q).name) + '</button>').join('') + '</div>';
   const defaultName = /^(Erkek|Kadın)$/i.test(c.name.trim());
   const greet = isToday ? greeting() + (defaultName ? '' : ', ' + esc(c.name)) + ' 👋' : fmtDL(state.date);
   const sub = '<div class="hsub"><span class="pill accent">⭐ ' + levelName(lp.count) + '</span>' + (lp.warmup ? '' : '<span class="pill">🪜 ' + lp.count + ' başarılı hafta</span>') + '</div>';
@@ -1450,7 +1457,7 @@ function questsHtml(p, L, c) {
   const earlier = logsOf(p).filter(l => l.weight != null && l.date < d), prev = earlier.length ? earlier[earlier.length - 1] : null;
   const items = [{ id: 'run', f: 'run', t: '06:15', name: 'Sabah koşusu', pts: 1, on: L.run, kind: 'toggle' }];
   if (dow === c.weighDay) items.push({ id: 'weigh', t: '06:05', name: 'Haftalık tartı', pts: 5, on: L.weight != null, kind: 'weigh', menu: 'Tuvaletten sonra, kahvaltıdan önce', delta: weightDelta(L, c, prev) });
-  menu.meals.filter(m => m.k !== 'g').forEach(m => items.push({ id: m.k, k: m.k, t: MEAL_TIMES[m.k], name: MEAL_NAMES[m.k], pts: 1, on: !!L.meals[m.k], kind: 'meal', menu: m.t, por: m[p], rl: recipeLinks(dow, m.k, m) }));
+  menu.meals.filter(m => m.k !== 'g').forEach(m => items.push({ id: m.k, k: m.k, t: MEAL_TIMES[m.k], name: MEAL_NAMES[m.k], pts: 1, on: !!L.meals[m.k], kind: 'meal', menu: m.t, por: portionFor(m, p), rl: recipeLinks(dow, m.k, m) }));
   items.push({ id: 'vinegar', f: 'vinegar', t: '12:15', name: 'Sirkeli su', pts: 0, on: L.vinegar, kind: 'toggle', menu: '1 yk elma sirkesi + 1 bardak su' });
   items.push({ id: 'walkNoon', f: 'walkNoon', t: '13:15', name: 'Öğle yürüyüşü', pts: 1, on: L.walkNoon, kind: 'toggle', menu: '10–15 dk dışarıda' });
   items.push({ id: 'walkEve', f: 'walkEve', t: '19:45', name: 'Akşam yürüyüşü', pts: 1, on: L.walkEve, kind: 'toggle', menu: '10 dk · sonra mutfak kapanır' });
@@ -1509,13 +1516,13 @@ function renderToday() {
   const p = state.person, d = state.date, L = getLog(p, d), c = cfg(p);
   const total = L.foods.reduce((s, f) => s + (f.kcal || 0), 0);
   let cycleBody = '', cycleSub = '';
-  if (p === 'K') {
+  if (c.female) {
     const ci = cycleInfo(c, d);
     if (!ci) { cycleSub = 'Son adet tarihini gir'; cycleBody = '<div class="field"><label for="cycleDate">Son adetin başladığı gün</label><div class="addfood"><input type="date" id="cycleDate" max="' + state.today + '"><button type="button" class="btn" data-action="cycleSave">Kaydet</button></div></div>'; }
     else { cycleSub = ci.day + '. gün · ' + ci.phase + ' · sonraki ' + fmtD(ci.next); cycleBody = '<div class="row"><span class="pill' + (ci.pms ? ' warn' : ci.phase === 'Adet' ? ' accent' : ' good') + '">' + ci.phase + '</span><span class="tiny">döngü ' + c.cycleLen + ' gün</span></div><p class="muted">' + esc(ci.tip) + '</p><div class="row"><button type="button" class="btn ghost small" data-action="cycleStart">Adet başladı</button></div>'; }
   }
   $('#view-bugun').innerHTML = loginCardHtml() + heroHtml(p, L, c) + questsHtml(p, L, c) +
-    (p === 'K' ? subSec('sub-dongu', '🌙', 'Döngü', cycleSub, cycleBody) : '');
+    (c.female ? subSec('sub-dongu', '🌙', 'Döngü', cycleSub, cycleBody) : '');
   restorePane();
   const st = $('#saveStatus'); if (st) st.textContent = saveStatusText(L);
 }
@@ -1543,7 +1550,7 @@ function compressImage(file) {
 }
 function foodPrompt(p, L, f, hasImage) {
   const c = cfg(p), menu = MENU[parseD(L.date).getDay()], planned = menu.meals.find(m => m.k === f.meal);
-  const who = p === 'E' ? '35 yaşında erkek, 170 cm, hedef 1 800 kcal/gün, ailede tip 2 diyabet öyküsü' : '37 yaşında kadın, 160 cm, hedef 1 450 kcal/gün';
+  const who = p === 'E' ? '35 yaşında erkek, 170 cm, hedef 1 800 kcal/gün, ailede tip 2 diyabet öyküsü' : p === 'K' ? '37 yaşında kadın, 160 cm, hedef 1 450 kcal/gün' : 'kadın, hedef ' + cfg(p).kcal + ' kcal/gün';
   const others = L.foods.filter(x => x.id !== f.id && x.kcal != null).reduce((s, x) => s + x.kcal, 0);
   return 'Sen deneyimli bir diyetisyensin. Kilo verme programındaki bir kişinin öğün kaydını değerlendir.\n' +
     'Kişi: ' + who + '. Bugüne kadar kayıtlı diğer öğünler: ' + Math.round(others) + ' kcal.\n' +
@@ -1607,12 +1614,12 @@ function bindToday() {
       else if (a === 'foodDel') { const id = act.dataset.id; editLog(L => { L.foods = L.foods.filter(x => x.id !== id); }); renderToday(); }
       else if (a === 'foodRetry') { analyzeFood(state.person, state.date, act.dataset.id, null); }
       else if (a === 'claimRung') { const w = Number(act.dataset.w); if (RUNG_WEEKS.indexOf(w) > 0) { state.rewards.claimed[state.person]['w' + w] = state.today; await saveRewards(); renderToday(); } }
-      else if (a === 'cycleSave') { const inp = $('#cycleDate'); if (!inp || !isDate(inp.value) || inp.value > state.today) return; const c = cfg('K'); c.cycleStart = inp.value; await saveSettings('K', c); renderToday(); }
+      else if (a === 'cycleSave') { const inp = $('#cycleDate'); if (!inp || !isDate(inp.value) || inp.value > state.today) return; const c = cfg(state.person); c.cycleStart = inp.value; await saveSettings(state.person, c); renderToday(); }
       else if (a === 'cycleStart') {
-        const c = cfg('K'); const hist = c.cycleHistory.slice(); if (c.cycleStart && c.cycleStart !== state.date) hist.push(c.cycleStart);
+        const c = cfg(state.person); const hist = c.cycleHistory.slice(); if (c.cycleStart && c.cycleStart !== state.date) hist.push(c.cycleStart);
         const starts = hist.concat([state.date]).sort(); const lens = []; for (let i = 1; i < starts.length; i++) { const L = daysBetween(starts[i - 1], starts[i]); if (L >= 20 && L <= 45) lens.push(L); }
         c.cycleHistory = hist.slice(-12); c.cycleStart = state.date; if (lens.length >= 2) c.cycleLen = Math.round(avg(lens.slice(-4)));
-        await saveSettings('K', c); renderToday();
+        await saveSettings(state.person, c); renderToday();
       }
     } else if (tog) { const f = tog.dataset.toggle; editLog(L => { L[f] = !L[f]; }); renderToday(); }
     else if (meal) { const k = meal.dataset.meal; editLog(L => { L.meals[k] = !L.meals[k]; }); renderToday(); }
@@ -1781,23 +1788,23 @@ function renderProgram() {
 function uniq(a) { return Array.from(new Set(a)); }
 function weekFeedback(ws) {
   const since = addDays(state.today, -13), out = {};
-  ['E', 'K'].forEach(p => {
+  PERSONS.forEach(p => {
     const c = cfg(p), logs = logsOf(p).filter(l => l.date >= since && l.date <= state.today), n = logs.length;
     const skip = { k: 0, a1: 0, o: 0, a2: 0, ak: 0 }; let water = 0, won = 0, runs = 0;
     logs.forEach(L => { MEAL_KEYS.forEach(k => { if (!L.meals[k]) skip[k]++; }); water += L.water; if (dayPoints(L, c) >= DAY_WIN) won++; if (L.run) runs++; });
     const foods = logs.flatMap(L => L.foods.map(f => (f.text || '').slice(0, 60) + (f.kcal ? ' (' + Math.round(f.kcal) + ' kcal)' : ''))).filter(s => s.trim()).slice(-20);
     const worst = MEAL_KEYS.slice().sort((a, b) => skip[b] - skip[a])[0];
     out[p] = { ad: c.name, kayitli_gun: n, atlanan_ogun_sayisi: skip, en_cok_atlanan: n ? MEAL_NAMES[worst] : null, su_ortalama_bardak: n ? Math.round(water / n * 10) / 10 : null, su_hedef: c.waterGoal, kazanilan_gun: won, kosu_gunu: runs, kaydedilen_yemekler: foods, kcal_hedef: c.kcal };
-    if (p === 'K') { const ci = cycleInfo(c, addDays(ws, 3)); if (ci) out[p].gelecek_hafta_dongu = ci.phase + ', ~' + ci.day + '. gün'; }
+    if (c.female) { const ci = cycleInfo(c, addDays(ws, 3)); if (ci) out[p].gelecek_hafta_dongu = ci.phase + ', ~' + ci.day + '. gün'; }
   });
   const liked = [], disliked = [], favs = [];
-  allRecipes().forEach(r => { const d = state.recipes[r.id]; if (!d) return; ['E', 'K'].forEach(p => { if (d.fav[p]) favs.push(r.name); if (d.rating[p] >= 4) liked.push(r.name); if (d.rating[p] && d.rating[p] <= 2) disliked.push(r.name); }); });
+  allRecipes().forEach(r => { const d = state.recipes[r.id]; if (!d) return; PERSONS.forEach(p => { if (d.fav[p]) favs.push(r.name); if (d.rating[p] >= 4) liked.push(r.name); if (d.rating[p] && d.rating[p] <= 2) disliked.push(r.name); }); });
   const cur = mondayOf(state.today), dishes = [];
   for (let i = 0; i < 7; i++) menuFor(addDays(cur, i)).meals.forEach(x => { if (x.k === 'o' || x.k === 'ak') dishes.push(x.t.slice(0, 70)); });
   return { kisiler: out, begenilen_tarifler: uniq(liked), favori_tarifler: uniq(favs), begenilmeyen_tarifler: uniq(disliked), bu_haftanin_ogle_ve_aksamlari: dishes };
 }
 function planInputs() { return lsGet('bt_plan_inputs', { fridge: '', avoid: '', notes: '' }) || { fridge: '', avoid: '', notes: '' }; }
-const PLAN_RULES = 'Program kuralları: Akdeniz tipi, paketli gıda yok, mevsim ürünleri (Kasım–Şubat: lahana, karnabahar, brokoli, pırasa, kereviz, ıspanak, pancar, bal kabağı, havuç, turp, roka; elma, armut, nar, mandalina, portakal, kivi, ayva, Trabzon hurması). E: 35 yaş erkek, 1800 kcal, protein 130 g, ailede tip 2 diyabet, bazen şişkinlik → baklagiller öğle öğününde, günde en fazla 1 baklagil öğünü, iyi pişmiş. K: 37 yaş kadın, 1450 kcal, protein 100 g, süt ürünlerini sever, dönemsel tatlı isteği (PMS haftasında planlı tatlı ve magnezyum). Öğünler: 07:30 kahvaltı, 10:30 ara 1, 12:30 öğle (günün karbonhidratı burada), 16:00 ara 2 (proteinli), 19:00 akşam (protein + sebze, tahıl az veya yok), 21:30 gece bitki çayı. Haftada 2 balık (hamsi, palamut, levrek, çipura, somon), kırmızı et en fazla 1–2, tavuk/hindi 2–3, yumurta günde ≤2, baklagil 3 öğle. Kahvaltılar kolay: yoğurt + yulaf + meyve, haşlanmış yumurta + peynir, lor kasesi, çılbır; hafta sonu daha zengin. Pişirme kolay: hafta içi akşam ≤25 dk, Pazar hazırlık günü (çorba, zeytinyağlı sebze, haşlanmış yumurta, fırın tavuk) ile öğleler hazırdan. Cumartesi 16:00 planlı tatlı (şekersiz fırın meyve vb.). Kahve günde en fazla 2. Çeşitlilik: bu haftanın öğle ve akşamlarını tekrarlama, protein kaynaklarını dönüşümlü kullan, aynı sebzeyi üst üste iki gün verme. Porsiyonlar: E 150–170 g et/balık, K 120–130 g; E 1,5 kepçe baklagil, K 1 kepçe; bulgur E 4–5 yk öğle, K 3 yk; yoğurt E 150 g, K 100–120 g. PİŞİRME DÜZENİ: sebze yemekleri (zeytinyağlılar, etli sebze, baklagil yemekleri) ve çorbalar 4 porsiyon pişer ve ardışık iki günde yenir: aynı yemeği iki güne yaz (ör. Pzt öğle + Sal öğle, Çar akşam + Cum öğle), ikinci günün metnine "(2. gün)" ekle, alışveriş kalemlerini ("s") yalnızca pişirildiği güne yaz; ana protein (balık, şiş, köfte) taze pişer. Yeni tarifler 4 porsiyonluk malzeme ile yazılır ("servings": 4), kcal porsiyon başına verilir.';
+const PLAN_RULES = 'Program kuralları: Akdeniz tipi, paketli gıda yok, mevsim ürünleri (Kasım–Şubat: lahana, karnabahar, brokoli, pırasa, kereviz, ıspanak, pancar, bal kabağı, havuç, turp, roka; elma, armut, nar, mandalina, portakal, kivi, ayva, Trabzon hurması). E: 35 yaş erkek, 1800 kcal, protein 130 g, ailede tip 2 diyabet, bazen şişkinlik → baklagiller öğle öğününde, günde en fazla 1 baklagil öğünü, iyi pişmiş. K: 37 yaş kadın (Selen), 1450 kcal, protein 100 g, süt ürünlerini sever, dönemsel tatlı isteği (PMS haftasında planlı tatlı ve magnezyum). S: Sevinç (kadın), kendi hedefleri yazılana kadar K ile aynı porsiyon ve kalori. Öğünler: 07:30 kahvaltı, 10:30 ara 1, 12:30 öğle (günün karbonhidratı burada), 16:00 ara 2 (proteinli), 19:00 akşam (protein + sebze, tahıl az veya yok), 21:30 gece bitki çayı. Haftada 2 balık (hamsi, palamut, levrek, çipura, somon), kırmızı et en fazla 1–2, tavuk/hindi 2–3, yumurta günde ≤2, baklagil 3 öğle. Kahvaltılar kolay: yoğurt + yulaf + meyve, haşlanmış yumurta + peynir, lor kasesi, çılbır; hafta sonu daha zengin. Pişirme kolay: hafta içi akşam ≤25 dk, Pazar hazırlık günü (çorba, zeytinyağlı sebze, haşlanmış yumurta, fırın tavuk) ile öğleler hazırdan. Cumartesi 16:00 planlı tatlı (şekersiz fırın meyve vb.). Kahve günde en fazla 2. Çeşitlilik: bu haftanın öğle ve akşamlarını tekrarlama, protein kaynaklarını dönüşümlü kullan, aynı sebzeyi üst üste iki gün verme. Porsiyonlar: E 150–170 g et/balık, K 120–130 g; E 1,5 kepçe baklagil, K 1 kepçe; bulgur E 4–5 yk öğle, K 3 yk; yoğurt E 150 g, K 100–120 g. PİŞİRME DÜZENİ: sebze yemekleri (zeytinyağlılar, etli sebze, baklagil yemekleri) ve çorbalar 4 porsiyon pişer ve ardışık iki günde yenir: aynı yemeği iki güne yaz (ör. Pzt öğle + Sal öğle, Çar akşam + Cum öğle), ikinci günün metnine "(2. gün)" ekle, alışveriş kalemlerini ("s") yalnızca pişirildiği güne yaz; ana protein (balık, şiş, köfte) taze pişer. Yeni tarifler 4 porsiyonluk malzeme ile yazılır ("servings": 4), kcal porsiyon başına verilir.';
 function planSchema() {
   const ids = allRecipes().map(r => r.id + ': ' + r.name).join('; ');
   return 'Yalnızca şu JSON nesnesini döndür (başka metin yok): {"days": {"1": {"tip": "o güne özel 1 cümle püf noktası", "meals": [{"k": "k", "t": "yemek adı ve kısa içerik", "E": "E porsiyonu", "K": "K porsiyonu", "r": ["tarif_id"], "s": [["Malzeme adı", miktar, "birim", "kategori", evdeVar]]}, ... k, a1, o, a2, ak, g sırasıyla 6 öğün]}, "2": {...}, "3": {...}, "4": {...}, "5": {...}, "6": {...}, "0": {...}}, "recipes": [{"id": "kucuk-harf-kisa", "name": "...", "time": dakika, "kcal": {"E": sayı, "K": sayı}, "tags": ["öğle"], "ing": ["2 kişilik malzeme satırları"], "steps": ["adımlar"], "por": {"E": "...", "K": "..."}, "tip": "..."}], "rationale": "3–4 cümle: protein dağılımı, balık/baklagil/et sayısı, geçen haftaya göre çeşitlilik, kişiye özel notlar"}. Kurallar: gün anahtarları 1=Pazartesi … 6=Cumartesi, 0=Pazar. "s" her öğünün 2 kişilik alışveriş kalemleri: birim yalnızca adet, g, ml, demet, baş, kavanoz; kategori yalnızca sebze, et, sut, firin, kiler; evdeVar true ise buzdolabında zaten var. Baharat, tuz, zeytinyağı gibi temel kiler kalemlerini yazma. "r": yemek mevcut tariflerden biriyle eşleşiyorsa o id; eşleşmiyorsa yeni tarifi "recipes" içine ekle (en fazla 8 yeni tarif) ve id\'sini "r" içine yaz. Gece (g) için yalnızca bitki çayı. Mevcut tarifler: ' + ids;
@@ -1868,7 +1875,7 @@ function planDaysHtml(doc, scope, ws) {
     return '<details data-plan-day="' + key + '"' + (state.plan.openDays.has(key) ? ' open' : '') + '><summary>' + d.name + (today ? ' · bugün' : '') + '<span class="sub">' + esc((d.meals.find(m => m.k === 'ak') || {}).t || '').slice(0, 60) + '</span></summary><div class="mlist">' + d.meals.map(m => {
       const editing = ed && ed.scope === scope && ed.ws === ws && ed.dow == dow && ed.k === m.k;
       const acts = m.k === 'g' ? '' : '<div class="acts">' + (state.sample && !STATIC_HOST ? '<button type="button" data-plan="swap" data-scope="' + scope + '" data-ws="' + ws + '" data-dow="' + dow + '" data-k="' + m.k + '" title="Claude alternatif önersin">↻</button>' : '') + '<button type="button" data-plan="edit" data-scope="' + scope + '" data-ws="' + ws + '" data-dow="' + dow + '" data-k="' + m.k + '" title="Elle düzenle">✎</button></div>';
-      const body = '<div><b>' + MEAL_NAMES[m.k] + ' ' + MEAL_TIMES[m.k] + '</b> · ' + esc(m.t) + (m[p] ? '<span class="p" style="display:block;color:var(--ink-2);font-size:.85rem">' + esc(name) + ': ' + esc(m[p]) + '</span>' : '') + recipeLinks(dow, m.k, m) + '</div>';
+      const body = '<div><b>' + MEAL_NAMES[m.k] + ' ' + MEAL_TIMES[m.k] + '</b> · ' + esc(m.t) + (portionFor(m, p) ? '<span class="p" style="display:block;color:var(--ink-2);font-size:.85rem">' + esc(name) + ': ' + esc(portionFor(m, p)) + '</span>' : '') + recipeLinks(dow, m.k, m) + '</div>';
       const editor = editing ? '<div class="edit"><input type="text" id="pe-t" value="' + esc(m.t) + '" maxlength="240" placeholder="Yemek ve içerik"><input type="text" id="pe-E" value="' + esc(m.E) + '" maxlength="120" placeholder="E porsiyonu"><input type="text" id="pe-K" value="' + esc(m.K) + '" maxlength="120" placeholder="K porsiyonu"><div class="row"><button type="button" class="btn small" data-plan="editsave" data-scope="' + scope + '" data-ws="' + ws + '" data-dow="' + dow + '" data-k="' + m.k + '">Kaydet</button><button type="button" class="btn ghost small" data-plan="editcancel">Vazgeç</button></div></div>' : '';
       return '<div class="planmeal">' + body + acts + editor + '</div>'; }).join('') + (d.tip ? '<div class="tipbox">' + esc(d.tip) + '</div>' : '') + '</div></details>'; }).join('');
 }
@@ -1989,10 +1996,10 @@ function renderRecipes() {
   const all = allRecipes().map((r, i) => ({ r: r, i: i, d: rc(r.id) })).sort((a, b) => (b.d.fav[p] - a.d.fav[p]) || (b.d.rating[p] - a.d.rating[p]) || (a.i - b.i));
   const list = all.filter(x => used.has(x.r.id));
   const stars = (id, v) => '<span class="stars" data-rate="' + id + '">' + [1, 2, 3, 4, 5].map(n => '<button type="button" data-v="' + n + '"' + (n <= v ? ' class="on"' : '') + ' aria-label="' + n + ' yıldız">★</button>').join('') + '</span>';
-  const item = x => { const r = x.r, d = x.d, other = p === 'E' ? 'K' : 'E';
+  const item = x => { const r = x.r, d = x.d, others = PERSONS.filter(q => q !== p && (d.rating[q] || d.fav[q]));
     return '<details id="rec-' + r.id + '"' + (state.open.has('rec-' + r.id) ? ' open' : '') + '><summary><span>' + (d.fav[p] ? '♥ ' : '') + esc(r.name) + '<span class="sub">' + r.time + ' dk · E ' + r.kcal.E + ' · K ' + r.kcal.K + ' kcal' + (r.servings ? ' · ' + r.servings + ' porsiyon' : '') + (d.rating[p] ? ' · ' + '★'.repeat(d.rating[p]) : '') + '</span></span></summary>' +
       '<div class="mlist"><div class="rec-h">' + stars(r.id, d.rating[p]) + '<button type="button" class="chip' + (d.fav[p] ? ' on' : '') + '" data-fav="' + r.id + '">' + (d.fav[p] ? 'Favori' : 'Favorilere ekle') + '</button></div>' +
-      (d.rating[other] || d.fav[other] ? '<p class="tiny">' + esc(cfg(other).name) + ': ' + (d.rating[other] ? '★'.repeat(d.rating[other]) : '') + (d.fav[other] ? ' ♥' : '') + '</p>' : '') +
+      (others.length ? '<p class="tiny">' + others.map(q => esc(cfg(q).name) + ': ' + (d.rating[q] ? '★'.repeat(d.rating[q]) : '') + (d.fav[q] ? ' ♥' : '')).join(' · ') + '</p>' : '') +
       '<div><div class="eyebrow">Malzeme · ' + (r.servings ? r.servings + ' porsiyon (2 kişi × ' + (r.servings / 2) + ' gün)' : '2 kişilik') + '</div>' + (r.tags.length ? '<p class="tiny">' + esc(r.tags.join(' · ')) + '</p>' : '') + '<ul class="plain">' + r.ing.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
       '<div><div class="eyebrow">Yapılışı</div><ol class="plain">' + r.steps.map(s => '<li>' + esc(s) + '</li>').join('') + '</ol></div>' +
       '<p class="muted"><b>Porsiyon</b> · E: ' + esc(r.por.E) + ' · K: ' + esc(r.por.K) + '</p><div class="tipbox">' + esc(r.tip) + '</div>' +
@@ -2012,14 +2019,14 @@ function bindRecipes() {
 }
 
 // ---------- settings ----------
-function backupJson() { return JSON.stringify({ app: 'beslenme-takip', v: 2, exported: new Date().toISOString(), settings: { E: state.settings.E, K: state.settings.K }, rewards: state.rewards, recipes: state.recipes, logs: state.logs }); }
+function backupJson() { return JSON.stringify({ app: 'beslenme-takip', v: 3, exported: new Date().toISOString(), settings: state.settings, rewards: state.rewards, recipes: state.recipes, logs: state.logs }); }
 async function restoreBackup(text) {
   let data; try { data = JSON.parse(text); } catch (e) { return 'Yedek metni okunamadı; tamamını yapıştırdığınızdan emin olun.'; }
   if (!data || typeof data !== 'object' || !data.logs || typeof data.logs !== 'object') return 'Bu metin bir yedek değil.';
   let n = 0;
   for (const k of Object.keys(data.logs)) { const l = normLog(data.logs[k]); if (!l) continue; const id = logId(l.person, l.date), cur = state.logs[id]; if (cur && (cur.updatedAt || '') >= (l.updatedAt || '')) continue; state.logs[id] = l; n++; if (canDb()) { try { await state.db.doc('logs/' + id).set(l); } catch (e) {} } }
-  if (data.settings && typeof data.settings === 'object') for (const p of ['E', 'K']) if (data.settings[p] && typeof data.settings[p] === 'object') { state.settings[p] = data.settings[p]; await writeDoc('settings/' + p, state.settings[p]); }
-  if (data.rewards && typeof data.rewards === 'object') { const inc = normRewards(data.rewards); ['E', 'K'].forEach(q => { Object.assign(inc.claimed[q], state.rewards.claimed[q], inc.claimed[q]); }); state.rewards = inc; await saveRewards(); }
+  if (data.settings && typeof data.settings === 'object') for (const p of PERSONS) if (data.settings[p] && typeof data.settings[p] === 'object') { state.settings[p] = data.settings[p]; await writeDoc('settings/' + p, state.settings[p]); }
+  if (data.rewards && typeof data.rewards === 'object') { const inc = normRewards(data.rewards); PERSONS.forEach(q => { Object.assign(inc.claimed[q], state.rewards.claimed[q], inc.claimed[q]); }); state.rewards = inc; await saveRewards(); }
   if (data.recipes && typeof data.recipes === 'object') for (const id of Object.keys(data.recipes)) if (!state.recipes[id]) await saveRecipe(id, normRecipe(data.recipes[id]));
   if (!canDb()) persistLocal();
   renderAll(); return n + ' günlük kayıt eklendi veya güncellendi.';
@@ -2028,7 +2035,7 @@ function renderSettings() {
   const p = state.person, c = cfg(p);
   const fld = (id, label, type, val, extra) => '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" type="' + type + '" value="' + esc(val) + '"' + (extra || '') + '></div>';
   const daySel = '<div class="field"><label for="sWeigh">Tartı günü</label><select id="sWeigh">' + [1, 2, 3, 4, 5, 6, 0].map(d => '<option value="' + d + '"' + (d === c.weighDay ? ' selected' : '') + '>' + DAY_NAMES[d] + '</option>').join('') + '</select></div>';
-  const cycle = p === 'K' ? '<div class="card"><div class="card-h"><h2>Döngü ayarları</h2></div><div class="three">' + fld('sCycleStart', 'Son adet başlangıcı', 'date', c.cycleStart, ' max="' + state.today + '"') + fld('sCycleLen', 'Döngü (gün)', 'number', c.cycleLen, ' min="20" max="45" step="1" inputmode="numeric"') + fld('sPeriodLen', 'Adet süresi (gün)', 'number', c.periodLen, ' min="2" max="10" step="1" inputmode="numeric"') + '</div>' +
+  const cycle = c.female ? '<div class="card"><div class="card-h"><h2>Döngü ayarları</h2></div><div class="three">' + fld('sCycleStart', 'Son adet başlangıcı', 'date', c.cycleStart, ' max="' + state.today + '"') + fld('sCycleLen', 'Döngü (gün)', 'number', c.cycleLen, ' min="20" max="45" step="1" inputmode="numeric"') + fld('sPeriodLen', 'Adet süresi (gün)', 'number', c.periodLen, ' min="2" max="10" step="1" inputmode="numeric"') + '</div>' +
     (c.cycleHistory.length ? '<p class="tiny">Önceki başlangıçlar: ' + c.cycleHistory.slice(-6).map(fmtD).join(', ') + '</p>' : '') + '<div class="row"><button type="button" class="btn ghost" id="saveCycle">Döngüyü kaydet</button><span class="tiny" id="cycleStatus"></span></div></div>' : '';
   const ladderRows = state.rewards.ladder[p].map(r => '<div class="listrow"><span class="tiny" style="width:64px;flex:none">' + RUNG_LABELS[r.weeks] + '</span><input type="text" id="li' + r.weeks + '" value="' + esc(r.icon) + '" maxlength="4" aria-label="Simge" style="width:52px;text-align:center;flex:none"><input type="text" id="lw' + r.weeks + '" value="' + esc(r.title) + '" maxlength="80" aria-label="Ödül" class="grow">' + (state.rewards.claimed[p]['w' + r.weeks] ? '<span class="tiny" style="flex:none">alındı ' + fmtD(state.rewards.claimed[p]['w' + r.weeks]) + '</span>' : '') + '</div>').join('');
   $('#view-ayarlar').innerHTML = (STATIC_HOST ? accountCardHtml() : '') + historyCardHtml() + analysisCardHtml() +
@@ -2054,7 +2061,7 @@ function bindSettings() {
       if (s.goalWeight >= s.startWeight) { $('#settingsStatus').textContent = 'Hedef kilo başlangıçtan küçük olmalı.'; return; }
       await saveSettings(p, s); renderToday(); $('#settingsStatus').textContent = 'Kaydedildi ' + nowHM(); return;
     }
-    if (e.target.closest('#saveCycle')) { const s = Object.assign({}, c, { cycleStart: isDate($('#sCycleStart').value) && $('#sCycleStart').value <= state.today ? $('#sCycleStart').value : '', cycleLen: Math.round(numv('#sCycleLen', c.cycleLen, 20, 45)), periodLen: Math.round(numv('#sPeriodLen', c.periodLen, 2, 10)) }); await saveSettings('K', s); $('#cycleStatus').textContent = 'Kaydedildi ' + nowHM(); return; }
+    if (e.target.closest('#saveCycle')) { const s = Object.assign({}, c, { cycleStart: isDate($('#sCycleStart').value) && $('#sCycleStart').value <= state.today ? $('#sCycleStart').value : '', cycleLen: Math.round(numv('#sCycleLen', c.cycleLen, 20, 45)), periodLen: Math.round(numv('#sPeriodLen', c.periodLen, 2, 10)) }); await saveSettings(p, s); $('#cycleStatus').textContent = 'Kaydedildi ' + nowHM(); return; }
     if (e.target.closest('#saveLadder')) { state.rewards.ladder[p] = RUNG_WEEKS.map((w, i) => ({ weeks: w, icon: ($('#li' + w).value.trim() || LADDER_DEFAULT[p][i].icon).slice(0, 4), title: ($('#lw' + w).value.trim() || LADDER_DEFAULT[p][i].title).slice(0, 80) })); state.rewards.threshold = Math.round(numv('#rTh', state.rewards.threshold, 20, 75)); await saveRewards(); renderSettings(); $('#ladderStatus').textContent = 'Kaydedildi ' + nowHM(); return; }
     if (e.target.closest('#copyBackup')) { const json = backupJson(), ta = $('#backupText'), st = $('#backupStatus'); ta.value = json; try { await navigator.clipboard.writeText(json); st.textContent = 'Panoya kopyalandı ' + nowHM(); } catch (err) { ta.focus(); ta.select(); st.textContent = 'Metin seçildi; basılı tutup Kopyala deyin.'; } return; }
     if (e.target.closest('#restoreBackup')) { const st = $('#backupStatus'), txt = $('#backupText').value.trim(); if (!txt) { st.textContent = 'Önce yedek metnini yapıştırın.'; return; } st.textContent = 'Geri yükleniyor…'; const msg = await restoreBackup(txt); const st2 = $('#backupStatus'); if (st2) st2.textContent = msg; }

@@ -30,7 +30,7 @@ const fontface = [
 ].join('\n');
 const si = a.indexOf('<style>'); if (si < 0) throw new Error('style bloğu yok');
 a = a.slice(0, si + 7) + '\n' + fontface + a.slice(si + 7);
-const pages = [{ p: 'E', slug: 'erkek', label: 'Erkek' }, { p: 'K', slug: 'kadin', label: 'Kadın' }];
+const pages = [{ p: 'E', slug: 'erkek', label: 'Erkek' }, { p: 'K', slug: 'kadin', label: 'Selen' }, { p: 'S', slug: 'sevinc', label: 'Sevinç' }];
 pages.forEach(pg => {
   const head = ['<!DOCTYPE html>', '<html lang="tr" dir="ltr">', '<head>', '<meta charset="utf-8">', '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">',
     '<title>Beslenme Takip · ' + pg.label + '</title>', '<meta name="description" content="İki kişilik kış beslenme programı için günlük takip (' + pg.label + '). Listelenmeyen sayfa.">',
