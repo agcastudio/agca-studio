@@ -1,7 +1,10 @@
 {
-  // Cloudflare Workers — statik site (Hugo çıktısı public/ klasöründen sunulur)
+  // Cloudflare Workers: statik site (Hugo çıktısı public/ klasöründen sunulur) + worker/index.js
   // Cloudflare panelinde: Build command = hugo --gc --minify · Deploy command = npx wrangler deploy · HUGO_VERSION = 0.166.0
+  // worker/index.js yalnız /api/takip/* isteklerini karşılar (duzentakip sayfalarının çevrimiçi kaydı);
+  // diğer her istek olduğu gibi statik varlıklara gider (env.ASSETS).
   "name": "agca-studio",
+  "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
   // workers.dev kopya ana makinesi kapalı. Panelden kapatmak KALICI DEĞİL: bu alan yokken
   // "wrangler deploy" her dağıtımda workers.dev rotasını yeniden açıyor (2026-09-24 ölçüldü).
@@ -9,7 +12,15 @@
   "workers_dev": false,
   "assets": {
     "directory": "./public",
+    "binding": "ASSETS",
     "not_found_handling": "404-page",
-    "html_handling": "auto-trailing-slash"
-  }
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": ["/api/*"]
+  },
+  // Takip verisi: SQLite destekli tek Durable Object (ev hesabı). Panelde ayrıca kaynak açmak gerekmez;
+  // sınıf ilk dağıtımda migrations ile oluşur.
+  "durable_objects": {
+    "bindings": [{ "name": "TAKIP", "class_name": "TakipStore" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["TakipStore"] }]
 }
