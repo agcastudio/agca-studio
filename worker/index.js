@@ -22,6 +22,14 @@ export default {
       const stub = env.TAKIP.get(env.TAKIP.idFromName('ev'));
       return stub.fetch(request);
     }
+    // Takip sayfaları Worker üzerinden, önbelleksiz: uç önbellek yeni dağıtımdan sonra eski sayfayı sunabiliyordu (9 Kas 2026).
+    if (url.pathname.startsWith('/duzentakip/')) {
+      const res = await env.ASSETS.fetch(request);
+      const h = new Headers(res.headers);
+      h.set('Cache-Control', 'no-store');
+      h.set('X-Robots-Tag', 'noindex, nofollow, noimageindex, noarchive');
+      return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
+    }
     return env.ASSETS.fetch(request);
   }
 };
