@@ -294,6 +294,7 @@ ul.plain, ol.plain { margin: 0; padding-left: 18px; font-size: 0.9rem; color: va
 .logrow:first-child { border-top: 0; }
 .logrow .when { color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .feed { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.feed.one { grid-template-columns: 1fr; }
 .feed div { background: var(--surface-2); border-radius: 10px; padding: 8px 10px; font-size: 0.84rem; }
 .feed b { display: block; font-family: var(--font-display); font-size: 1rem; }
 .shopgrp { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
@@ -1277,9 +1278,22 @@ function historyCardHtml() {
   const rows = has.slice().reverse().map(d => '<div class="' + cls + '"><span class="hd">' + fmtD(d) + '</span>' + persons.map(p => cell(p, d)).join('') + '</div>').join('');
   return '<div class="card"><div class="card-h"><h2>Geçmiş</h2><span class="meta">' + has.length + ' günlük kayıt</span></div>' +
     '<div class="daterow"><button type="button" class="iconbtn" data-hist="prev" aria-label="Önceki ay">' + svgIcon('prev') + '</button><div class="d">' + MONTHS_TR_LONG[m - 1] + ' ' + y + '</div><button type="button" class="iconbtn" data-hist="next" aria-label="Sonraki ay"' + (ym >= state.today.slice(0, 7) ? ' disabled' : '') + '>' + svgIcon('next') + '</button></div>' +
-    '<div class="feed">' + persons.map(box).join('') + '</div>' +
+    '<div class="feed' + (persons.length === 1 ? ' one' : '') + '">' + persons.map(box).join('') + '</div>' +
     (rows ? '<div><div class="' + cls + ' head"><span>Gün</span>' + persons.map(p => '<span>' + esc(cfg(p).name) + '</span>').join('') + '</div>' + rows + '</div>' : '<p class="muted">Bu ayda kayıt yok.</p>') +
     '<div class="row"><button type="button" class="btn ghost small" data-hist="csv"' + (has.length ? '' : ' disabled') + '>Ayı kopyala (CSV)</button><span class="tiny" id="histMsg"></span></div></div>';
+}
+// Ayarlar → Analiz: the last 14 days per person (won days, water, most skipped meal), this week vs last week, recipe likes.
+function analysisCardHtml() {
+  if (typeof weekFeedback !== 'function') return '';
+  const fb = weekFeedback(nextPlanWeek()), persons = histPersons(), thisWs = mondayOf(state.today), lastWs = addDays(thisWs, -7);
+  const boxes = persons.map(p => {
+    const f = fb.kisiler[p], c = cfg(p), w1 = weekPoints(p, thisWs).points, w0 = weekPoints(p, lastWs).points;
+    return '<div><b>' + esc(c.name) + '</b>' + (f.kayitli_gun ? f.kazanilan_gun + '/' + f.kayitli_gun + ' kazanılan gün · su ' + (f.su_ortalama_bardak == null ? '—' : f.su_ortalama_bardak) + '/' + f.su_hedef + ' bardak<br>en çok atlanan: ' + esc(f.en_cok_atlanan || '—') : 'Son 14 günde kayıt yok') +
+      '<br>bu hafta <b class="num">' + w1 + '</b> · geçen hafta <b class="num">' + w0 + '</b> puan' + (f.gelecek_hafta_dongu ? '<br>döngü: ' + esc(f.gelecek_hafta_dongu) : '') + '</div>';
+  }).join('');
+  const liked = uniq(fb.begenilen_tarifler.concat(fb.favori_tarifler));
+  const notes = (liked.length ? 'Beğenilen tarifler: ' + esc(liked.slice(0, 6).join(', ')) + '. ' : '') + (fb.begenilmeyen_tarifler.length ? 'Planlara konmayacak: ' + esc(fb.begenilmeyen_tarifler.join(', ')) + '.' : '');
+  return '<div class="card"><div class="card-h"><h2>Analiz</h2><span class="meta">son 14 gün</span></div><div class="feed' + (persons.length === 1 ? ' one' : '') + '">' + boxes + '</div>' + (notes ? '<p class="tiny">' + notes + '</p>' : '') + '</div>';
 }
 function historyCsv(ym) {
   const head = 'Tarih;Kişi;Puan;Kazanıldı;Su (bardak);Kilo;Öğün;Koşu;Öğle yürüyüşü;Akşam yürüyüşü;Uyku düzeni;Yatış;Kalkış';
@@ -1833,13 +1847,9 @@ function planDaysHtml(doc, scope, ws) {
       return '<div class="planmeal">' + body + acts + editor + '</div>'; }).join('') + (d.tip ? '<div class="tipbox">' + esc(d.tip) + '</div>' : '') + '</div></details>'; }).join('');
 }
 function plannerCard() {
-  const ws = planWeek(), saved = state.weekmenus[ws] || codeWeekDoc(ws), draft = state.plan.draft && state.plan.draft.ws === ws ? state.plan.draft : null, inp = planInputs(), fb = weekFeedback(ws);
+  const ws = planWeek(), saved = state.weekmenus[ws] || codeWeekDoc(ws), draft = state.plan.draft && state.plan.draft.ws === ws ? state.plan.draft : null, inp = planInputs();
   const thisWs = mondayOf(state.today), weeks = [thisWs, addDays(thisWs, 7), addDays(thisWs, 14)];
   const weekSwitch = '<div class="segs">' + weeks.map((w, i) => '<button type="button" data-plan="week" data-ws="' + w + '"' + (w === ws ? ' class="on"' : '') + '>' + (i === 0 ? 'Bu hafta' : i === 1 ? 'Gelecek hafta' : 'Sonraki') + ' · ' + parseD(w).getDate() + ' ' + MONTHS_TR[parseD(w).getMonth()] + '</button>').join('') + '</div>';
-  const feed = (STATIC_HOST ? [state.person] : ['E', 'K']).map(p => { const f = fb.kisiler[p]; return '<div><b>' + esc(f.ad) + '</b>' + (f.kayitli_gun ? f.kazanilan_gun + '/' + f.kayitli_gun + ' kazanılan gün · su ' + (f.su_ortalama_bardak == null ? '—' : f.su_ortalama_bardak) + '/' + f.su_hedef + '<br>en çok atlanan: ' + (f.en_cok_atlanan || '—') : 'Son 14 günde kayıt yok') + (f.gelecek_hafta_dongu ? '<br>döngü: ' + esc(f.gelecek_hafta_dongu) : '') + '</div>'; }).join('');
-  const liked = fb.begenilen_tarifler.concat(fb.favori_tarifler);
-  const feedNotes = (liked.length ? 'Beğenilen: ' + esc(uniq(liked).slice(0, 6).join(', ')) + '. ' : '') + (fb.begenilmeyen_tarifler.length ? 'Konmayacak: ' + esc(fb.begenilmeyen_tarifler.join(', ')) + '.' : '');
-  const feedHtml = '<div class="feed">' + feed + '</div>' + (feedNotes ? '<p class="tiny">' + feedNotes + '</p>' : '');
   const inputs = '<div class="field"><label for="plFridge">Buzdolabında / elde olanlar</label><textarea id="plFridge" rows="2" placeholder="Örn. 1 kg ıspanak, 6 yumurta, kalan tavuk, közlenmiş biber">' + esc(inp.fridge) + '</textarea></div><div class="two"><div class="field"><label for="plAvoid">Bu hafta istenmeyenler</label><input type="text" id="plAvoid" value="' + esc(inp.avoid) + '" maxlength="300" placeholder="Örn. kuru fasulye, karnabahar"></div><div class="field"><label for="plNotes">Notlar</label><input type="text" id="plNotes" value="' + esc(inp.notes) + '" maxlength="300" placeholder="Örn. Çarşamba akşam dışarıda, misafir Cumartesi"></div></div>';
   const genBtn = !STATIC_HOST && state.sample ? '<div class="row"><button type="button" class="btn" data-plan="generate" data-ws="' + ws + '"' + (state.plan.busy ? ' disabled' : '') + '>' + (saved ? 'Claude ile yeniden planla' : 'Claude ile planla') + '</button><span class="tiny">' + esc(state.plan.msg) + '</span></div>' : '';
   const draftHtml = draft ? '<div class="note"><b>Taslak · ' + fmtD(ws) + ' haftası</b>' + (draft.meta.rationale ? '<details><summary>Gerekçe</summary><p class="muted">' + esc(draft.meta.rationale) + '</p></details>' : '') + '</div><div>' + planDaysHtml(draft, 'draft', ws) + '</div>' + (draft.recipes.length ? '<p class="tiny">Yeni tarifler: ' + esc(draft.recipes.map(r => r.name).join(', ')) + '</p>' : '') + '<div class="row"><button type="button" class="btn" data-plan="save" data-ws="' + ws + '">Planı kaydet</button><button type="button" class="btn ghost" data-plan="discard">Vazgeç</button></div>' : '';
@@ -1857,7 +1867,7 @@ function plannerCard() {
   const log = state.changelog.slice(0, 30).map(e => '<div class="logrow"><span class="when">' + (e.at ? fmtD(e.at.slice(0, 10)) + ' ' + localTime(e.at) : '') + '</span><span>' + esc(e.text) + (e.by ? ' <span class="tiny">· ' + esc(cfg(e.by).name) + '</span>' : '') + '</span></div>').join('');
   const logHtml = '<details class="item" id="plan-log"' + (state.open.has('plan-log') ? ' open' : '') + '><summary>Değişiklik kaydı<span class="sub">' + state.changelog.length + ' kayıt</span></summary><div class="mlist">' + (log || '<p class="tiny">Henüz kayıt yok.</p>') + '</div></details>';
   return '<div class="card"><div class="card-h"><h2>Haftalık plan</h2><span class="meta">' + fmtD(ws) + ' – ' + fmtD(addDays(ws, 6)) + '</span></div>' + weekSwitch +
-    '<div class="eyebrow">Son 14 gün</div>' + feedHtml + inputs + genBtn + draftHtml + savedHtml + auditHtml + bridge + logHtml + '</div>';
+    inputs + genBtn + draftHtml + savedHtml + auditHtml + bridge + logHtml + '</div>';
 }
 function runAudit(ws) { const doc = planDoc('saved', ws); state.plan.audit = { ws: ws, rows: doc ? auditWeekDoc(doc) : [] }; }
 async function auditAdd(ws, idxs) {
@@ -1950,7 +1960,7 @@ function renderSettings() {
   const cycle = p === 'K' ? '<div class="card"><div class="card-h"><h2>Döngü ayarları</h2></div><div class="three">' + fld('sCycleStart', 'Son adet başlangıcı', 'date', c.cycleStart, ' max="' + state.today + '"') + fld('sCycleLen', 'Döngü (gün)', 'number', c.cycleLen, ' min="20" max="45" step="1" inputmode="numeric"') + fld('sPeriodLen', 'Adet süresi (gün)', 'number', c.periodLen, ' min="2" max="10" step="1" inputmode="numeric"') + '</div>' +
     (c.cycleHistory.length ? '<p class="tiny">Önceki başlangıçlar: ' + c.cycleHistory.slice(-6).map(fmtD).join(', ') + '</p>' : '') + '<div class="row"><button type="button" class="btn ghost" id="saveCycle">Döngüyü kaydet</button><span class="tiny" id="cycleStatus"></span></div></div>' : '';
   const ladderRows = state.rewards.ladder[p].map(r => '<div class="listrow"><span class="tiny" style="width:64px;flex:none">' + RUNG_LABELS[r.weeks] + '</span><input type="text" id="li' + r.weeks + '" value="' + esc(r.icon) + '" maxlength="4" aria-label="Simge" style="width:52px;text-align:center;flex:none"><input type="text" id="lw' + r.weeks + '" value="' + esc(r.title) + '" maxlength="80" aria-label="Ödül" class="grow">' + (state.rewards.claimed[p]['w' + r.weeks] ? '<span class="tiny" style="flex:none">alındı ' + fmtD(state.rewards.claimed[p]['w' + r.weeks]) + '</span>' : '') + '</div>').join('');
-  $('#view-ayarlar').innerHTML = (STATIC_HOST ? accountCardHtml() : '') + historyCardHtml() +
+  $('#view-ayarlar').innerHTML = (STATIC_HOST ? accountCardHtml() : '') + historyCardHtml() + analysisCardHtml() +
     '<div class="card"><div class="card-h"><h2>' + esc(c.name) + ' · plan ayarları</h2></div>' + fld('sName', 'Görünen ad', 'text', c.name, ' maxlength="20"') +
     '<div class="two">' + fld('sStart', 'Başlangıç kilosu (kg)', 'number', c.startWeight, ' step="0.1" inputmode="decimal"') + fld('sGoal', 'Hedef kilo (kg)', 'number', c.goalWeight, ' step="0.1" inputmode="decimal"') + '</div>' +
     '<div class="two">' + fld('sDate', 'Başlangıç tarihi', 'date', c.startDate, '') + fld('sRate', 'Hedef tempo (kg/hafta)', 'number', c.rate, ' step="0.1" min="0.2" max="1" inputmode="decimal"') + '</div>' +
