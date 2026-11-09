@@ -20,7 +20,7 @@ function compressImage(file) {
 }
 function foodPrompt(p, L, f, hasImage) {
   const c = cfg(p), menu = MENU[parseD(L.date).getDay()], planned = menu.meals.find(m => m.k === f.meal);
-  const who = p === 'E' ? '35 yaşında erkek, 170 cm, hedef 1 800 kcal/gün, ailede tip 2 diyabet öyküsü' : p === 'K' ? '37 yaşında kadın, 160 cm, hedef 1 450 kcal/gün' : 'kadın, hedef ' + cfg(p).kcal + ' kcal/gün';
+  const who = p === 'E' ? '35 yaşında erkek, 170 cm, hedef 1 800 kcal/gün, ailede tip 2 diyabet öyküsü' : p === 'K' ? '37 yaşında kadın, 160 cm, hedef 1 450 kcal/gün' : '42 yaşında kadın, 155 cm, 57 kg, günde iki ana öğün, hedef 1 600 kcal/gün';
   const others = L.foods.filter(x => x.id !== f.id && x.kcal != null).reduce((s, x) => s + x.kcal, 0);
   return 'Sen deneyimli bir diyetisyensin. Kilo verme programındaki bir kişinin öğün kaydını değerlendir.\n' +
     'Kişi: ' + who + '. Bugüne kadar kayıtlı diğer öğünler: ' + Math.round(others) + ' kcal.\n' +

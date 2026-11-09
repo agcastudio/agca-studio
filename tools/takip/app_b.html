@@ -18,9 +18,45 @@
 const DEFAULTS = {
   E: { name: 'Erkek', startWeight: 87, goalWeight: 78, startDate: '2026-11-09', rate: 0.7, waterGoal: 11, kcal: 1800, height: 170, weighDay: 5 },
   K: { name: 'Selen', female: true, startWeight: 74, goalWeight: 62, startDate: '2026-11-09', rate: 0.5, waterGoal: 9, kcal: 1450, height: 160, weighDay: 5, cycleStart: '', cycleLen: 28, periodLen: 5, cycleHistory: [] },
-  S: { name: 'Sevinç', female: true, startWeight: 70, goalWeight: 65, startDate: '2026-11-09', rate: 0.5, waterGoal: 9, kcal: 1450, height: 160, weighDay: 5, cycleStart: '', cycleLen: 28, periodLen: 5, cycleHistory: [] }
+  S: { name: 'Sevinç', female: false, program: 'ikiogun', startWeight: 57, goalWeight: 55, startDate: '2026-11-09', rate: 0.25, waterGoal: 8, kcal: 1600, height: 155, weighDay: 5 }
 };
 const PERSONS = ['E', 'K', 'S']; // E erkek sayfası, K Selen (kadin sayfası), S Sevinç (sevinc sayfası)
+// Kişiye özel program: varsayılan 5 öğün + koşu + iki yürüyüş; "ikiogun" (Sevinç) iki ana öğün + kahve kuralı + ev egzersizi. Gün yine 11 puan.
+const PROGRAMS = {
+  default: { meals: ['k', 'a1', 'o', 'a2', 'ak'], mealPts: { k: 1, a1: 1, o: 1, a2: 1, ak: 1 }, times: {}, names: {}, toggles: { run: 1, walkNoon: 1, walkEve: 1 }, wakeLimit: null },
+  ikiogun: { meals: ['k', 'a2', 'ak'], mealPts: { k: 2, a2: 0, ak: 2 }, times: { k: '09:30', a2: '15:00', ak: '18:30' }, names: { k: 'Kahvaltı · 1. ana öğün', a2: 'Hafif ara · isteğe bağlı', ak: 'Akşam · 2. ana öğün' }, toggles: { run: 2, walkNoon: 1, vinegar: 1 }, wakeLimit: '07:30' }
+};
+const RHYTHM_S = [
+  ['07:00', 'Kalk, perdeyi aç, 2 bardak su; kahve henüz değil'],
+  ['07:15', '10 dk esneme ve nefes; mümkünse 5 dk gün ışığı'],
+  ['08:00', 'İlk kahve: kalktıktan en az 1 saat sonra, yanında birkaç badem'],
+  ['09:30', 'Kahvaltı (1. ana öğün): 25–35 g protein, sebze, tam tahıl'],
+  ['12:30', '20 dk tempolu yürüyüş, su'],
+  ['14:00', 'İkinci ve son kahve (günde en fazla 2)'],
+  ['15:00', 'Hafif ara, isteğe bağlı: yoğurt + meyve ya da bir avuç kuruyemiş'],
+  ['17:00', 'Ev egzersizi 20 dk (günün programı)'],
+  ['18:30', 'Akşam (2. ana öğün): protein + bol sebze, tahıl az'],
+  ['20:30', 'Mutfak kapandı; bitki çayı'],
+  ['22:30', 'Ekranlar kapalı, ışıklar kısık'],
+  ['23:00', 'Uyku (7–8 saat)']
+];
+const HOME_WORKOUTS = {
+  1: { title: 'Kuvvet A · 20 dk', text: '3 tur: 12 squat, 10 kalça köprüsü, 8 diz üstü şınav, 30 sn plank, 10 bird-dog · turlar arası 60 sn' },
+  2: { title: 'Yürüyüş + merdiven · 25 dk', text: '20 dk tempolu yürüyüş, ardından 5 dk merdiven inip çıkma ya da yerinde yüksek diz' },
+  3: { title: 'Core ve pilates · 15 dk', text: '2 tur: 10 dead bug, 20 sn yan plank (her taraf), 15 kalça köprüsü, 10 kedi-deve, 12 bisiklet' },
+  4: { title: 'Kuvvet B · 20 dk', text: '3 tur: 10 lunge (her bacak), 12 sandalye squat, 10 duvar veya diz şınavı, 12 superman, 30 sn plank' },
+  5: { title: 'Dans veya tempolu kardiyo · 20 dk', text: 'Sevdiğin müzikle 20 dk; konuşabilecek ama şarkı söyleyemeyecek tempoda' },
+  6: { title: 'Mobilite ve yoga · 20 dk', text: '3 tur güneşe selam, kalça açıcılar, omuz esnetme, 5 dk nefes' },
+  0: { title: 'Dinlenme yürüyüşü · 30 dk', text: 'Açık havada rahat tempo; haftayı değerlendir, gelecek haftayı planla' }
+};
+const SEVINC_RULES = [
+  'Günde iki ana öğün: 09:30 kahvaltı ve 18:30 akşam; ikisinde de 25–35 g protein (yumurta, lor, yoğurt, balık, tavuk, baklagil). Esas olan öğün atlamak değil, öğünü doyurucu kurmak.',
+  'Kahve kalkar kalkmaz değil: önce 2 bardak su, ilk kahve en az 1 saat sonra ya da kahvaltıyla; günde en fazla 2 fincan, sonuncusu 14:00\'ten önce.',
+  'Açlık olursa 15:00 civarı hafif bir ara: yoğurt + meyve ya da bir avuç kuruyemiş. 20:30\'dan sonra mutfak kapalı.',
+  'Haftada 2 kuvvet, 1 core, 1 kardiyo, 1 mobilite günü ve her gün 20 dk yürüyüş: 42 yaşında kas ve kemik kütlesini koruyan en etkili düzen. İki hafta sonra tur ya da tekrar sayısını artır.',
+  'Su günde 8 bardak (2 L); uyku 23:00–07:00. Tartı haftada bir, Cuma sabahı.',
+  'Hedef kilo değil kuvvet: 57 kg, 155 cm için sağlıklı aralık. Amaç enerji, duruş ve kas; tartı 55–57 bandında kalsın.'
+];
 const DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 const REWARD_DEFAULT_POINTS = 55;
 const MEAL_KEYS = ['k', 'a1', 'o', 'a2', 'ak'];

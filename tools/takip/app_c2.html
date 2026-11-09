@@ -20,7 +20,7 @@ function recipeLinks(dow, mealKey, meal) {
   const html = ids.map(id => { const r = findRecipe(id); return r ? '<button type="button" class="rlink" data-recipe="' + id + '">📖 ' + esc(r.name) + '</button>' : ''; }).join('');
   return html ? '<div class="rl">' + html + '</div>' : '';
 }
-function nextRhythm() { const hm = nowHM(); for (const r of RHYTHM) if (r[0] > hm) return r; return null; }
+function nextRhythm() { const hm = nowHM(); for (const r of rhythmFor(state.person)) if (r[0] > hm) return r; return null; }
 function shortRhythm(t) {
   const s = String(t).replace(/\s*\([^)]*\)/g, '').replace(/:\s*/, ' · ').trim();
   if (s.length <= 46) return s;
@@ -87,7 +87,7 @@ function updateWaterUI(L, c) {
   document.querySelectorAll('#drops .drop').forEach(d => d.classList.toggle('on', Number(d.dataset.n) <= L.water));
 }
 function questRow(q, L) {
-  const body = '<div class="em">' + EMOJI[q.id] + '</div><div class="grow"><div class="nm">' + q.name + '<span class="tm">' + q.t + '</span></div>' + (q.menu ? '<div class="mn">' + esc(q.menu) + '</div>' : '') + (q.por ? '<div class="pr">' + esc(q.por) + '</div>' : '') + (q.rl || '');
+  const body = '<div class="em">' + (q.em || EMOJI[q.id]) + '</div><div class="grow"><div class="nm">' + q.name + '<span class="tm">' + q.t + '</span></div>' + (q.menu ? '<div class="mn">' + esc(q.menu) + '</div>' : '') + (q.por ? '<div class="pr">' + esc(q.por) + '</div>' : '') + (q.rl || '');
   if (q.kind === 'sleep') return '<div class="q sleepq' + (q.on ? ' on' : '') + '">' + body + '<div class="row"><label class="tiny">Yatış <input type="time" id="bedInput" value="' + esc(L.bed) + '"></label><label class="tiny">Kalkış <input type="time" id="wakeInput" value="' + esc(L.wake) + '"></label></div></div><div class="pt">+1</div></div>';
   if (q.kind === 'weigh') return '<div class="q sleepq' + (q.on ? ' on' : '') + '">' + body + '<div class="row"><input type="number" id="weightInput" inputmode="decimal" step="0.1" min="30" max="250" value="' + (L.weight == null ? '' : L.weight) + '" placeholder="kg" aria-label="Kilo" style="width:96px;font-weight:700"><span class="tiny" id="weightDelta">' + q.delta + '</span></div></div><div class="pt">+5</div></div>';
   const attr = q.kind === 'meal' ? 'data-meal="' + q.k + '"' : 'data-toggle="' + q.f + '"';
@@ -96,14 +96,22 @@ function questRow(q, L) {
 function questsHtml(p, L, c) {
   const d = state.date, dow = parseD(d).getDay(), menu = menuFor(d), isToday = d === state.today, nx = isToday ? nextRhythm() : null, hm = nowHM();
   const earlier = logsOf(p).filter(l => l.weight != null && l.date < d), prev = earlier.length ? earlier[earlier.length - 1] : null;
-  const items = [{ id: 'run', f: 'run', t: '06:15', name: 'Sabah koşusu', pts: 1, on: L.run, kind: 'toggle' }];
-  if (dow === c.weighDay) items.push({ id: 'weigh', t: '06:05', name: 'Haftalık tartı', pts: 5, on: L.weight != null, kind: 'weigh', menu: 'Tuvaletten sonra, kahvaltıdan önce', delta: weightDelta(L, c, prev) });
-  menu.meals.filter(m => m.k !== 'g').forEach(m => items.push({ id: m.k, k: m.k, t: MEAL_TIMES[m.k], name: MEAL_NAMES[m.k], pts: 1, on: !!L.meals[m.k], kind: 'meal', menu: m.t, por: portionFor(m, p), rl: recipeLinks(dow, m.k, m) }));
-  items.push({ id: 'vinegar', f: 'vinegar', t: '12:15', name: 'Sirkeli su', pts: 0, on: L.vinegar, kind: 'toggle', menu: '1 yk elma sirkesi + 1 bardak su' });
-  items.push({ id: 'walkNoon', f: 'walkNoon', t: '13:15', name: 'Öğle yürüyüşü', pts: 1, on: L.walkNoon, kind: 'toggle', menu: '10–15 dk dışarıda' });
-  items.push({ id: 'walkEve', f: 'walkEve', t: '19:45', name: 'Akşam yürüyüşü', pts: 1, on: L.walkEve, kind: 'toggle', menu: '10 dk · sonra mutfak kapanır' });
-  items.push({ id: 'strength', f: 'strength', t: '20:00', name: 'Kuvvet 15 dk', pts: 0, on: L.strength, kind: 'toggle', menu: '3 tur · squat, şınav, plank, köprü' });
-  items.push({ id: 'sleep', t: '23:00', name: 'Uyku düzeni', pts: 1, on: sleepOk(L), kind: 'sleep', menu: 'Yatış en geç 23:15 · kalkış en geç ' + wakeLimit(d) + (L.sleep != null ? ' · ' + n1(L.sleep) + ' saat uyku' : '') });
+  const prog = programFor(c), alt = prog !== PROGRAMS.default, items = [];
+  if (!alt) items.push({ id: 'run', f: 'run', t: '06:15', name: 'Sabah koşusu', pts: 1, on: L.run, kind: 'toggle' });
+  if (dow === c.weighDay) items.push({ id: 'weigh', t: alt ? '07:10' : '06:05', name: 'Haftalık tartı', pts: 5, on: L.weight != null, kind: 'weigh', menu: 'Tuvaletten sonra, kahvaltıdan önce', delta: weightDelta(L, c, prev) });
+  menu.meals.filter(m => prog.meals.indexOf(m.k) >= 0).forEach(m => { const lightSnack = alt && m.k === 'a2'; items.push({ id: m.k, k: m.k, t: prog.times[m.k] || MEAL_TIMES[m.k], name: prog.names[m.k] || MEAL_NAMES[m.k], pts: prog.mealPts[m.k] != null ? prog.mealPts[m.k] : 1, on: !!L.meals[m.k], kind: 'meal', menu: lightSnack ? 'Yoğurt + meyve ya da bir avuç kuruyemiş; aç değilsen atla' : m.t, por: lightSnack ? '' : portionFor(m, p), rl: lightSnack ? '' : recipeLinks(dow, m.k, m) }); });
+  if (alt) {
+    const hw = HOME_WORKOUTS[dow];
+    items.push({ id: 'vinegar', f: 'vinegar', t: '08:00', name: 'Kahve kuralı', pts: 1, on: L.vinegar, kind: 'toggle', em: '☕', menu: 'Önce 2 bardak su; kahve kalktıktan en az 1 saat sonra ya da kahvaltıyla' });
+    items.push({ id: 'walkNoon', f: 'walkNoon', t: '12:30', name: 'Yürüyüş 20 dk', pts: 1, on: L.walkNoon, kind: 'toggle', menu: 'Tempolu, gün ışığında' });
+    items.push({ id: 'run', f: 'run', t: '17:00', name: 'Ev egzersizi · ' + hw.title, pts: 2, on: L.run, kind: 'toggle', em: '💪', menu: hw.text });
+  } else {
+    items.push({ id: 'vinegar', f: 'vinegar', t: '12:15', name: 'Sirkeli su', pts: 0, on: L.vinegar, kind: 'toggle', menu: '1 yk elma sirkesi + 1 bardak su' });
+    items.push({ id: 'walkNoon', f: 'walkNoon', t: '13:15', name: 'Öğle yürüyüşü', pts: 1, on: L.walkNoon, kind: 'toggle', menu: '10–15 dk dışarıda' });
+    items.push({ id: 'walkEve', f: 'walkEve', t: '19:45', name: 'Akşam yürüyüşü', pts: 1, on: L.walkEve, kind: 'toggle', menu: '10 dk · sonra mutfak kapanır' });
+    items.push({ id: 'strength', f: 'strength', t: '20:00', name: 'Kuvvet 15 dk', pts: 0, on: L.strength, kind: 'toggle', menu: '3 tur · squat, şınav, plank, köprü' });
+  }
+  items.push({ id: 'sleep', t: '23:00', name: 'Uyku düzeni', pts: 1, on: sleepOk(L), kind: 'sleep', menu: 'Yatış en geç 23:15 · kalkış en geç ' + wakeLimit(d, p) + (L.sleep != null ? ' · ' + n1(L.sleep) + ' saat uyku' : '') });
   items.sort((a, b) => a.t < b.t ? -1 : 1);
   const expired = q => { if (!isToday) return false; if (q.kind === 'sleep') return !!(L.bed && L.wake); const lim = (Number(q.t.slice(0, 2)) * 60 + Number(q.t.slice(3, 5)) + 90); return (Number(hm.slice(0, 2)) * 60 + Number(hm.slice(3, 5))) > lim; };
   const active = isToday ? items.filter(q => !q.on && !expired(q)) : items;

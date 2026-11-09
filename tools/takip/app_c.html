@@ -145,12 +145,15 @@ function normLog(l) {
 }
 // Portion text for a person; Sevinç (S) uses the women's (K) portion until her own is written.
 function portionFor(m, p) { return (m && m[p]) || (p !== 'E' && m ? (m.K || '') : ''); }
+function programFor(c) { return PROGRAMS[c && c.program] || PROGRAMS.default; }
+function rhythmFor(p) { return programFor(cfg(p)) === PROGRAMS.default ? RHYTHM : RHYTHM_S; }
 function getLog(p, d) { const l = state.logs[logId(p, d)]; return l ? clone(l) : emptyLog(p, d); }
 function cfg(p) {
   const s = Object.assign({}, DEFAULTS[p], state.settings[p] || {});
   ['startWeight', 'goalWeight', 'rate', 'waterGoal', 'kcal', 'height'].forEach(k => { const v = Number(s[k]); s[k] = isFinite(v) && v > 0 ? v : DEFAULTS[p][k]; });
   s.name = String(s.name || DEFAULTS[p].name).slice(0, 20); if (s.name === 'Kadın') s.name = DEFAULTS[p].name;
   s.female = !!DEFAULTS[p].female;
+  s.program = DEFAULTS[p].program || 'default';
   if (!isDate(s.startDate)) s.startDate = DEFAULTS[p].startDate;
   const wd = Number(s.weighDay); s.weighDay = isFinite(wd) && wd >= 0 && wd <= 6 ? Math.round(wd) : 5;
   if (s.female) {
@@ -203,13 +206,14 @@ function canDb() { return !!state.db && state.mode !== 'local'; }
 
 // ---------- points, rewards, cycle ----------
 const DAY_MAX = 11, DAY_WIN = 10, WEEK_MAX = 82;
-function wakeLimit(date) { const d = parseD(date).getDay(); return (d === 0 || d === 6) ? '07:30' : '06:30'; }
-function sleepOk(L) { if (!L.bed || !L.wake) return false; return L.bed >= '20:00' && L.bed <= '23:15' && L.wake >= '04:00' && L.wake <= wakeLimit(L.date); }
+function wakeLimit(date, p) { const lim = p ? programFor(cfg(p)).wakeLimit : null; if (lim) return lim; const d = parseD(date).getDay(); return (d === 0 || d === 6) ? '07:30' : '06:30'; }
+function sleepOk(L) { if (!L.bed || !L.wake) return false; return L.bed >= '20:00' && L.bed <= '23:15' && L.wake >= '04:00' && L.wake <= wakeLimit(L.date, L.person); }
 function sleepHours(bed, wake) { if (!bed || !wake) return null; const b = Number(bed.slice(0, 2)) * 60 + Number(bed.slice(3, 5)), w = Number(wake.slice(0, 2)) * 60 + Number(wake.slice(3, 5)); return Math.round(((w - b + 1440) % 1440) / 30) / 2; }
 function dayPoints(L, c) {
-  let p = MEAL_KEYS.filter(k => L.meals[k]).length;
+  const prog = programFor(c); let p = 0;
+  prog.meals.forEach(k => { if (L.meals[k]) p += prog.mealPts[k] || 0; });
   if (L.water >= c.waterGoal) p += 2;
-  if (L.run) p += 1; if (L.walkNoon) p += 1; if (L.walkEve) p += 1;
+  Object.keys(prog.toggles).forEach(f => { if (L[f]) p += prog.toggles[f]; });
   if (sleepOk(L)) p += 1;
   return p;
 }

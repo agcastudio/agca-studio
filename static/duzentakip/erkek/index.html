@@ -333,9 +333,45 @@ ul.plain, ol.plain { margin: 0; padding-left: 18px; font-size: 0.9rem; color: va
 const DEFAULTS = {
   E: { name: 'Erkek', startWeight: 87, goalWeight: 78, startDate: '2026-11-09', rate: 0.7, waterGoal: 11, kcal: 1800, height: 170, weighDay: 5 },
   K: { name: 'Selen', female: true, startWeight: 74, goalWeight: 62, startDate: '2026-11-09', rate: 0.5, waterGoal: 9, kcal: 1450, height: 160, weighDay: 5, cycleStart: '', cycleLen: 28, periodLen: 5, cycleHistory: [] },
-  S: { name: 'Sevinç', female: true, startWeight: 70, goalWeight: 65, startDate: '2026-11-09', rate: 0.5, waterGoal: 9, kcal: 1450, height: 160, weighDay: 5, cycleStart: '', cycleLen: 28, periodLen: 5, cycleHistory: [] }
+  S: { name: 'Sevinç', female: false, program: 'ikiogun', startWeight: 57, goalWeight: 55, startDate: '2026-11-09', rate: 0.25, waterGoal: 8, kcal: 1600, height: 155, weighDay: 5 }
 };
 const PERSONS = ['E', 'K', 'S']; // E erkek sayfası, K Selen (kadin sayfası), S Sevinç (sevinc sayfası)
+// Kişiye özel program: varsayılan 5 öğün + koşu + iki yürüyüş; "ikiogun" (Sevinç) iki ana öğün + kahve kuralı + ev egzersizi. Gün yine 11 puan.
+const PROGRAMS = {
+  default: { meals: ['k', 'a1', 'o', 'a2', 'ak'], mealPts: { k: 1, a1: 1, o: 1, a2: 1, ak: 1 }, times: {}, names: {}, toggles: { run: 1, walkNoon: 1, walkEve: 1 }, wakeLimit: null },
+  ikiogun: { meals: ['k', 'a2', 'ak'], mealPts: { k: 2, a2: 0, ak: 2 }, times: { k: '09:30', a2: '15:00', ak: '18:30' }, names: { k: 'Kahvaltı · 1. ana öğün', a2: 'Hafif ara · isteğe bağlı', ak: 'Akşam · 2. ana öğün' }, toggles: { run: 2, walkNoon: 1, vinegar: 1 }, wakeLimit: '07:30' }
+};
+const RHYTHM_S = [
+  ['07:00', 'Kalk, perdeyi aç, 2 bardak su; kahve henüz değil'],
+  ['07:15', '10 dk esneme ve nefes; mümkünse 5 dk gün ışığı'],
+  ['08:00', 'İlk kahve: kalktıktan en az 1 saat sonra, yanında birkaç badem'],
+  ['09:30', 'Kahvaltı (1. ana öğün): 25–35 g protein, sebze, tam tahıl'],
+  ['12:30', '20 dk tempolu yürüyüş, su'],
+  ['14:00', 'İkinci ve son kahve (günde en fazla 2)'],
+  ['15:00', 'Hafif ara, isteğe bağlı: yoğurt + meyve ya da bir avuç kuruyemiş'],
+  ['17:00', 'Ev egzersizi 20 dk (günün programı)'],
+  ['18:30', 'Akşam (2. ana öğün): protein + bol sebze, tahıl az'],
+  ['20:30', 'Mutfak kapandı; bitki çayı'],
+  ['22:30', 'Ekranlar kapalı, ışıklar kısık'],
+  ['23:00', 'Uyku (7–8 saat)']
+];
+const HOME_WORKOUTS = {
+  1: { title: 'Kuvvet A · 20 dk', text: '3 tur: 12 squat, 10 kalça köprüsü, 8 diz üstü şınav, 30 sn plank, 10 bird-dog · turlar arası 60 sn' },
+  2: { title: 'Yürüyüş + merdiven · 25 dk', text: '20 dk tempolu yürüyüş, ardından 5 dk merdiven inip çıkma ya da yerinde yüksek diz' },
+  3: { title: 'Core ve pilates · 15 dk', text: '2 tur: 10 dead bug, 20 sn yan plank (her taraf), 15 kalça köprüsü, 10 kedi-deve, 12 bisiklet' },
+  4: { title: 'Kuvvet B · 20 dk', text: '3 tur: 10 lunge (her bacak), 12 sandalye squat, 10 duvar veya diz şınavı, 12 superman, 30 sn plank' },
+  5: { title: 'Dans veya tempolu kardiyo · 20 dk', text: 'Sevdiğin müzikle 20 dk; konuşabilecek ama şarkı söyleyemeyecek tempoda' },
+  6: { title: 'Mobilite ve yoga · 20 dk', text: '3 tur güneşe selam, kalça açıcılar, omuz esnetme, 5 dk nefes' },
+  0: { title: 'Dinlenme yürüyüşü · 30 dk', text: 'Açık havada rahat tempo; haftayı değerlendir, gelecek haftayı planla' }
+};
+const SEVINC_RULES = [
+  'Günde iki ana öğün: 09:30 kahvaltı ve 18:30 akşam; ikisinde de 25–35 g protein (yumurta, lor, yoğurt, balık, tavuk, baklagil). Esas olan öğün atlamak değil, öğünü doyurucu kurmak.',
+  'Kahve kalkar kalkmaz değil: önce 2 bardak su, ilk kahve en az 1 saat sonra ya da kahvaltıyla; günde en fazla 2 fincan, sonuncusu 14:00\'ten önce.',
+  'Açlık olursa 15:00 civarı hafif bir ara: yoğurt + meyve ya da bir avuç kuruyemiş. 20:30\'dan sonra mutfak kapalı.',
+  'Haftada 2 kuvvet, 1 core, 1 kardiyo, 1 mobilite günü ve her gün 20 dk yürüyüş: 42 yaşında kas ve kemik kütlesini koruyan en etkili düzen. İki hafta sonra tur ya da tekrar sayısını artır.',
+  'Su günde 8 bardak (2 L); uyku 23:00–07:00. Tartı haftada bir, Cuma sabahı.',
+  'Hedef kilo değil kuvvet: 57 kg, 155 cm için sağlıklı aralık. Amaç enerji, duruş ve kas; tartı 55–57 bandında kalsın.'
+];
 const DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 const REWARD_DEFAULT_POINTS = 55;
 const MEAL_KEYS = ['k', 'a1', 'o', 'a2', 'ak'];
@@ -969,12 +1005,15 @@ function normLog(l) {
 }
 // Portion text for a person; Sevinç (S) uses the women's (K) portion until her own is written.
 function portionFor(m, p) { return (m && m[p]) || (p !== 'E' && m ? (m.K || '') : ''); }
+function programFor(c) { return PROGRAMS[c && c.program] || PROGRAMS.default; }
+function rhythmFor(p) { return programFor(cfg(p)) === PROGRAMS.default ? RHYTHM : RHYTHM_S; }
 function getLog(p, d) { const l = state.logs[logId(p, d)]; return l ? clone(l) : emptyLog(p, d); }
 function cfg(p) {
   const s = Object.assign({}, DEFAULTS[p], state.settings[p] || {});
   ['startWeight', 'goalWeight', 'rate', 'waterGoal', 'kcal', 'height'].forEach(k => { const v = Number(s[k]); s[k] = isFinite(v) && v > 0 ? v : DEFAULTS[p][k]; });
   s.name = String(s.name || DEFAULTS[p].name).slice(0, 20); if (s.name === 'Kadın') s.name = DEFAULTS[p].name;
   s.female = !!DEFAULTS[p].female;
+  s.program = DEFAULTS[p].program || 'default';
   if (!isDate(s.startDate)) s.startDate = DEFAULTS[p].startDate;
   const wd = Number(s.weighDay); s.weighDay = isFinite(wd) && wd >= 0 && wd <= 6 ? Math.round(wd) : 5;
   if (s.female) {
@@ -1027,13 +1066,14 @@ function canDb() { return !!state.db && state.mode !== 'local'; }
 
 // ---------- points, rewards, cycle ----------
 const DAY_MAX = 11, DAY_WIN = 10, WEEK_MAX = 82;
-function wakeLimit(date) { const d = parseD(date).getDay(); return (d === 0 || d === 6) ? '07:30' : '06:30'; }
-function sleepOk(L) { if (!L.bed || !L.wake) return false; return L.bed >= '20:00' && L.bed <= '23:15' && L.wake >= '04:00' && L.wake <= wakeLimit(L.date); }
+function wakeLimit(date, p) { const lim = p ? programFor(cfg(p)).wakeLimit : null; if (lim) return lim; const d = parseD(date).getDay(); return (d === 0 || d === 6) ? '07:30' : '06:30'; }
+function sleepOk(L) { if (!L.bed || !L.wake) return false; return L.bed >= '20:00' && L.bed <= '23:15' && L.wake >= '04:00' && L.wake <= wakeLimit(L.date, L.person); }
 function sleepHours(bed, wake) { if (!bed || !wake) return null; const b = Number(bed.slice(0, 2)) * 60 + Number(bed.slice(3, 5)), w = Number(wake.slice(0, 2)) * 60 + Number(wake.slice(3, 5)); return Math.round(((w - b + 1440) % 1440) / 30) / 2; }
 function dayPoints(L, c) {
-  let p = MEAL_KEYS.filter(k => L.meals[k]).length;
+  const prog = programFor(c); let p = 0;
+  prog.meals.forEach(k => { if (L.meals[k]) p += prog.mealPts[k] || 0; });
   if (L.water >= c.waterGoal) p += 2;
-  if (L.run) p += 1; if (L.walkNoon) p += 1; if (L.walkEve) p += 1;
+  Object.keys(prog.toggles).forEach(f => { if (L[f]) p += prog.toggles[f]; });
   if (sleepOk(L)) p += 1;
   return p;
 }
@@ -1379,7 +1419,7 @@ function recipeLinks(dow, mealKey, meal) {
   const html = ids.map(id => { const r = findRecipe(id); return r ? '<button type="button" class="rlink" data-recipe="' + id + '">📖 ' + esc(r.name) + '</button>' : ''; }).join('');
   return html ? '<div class="rl">' + html + '</div>' : '';
 }
-function nextRhythm() { const hm = nowHM(); for (const r of RHYTHM) if (r[0] > hm) return r; return null; }
+function nextRhythm() { const hm = nowHM(); for (const r of rhythmFor(state.person)) if (r[0] > hm) return r; return null; }
 function shortRhythm(t) {
   const s = String(t).replace(/\s*\([^)]*\)/g, '').replace(/:\s*/, ' · ').trim();
   if (s.length <= 46) return s;
@@ -1446,7 +1486,7 @@ function updateWaterUI(L, c) {
   document.querySelectorAll('#drops .drop').forEach(d => d.classList.toggle('on', Number(d.dataset.n) <= L.water));
 }
 function questRow(q, L) {
-  const body = '<div class="em">' + EMOJI[q.id] + '</div><div class="grow"><div class="nm">' + q.name + '<span class="tm">' + q.t + '</span></div>' + (q.menu ? '<div class="mn">' + esc(q.menu) + '</div>' : '') + (q.por ? '<div class="pr">' + esc(q.por) + '</div>' : '') + (q.rl || '');
+  const body = '<div class="em">' + (q.em || EMOJI[q.id]) + '</div><div class="grow"><div class="nm">' + q.name + '<span class="tm">' + q.t + '</span></div>' + (q.menu ? '<div class="mn">' + esc(q.menu) + '</div>' : '') + (q.por ? '<div class="pr">' + esc(q.por) + '</div>' : '') + (q.rl || '');
   if (q.kind === 'sleep') return '<div class="q sleepq' + (q.on ? ' on' : '') + '">' + body + '<div class="row"><label class="tiny">Yatış <input type="time" id="bedInput" value="' + esc(L.bed) + '"></label><label class="tiny">Kalkış <input type="time" id="wakeInput" value="' + esc(L.wake) + '"></label></div></div><div class="pt">+1</div></div>';
   if (q.kind === 'weigh') return '<div class="q sleepq' + (q.on ? ' on' : '') + '">' + body + '<div class="row"><input type="number" id="weightInput" inputmode="decimal" step="0.1" min="30" max="250" value="' + (L.weight == null ? '' : L.weight) + '" placeholder="kg" aria-label="Kilo" style="width:96px;font-weight:700"><span class="tiny" id="weightDelta">' + q.delta + '</span></div></div><div class="pt">+5</div></div>';
   const attr = q.kind === 'meal' ? 'data-meal="' + q.k + '"' : 'data-toggle="' + q.f + '"';
@@ -1455,14 +1495,22 @@ function questRow(q, L) {
 function questsHtml(p, L, c) {
   const d = state.date, dow = parseD(d).getDay(), menu = menuFor(d), isToday = d === state.today, nx = isToday ? nextRhythm() : null, hm = nowHM();
   const earlier = logsOf(p).filter(l => l.weight != null && l.date < d), prev = earlier.length ? earlier[earlier.length - 1] : null;
-  const items = [{ id: 'run', f: 'run', t: '06:15', name: 'Sabah koşusu', pts: 1, on: L.run, kind: 'toggle' }];
-  if (dow === c.weighDay) items.push({ id: 'weigh', t: '06:05', name: 'Haftalık tartı', pts: 5, on: L.weight != null, kind: 'weigh', menu: 'Tuvaletten sonra, kahvaltıdan önce', delta: weightDelta(L, c, prev) });
-  menu.meals.filter(m => m.k !== 'g').forEach(m => items.push({ id: m.k, k: m.k, t: MEAL_TIMES[m.k], name: MEAL_NAMES[m.k], pts: 1, on: !!L.meals[m.k], kind: 'meal', menu: m.t, por: portionFor(m, p), rl: recipeLinks(dow, m.k, m) }));
-  items.push({ id: 'vinegar', f: 'vinegar', t: '12:15', name: 'Sirkeli su', pts: 0, on: L.vinegar, kind: 'toggle', menu: '1 yk elma sirkesi + 1 bardak su' });
-  items.push({ id: 'walkNoon', f: 'walkNoon', t: '13:15', name: 'Öğle yürüyüşü', pts: 1, on: L.walkNoon, kind: 'toggle', menu: '10–15 dk dışarıda' });
-  items.push({ id: 'walkEve', f: 'walkEve', t: '19:45', name: 'Akşam yürüyüşü', pts: 1, on: L.walkEve, kind: 'toggle', menu: '10 dk · sonra mutfak kapanır' });
-  items.push({ id: 'strength', f: 'strength', t: '20:00', name: 'Kuvvet 15 dk', pts: 0, on: L.strength, kind: 'toggle', menu: '3 tur · squat, şınav, plank, köprü' });
-  items.push({ id: 'sleep', t: '23:00', name: 'Uyku düzeni', pts: 1, on: sleepOk(L), kind: 'sleep', menu: 'Yatış en geç 23:15 · kalkış en geç ' + wakeLimit(d) + (L.sleep != null ? ' · ' + n1(L.sleep) + ' saat uyku' : '') });
+  const prog = programFor(c), alt = prog !== PROGRAMS.default, items = [];
+  if (!alt) items.push({ id: 'run', f: 'run', t: '06:15', name: 'Sabah koşusu', pts: 1, on: L.run, kind: 'toggle' });
+  if (dow === c.weighDay) items.push({ id: 'weigh', t: alt ? '07:10' : '06:05', name: 'Haftalık tartı', pts: 5, on: L.weight != null, kind: 'weigh', menu: 'Tuvaletten sonra, kahvaltıdan önce', delta: weightDelta(L, c, prev) });
+  menu.meals.filter(m => prog.meals.indexOf(m.k) >= 0).forEach(m => { const lightSnack = alt && m.k === 'a2'; items.push({ id: m.k, k: m.k, t: prog.times[m.k] || MEAL_TIMES[m.k], name: prog.names[m.k] || MEAL_NAMES[m.k], pts: prog.mealPts[m.k] != null ? prog.mealPts[m.k] : 1, on: !!L.meals[m.k], kind: 'meal', menu: lightSnack ? 'Yoğurt + meyve ya da bir avuç kuruyemiş; aç değilsen atla' : m.t, por: lightSnack ? '' : portionFor(m, p), rl: lightSnack ? '' : recipeLinks(dow, m.k, m) }); });
+  if (alt) {
+    const hw = HOME_WORKOUTS[dow];
+    items.push({ id: 'vinegar', f: 'vinegar', t: '08:00', name: 'Kahve kuralı', pts: 1, on: L.vinegar, kind: 'toggle', em: '☕', menu: 'Önce 2 bardak su; kahve kalktıktan en az 1 saat sonra ya da kahvaltıyla' });
+    items.push({ id: 'walkNoon', f: 'walkNoon', t: '12:30', name: 'Yürüyüş 20 dk', pts: 1, on: L.walkNoon, kind: 'toggle', menu: 'Tempolu, gün ışığında' });
+    items.push({ id: 'run', f: 'run', t: '17:00', name: 'Ev egzersizi · ' + hw.title, pts: 2, on: L.run, kind: 'toggle', em: '💪', menu: hw.text });
+  } else {
+    items.push({ id: 'vinegar', f: 'vinegar', t: '12:15', name: 'Sirkeli su', pts: 0, on: L.vinegar, kind: 'toggle', menu: '1 yk elma sirkesi + 1 bardak su' });
+    items.push({ id: 'walkNoon', f: 'walkNoon', t: '13:15', name: 'Öğle yürüyüşü', pts: 1, on: L.walkNoon, kind: 'toggle', menu: '10–15 dk dışarıda' });
+    items.push({ id: 'walkEve', f: 'walkEve', t: '19:45', name: 'Akşam yürüyüşü', pts: 1, on: L.walkEve, kind: 'toggle', menu: '10 dk · sonra mutfak kapanır' });
+    items.push({ id: 'strength', f: 'strength', t: '20:00', name: 'Kuvvet 15 dk', pts: 0, on: L.strength, kind: 'toggle', menu: '3 tur · squat, şınav, plank, köprü' });
+  }
+  items.push({ id: 'sleep', t: '23:00', name: 'Uyku düzeni', pts: 1, on: sleepOk(L), kind: 'sleep', menu: 'Yatış en geç 23:15 · kalkış en geç ' + wakeLimit(d, p) + (L.sleep != null ? ' · ' + n1(L.sleep) + ' saat uyku' : '') });
   items.sort((a, b) => a.t < b.t ? -1 : 1);
   const expired = q => { if (!isToday) return false; if (q.kind === 'sleep') return !!(L.bed && L.wake); const lim = (Number(q.t.slice(0, 2)) * 60 + Number(q.t.slice(3, 5)) + 90); return (Number(hm.slice(0, 2)) * 60 + Number(hm.slice(3, 5))) > lim; };
   const active = isToday ? items.filter(q => !q.on && !expired(q)) : items;
@@ -1550,7 +1598,7 @@ function compressImage(file) {
 }
 function foodPrompt(p, L, f, hasImage) {
   const c = cfg(p), menu = MENU[parseD(L.date).getDay()], planned = menu.meals.find(m => m.k === f.meal);
-  const who = p === 'E' ? '35 yaşında erkek, 170 cm, hedef 1 800 kcal/gün, ailede tip 2 diyabet öyküsü' : p === 'K' ? '37 yaşında kadın, 160 cm, hedef 1 450 kcal/gün' : 'kadın, hedef ' + cfg(p).kcal + ' kcal/gün';
+  const who = p === 'E' ? '35 yaşında erkek, 170 cm, hedef 1 800 kcal/gün, ailede tip 2 diyabet öyküsü' : p === 'K' ? '37 yaşında kadın, 160 cm, hedef 1 450 kcal/gün' : '42 yaşında kadın, 155 cm, 57 kg, günde iki ana öğün, hedef 1 600 kcal/gün';
   const others = L.foods.filter(x => x.id !== f.id && x.kcal != null).reduce((s, x) => s + x.kcal, 0);
   return 'Sen deneyimli bir diyetisyensin. Kilo verme programındaki bir kişinin öğün kaydını değerlendir.\n' +
     'Kişi: ' + who + '. Bugüne kadar kayıtlı diğer öğünler: ' + Math.round(others) + ' kcal.\n' +
@@ -1774,11 +1822,13 @@ function bindProgram() {
 }
 function renderShopping() { $('#view-alisveris').innerHTML = shoppingCard(); }
 function renderProgram() {
-  const hm = nowHM();
-  let curI = -1; RHYTHM.forEach((r, i) => { if (r[0] <= hm) curI = i; });
-  const tl = RHYTHM.map((r, i) => '<div class="tl' + (i === curI ? ' now' : '') + '"><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>').join('');
+  const hm = nowHM(), c = cfg(state.person), prog = programFor(c), RH = rhythmFor(state.person), dow = parseD(state.today).getDay();
+  let curI = -1; RH.forEach((r, i) => { if (r[0] <= hm) curI = i; });
+  const tl = RH.map((r, i) => '<div class="tl' + (i === curI ? ' now' : '') + '"><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>').join('');
   $('#view-program').innerHTML = plannerCard() +
-    '<div class="card"><div class="card-h"><h2>Günlük ritim</h2></div><div class="timeline">' + tl + '</div></div>';
+    '<div class="card"><div class="card-h"><h2>Günlük ritim</h2></div><div class="timeline">' + tl + '</div></div>' +
+    (prog === PROGRAMS.ikiogun ? '<div class="card"><div class="card-h"><h2>Ev egzersizi programı</h2><span class="meta">20 dk · ekipmansız</span></div><div class="timeline">' + [1, 2, 3, 4, 5, 6, 0].map(dd => '<div class="tl' + (dd === dow ? ' now' : '') + '"><b>' + DAY_NAMES[dd].slice(0, 3) + '</b><span><b>' + esc(HOME_WORKOUTS[dd].title) + '</b><br>' + esc(HOME_WORKOUTS[dd].text) + '</span></div>').join('') + '</div></div>' +
+    '<div class="card"><div class="card-h"><h2>' + esc(c.name) + '\'in düzeni</h2><span class="meta">yaşam koçu notları</span></div><ul class="plain">' + SEVINC_RULES.map(r => '<li>' + esc(r) + '</li>').join('') + '</ul></div>' : '');
 }
 </script>
 
@@ -1790,10 +1840,10 @@ function weekFeedback(ws) {
   const since = addDays(state.today, -13), out = {};
   PERSONS.forEach(p => {
     const c = cfg(p), logs = logsOf(p).filter(l => l.date >= since && l.date <= state.today), n = logs.length;
-    const skip = { k: 0, a1: 0, o: 0, a2: 0, ak: 0 }; let water = 0, won = 0, runs = 0;
-    logs.forEach(L => { MEAL_KEYS.forEach(k => { if (!L.meals[k]) skip[k]++; }); water += L.water; if (dayPoints(L, c) >= DAY_WIN) won++; if (L.run) runs++; });
+    const prog = programFor(c), keys = prog.meals.filter(k => prog.mealPts[k]), skip = {}; keys.forEach(k => { skip[k] = 0; }); let water = 0, won = 0, runs = 0;
+    logs.forEach(L => { keys.forEach(k => { if (!L.meals[k]) skip[k]++; }); water += L.water; if (dayPoints(L, c) >= DAY_WIN) won++; if (L.run) runs++; });
     const foods = logs.flatMap(L => L.foods.map(f => (f.text || '').slice(0, 60) + (f.kcal ? ' (' + Math.round(f.kcal) + ' kcal)' : ''))).filter(s => s.trim()).slice(-20);
-    const worst = MEAL_KEYS.slice().sort((a, b) => skip[b] - skip[a])[0];
+    const worst = keys.slice().sort((a, b) => skip[b] - skip[a])[0];
     out[p] = { ad: c.name, kayitli_gun: n, atlanan_ogun_sayisi: skip, en_cok_atlanan: n ? MEAL_NAMES[worst] : null, su_ortalama_bardak: n ? Math.round(water / n * 10) / 10 : null, su_hedef: c.waterGoal, kazanilan_gun: won, kosu_gunu: runs, kaydedilen_yemekler: foods, kcal_hedef: c.kcal };
     if (c.female) { const ci = cycleInfo(c, addDays(ws, 3)); if (ci) out[p].gelecek_hafta_dongu = ci.phase + ', ~' + ci.day + '. gün'; }
   });
@@ -1804,7 +1854,7 @@ function weekFeedback(ws) {
   return { kisiler: out, begenilen_tarifler: uniq(liked), favori_tarifler: uniq(favs), begenilmeyen_tarifler: uniq(disliked), bu_haftanin_ogle_ve_aksamlari: dishes };
 }
 function planInputs() { return lsGet('bt_plan_inputs', { fridge: '', avoid: '', notes: '' }) || { fridge: '', avoid: '', notes: '' }; }
-const PLAN_RULES = 'Program kuralları: Akdeniz tipi, paketli gıda yok, mevsim ürünleri (Kasım–Şubat: lahana, karnabahar, brokoli, pırasa, kereviz, ıspanak, pancar, bal kabağı, havuç, turp, roka; elma, armut, nar, mandalina, portakal, kivi, ayva, Trabzon hurması). E: 35 yaş erkek, 1800 kcal, protein 130 g, ailede tip 2 diyabet, bazen şişkinlik → baklagiller öğle öğününde, günde en fazla 1 baklagil öğünü, iyi pişmiş. K: 37 yaş kadın (Selen), 1450 kcal, protein 100 g, süt ürünlerini sever, dönemsel tatlı isteği (PMS haftasında planlı tatlı ve magnezyum). S: Sevinç (kadın), kendi hedefleri yazılana kadar K ile aynı porsiyon ve kalori. Öğünler: 07:30 kahvaltı, 10:30 ara 1, 12:30 öğle (günün karbonhidratı burada), 16:00 ara 2 (proteinli), 19:00 akşam (protein + sebze, tahıl az veya yok), 21:30 gece bitki çayı. Haftada 2 balık (hamsi, palamut, levrek, çipura, somon), kırmızı et en fazla 1–2, tavuk/hindi 2–3, yumurta günde ≤2, baklagil 3 öğle. Kahvaltılar kolay: yoğurt + yulaf + meyve, haşlanmış yumurta + peynir, lor kasesi, çılbır; hafta sonu daha zengin. Pişirme kolay: hafta içi akşam ≤25 dk, Pazar hazırlık günü (çorba, zeytinyağlı sebze, haşlanmış yumurta, fırın tavuk) ile öğleler hazırdan. Cumartesi 16:00 planlı tatlı (şekersiz fırın meyve vb.). Kahve günde en fazla 2. Çeşitlilik: bu haftanın öğle ve akşamlarını tekrarlama, protein kaynaklarını dönüşümlü kullan, aynı sebzeyi üst üste iki gün verme. Porsiyonlar: E 150–170 g et/balık, K 120–130 g; E 1,5 kepçe baklagil, K 1 kepçe; bulgur E 4–5 yk öğle, K 3 yk; yoğurt E 150 g, K 100–120 g. PİŞİRME DÜZENİ: sebze yemekleri (zeytinyağlılar, etli sebze, baklagil yemekleri) ve çorbalar 4 porsiyon pişer ve ardışık iki günde yenir: aynı yemeği iki güne yaz (ör. Pzt öğle + Sal öğle, Çar akşam + Cum öğle), ikinci günün metnine "(2. gün)" ekle, alışveriş kalemlerini ("s") yalnızca pişirildiği güne yaz; ana protein (balık, şiş, köfte) taze pişer. Yeni tarifler 4 porsiyonluk malzeme ile yazılır ("servings": 4), kcal porsiyon başına verilir.';
+const PLAN_RULES = 'Program kuralları: Akdeniz tipi, paketli gıda yok, mevsim ürünleri (Kasım–Şubat: lahana, karnabahar, brokoli, pırasa, kereviz, ıspanak, pancar, bal kabağı, havuç, turp, roka; elma, armut, nar, mandalina, portakal, kivi, ayva, Trabzon hurması). E: 35 yaş erkek, 1800 kcal, protein 130 g, ailede tip 2 diyabet, bazen şişkinlik → baklagiller öğle öğününde, günde en fazla 1 baklagil öğünü, iyi pişmiş. K: 37 yaş kadın (Selen), 1450 kcal, protein 100 g, süt ürünlerini sever, dönemsel tatlı isteği (PMS haftasında planlı tatlı ve magnezyum). S: Sevinç, 42 yaş kadın, 155 cm, 57 kg (sağlıklı aralık; hedef kilo değil kuvvet), 1600 kcal, günde İKİ ana öğün: planın kahvaltısı (09:30) ve akşamı (18:30) onun için tek başına doyurucu ve 25–35 g proteinli olmalı; porsiyonu K ile aynı yazılır. Öğünler: 07:30 kahvaltı, 10:30 ara 1, 12:30 öğle (günün karbonhidratı burada), 16:00 ara 2 (proteinli), 19:00 akşam (protein + sebze, tahıl az veya yok), 21:30 gece bitki çayı. Haftada 2 balık (hamsi, palamut, levrek, çipura, somon), kırmızı et en fazla 1–2, tavuk/hindi 2–3, yumurta günde ≤2, baklagil 3 öğle. Kahvaltılar kolay: yoğurt + yulaf + meyve, haşlanmış yumurta + peynir, lor kasesi, çılbır; hafta sonu daha zengin. Pişirme kolay: hafta içi akşam ≤25 dk, Pazar hazırlık günü (çorba, zeytinyağlı sebze, haşlanmış yumurta, fırın tavuk) ile öğleler hazırdan. Cumartesi 16:00 planlı tatlı (şekersiz fırın meyve vb.). Kahve günde en fazla 2. Çeşitlilik: bu haftanın öğle ve akşamlarını tekrarlama, protein kaynaklarını dönüşümlü kullan, aynı sebzeyi üst üste iki gün verme. Porsiyonlar: E 150–170 g et/balık, K 120–130 g; E 1,5 kepçe baklagil, K 1 kepçe; bulgur E 4–5 yk öğle, K 3 yk; yoğurt E 150 g, K 100–120 g. PİŞİRME DÜZENİ: sebze yemekleri (zeytinyağlılar, etli sebze, baklagil yemekleri) ve çorbalar 4 porsiyon pişer ve ardışık iki günde yenir: aynı yemeği iki güne yaz (ör. Pzt öğle + Sal öğle, Çar akşam + Cum öğle), ikinci günün metnine "(2. gün)" ekle, alışveriş kalemlerini ("s") yalnızca pişirildiği güne yaz; ana protein (balık, şiş, köfte) taze pişer. Yeni tarifler 4 porsiyonluk malzeme ile yazılır ("servings": 4), kcal porsiyon başına verilir.';
 function planSchema() {
   const ids = allRecipes().map(r => r.id + ': ' + r.name).join('; ');
   return 'Yalnızca şu JSON nesnesini döndür (başka metin yok): {"days": {"1": {"tip": "o güne özel 1 cümle püf noktası", "meals": [{"k": "k", "t": "yemek adı ve kısa içerik", "E": "E porsiyonu", "K": "K porsiyonu", "r": ["tarif_id"], "s": [["Malzeme adı", miktar, "birim", "kategori", evdeVar]]}, ... k, a1, o, a2, ak, g sırasıyla 6 öğün]}, "2": {...}, "3": {...}, "4": {...}, "5": {...}, "6": {...}, "0": {...}}, "recipes": [{"id": "kucuk-harf-kisa", "name": "...", "time": dakika, "kcal": {"E": sayı, "K": sayı}, "tags": ["öğle"], "ing": ["2 kişilik malzeme satırları"], "steps": ["adımlar"], "por": {"E": "...", "K": "..."}, "tip": "..."}], "rationale": "3–4 cümle: protein dağılımı, balık/baklagil/et sayısı, geçen haftaya göre çeşitlilik, kişiye özel notlar"}. Kurallar: gün anahtarları 1=Pazartesi … 6=Cumartesi, 0=Pazar. "s" her öğünün 2 kişilik alışveriş kalemleri: birim yalnızca adet, g, ml, demet, baş, kavanoz; kategori yalnızca sebze, et, sut, firin, kiler; evdeVar true ise buzdolabında zaten var. Baharat, tuz, zeytinyağı gibi temel kiler kalemlerini yazma. "r": yemek mevcut tariflerden biriyle eşleşiyorsa o id; eşleşmiyorsa yeni tarifi "recipes" içine ekle (en fazla 8 yeni tarif) ve id\'sini "r" içine yaz. Gece (g) için yalnızca bitki çayı. Mevcut tarifler: ' + ids;
@@ -1866,13 +1916,13 @@ async function manualEdit(scope, ws, dow, k, vals) {
   renderProgram();
 }
 function planDaysHtml(doc, scope, ws) {
-  const p = state.person, name = cfg(p).name, ed = state.plan.edit, todayDow = parseD(state.today).getDay(), isThisWeek = ws === mondayOf(state.today);
+  const p = state.person, name = cfg(p).name, prog = programFor(cfg(p)), ed = state.plan.edit, todayDow = parseD(state.today).getDay(), isThisWeek = ws === mondayOf(state.today);
   if (!state.plan.openDays) state.plan.openDays = new Set(['saved:' + todayDow, 'draft:1']);
   return [1, 2, 3, 4, 5, 6, 0].map(dow => {
     const key = scope + ':' + dow, d = doc.days[dow];
     if (!d) return '<details data-plan-day="' + key + '"><summary>' + DAY_NAMES[dow] + '<span class="sub">plan yok</span></summary></details>';
     const today = scope === 'saved' && isThisWeek && dow === todayDow;
-    return '<details data-plan-day="' + key + '"' + (state.plan.openDays.has(key) ? ' open' : '') + '><summary>' + d.name + (today ? ' · bugün' : '') + '<span class="sub">' + esc((d.meals.find(m => m.k === 'ak') || {}).t || '').slice(0, 60) + '</span></summary><div class="mlist">' + d.meals.map(m => {
+    return '<details data-plan-day="' + key + '"' + (state.plan.openDays.has(key) ? ' open' : '') + '><summary>' + d.name + (today ? ' · bugün' : '') + '<span class="sub">' + esc((d.meals.find(m => m.k === 'ak') || {}).t || '').slice(0, 60) + '</span></summary><div class="mlist">' + d.meals.filter(m => prog === PROGRAMS.default || m.k === 'g' || prog.meals.indexOf(m.k) >= 0).map(m => {
       const editing = ed && ed.scope === scope && ed.ws === ws && ed.dow == dow && ed.k === m.k;
       const acts = m.k === 'g' ? '' : '<div class="acts">' + (state.sample && !STATIC_HOST ? '<button type="button" data-plan="swap" data-scope="' + scope + '" data-ws="' + ws + '" data-dow="' + dow + '" data-k="' + m.k + '" title="Claude alternatif önersin">↻</button>' : '') + '<button type="button" data-plan="edit" data-scope="' + scope + '" data-ws="' + ws + '" data-dow="' + dow + '" data-k="' + m.k + '" title="Elle düzenle">✎</button></div>';
       const body = '<div><b>' + MEAL_NAMES[m.k] + ' ' + MEAL_TIMES[m.k] + '</b> · ' + esc(m.t) + (portionFor(m, p) ? '<span class="p" style="display:block;color:var(--ink-2);font-size:.85rem">' + esc(name) + ': ' + esc(portionFor(m, p)) + '</span>' : '') + recipeLinks(dow, m.k, m) + '</div>';
