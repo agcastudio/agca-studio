@@ -1,0 +1,41 @@
+{{- /* LLM Sınav: kişisel çoktan seçmeli çalışma sınavı (KARARLAR 2026-11-09). Site iskeletini (baseof) kullanmaz:
+       kullanıcı isteğiyle sayfa başlığı (logo/menü) ve altbilgi de yok; yalnız içerik alanı. Arama motorlarına kapalı.
+       Sorular data/llmsinav/*.json dosyalarından gelir ve sayfaya JSON olarak gömülür; sunucuya veri gitmez,
+       deneme geçmişi tarayıcıda kalır. */ -}}
+{{- $veri := hugo.Data.llmsinav -}}
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ .Title }} · {{ site.Params.brand }}</title>
+<meta name="description" content="{{ .Description }}">
+<meta name="robots" content="noindex, nofollow, noimageindex, noarchive">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141617" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LLM Sınav">
+<link rel="icon" href="/img/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/inter-turkish.woff2" as="font" type="font/woff2" crossorigin>
+{{- $css := resources.Get "css/sinav.css" | resources.Minify | resources.Fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+</head>
+<body>
+<div class="sinav" id="app">
+  <main class="ekran" id="ekran" tabindex="-1" aria-live="polite">
+    <p class="yukleniyor">Sorular yükleniyor…</p>
+  </main>
+</div>
+<noscript><p class="noscript">Sınavı çözmek için JavaScript gerekli.</p></noscript>
+<script id="veri" type="application/json">{{ $veri | jsonify | safeJS }}</script>
+{{- $js := resources.Get "js/sinav.js" | resources.Minify | resources.Fingerprint }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{- if not hugo.IsServer }}{{ with site.Params.cfAnalyticsToken }}
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ . }}"}'></script>
+{{ end }}{{ end }}
+</body>
+</html>

@@ -1,0 +1,291 @@
+{
+  "id": "ders7",
+  "ders": "Ders 7",
+  "baslik": "Efficient LLMs: Quantization, Pruning, and Knowledge Distillation",
+  "konular": [
+    "LLM size and the memory problem (weights and KV cache)",
+    "Quantization basics: number formats, scale, and rounding",
+    "The outlier problem, granularity, and calibration",
+    "Weight / activation / KV-cache quantization and LLM.int8()",
+    "PTQ and QAT",
+    "Pruning basics and sparsity patterns",
+    "Pruning scoring methods: Magnitude, Wanda, SparseGPT",
+    "Structured pruning, low-rank factorization, and recovery",
+    "Knowledge distillation: soft targets and temperature",
+    "KD loss and types of knowledge",
+    "KD case studies: DistilBERT/TinyBERT, Step-by-Step, Minitron",
+    "KV-cache compression and choosing a method"
+  ],
+  "sorular": [
+    {
+      "id": "d7-01",
+      "konu": "LLM size and the memory problem (weights and KV cache)",
+      "zorluk": 1,
+      "slayt": 3,
+      "soru": "A 70B-parameter model's FP16 weights take 140 GB and do not fit on a single 80 GB datacenter GPU. Considering weight memory only, which is the least aggressive format (the one with the most bits) that lets the weights fit on this GPU?",
+      "secenekler": [
+        "BF16",
+        "INT4",
+        "INT8",
+        "INT2"
+      ],
+      "dogru": 2,
+      "aciklama": "INT8 uses 1 byte per weight: 140 GB / 2 = 70 GB < 80 GB, so no further bit reduction is needed. INT4 (35 GB) also fits but is more aggressive; BF16 uses 16 bits like FP16, so it still takes 140 GB."
+    },
+    {
+      "id": "d7-02",
+      "konu": "Quantization basics: number formats, scale, and rounding",
+      "zorluk": 2,
+      "slayt": 9,
+      "soru": "A symmetric 4-bit quantization scheme computes the scale as s = max|w| / 7 and q = round(w / s). In a group whose largest |w| is 3.5, what are s and q for the weight w = 1.2?",
+      "secenekler": [
+        "s = 0.5 and q = 2",
+        "s = 0.5 and q = 3",
+        "s ≈ 0.44 and q = 3",
+        "s ≈ 0.23 and q = 5"
+      ],
+      "dogru": 0,
+      "aciklama": "s = 3.5 / 7 = 0.5; 1.2 / 0.5 = 2.4 is rounded to the nearest integer, 2 (ŵ = 1.0; error 0.2). 'q = 3' is a rounding-up error; 0.44 and 0.23 are the wrong scale values obtained by dividing by 8 or 15 instead of 7."
+    },
+    {
+      "id": "d7-03",
+      "konu": "The outlier problem, granularity, and calibration",
+      "zorluk": 2,
+      "slayt": 10,
+      "soru": "Adding a single outlier of value 14.0 to a group of INT4-quantized weights leaves the outlier's own error at 0.00 but raises the maximum error of the other four weights from 0.07 to 0.93. What is the mechanism behind this degradation?",
+      "secenekler": [
+        "The outlier exceeds the INT4 range, so it is clipped to 7 and the resulting residual error is spread across the other four weights",
+        "Because the scale is derived from max|w|, the step grows from 0.2 to 2.0; the normal weights are rounded to the grid points 0 or ±2",
+        "Rounding error is inversely proportional to the magnitude of a weight, so weights with small absolute values inherently incur more error",
+        "The outlier does not affect the scale; the error comes from the precision lost when converting back from INT4 to FP16 in the dequantize step"
+      ],
+      "dogru": 1,
+      "aciklama": "Since the single scale is set by max|w| / 7, 14.0 enlarges the scale 10× (to 2.0): 0.83 and −0.35 are rounded to zero, and 1.40 and −1.07 to ±2, while the outlier is represented exactly as 7 × 2.0 = 14.0. The clipping option is wrong: no clipping happens in this scheme, the outlier stays inside the range, and it harms the others by enlarging the step."
+    },
+    {
+      "id": "d7-04",
+      "konu": "The outlier problem, granularity, and calibration",
+      "zorluk": 3,
+      "slayt": 12,
+      "soru": "For the five weights 0.83, −0.35, 1.40, −1.07, and 14.0, clipping the range to ±2 reduces the step from 2.0 to ≈0.29. Which option correctly summarizes the outcome of this calibration decision?",
+      "secenekler": [
+        "The error of all five weights decreases; clipping pulls the outlier to 2.0 while preserving its information inside the scale value",
+        "The error of the common weights does not change; clipping is a net loss because only the outlier's error rises from 0.00 to 12.0",
+        "Because the step shrinks, the number of usable grid points drops from 15 to 3, which increases the error of the common weights",
+        "The error of the four common weights falls to ≤0.07; in return the outlier is clipped to 2.0 and alone carries an error of 12.0"
+      ],
+      "dogru": 3,
+      "aciklama": "The narrow range keeps the common values precise (errors 0.03–0.07) but sacrifices the outlier (14.0 → 2.0, error 12.0); the rule of thumb 'wide range keeps the outlier, narrow range keeps the common values precise' is exactly this trade-off. The first option is wrong: the outlier's value is not stored in the scale; when read back it becomes 2.0."
+    },
+    {
+      "id": "d7-05",
+      "konu": "Weight / activation / KV-cache quantization and LLM.int8()",
+      "zorluk": 2,
+      "slayt": 15,
+      "soru": "What solution does the LLM.int8() work by Dettmers et al. (2022) offer against the collapse of plain 8-bit quantization from 6.7B parameters onward?",
+      "secenekler": [
+        "Clipping all activations to |x| ≤ 6 and converting them to INT8 with a single per-tensor scale",
+        "Multiplying the few outlier feature columns with |x| > 6 in FP16 and the remaining >99.9% in INT8, then summing the two results",
+        "Pruning the weight columns that correspond to the outlier features and converting the remaining smaller matrix to INT8",
+        "Splitting the weights into groups of 128 and giving each group its own scale, so an outlier's effect is limited to its own group"
+      ],
+      "dogru": 1,
+      "aciklama": "LLM.int8() splits the matrix multiplication in two: the very few outlier columns are computed in 16-bit and the rest in 8-bit, and the results are summed; this gives '8-bit memory, 16-bit quality' and matches the 16-bit curve even beyond 6.7B. Per-group scaling (the last option) is a genuine remedy for outliers, but it belongs to the general list of outlier remedies, not to the mechanism of LLM.int8()."
+    },
+    {
+      "id": "d7-06",
+      "konu": "PTQ and QAT",
+      "zorluk": 1,
+      "slayt": 16,
+      "soru": "What is the usual division of labor between PTQ (post-training quantization) and QAT (quantization-aware training)?",
+      "secenekler": [
+        "QAT is the first choice because it needs no calibration data; PTQ is reserved only for very low bit widths such as 2–3 bits",
+        "Both give the same quality; the difference is that QAT can also quantize the KV cache while PTQ is limited to weights",
+        "QAT is cheaper because it requires no extra training; PTQ needs a separate training run because it puts rounding into the training loop",
+        "PTQ is the first choice: it works well down to 4-bit with a small calibration set; QAT is for 2–3 bits and comes with a training cost"
+      ],
+      "dogru": 3,
+      "aciklama": "PTQ is applied to a trained model with a small calibration set, is cheap, and works well down to 4-bit; QAT brings rounding into the training loop, so it costs a training run and is used when PTQ is not enough (2–3 bits). The third option reverses the roles: QAT is the one that requires training."
+    },
+    {
+      "id": "d7-07",
+      "konu": "Pruning basics and sparsity patterns",
+      "zorluk": 2,
+      "slayt": 19,
+      "soru": "In an LLM that has reached 50% unstructured sparsity, the number of nonzero parameters is halved, yet it is often warned that 'speedup is not automatic'. What is the reason for this warning?",
+      "secenekler": [
+        "The zeros have no fixed pattern; dense kernels multiply the zeros too, so a gain requires special sparse kernels or the 2:4 pattern",
+        "Unstructured pruning can only be applied to the attention projections, so the computational load of the MLP layers stays entirely unchanged",
+        "The LoRA recovery step required after pruning adds an extra adapter multiplication to every layer at inference time, which cancels the speed gain",
+        "SparseGPT's δ updates put new nonzero values in place of the deleted weights, so the total number of operations actually does not change"
+      ],
+      "dogru": 0,
+      "aciklama": "Unstructured sparsity has 'no fixed pattern; special sparse kernels needed': hardware cannot skip irregular zeros, so any speedup depends on hardware and kernel support, whereas structured pruning directly yields a smaller dense architecture and a speed gain is nearly guaranteed. The SparseGPT option is wrong: the δ updates are applied to the kept weights and do not change the sparsity ratio."
+    },
+    {
+      "id": "d7-08",
+      "konu": "Pruning scoring methods: Magnitude, Wanda, SparseGPT",
+      "zorluk": 3,
+      "slayt": 22,
+      "soru": "With the same row-wise rule '50%, remove the lowest 2 in each row', magnitude pruning removes the weight −0.35, while Wanda keeps it and removes −1.07 instead. What is the source of this difference?",
+      "secenekler": [
+        "Wanda uses H = XXᵀ to propagate the effect of the removed weight to the remaining weights as δ, so it can afford to keep −0.35",
+        "Wanda compares weights column-wise instead of row-wise; −0.35 survives because it has the largest absolute value in its own column",
+        "The Wanda score is |W| · ‖x‖; the input of −0.35 is 5× stronger, so its score rises to 1.75, above that of −1.07 (1.07)",
+        "Wanda enlarges the absolute value of −0.35 through a short retraining, so the weight rises above the row threshold and is kept"
+      ],
+      "dogru": 2,
+      "aciklama": "Magnitude looks only at |W| and never sees the input; Wanda adds the input norm, measured from ~128 calibration texts, as a multiplier, so −0.35, which is small but has a strong input (0.35 × 5 = 1.75), is kept and −1.07 (1.07 × 1) is removed. The first option describes the mechanism of SparseGPT; Wanda scores with a single forward pass, does not update weights, and does no retraining."
+    },
+    {
+      "id": "d7-09",
+      "konu": "Pruning scoring methods: Magnitude, Wanda, SparseGPT",
+      "zorluk": 2,
+      "slayt": 25,
+      "soru": "In a comparison of pruning methods on LLaMA-7B at 50% sparsity, what is the main difference between Wanda and SparseGPT?",
+      "secenekler": [
+        "Wanda uses no calibration data while SparseGPT does; therefore SparseGPT's perplexity is clearly better",
+        "Both use calibration data; only SparseGPT updates the remaining weights with H⁻¹ to compensate for the error, and the ppl gap is small",
+        "Wanda updates the remaining weights while SparseGPT only selects what to remove; therefore their perplexities are nearly equal",
+        "SparseGPT performs a short retraining on labeled data, whereas Wanda settles for a single forward pass and is about 10 ppl points worse"
+      ],
+      "dogru": 1,
+      "aciklama": "In the table, the 'calibration data' row is 'yes' for both Wanda and SparseGPT, while 'updates kept weights' is 'yes' only for SparseGPT; perplexities of 7.26 and 7.22 are nearly equal, a loss of ~1.5 points versus dense at 5.68. The method that uses no calibration data and loses ~11.6 points is magnitude pruning (17.29), not Wanda."
+    },
+    {
+      "id": "d7-10",
+      "konu": "Structured pruning, low-rank factorization, and recovery",
+      "zorluk": 2,
+      "slayt": 42,
+      "soru": "A team wants to run LLaMA-7B with genuinely lower latency on its own GPU; the hardware has no sparse kernel support, and memory is not a problem. A few hours of LoRA training are affordable. Which approach is the most appropriate?",
+      "secenekler": [
+        "Apply 50% unstructured magnitude pruning and then recover the lost quality with LoRA",
+        "Convert the weights to weight-only INT4 and thereby automatically halve activation memory and compute cost as well",
+        "Define a smaller student architecture from scratch and train it with response-based distillation",
+        "Use structured pruning (e.g., LLM-Pruner, width/depth) to produce a smaller dense model and recover it with LoRA"
+      ],
+      "dogru": 3,
+      "aciklama": "For real speed on your own hardware, structured pruning is the answer: when whole blocks, heads, or MLP neurons are removed, the model becomes smaller but stays dense, and no special kernel is needed; in an LLM-Pruner example, 20% of the structure is removed and ~3 hours of LoRA bring the score from 56.82 back up to 60.07. Unstructured pruning gives no speedup without sparse kernels; weight-only INT4 mainly targets memory and bandwidth and does not automatically reduce compute."
+    },
+    {
+      "id": "d7-11",
+      "konu": "Knowledge distillation: soft targets and temperature",
+      "zorluk": 1,
+      "slayt": 33,
+      "soru": "In the context of Hinton et al. (2015), what is meant by 'dark knowledge'?",
+      "secenekler": [
+        "Internal representations hidden in the teacher's hidden states and attention features that are never reflected in the logit layer",
+        "Implicit knowledge about examples the teacher never saw in its training data, which can in no way be transferred to the student",
+        "The relative preference information in the small nonzero probabilities the teacher gives wrong classes (e.g., dog 0.018)",
+        "Knowledge the student acquires by discovering, on its own, patterns the teacher did not show, enabling it to surpass the teacher"
+      ],
+      "dogru": 2,
+      "aciklama": "In soft targets, 'dog 0.018 ≠ 0' tells us the input also looks slightly like a dog, whereas a hard label says only 'cat'. The student thus learns the teacher's whole distribution, i.e., its relative preferences between classes. The first option describes feature-based KD; dark knowledge is the information in the output distribution (response-based)."
+    },
+    {
+      "id": "d7-12",
+      "konu": "Knowledge distillation: soft targets and temperature",
+      "zorluk": 2,
+      "slayt": 34,
+      "soru": "In distillation, suppose the teacher gives 'cat 0.982 / dog 0.018' at T = 1 and '0.731 / 0.269' at T = 4. What is the rationale for using T > 1 in distillation?",
+      "secenekler": [
+        "At T = 1 the distribution is almost one-hot, close to the hard label; T > 1 keeps the argmax but makes small probabilities visible",
+        "T > 1 changes the teacher's argmax; the student thus gives equal weight not only to the most probable class but also to the alternatives",
+        "T > 1 scales up the student's logits and thereby increases the gradient scale by τ², making training converge much faster",
+        "T > 1 filters out the teacher's low-confidence predictions; only the high-probability classes are transferred to the student"
+      ],
+      "dogru": 0,
+      "aciklama": "Temperature divides every logit by T: the argmax does not change but the distribution flattens, so signals of 'dark knowledge' such as 0.018 reach a magnitude the student can learn (dog 0.401 at T = 10). The third option is wrong: T > 1 shrinks the gradient, and a τ² factor is added to the loss to compensate."
+    },
+    {
+      "id": "d7-13",
+      "konu": "KD loss and types of knowledge",
+      "zorluk": 3,
+      "slayt": 35,
+      "soru": "In the formula L_KD = α·L(W_S, x) + (1 − α)·τ²·KLdiv(Q_S, Q_T) used in knowledge distillation, what is the meaning of the τ² factor and of choosing α = 0?",
+      "secenekler": [
+        "τ² softens the teacher output even further; α = 0 means the student learns only from the hard (true) labels, ignoring the teacher",
+        "τ² restores the gradient scale shrunk by softening; α = 0 switches off the label term, leaving only the teacher",
+        "τ² makes the KL divergence equivalent to cross-entropy; α = 0 disables the teacher term and uses only the ground truth",
+        "τ² balances the label and teacher terms; α = 0 indicates a switch from white-box KD to black-box KD in this setting"
+      ],
+      "dogru": 1,
+      "aciklama": "When logits are divided by τ, gradients with respect to the soft targets shrink by roughly 1/τ²; the τ² factor restores this scale ('restores the gradient scale'). α balances labels against the teacher; α = 0 is the 'no labels' case and only the distillation term remains. The first and third options interpret α = 0 in reverse, as label-only."
+    },
+    {
+      "id": "d7-14",
+      "konu": "KD loss and types of knowledge",
+      "zorluk": 2,
+      "slayt": 36,
+      "soru": "TinyBERT copies not only the output probabilities but also the 'hidden layers'. Under the classification of Gou et al. (2021), which type of knowledge is this, and what is its prerequisite?",
+      "secenekler": [
+        "Response-based; access to only the text the teacher generates or its token probabilities is sufficient",
+        "Relation-based; the similarity structure between examples or features must be taken from the teacher",
+        "Feature-based; access to the teacher's internal representations (white-box access) is needed",
+        "Black-box KD; the teacher behaves like an API and returns only softened probabilities"
+      ],
+      "dogru": 2,
+      "aciklama": "Feature-based KD matches 'hidden states or attention features' and 'deeper knowledge gives a richer signal, but you need the teacher's internals'; TinyBERT's copying of intermediate layers is exactly this. Response-based KD uses only the teacher's predictions (probabilities / text) and does not need internal representations."
+    },
+    {
+      "id": "d7-15",
+      "konu": "KD case studies: DistilBERT/TinyBERT, Step-by-Step, Minitron",
+      "zorluk": 1,
+      "slayt": 38,
+      "soru": "In Distilling Step-by-Step (Hsieh et al., 2023), what happens when the student is deployed?",
+      "secenekler": [
+        "The student first runs the [rationale] task to generate the rationale, then gives the final answer based on that rationale",
+        "The 540B PaLM teacher writes the rationale at test time, and the student derives the final answer from that rationale alone",
+        "The student uses only the [rationale] task; the answer is read from the last line of the generated rationale",
+        "Only the [label] task is used; at test time no rationale is generated and no large LLM is needed"
+      ],
+      "dogru": 3,
+      "aciklama": "In training, the student learns two tasks on the same question with two prefixes ([label] → answer, [rationale] → rationale), and λ sets the weight of the rationale; at deployment only the answer task is used: 'no rationale and no LLM at test time'. The first option describes chain-of-thought inference; here the rationale is only a training signal and has no test-time cost."
+    },
+    {
+      "id": "d7-16",
+      "konu": "KD case studies: DistilBERT/TinyBERT, Step-by-Step, Minitron",
+      "zorluk": 2,
+      "slayt": 39,
+      "soru": "A company has trained a 15B-parameter model and now wants 8B and 4B variants of the same family, but it lacks the token budget to train each from scratch. Following the Minitron approach, what is the most efficient path?",
+      "secenekler": [
+        "Prune the 15B model in width/depth and distill with the 15B as teacher; ~40× fewer tokens than training from scratch suffice",
+        "Quantize the 15B model to INT4 to match the memory footprint of 8B and 4B FP16 models; no additional training is needed",
+        "Collect the 15B model's rationales and train a small T5 from scratch with Distilling Step-by-Step; data needs drop to 80%",
+        "Randomly initialize the 8B and 4B architectures and train them with the 15B's soft targets; with no pruning, initial quality is preserved"
+      ],
+      "dogru": 0,
+      "aciklama": "'Train the biggest model once; get the smaller ones by pruning + distillation': the pruned model starts from trained weights and recovers quickly under teacher supervision, and Minitron 8B reaches the level of Mistral 7B / Gemma 7B with ~40× fewer tokens. A randomly initialized student (the last option) brings back exactly the 'from scratch' cost (40 units) that one wants to avoid; quantization does not change the parameter count and does not produce a separate 8B/4B architecture."
+    },
+    {
+      "id": "d7-17",
+      "konu": "KV-cache compression and choosing a method",
+      "zorluk": 3,
+      "slayt": 40,
+      "soru": "By the formula (layers × tokens × KV heads × head dim × 2 × bytes), the FP16 KV cache for Llama-2-7B with 8 users × 4K tokens is ≈ 16 GB. If the KV cache is quantized to 4-bit and GQA is used with 8 KV heads instead of 32, what is the approximate total KV cache?",
+      "secenekler": [
+        "≈ 4 GB",
+        "≈ 2 GB",
+        "≈ 1 GB",
+        "≈ 0.5 GB"
+      ],
+      "dogru": 2,
+      "aciklama": "16 → 4 bit is a 4× reduction in bytes; 32 → 8 KV heads is a further 4× reduction; 16 GB / 16 = 1 GB. 4 GB is the result of applying only a single improvement; 2 GB is a misapplication to this model of the 70B-model ratio (64 query / 8 KV heads → 8×); 0.5 GB is the single-user 4-bit value."
+    },
+    {
+      "id": "d7-18",
+      "konu": "KV-cache compression and choosing a method",
+      "zorluk": 3,
+      "slayt": 41,
+      "soru": "In a LLaMA-7B / FreebaseQA experiment comparing GPTQ quantization with pruning (Magnitude, Wanda, SparseGPT), which conclusion can correctly be drawn?",
+      "secenekler": [
+        "8-bit GPTQ is lossless on this knowledge-heavy task; loss begins only at 4-bit, and even there it stays at the same level as 50% pruning",
+        "At the same 2× compression, 8-bit GPTQ is ≈ −10% while 50% pruning is −50% or worse; even 4-bit, at 4× compression, beats 2× pruning",
+        "Magnitude, Wanda, and SparseGPT stay in the green zone up to 50% sparsity; a marked collapse starts only beyond 60% sparsity",
+        "The pruning curves are flat up to 20–25% sparsity, and quantization causes more loss than pruning at every bit level"
+      ],
+      "dogru": 1,
+      "aciklama": "In this experiment, 8-bit ≈ −10% and 4-bit ≈ −31%; pruning is fine up to 20–25%, then collapses and reaches −50% or worse at 50%, so at the same size quantization beats pruning. The first option is wrong: 8-bit is not free on knowledge-heavy tasks; even 8-bit shows a loss of ≈ −10%."
+    }
+  ]
+}

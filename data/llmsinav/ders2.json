@@ -1,0 +1,289 @@
+{
+  "id": "ders2",
+  "ders": "Ders 2",
+  "baslik": "Transformers",
+  "konular": [
+    "Why Transformers: attention instead of recurrence",
+    "Input vectors and positional encoding (absolute, relative, RoPE)",
+    "Self-attention and Q/K/V computation (scaled dot-product)",
+    "Multi-head attention",
+    "Add & Norm: residual connection and LayerNorm",
+    "Distinct roles of attention and FFN, and the block stack",
+    "Attention mask and causal self-attention",
+    "Encoder–decoder structure and cross-attention",
+    "Real-scale dimensions and attention cost",
+    "Model families: BERT, GPT, T5 and MLM"
+  ],
+  "sorular": [
+    {
+      "id": "d2-01",
+      "konu": "Why Transformers: attention instead of recurrence",
+      "zorluk": 1,
+      "slayt": 5,
+      "soru": "What is the main reason the Transformer prefers attention over RNN/LSTM-style step-by-step processing?",
+      "secenekler": [
+        "Attention reduces the number of parameters, making training cheaper",
+        "Attention processes all positions in parallel and creates direct paths between tokens",
+        "Attention carries order information implicitly in the dot product, so no extra signal is needed",
+        "Attention reduces memory by compressing a long sequence into a single fixed-size summary vector"
+      ],
+      "dogru": 1,
+      "aciklama": "RNNs carry information step by step and parallelism is limited, whereas attention processes all positions in parallel and builds direct token-to-token paths. The claim that order information is implicit in the dot product is wrong; in fact position information must be supplied separately."
+    },
+    {
+      "id": "d2-02",
+      "konu": "Input vectors and positional encoding (absolute, relative, RoPE)",
+      "zorluk": 2,
+      "slayt": 7,
+      "soru": "Without positional encoding, why can self-attention not distinguish the sequences 'dog bites man' and 'man bites dog'?",
+      "secenekler": [
+        "Because softmax weights sum to 1, order information is normalized away and lost",
+        "Because the embedding table gives the same word a different vector at each position, causing total confusion",
+        "Because the residual connection cannot pass the position vector to the next block, so order is erased",
+        "Because dot-product comparison is insensitive to order; the two sequences look like the same set of tokens"
+      ],
+      "dogru": 3,
+      "aciklama": "Self-attention only compares content vectors, and the dot product contains no token order, so the same tokens in a different order look like the same set. The embedding table is position-independent: the same word gets the same token embedding, and any difference comes only from the added position vector."
+    },
+    {
+      "id": "d2-03",
+      "konu": "Input vectors and positional encoding (absolute, relative, RoPE)",
+      "zorluk": 2,
+      "slayt": 8,
+      "soru": "Which limitation of pure absolute positional encoding (sinusoidal or learned) motivates relative methods?",
+      "secenekler": [
+        "The distance between tokens is not explicit; the model must learn it indirectly from pᵢ and pⱼ",
+        "The same word receives the same total input vector at every position, so order information is completely lost",
+        "The position signal is added only to Q and K and not to V, so the content is corrupted",
+        "The sinusoidal pattern is deterministic, so it is never updated during training"
+      ],
+      "dogru": 0,
+      "aciklama": "Absolute methods answer the question 'which slot am I in?'; the distance between two tokens is not represented explicitly, and the model must infer it from pᵢ and pⱼ. That the sinusoidal pattern is fixed is true, but it is a difference from learned PE, not a limitation."
+    },
+    {
+      "id": "d2-04",
+      "konu": "Input vectors and positional encoding (absolute, relative, RoPE)",
+      "zorluk": 2,
+      "slayt": 9,
+      "soru": "In modern practice, how does RoPE use position information differently from the classical approach?",
+      "secenekler": [
+        "By adding a learned position vector (learned PE) to the input embedding",
+        "By adding a deterministic sinusoidal position vector to the token embedding",
+        "By rotating Q and K according to their absolute positions, which gives attention a relative effect",
+        "By adding token-to-token offset information to the value vectors, which changes the weighted sum"
+      ],
+      "dogru": 2,
+      "aciklama": "Instead of adding position to the input, RoPE rotates Q and K inside attention according to absolute position, and the effect behaves like relative position. Adding a position vector to the input embedding is the classical (learned/sinusoidal) absolute approach; RoPE differs precisely by not doing this."
+    },
+    {
+      "id": "d2-05",
+      "konu": "Self-attention and Q/K/V computation (scaled dot-product)",
+      "zorluk": 2,
+      "slayt": 15,
+      "soru": "For the query q_it = [0.5, 0.5, 0.5, 0.5] and the key k_tired = [1.0, 0.0, 0.5, 0.5] with dk = 4, what are the raw dot-product score and the score scaled by √dk for 'tired', respectively?",
+      "secenekler": [
+        "2.0 and 1.00",
+        "1.0 and 0.25",
+        "1.0 and 0.50",
+        "0.5 and 0.25"
+      ],
+      "dogru": 2,
+      "aciklama": "The dot product is 0.5·1 + 0.5·0 + 0.5·0.5 + 0.5·0.5 = 1.0; dividing by √dk = √4 = 2 gives 0.50. The option '1.0 and 0.25' reflects the error of dividing by dk = 4 instead of √dk, and '2.0 and 1.00' is the score of the token 'animal'."
+    },
+    {
+      "id": "d2-06",
+      "konu": "Self-attention and Q/K/V computation (scaled dot-product)",
+      "zorluk": 3,
+      "slayt": 16,
+      "soru": "Given the attention weights ('animal' 0.481, 'street' 0.227, 'tired' 0.292) and the value vectors (v_animal = [1,0,0,1], v_street = [0,1,0,1], v_tired = [1,1,1,0]), approximately what is the second component of the output vector for 'it'?",
+      "secenekler": [
+        "0.292",
+        "0.519",
+        "0.708",
+        "0.773"
+      ],
+      "dogru": 1,
+      "aciklama": "Only v_street and v_tired have the value 1 in the second component: 0.227 + 0.292 = 0.519. 0.773 is the first component (animal + tired) and 0.708 is the fourth component (animal + street); one must note which value vector carries a 1 in which component."
+    },
+    {
+      "id": "d2-07",
+      "konu": "Multi-head attention",
+      "zorluk": 2,
+      "slayt": 17,
+      "soru": "In multi-head attention, which mechanism lets the heads produce 'complementary views' of the same sequence?",
+      "secenekler": [
+        "Each head takes a different part of the sequence (a local window) and processes only that part",
+        "The heads run sequentially; each head takes the previous head's output as input and updates it",
+        "The heads share the same WQ, WK, WV weights; only the softmax scaling factor differs between heads",
+        "Each head applies its own WQ, WK, WV to the same X; outputs are concatenated and mixed by WO"
+      ],
+      "dogru": 3,
+      "aciklama": "Each head computes head_i = Attention(XW_i^Q, XW_i^K, XW_i^V); all heads see the same X but learn different projections, so they form different routing patterns, and the results are combined with Concat(...)W^O. The idea that heads process different parts of the sequence is wrong; the difference lies in the learned projections, not in the input."
+    },
+    {
+      "id": "d2-08",
+      "konu": "Real-scale dimensions and attention cost",
+      "zorluk": 3,
+      "slayt": 27,
+      "soru": "A model has sequence length n = 8192, dmodel = 4096, h = 32 heads and dhead = 128. What are the dimensions of a single head's Q_hK_hᵀ score matrix and of the concatenated output of all heads (the matrix fed into W_O), respectively?",
+      "secenekler": [
+        "8192 × 8192 and 8192 × 4096",
+        "8192 × 128 and 8192 × 128",
+        "8192 × 8192 and 8192 × 128",
+        "128 × 128 and 4096 × 4096"
+      ],
+      "dogru": 0,
+      "aciklama": "Multiplying Q_h (8192×128) by K_hᵀ (128×8192) gives an 8192×8192 score matrix, an n×n matrix independent of dhead; each of the 32 heads produces an 8192×128 output, and the concatenation is 8192×(32·128) = 8192×4096. The option '8192 × 8192 and 8192 × 128' confuses a single head's output with the concatenated result."
+    },
+    {
+      "id": "d2-09",
+      "konu": "Add & Norm: residual connection and LayerNorm",
+      "zorluk": 1,
+      "slayt": 19,
+      "soru": "What does LayerNorm in a Transformer normalize, and along which axis?",
+      "secenekler": [
+        "One token vector across its own feature dimensions; independent of the batch",
+        "Each feature across all tokens in the sequence; it depends on the sequence length",
+        "Each feature across the examples in the mini-batch; it depends on batch statistics",
+        "The attention scores along each row; it makes the weights sum to 1 for every query"
+      ],
+      "dogru": 0,
+      "aciklama": "LayerNorm computes μ and σ² over the d components of a single token vector; each token is normalized independently and no batch statistics are used. Normalizing over the mini-batch is the behavior of BatchNorm, and making each row sum to 1 is the job of softmax."
+    },
+    {
+      "id": "d2-10",
+      "konu": "Add & Norm: residual connection and LayerNorm",
+      "zorluk": 2,
+      "slayt": 18,
+      "soru": "If the residual (skip) connection in the Add & Norm step were removed, what would be lost?",
+      "secenekler": [
+        "The guarantee that softmax attention weights are always positive and sum to exactly 1",
+        "Preservation of the old state; the sublayer would have to produce all of h′, not just Δh",
+        "The FFN's property of processing each position independently of other tokens' representations",
+        "LayerNorm's ability to restore a useful scale and shift through its γ and β parameters"
+      ],
+      "dogru": 1,
+      "aciklama": "The sublayer only proposes an update (Δh), and the residual path carries the old h into the sum so that information is not lost; without the connection, each block would have to rewrite the vector from scratch. The softmax sum and the FFN's position independence are properties unrelated to the residual connection."
+    },
+    {
+      "id": "d2-11",
+      "konu": "Distinct roles of attention and FFN, and the block stack",
+      "zorluk": 1,
+      "slayt": 20,
+      "soru": "Which statement comparing the attention and FFN sublayers of a Transformer block is correct?",
+      "secenekler": [
+        "Attention transforms each token independently; the FFN carries information across tokens",
+        "Both carry information across tokens; the only difference between them is that the FFN is nonlinear",
+        "Attention carries information across tokens; the FFN applies the same network to each position",
+        "The FFN learns different weights for each position; attention shares weights across all positions"
+      ],
+      "dogru": 2,
+      "aciklama": "Attention is the 'tokens talk' step, where information comes from other positions; the FFN does not select other tokens and applies the same nonlinear transformation position by position. The first option reverses the roles, a common confusion; the FFN does not learn position-specific weights, and the 'same FFN' is shared across all positions."
+    },
+    {
+      "id": "d2-12",
+      "konu": "Attention mask and causal self-attention",
+      "zorluk": 2,
+      "slayt": 23,
+      "soru": "In a causal mask example, if the scaled scores are [1, 2, 1, 2] and the mask is [0, 0, −∞, −∞], which of the following is approximately the attention weights after softmax?",
+      "secenekler": [
+        "[0.13, 0.37, 0.13, 0.37]",
+        "[0.50, 0.50, 0, 0]",
+        "[0, 0, 0.27, 0.73]",
+        "[0.27, 0.73, 0, 0]"
+      ],
+      "dogru": 3,
+      "aciklama": "The mask is added before softmax: [1, 2, −∞, −∞] → since exp(−∞) = 0, the last two positions get 0, and the first two become e¹/(e¹+e²) ≈ 0.27 and e²/(e¹+e²) ≈ 0.73. [0.13, 0.37, 0.13, 0.37] is the softmax of all four scores as if no mask were applied; [0.50, 0.50, 0, 0] is the error of giving the allowed positions equal weight regardless of the scores."
+    },
+    {
+      "id": "d2-13",
+      "konu": "Attention mask and causal self-attention",
+      "zorluk": 2,
+      "slayt": 22,
+      "soru": "While training a decoder-only model, the shifted-right target positions are computed in parallel; what happens if the causal mask is accidentally not applied?",
+      "secenekler": [
+        "Training can no longer be parallelized; tokens must be generated one by one as in inference",
+        "Each position sees the next token it is supposed to predict directly through attention; the model 'cheats'",
+        "Cross-attention can no longer access the encoder output; the source sentence information is completely lost",
+        "Softmax weights can become negative; training becomes numerically unstable"
+      ],
+      "dogru": 1,
+      "aciklama": "In training, all target positions are computed in parallel, so ensuring that position t does not see positions > t is achieved only by the causal mask; without it, the model reads the next token directly and next-token prediction becomes meaningless. The claim that parallelism would break is backwards: the mask does not prevent parallelism, it is the rule that makes parallel training possible."
+    },
+    {
+      "id": "d2-14",
+      "konu": "Encoder–decoder structure and cross-attention",
+      "zorluk": 2,
+      "slayt": 26,
+      "soru": "During translation, when the decoder predicts the token 'ours', where do Q, K and V in cross-attention come from?",
+      "secenekler": [
+        "Q, K and V all come from the decoder's current target-prefix state",
+        "Q comes from the encoder memory H_enc; K and V come from the decoder prefix state",
+        "Q comes from the decoder state h_t; K and V come from the encoder output H_enc",
+        "Q and K come from the decoder; V comes from the raw token embeddings of the source sentence"
+      ],
+      "dogru": 2,
+      "aciklama": "Q = h_t W_Q (decoder), K = H_enc W_K and V = H_enc W_V (encoder); the decoder asks 'what should I fetch', the source states match it and supply the content. All three coming from the same sequence is the definition of self-attention, not of cross-attention."
+    },
+    {
+      "id": "d2-15",
+      "konu": "Encoder–decoder structure and cross-attention",
+      "zorluk": 3,
+      "slayt": 25,
+      "soru": "When running inference with an encoder–decoder Transformer, which statement is correct at each new target-token generation step?",
+      "secenekler": [
+        "H_enc is computed once and reused at every step; the decoder takes the growing target prefix",
+        "The source sentence is fed to the decoder again at every step and the encoder stack is rerun from scratch",
+        "The decoder takes only the state of the last source token from the encoder and uses only that",
+        "The decoder generates the entire target sentence at once, fully in parallel, without a causal mask"
+      ],
+      "dogru": 0,
+      "aciklama": "H_enc is reused at every decoder step; the decoder's input is not the source sentence but the target prefix, which grows by one token at each step (<BOS> → <BOS> Un → ...). Computing the whole target in parallel at once is the training view (under a causal mask), not the inference view."
+    },
+    {
+      "id": "d2-16",
+      "konu": "Model families: BERT, GPT, T5 and MLM",
+      "zorluk": 3,
+      "slayt": 29,
+      "soru": "What is the rationale for training BERT with Masked Language Modeling (MLM) rather than ordinary next-token prediction?",
+      "secenekler": [
+        "MLM allows the encoder to change the sequence length from layer to layer, unlike decoders",
+        "Next-token prediction is defined only in encoder–decoder models that contain cross-attention",
+        "MLM makes the causal mask unnecessary, so training parallelizes faster than in decoders",
+        "A bidirectional encoder sees the right context, so next-token prediction would be trivial"
+      ],
+      "dogru": 3,
+      "aciklama": "The encoder uses full self-attention, so both left and right context are visible; asking it to predict the next token would lead to 'cheating', so the target information is hidden from the input with [MASK]. The claim that 'it parallelizes faster because the causal mask is unnecessary' is misleading: decoder-only training is also parallel under a causal mask."
+    },
+    {
+      "id": "d2-17",
+      "konu": "Model families: BERT, GPT, T5 and MLM",
+      "zorluk": 1,
+      "slayt": 28,
+      "soru": "A team will choose a single pretrained model for NER, extractive QA and text embedding generation. which family is best suited to this use?",
+      "secenekler": [
+        "Encoder-only (BERT-style): bidirectional self-attention, masked-token prediction",
+        "Decoder-only (GPT-style): causal self-attention, left-to-right next-token prediction",
+        "Encoder–decoder (T5-style): encoder + decoder with cross-attention, text-to-text",
+        "Decoder-only with the causal mask removed: bidirectional next-token prediction"
+      ],
+      "dogru": 0,
+      "aciklama": "Encoder-only BERT-style models read the whole input bidirectionally, produce a contextual representation for each token, and are used for classification, retrieval, NER, extractive QA and embeddings. The decoder-only family is for open-ended generation; next-token prediction with the causal mask removed 'cheats' and is not a valid training setup."
+    },
+    {
+      "id": "d2-18",
+      "konu": "Real-scale dimensions and attention cost",
+      "zorluk": 3,
+      "slayt": 30,
+      "soru": "If the context length of a model using standard self-attention is increased from 2,048 to 8,192 tokens, by roughly what factor does the number of attention scores of a single head grow, according to the scaling rule of attention?",
+      "secenekler": [
+        "4×",
+        "16×",
+        "32×",
+        "64×"
+      ],
+      "dogru": 1,
+      "aciklama": "The number of scores scales with n²; when n grows 4× (2,048 → 8,192), the number of scores grows 4² = 16× (8192² / 2048² = 16). The answer '4×' is the mistake of assuming cost is linear in sequence length; the relationship is quadratic: 2n tokens give about 4× the scores."
+    }
+  ]
+}

@@ -26,3 +26,5 @@
 /duzentakip/*
   X-Robots-Tag: noindex, nofollow, noimageindex, noarchive
   Cache-Control: no-cache
+/llm-sinav/*
+  X-Robots-Tag: noindex, nofollow, noimageindex, noarchive

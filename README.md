@@ -12,6 +12,7 @@ site/
   assets/projeler/     proje görselleri (hazirla.py üretir; 2560 px sRGB JPEG)
   assets/img/          portreler, paylaşım kartı
   layouts/             şablonlar
+  data/llmsinav/       LLM Sınav soruları (kişisel çalışma sayfası /llm-sinav/, KARARLAR 2026-11-09)
   static/              logo, yazı tipleri, simgeler, _headers, _redirects
   tools/               hazirla.py · ikonlar.py · logo_svg.py · yayin_bildir.py
   KARARLAR.md          karar kaydı · BAKIM.md bakım takvimi · YAYIN.md yayına alma adımları

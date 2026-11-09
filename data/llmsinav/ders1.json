@@ -1,0 +1,319 @@
+{
+  "id": "ders1",
+  "ders": "Ders 1",
+  "baslik": "Introduction to LLMs",
+  "konular": [
+    "Language model and probability",
+    "N-gram models and their limits",
+    "Tokenization and subwords",
+    "Embeddings and Word2Vec",
+    "RNN, attention, and the Transformer",
+    "Architecture families",
+    "Softmax and decoding",
+    "Training and pretraining data",
+    "Scale and scaling laws",
+    "Adaptation and risks"
+  ],
+  "sorular": [
+    {
+      "id": "d1-01",
+      "konu": "Language model and probability",
+      "zorluk": 1,
+      "slayt": 4,
+      "soru": "By definition, what exactly does an LLM do when it \"generates the next token\"?",
+      "secenekler": [
+        "It finds the training sentence most similar to the context and copies its continuation word for word",
+        "It assigns a probability to every token in the vocabulary and samples one from that distribution",
+        "It extracts the grammar tree of the context and picks the word that best fits the grammatical rules",
+        "It looks up the correct answer in an internal knowledge base and writes the most reliable one found"
+      ],
+      "dogru": 1,
+      "aciklama": "The model produces a P(next token | context) distribution, and generation means repeatedly sampling tokens from it. Finding and copying a training sentence is retrieval behavior; an LLM does not fetch memorized text, it assigns probabilities."
+    },
+    {
+      "id": "d1-02",
+      "konu": "Language model and probability",
+      "zorluk": 2,
+      "slayt": 4,
+      "soru": "What is the best interpretation of the \"Probability ≠ truth\" warning about language models?",
+      "secenekler": [
+        "The model never produces low-probability tokens, so rare but correct facts are lost",
+        "Because softmax normalizes probabilities to sum to 1, no token can be considered fully correct",
+        "Probability assignment applies only in sampling mode; under greedy decoding the model gives a definite answer",
+        "High probability says a continuation is common in the training data; it does not guarantee that it is correct"
+      ],
+      "dogru": 3,
+      "aciklama": "The model learns the continuations that are most frequent in its training text; being frequent does not make something true, and this is the root of hallucination. The normalization option misreads a mathematical property: probabilities summing to 1 says nothing about correctness."
+    },
+    {
+      "id": "d1-03",
+      "konu": "N-gram models and their limits",
+      "zorluk": 2,
+      "slayt": 7,
+      "soru": "In the example \"I drink my coffee with ___\", a model estimates P(milk | coffee with) = 0.70. Which type of n-gram does this correspond to, and why?",
+      "secenekler": [
+        "Trigram; because the next word is conditioned on the previous two words (coffee, with)",
+        "Bigram; because a single word is predicted and there is a single probability value",
+        "4-gram; because the sentence has five words and the model must use the last four",
+        "Unigram; because the probability of milk is given as a context-independent frequency"
+      ],
+      "dogru": 0,
+      "aciklama": "In an n-gram, n is the number of context words plus the predicted word: two context words + one target = trigram, i.e. P(wₜ | wₜ₋₂, wₜ₋₁). The bigram option argues that a single word is predicted, but every n-gram predicts one word; the difference lies in the number of conditioning words."
+    },
+    {
+      "id": "d1-04",
+      "konu": "Language model and probability",
+      "zorluk": 3,
+      "slayt": 9,
+      "soru": "Which of the following is true of the factorization P(w₁,…,wₙ) = ∏ P(wᵢ | w₁,…,wᵢ₋₁)?",
+      "secenekler": [
+        "It is an approximation; because long-range dependencies are ignored, it shares the flaw of n-gram models",
+        "It holds only for decoder-only models; sequence probability is not defined for encoder-only architectures",
+        "It is an exact equality; so predicting the next token is equivalent to modeling the sequence distribution",
+        "It holds only when tokens are independent of each other; this condition fails in natural language text"
+      ],
+      "dogru": 2,
+      "aciklama": "This is the chain rule of probability and holds exactly for any joint distribution; the approximation is the n-gram's truncation of the condition to the last n−1 words. The independence assumption is the opposite: the product of conditionals already accounts for dependencies."
+    },
+    {
+      "id": "d1-05",
+      "konu": "N-gram models and their limits",
+      "zorluk": 2,
+      "slayt": 10,
+      "soru": "In the example \"The keys to the old cabinet ___ on the table\", which weakness of n-gram models is shown, and how do neural models overcome it?",
+      "secenekler": [
+        "Sparsity; neural models rescue unseen sequences from zero probability through smoothing",
+        "Long-range dependency; neural models can use a longer context instead of a fixed window",
+        "Polysemy; neural models keep different vectors for keys depending on its meaning",
+        "Out-of-vocabulary words; neural models recognize cabinet by splitting it into subparts"
+      ],
+      "dogru": 1,
+      "aciklama": "A local window sees \"cabinet ___\" and predicts the singular \"is\"; the correct verb \"are\" requires the subject \"keys\", which lies far back, and that is a long-range dependency. Sparsity is a different weakness of n-grams (e.g. \"quantum banana treaty\"), and it is not what this example illustrates."
+    },
+    {
+      "id": "d1-06",
+      "konu": "N-gram models and their limits",
+      "zorluk": 2,
+      "slayt": 10,
+      "soru": "A trigram model has seen the sequence \"the cat sat\" many times in its training data but has never seen \"the kitten sat\". what is the consequence for a pure n-gram model?",
+      "secenekler": [
+        "The model uses the semantic similarity between kitten and cat to produce a low but nonzero probability",
+        "The model treats kitten as out-of-vocabulary and falls back to predicting from characters",
+        "The model automatically widens its context window and uses other sentences containing kitten",
+        "The model finds no reliable count for this sequence; to it, cat and kitten are two unrelated symbols"
+      ],
+      "dogru": 3,
+      "aciklama": "A count-based model only knows exact matches; an unseen sequence has a count of zero, and there is no notion of similarity between words. The similarity option describes exactly the generalization that neural models gain from learned representations; n-grams cannot do this."
+    },
+    {
+      "id": "d1-07",
+      "konu": "Tokenization and subwords",
+      "zorluk": 1,
+      "slayt": 11,
+      "soru": "What is the reason behind the statement that \"tokenizer choice affects sequence length and cost\"?",
+      "secenekler": [
+        "Different tokenizers split the same text into different numbers of tokens, and the model computes per token",
+        "The tokenizer determines the number of model parameters; a larger vocabulary always means a larger model overall",
+        "The tokenizer determines the embedding dimension (d_model); longer tokens require larger vectors to store them",
+        "The tokenizer fixes the context window in terms of word count; short words take up more room in the window"
+      ],
+      "dogru": 0,
+      "aciklama": "The model processes tokens, not raw text; the same sentence can be 7 or 12 tokens, which directly changes computation, context window usage, and price. Vocabulary size only affects the number of rows in the embedding table; it does not determine d_model or the context window."
+    },
+    {
+      "id": "d1-08",
+      "konu": "Tokenization and subwords",
+      "zorluk": 2,
+      "slayt": 12,
+      "soru": "Which statement is true about the tokenizer splitting \"unbelievability\" as \"un | believ | ability\"?",
+      "secenekler": [
+        "The tokenizer performs morpheme analysis; believ was chosen as a piece because it is a common English root",
+        "Subword splitting applies only to out-of-vocabulary words; words already in the vocabulary are never split",
+        "The split is an engineering choice to encode rare words with a limited vocabulary, not to analyze language",
+        "The tokenizer looks at meaning vectors to pick the most meaningful pieces; that is why ability stayed whole"
+      ],
+      "dogru": 2,
+      "aciklama": "Tokenization is not linguistic analysis; it is an engineering choice. Pieces are determined by the vocabulary, which is why non-grammatical pieces like \"believ\" appear. The tokenizer never sees meaning vectors; embedding comes after tokenization."
+    },
+    {
+      "id": "d1-09",
+      "konu": "Embeddings and Word2Vec",
+      "zorluk": 2,
+      "slayt": 13,
+      "soru": "What is the key difference between an LLM's input embedding and its hidden state?",
+      "secenekler": [
+        "The input embedding is learned beforehand with Word2Vec; the hidden state is read from the Transformer's own table",
+        "The input embedding has a different dimension for each token; the hidden state is reduced to a fixed d_model",
+        "The input embedding is used only in training; at inference the model starts directly from the hidden state",
+        "The input embedding is a context-independent table lookup; the hidden state is context-dependent after the layers"
+      ],
+      "dogru": 3,
+      "aciklama": "The embedding table is a V × d_model lookup and always returns the same row for \"bank\"; a contextual representation only forms after passing through the Transformer layers. An LLM's embeddings are learned through the model's own training, not with Word2Vec; an embedding is not the same thing as Word2Vec."
+    },
+    {
+      "id": "d1-10",
+      "konu": "Embeddings and Word2Vec",
+      "zorluk": 3,
+      "slayt": 15,
+      "soru": "Why is it a limitation that Word2Vec produces a single vector for the word \"bank\", and by what mechanism do LLMs overcome it?",
+      "secenekler": [
+        "A single vector cannot separate meanings; the LLM solves this by keeping a separate vocabulary entry for each meaning",
+        "A single vector cannot separate meanings; the LLM looks at surrounding tokens to produce a contextual representation",
+        "A single vector uses too much memory; the LLM solves this by shrinking the vocabulary with shared subword embeddings",
+        "A single vector cannot be updated during training; the LLM solves this with an embedding table updated by gradients"
+      ],
+      "dogru": 1,
+      "aciklama": "Word2Vec gives one vector per word type, so \"river bank\" and \"bank deposit\" get the same representation; in an LLM the same input vector is transformed into A and B according to context in the Transformer layers. Keeping a separate vocabulary entry for each meaning would blow up the vocabulary and require enumerating meanings in advance; LLMs do not do this."
+    },
+    {
+      "id": "d1-11",
+      "konu": "RNN, attention, and the Transformer",
+      "zorluk": 2,
+      "slayt": 16,
+      "soru": "What is the \"bottleneck\" problem of RNN-based seq2seq models, and how does attention address it?",
+      "secenekler": [
+        "All input is squeezed into one fixed-size vector; attention lets each token access the relevant tokens directly",
+        "Computation is sequential, step by step; attention overcomes this bottleneck by distributing layers across multiple GPUs",
+        "The embedding table bloats as the vocabulary grows; attention shrinks the vocabulary with subword pieces and sharing",
+        "Gradients explode or vanish over long sequences; attention keeps the gradient stable with residual connections"
+      ],
+      "dogru": 0,
+      "aciklama": "The encoder RNN must compress an entire 50-word sentence into a single hidden state, and older information fades; attention removes this compression and lets each token look wherever it needs. Sequential computation is a second problem of RNNs, but it is not the one called the bottleneck; distributing across GPUs is not attention's mechanism either."
+    },
+    {
+      "id": "d1-12",
+      "konu": "RNN, attention, and the Transformer",
+      "zorluk": 2,
+      "slayt": 18,
+      "soru": "Which need does the \"dog chased cat ≠ cat chased dog\" example emphasize, and why did this need not arise separately in RNNs?",
+      "secenekler": [
+        "Causal masking; RNNs cannot see the future anyway, so they needed no separate mask",
+        "Bidirectional reading; RNNs processed the sequence in both directions, so they already captured order",
+        "Positional information; RNNs process tokens in order anyway, so order information was naturally present",
+        "A larger vocabulary; RNNs work at the word level, so order information was encoded in the vocabulary"
+      ],
+      "dogru": 2,
+      "aciklama": "Attention operates on a set and does not inherently know token order, which is why positional information is added to the Transformer separately. In an RNN, order came for free from step-by-step processing. Causal masking is a mechanism for hiding the future, not order information."
+    },
+    {
+      "id": "d1-13",
+      "konu": "Architecture families",
+      "zorluk": 2,
+      "slayt": 20,
+      "soru": "A team has a labeled dataset for classifying customer reviews as positive/negative and does not need to generate long text. Which architecture family is most suitable, and why?",
+      "secenekler": [
+        "Encoder-only; it suits bidirectional context-understanding tasks and is fine-tuned with labeled data",
+        "Decoder-only; the autoregressive objective can directly generate class labels as text",
+        "Encoder–decoder; reading the input and producing a label as output is a typical seq2seq task",
+        "Encoder-only; but because it is trained only with masked-token prediction, it needs no extra labels"
+      ],
+      "dogru": 0,
+      "aciklama": "BERT-style models are fine-tuned with labeled data for \"understanding\" tasks (classification, sentiment, NER). The last option picks the right architecture but with the wrong reasoning: masked-token prediction is a pretraining objective, and classification still requires labeled fine-tuning."
+    },
+    {
+      "id": "d1-14",
+      "konu": "Architecture families",
+      "zorluk": 3,
+      "slayt": 22,
+      "soru": "What would be the most important consequence if causal masking were removed when training a decoder-only model?",
+      "secenekler": [
+        "The model would see bidirectional context and learn better representations; only inference would be slightly slower",
+        "The context window would effectively be halved, because without the mask half of the positions would be unusable",
+        "Softmax outputs would no longer sum to 1, and greedy or sampling decoding would break at generation time",
+        "The model would see the target token in its input and learn to copy it; at inference there is no future token"
+      ],
+      "dogru": 3,
+      "aciklama": "In training the whole sentence is available; without the mask, \"capital\" is visible while predicting \"capital\", and the model copies instead of learning. At inference the future tokens do not exist, so training and usage conditions diverge. Bidirectional context is a property of encoder-only models and is unsuitable for generation."
+    },
+    {
+      "id": "d1-15",
+      "konu": "Softmax and decoding",
+      "zorluk": 3,
+      "slayt": 23,
+      "soru": "Suppose the logits are mat = 3.0, floor = 1.0, roof = 0.0. If 2 is added to every logit (5.0, 3.0, 2.0), how do the softmax probabilities change?",
+      "secenekler": [
+        "All three increase, because exp is an increasing function and a larger logit always gives a larger probability",
+        "They do not change, because numerator and denominator grow by the same factor e², and softmax ignores constant shifts",
+        "mat becomes more dominant, because exp differences open up faster at larger logits and sharpen the distribution",
+        "The distribution flattens, because the ratio between logits (5/3 and 3/2) is smaller than before, lowering the peak"
+      ],
+      "dogru": 1,
+      "aciklama": "pᵢ = exp(zᵢ + c) / Σ exp(zⱼ + c) = exp(c)·exp(zᵢ) / (exp(c)·Σ exp(zⱼ)); exp(c) cancels. What matters for softmax is the differences between logits, not their ratio or absolute value; so the \"the ratio got smaller\" reasoning is misleading."
+    },
+    {
+      "id": "d1-16",
+      "konu": "Softmax and decoding",
+      "zorluk": 2,
+      "slayt": 24,
+      "soru": "Suppose a model gives mat .98, floor .02 at T = 0.5, and mat .63, floor .23, roof .14 at T = 2.0. What is the mechanism by which a high temperature flattens the distribution?",
+      "secenekler": [
+        "A high T adds noise to the model's weights, so different logits come out for the same context every time",
+        "A high T allows multiple tokens to be drawn in sampling; the probability mass is split among them equally",
+        "A high T divides the logits by T, shrinking the gaps; the post-softmax distribution flattens",
+        "A high T adds low-probability tokens to the candidate list; at T = 0.5, roof was never a candidate"
+      ],
+      "dogru": 2,
+      "aciklama": "Logits are divided by T: with T=2, 3, 1, 0 become 1.5, 0.5, 0, and because the gaps shrink, softmax flattens; with T=0.5 they become 6, 2, 0 and the distribution sharpens. Decoding does not change the model weights; roof is a candidate at every T, only its probability changes."
+    },
+    {
+      "id": "d1-17",
+      "konu": "Training and pretraining data",
+      "zorluk": 2,
+      "slayt": 25,
+      "soru": "A loss of 0.36 corresponds to P(mat | context) = 0.70 and 2.30 to P = 0.10. If the model assigned the correct token a probability of 0.01, approximately what would the loss be, and what does it make the model do?",
+      "secenekler": [
+        "≈ 0.99; a small update, because cross-entropy loss is bounded above by 1 for any probability",
+        "≈ 2.30, the same, because probabilities below 0.10 count in the same loss class and give equal loss",
+        "≈ 100; because the loss is computed as 1/P and grows linearly as the probability shrinks further",
+        "≈ 4.6; strong pressure for a large update, because −log penalizes small probabilities heavily"
+      ],
+      "dogru": 3,
+      "aciklama": "L = −ln(0.01) ≈ 4.61. The loss goes to infinity as P → 0, so assigning very low probability to the correct answer produces the strongest update signal. The −log function is not 1/P and has no upper bound; \"the loss cannot exceed 1\" is a false intuition."
+    },
+    {
+      "id": "d1-18",
+      "konu": "Training and pretraining data",
+      "zorluk": 2,
+      "slayt": 28,
+      "soru": "The news story \"How strangers got my email address from ChatGPT's model\" is most directly related to which step of the pretraining data pipeline, and why?",
+      "secenekler": [
+        "Dedup; repeated text gets memorized, and personal data in the training set can resurface in output",
+        "Lang ID; incorrect language detection lets personal data slip past the language filter and into the corpus",
+        "Mixture; if the share of web data in the mixture is high, the amount of personal information increases",
+        "Tokenize; email addresses are encoded as single tokens, so the model remembers them easily afterwards"
+      ],
+      "dogru": 0,
+      "aciklama": "Filtering decisions affect memorization; repeated text gets memorized, and this is the technical source of the privacy risk. Mixture can indirectly affect the amount of personal information, but the step that explains memorization is deduplication."
+    },
+    {
+      "id": "d1-19",
+      "konu": "Scale and scaling laws",
+      "zorluk": 3,
+      "slayt": 30,
+      "soru": "A team training with a fixed compute budget plans to improve performance by only doubling the number of parameters. According to the Chinchilla scaling results (Hoffmann et al. 2022), what is the objection to this plan?",
+      "secenekler": [
+        "Increasing parameters directly increases the loss; scaling laws always favor smaller models",
+        "With fixed compute the number of parameters cannot be changed, because FLOPs depend only on the amount of data",
+        "With the same budget, only enlarging the parameters reduces the data; compute-optimal training balances the two",
+        "Increasing parameters only enlarges the context window; it has no measurable effect on the loss"
+      ],
+      "dogru": 2,
+      "aciklama": "Training compute scales roughly with parameters × tokens; with a fixed budget, doubling the parameters halves the number of tokens seen, and the large model is left \"starved\". Chinchilla's message is not \"smaller is always better\" but that model size, data, and compute should be scaled in balance."
+    },
+    {
+      "id": "d1-20",
+      "konu": "Adaptation and risks",
+      "zorluk": 2,
+      "slayt": 31,
+      "soru": "When \"Explain the moon landing to a 6-year-old\" is given to a base model that has finished pretraining, the model lists similar questions instead of answering. What is the cause of this behavior?",
+      "secenekler": [
+        "The model has not learned about the moon landing; continued pretraining with domain data is needed",
+        "The model is trained to continue text; instruction tuning teaches the question → answer format",
+        "The decoding temperature is too high; if lowered, the model would give a direct, coherent answer",
+        "The context window is full; unable to take in new information, the model repeats patterns it has seen"
+      ],
+      "dogru": 1,
+      "aciklama": "A base LM answers the question \"what would plausibly follow this text on the internet?\", and what follows a question is often more questions; instruction and preference tuning teach the format and the behavior. It is a lack of format, not a lack of knowledge: the model most likely learned the facts during pretraining."
+    }
+  ]
+}
