@@ -443,56 +443,63 @@ const MENU_RECIPES = {
 };
 // Haftaya özel menüler (Pazartesi tarihi → gün → öğünler). Buzdolabı: kereviz, taze fasulye, közlenmiş patlıcan.
 const WEEK_MENUS = {
-  '2026-11-09': {
-    1: { name: 'Pazartesi', tip: 'Pazar pişen taze fasulye ve kereviz haftanın yarısını taşır; zeytinyağlılar soğuk daha lezzetli. Tavuğu fırına atıp 40 dk unut.', meals: [
-      { k: 'k', t: 'Yoğurt + yulaf + meyve kasesi (elma veya nar, ceviz, tarçın) + 1 haşlanmış yumurta', E: '150 g yoğurt · 40 g yulaf · 6 ceviz yarımı · 1 yumurta', K: '120 g yoğurt · 30 g yulaf · 4 ceviz yarımı · 1 yumurta', r: ['yulaf'] },
-      { k: 'a1', t: '1 mandalina + badem', E: '8 badem', K: '5 badem' },
-      { k: 'o', t: 'Zeytinyağlı taze fasulye (4 porsiyon pişer, yarısı yarına) + yoğurt + bulgur', E: '1,5 kepçe · 150 g yoğurt · 4 yk bulgur', K: '1 kepçe · 100 g yoğurt · 2 yk bulgur', r: ['tazefasulye'] },
-      { k: 'a2', t: 'Kefir + tarçın', E: '200 ml', K: '200 ml' },
-      { k: 'ak', t: 'Fırında baharatlı tavuk but + yoğurtlu közlenmiş patlıcan salatası + roka', E: '150 g tavuk · 3 yk patlıcan salatası', K: '120 g tavuk · 2 yk patlıcan salatası', r: ['firintavuk', 'patlicansalata'] },
-      { k: 'g', t: 'Papatya çayı', E: '', K: '' }] },
-    2: { name: 'Salı', tip: 'Yumurtalar Pazar\'dan haşlı; kahvaltı 3 dakika. Akşam hamsi kağıtta 15 dk, bulaşık yok.', meals: [
-      { k: 'k', t: '2 haşlanmış yumurta + beyaz peynir + 5 zeytin + roka-turp', E: '2 yumurta · 30 g peynir · 1 dilim ekmek', K: '2 yumurta · 30 g peynir · ekmeksiz' },
-      { k: 'a1', t: '1 armut + fındık', E: '8 fındık', K: '6 fındık' },
-      { k: 'o', t: 'Dünkü taze fasulye (2. gün) + dünkü tavuk (soğuk) + yoğurt', E: '1,5 kepçe · 80 g tavuk · 150 g yoğurt', K: '1 kepçe · 60 g tavuk · 100 g yoğurt', r: ['tazefasulye'] },
-      { k: 'a2', t: '1 haşlanmış yumurta + havuç çubukları', E: '', K: '' },
-      { k: 'ak', t: 'Fırında hamsi + roka-kırmızı soğan-turp salatası', E: '200 g hamsi · 1 ince dilim mısır ekmeği (isteğe bağlı)', K: '150 g hamsi', r: ['hamsi'] },
-      { k: 'g', t: 'Rezene çayı', E: '', K: '' }] },
-    3: { name: 'Çarşamba', tip: 'Közlenmiş patlıcan akşam yemeğini 10 dakikaya indirir: doğra, biberle çevir, yumurtayı kır.', meals: [
-      { k: 'k', t: 'Yoğurt + yulaf + nar + ceviz + tarçın', E: '150 g yoğurt · 40 g yulaf · 6 ceviz yarımı', K: '120 g yoğurt · 30 g yulaf · 4 ceviz yarımı', r: ['yulaf'] },
-      { k: 'a1', t: '1 portakal + ceviz', E: '5 yarım', K: '4 yarım' },
-      { k: 'o', t: 'Zeytinyağlı portakallı kereviz (4 porsiyon, yarısı yarına) + 1 haşlanmış yumurta + yoğurt', E: '1,5 kepçe · 1 yumurta · 100 g yoğurt · 1 dilim ekmek', K: '1 kepçe · 1 yumurta · 100 g yoğurt', r: ['zkereviz'] },
-      { k: 'a2', t: 'Yoğurt + 1 yk öğütülmüş keten tohumu + tarçın', E: '150 g', K: '100 g' },
-      { k: 'ak', t: 'Közlenmiş patlıcanlı yumurta (tavada, biberli) + yoğurt + yeşil salata', E: '2 yumurta · 1 patlıcan · 100 g yoğurt', K: '2 yumurta · ½ patlıcan · 100 g yoğurt', r: ['patlicanliyumurta'] },
-      { k: 'g', t: 'Melisa çayı', E: '', K: '' }] },
-    4: { name: 'Perşembe', tip: 'Öğle tamamen hazırdan: kereviz, haşlanmış yumurta, yoğurt. Akşam sote 20 dakika.', meals: [
-      { k: 'k', t: 'Lor-yoğurt kasesi (yulaf, nar, ceviz, tarçın)', E: '150 g yoğurt · 70 g lor · 3 yk yulaf · 5 ceviz yarımı', K: '120 g yoğurt · 50 g lor · 2 yk yulaf · 4 ceviz yarımı', r: ['lorkase'] },
-      { k: 'a1', t: 'Kivi + badem', E: '1 kivi · 8 badem', K: '2 kivi · 6 badem' },
-      { k: 'o', t: 'Dünkü kereviz (2. gün) + kırmızı mercimek çorbası (4 porsiyon, yarısı Cuma\'ya) + yoğurt', E: '1 kepçe · 1 kase · 100 g yoğurt', K: '1 kepçe · 1 kase · 100 g yoğurt', r: ['zkereviz', 'mercimek'] },
-      { k: 'a2', t: 'Humus + havuç çubukları (E şişkinse kefir)', E: '3 yk', K: '2 yk', r: ['humus'] },
-      { k: 'ak', t: 'Sebzeli tavuk sote (mantar, kapya biber, brokoli) + roka', E: '150 g tavuk · 1 yk yağ', K: '120 g tavuk · 2 tk yağ', r: ['sote'] },
-      { k: 'g', t: 'Ihlamur', E: '', K: '' }] },
-    5: { name: 'Cuma', tip: 'Tartı günü: sabah, tuvaletten sonra, kahvaltıdan önce. Kereviz salatası 10 dakikada rendeyle hazır.', meals: [
-      { k: 'k', t: '2 haşlanmış yumurta + ½ avokado + roka + limon', E: '2 yumurta · ¼–½ avokado · 1 dilim ekmek', K: '2 yumurta · ½ avokado · 1 ince dilim' },
-      { k: 'a1', t: '1 elma + ceviz', E: '5 yarım', K: '4 yarım' },
-      { k: 'o', t: 'Perşembe\'nin mercimek çorbası (2. gün) + yoğurtlu kereviz salatası + beyaz peynir', E: '1 kase · 1 kase salata · 40 g peynir · 1 dilim ekmek', K: '1 kase · 1 kase salata · 30 g peynir', r: ['mercimek', 'kerevizsalata'] },
-      { k: 'a2', t: 'Kefir', E: '200 ml + 20 g kabak çekirdeği', K: '200 ml' },
-      { k: 'ak', t: 'Fırında somon veya levrek + buharda brokoli-karnabahar', E: '170 g balık · 1 yk yağ', K: '130 g balık · 2 tk yağ', r: ['somon'] },
-      { k: 'g', t: 'Papatya çayı', E: '', K: '' }] },
-    6: { name: 'Cumartesi', tip: 'Haftanın serbest kahvaltısı; közlenmiş patlıcan ezmesi sofraya renk katar. Öğle kısır, akşam köfte.', meals: [
-      { k: 'k', t: 'Hafta sonu kahvaltısı (08:30): sahanda yumurta, beyaz peynir, zeytin, sarımsaklı yoğurtlu közlenmiş patlıcan ezmesi, bol yeşillik, ekmek, kahve', E: '2 yumurta · 40 g peynir · 1 tk tahin · 1–2 dilim ekmek', K: '2 yumurta · 40 g peynir · 1 tk tahin + 1 tk pekmez · 1 dilim ekmek', r: ['patlicansalata'] },
-      { k: 'a1', t: 'Atla; 11:30\'da açlık olursa 1 meyve', E: '', K: '' },
-      { k: 'o', t: 'Narlı kısır (4 porsiyon, yarısı Pazar\'a) + yoğurt + marul (13:30)', E: '6 yk kısır · 150 g yoğurt', K: '4 yk kısır · 100 g yoğurt', r: ['kisir'] },
-      { k: 'a2', t: 'Planlı tatlı: fırında tarçınlı elma veya ayva + yoğurt + ceviz', E: '1 adet', K: '1 adet', r: ['ayva'] },
-      { k: 'ak', t: 'Fırında köfte + fırın sebze + yoğurt sos', E: '150 g köfte · 1 yk yağ', K: '110 g köfte · 2 tk yağ', r: ['kofte', 'firinsebze'] },
-      { k: 'g', t: 'Melisa çayı', E: '', K: '' }] },
-    0: { name: 'Pazar', tip: 'Hazırlık günü (2 saat): mercimek çorbası, zeytinyağlı bir sebze, fırın tavuk, 6 haşlanmış yumurta, bulgur, yıkanmış yeşillik.', meals: [
-      { k: 'k', t: 'Yoğurt + yulaf + meyve (K isterse kefirli hafif kase)', E: '150 g yoğurt · 40 g yulaf · 1 meyve · 6 ceviz yarımı', K: '120 g yoğurt veya 200 ml kefir · 30 g yulaf · 1 meyve · 4 ceviz yarımı', r: ['yulaf'] },
-      { k: 'a1', t: '1 elma + kuşburnu çayı', E: '', K: '' },
-      { k: 'o', t: 'Dünkü narlı kısır (2. gün) + haşlanmış yumurta + ayran', E: '6 yk · 2 yumurta · 1 bardak ayran', K: '4 yk · 1 yumurta · 1 bardak ayran', r: ['kisir'] },
-      { k: 'a2', t: 'Kefir + közlenmiş kestane', E: '200 ml · 6 kestane', K: '200 ml · 5 kestane' },
-      { k: 'ak', t: 'Fırında karnabahar-brokoli (yoğurt-yumurta soslu; 4 porsiyon, yarısı Pazartesi akşama) + roka-turp salatası', E: 'Büyük porsiyon', K: 'Orta porsiyon', r: ['karnabahar'] },
-      { k: 'g', t: 'Papatya veya ıhlamur · 23:00 uyku', E: '', K: '' }] }
+  "2026-11-09": {
+    1: { name: "Pazartesi", tip: "Bugün pişen taze fasulye yarın da yenir, Çarşamba pişen kereviz Perşembe'ye kalır; zeytinyağlılar soğuk daha lezzetli. Tavuğu fırına atıp 40 dk unut.", meals: [
+      {"k":"k","t":"Yoğurt + yulaf + meyve kasesi (elma veya nar, ceviz, tarçın) + 1 haşlanmış yumurta","E":"150 g yoğurt · 40 g yulaf · 6 ceviz yarımı · 1 yumurta","K":"120 g yoğurt · 30 g yulaf · 4 ceviz yarımı · 1 yumurta","r":["yulaf"],"s":[["Yoğurt",270,"g","sut",false],["Yulaf",70,"g","kiler",false],["Elma",1,"adet","sebze",false],["Ceviz",30,"g","kiler",false],["Yumurta",2,"adet","sut",false],["Keten tohumu",10,"g","kiler",false]]},
+      {"k":"a1","t":"1 mandalina + badem","E":"8 badem","K":"5 badem","r":[],"s":[["Mandalina",2,"adet","sebze",false],["Badem",15,"g","kiler",false]]},
+      {"k":"o","t":"Zeytinyağlı taze fasulye (4 porsiyon pişer, yarısı yarına) + yoğurt + bulgur","E":"1,5 kepçe · 150 g yoğurt · 4 yk bulgur","K":"1 kepçe · 100 g yoğurt · 2 yk bulgur","r":["tazefasulye"],"s":[["Taze fasulye",750,"g","sebze",true],["Soğan",1,"adet","sebze",false],["Havuç",1,"adet","sebze",false],["Domates",2,"adet","sebze",false],["Yoğurt",250,"g","sut",false],["Bulgur",60,"g","kiler",false]]},
+      {"k":"a2","t":"Kefir + tarçın","E":"200 ml","K":"200 ml","r":[],"s":[["Kefir",400,"ml","sut",false]]},
+      {"k":"ak","t":"Fırında baharatlı tavuk but + yoğurtlu közlenmiş patlıcan salatası + roka","E":"150 g tavuk · 3 yk patlıcan salatası","K":"120 g tavuk · 2 yk patlıcan salatası","r":["firintavuk","patlicansalata"],"s":[["Tavuk but (derisiz)",1000,"g","et",false],["Közlenmiş patlıcan",2,"adet","sebze",true],["Süzme yoğurt",200,"g","sut",false],["Sarımsak",1,"baş","sebze",false],["Limon",1,"adet","sebze",false],["Roka",1,"demet","sebze",false],["Maydanoz",1,"demet","sebze",false],["Bal kabağı",400,"g","sebze",false],["Havuç",3,"adet","sebze",false],["Brokoli",1,"adet","sebze",false]]},
+      {"k":"g","t":"Papatya çayı","E":"","K":"","r":[],"s":[]}
+    ] },
+    2: { name: "Salı", tip: "Yumurtalar Pazar'dan haşlı; kahvaltı 3 dakika. Akşam hamsi kağıtta 15 dk, bulaşık yok.", meals: [
+      {"k":"k","t":"2 haşlanmış yumurta + beyaz peynir + 5 zeytin + roka-turp","E":"2 yumurta · 30 g peynir · 1 dilim ekmek","K":"2 yumurta · 30 g peynir · ekmeksiz","r":[],"s":[["Yumurta",4,"adet","sut",false],["Beyaz peynir",60,"g","sut",false],["Zeytin",50,"g","kiler",false],["Roka",1,"demet","sebze",false],["Turp",1,"demet","sebze",false],["Ekşi mayalı ekmek",1,"adet","firin",false]]},
+      {"k":"a1","t":"1 armut + fındık","E":"8 fındık","K":"6 fındık","r":[],"s":[["Armut",2,"adet","sebze",false],["Fındık",15,"g","kiler",false]]},
+      {"k":"o","t":"Dünkü taze fasulye (2. gün) + dünkü tavuk (soğuk) + yoğurt","E":"1,5 kepçe · 80 g tavuk · 150 g yoğurt","K":"1 kepçe · 60 g tavuk · 100 g yoğurt","r":["tazefasulye"],"s":[["Yoğurt",250,"g","sut",false]]},
+      {"k":"a2","t":"1 haşlanmış yumurta + havuç çubukları","E":"","K":"","r":[],"s":[["Yumurta",2,"adet","sut",false],["Havuç",1,"adet","sebze",false]]},
+      {"k":"ak","t":"Fırında hamsi + roka-kırmızı soğan-turp salatası","E":"200 g hamsi · 1 ince dilim mısır ekmeği (isteğe bağlı)","K":"150 g hamsi","r":["hamsi"],"s":[["Hamsi (temizlenmiş)",600,"g","et",false],["Limon",1,"adet","sebze",false],["Dereotu",1,"demet","sebze",false],["Roka",1,"demet","sebze",false],["Kırmızı soğan",1,"adet","sebze",false],["Turp",1,"demet","sebze",false]]},
+      {"k":"g","t":"Rezene çayı","E":"","K":"","r":[],"s":[]}
+    ] },
+    3: { name: "Çarşamba", tip: "Közlenmiş patlıcan akşam yemeğini 10 dakikaya indirir: doğra, biberle çevir, yumurtayı kır.", meals: [
+      {"k":"k","t":"Yoğurt + yulaf + nar + ceviz + tarçın","E":"150 g yoğurt · 40 g yulaf · 6 ceviz yarımı","K":"120 g yoğurt · 30 g yulaf · 4 ceviz yarımı","r":["yulaf"],"s":[["Yoğurt",270,"g","sut",false],["Yulaf",70,"g","kiler",false],["Nar",1,"adet","sebze",false],["Ceviz",30,"g","kiler",false]]},
+      {"k":"a1","t":"1 portakal + ceviz","E":"5 yarım","K":"4 yarım","r":[],"s":[["Portakal",2,"adet","sebze",false],["Ceviz",25,"g","kiler",false]]},
+      {"k":"o","t":"Zeytinyağlı portakallı kereviz (4 porsiyon, yarısı yarına) + 1 haşlanmış yumurta + yoğurt","E":"1,5 kepçe · 1 yumurta · 100 g yoğurt · 1 dilim ekmek","K":"1 kepçe · 1 yumurta · 100 g yoğurt","r":["zkereviz"],"s":[["Kereviz",3,"adet","sebze",true],["Havuç",2,"adet","sebze",false],["Soğan",1,"adet","sebze",false],["Portakal",1,"adet","sebze",false],["Limon",1,"adet","sebze",false],["Dereotu",1,"demet","sebze",false],["Yumurta",2,"adet","sut",false],["Yoğurt",200,"g","sut",false],["Ekşi mayalı ekmek",1,"adet","firin",false]]},
+      {"k":"a2","t":"Yoğurt + 1 yk öğütülmüş keten tohumu + tarçın","E":"150 g","K":"100 g","r":[],"s":[["Yoğurt",250,"g","sut",false],["Keten tohumu",20,"g","kiler",false]]},
+      {"k":"ak","t":"Közlenmiş patlıcanlı yumurta (tavada, biberli) + yoğurt + yeşil salata","E":"2 yumurta · 1 patlıcan · 100 g yoğurt","K":"2 yumurta · ½ patlıcan · 100 g yoğurt","r":["patlicanliyumurta"],"s":[["Közlenmiş patlıcan",2,"adet","sebze",true],["Kapya biber",1,"adet","sebze",false],["Soğan",1,"adet","sebze",false],["Yumurta",4,"adet","sut",false],["Yoğurt",200,"g","sut",false],["Marul",1,"adet","sebze",false],["Roka",1,"demet","sebze",false]]},
+      {"k":"g","t":"Melisa çayı","E":"","K":"","r":[],"s":[]}
+    ] },
+    4: { name: "Perşembe", tip: "Öğle tamamen hazırdan: kereviz, çorba, haşlanmış yumurta, yoğurt. Tavuğu sabah 2 dakikada yoğurt-limonla marine et; akşam tek tepsi, 20 dk fırın.", meals: [
+      {"k":"k","t":"Lor-yoğurt kasesi (yulaf, nar, ceviz, tarçın)","E":"150 g yoğurt · 100 g lor · 3 yk yulaf · 5 ceviz yarımı","K":"120 g yoğurt · 50 g lor · 2 yk yulaf · 4 ceviz yarımı","r":["lorkase"],"s":[["Yoğurt",270,"g","sut",false],["Lor peyniri",150,"g","sut",false],["Yulaf",50,"g","kiler",false],["Nar",1,"adet","sebze",false],["Ceviz",25,"g","kiler",false]]},
+      {"k":"a1","t":"Kivi + badem","E":"1 kivi · 8 badem","K":"2 kivi · 6 badem","r":[],"s":[["Kivi",3,"adet","sebze",false],["Badem",30,"g","kiler",false]]},
+      {"k":"o","t":"Dünkü kereviz (2. gün) + kırmızı mercimek çorbası (4 porsiyon, yarısı Cuma'ya) + 1 haşlanmış yumurta + yoğurt","E":"1 kepçe kereviz · 1 kase çorba · 1 yumurta · 150 g yoğurt · 1 dilim ekmek","K":"1 kepçe kereviz · 1 kase çorba · 1 yumurta · 100 g yoğurt","r":["zkereviz","mercimek"],"s":[["Kırmızı mercimek",200,"g","kiler",false],["Soğan",1,"adet","sebze",false],["Havuç",1,"adet","sebze",false],["Limon",1,"adet","sebze",false],["Yumurta",2,"adet","sut",false],["Yoğurt",250,"g","sut",false],["Ekşi mayalı ekmek",1,"adet","firin",false]]},
+      {"k":"a2","t":"Kefir + tarçın","E":"200 ml","K":"200 ml","r":[],"s":[["Kefir",400,"ml","sut",false]]},
+      {"k":"ak","t":"Fırında yoğurt-limon marineli tavuk göğsü + aynı tepside sakız kabağı ve mantar + roka","E":"150 g tavuk · 1 yk yağ","K":"120 g tavuk · 2 tk yağ","r":["limonlutavuk"],"s":[["Tavuk göğsü",400,"g","et",false],["Yoğurt",50,"g","sut",false],["Limon",1,"adet","sebze",false],["Sarımsak",1,"baş","sebze",false],["Sakız kabağı",2,"adet","sebze",false],["Mantar",200,"g","sebze",false],["Roka",1,"demet","sebze",false]]},
+      {"k":"g","t":"Ihlamur","E":"","K":"","r":[],"s":[]}
+    ] },
+    5: { name: "Cuma", tip: "Tartı günü: sabah, tuvaletten sonra, kahvaltıdan önce. Lahana salatası 10 dakikada rendeyle hazır; akşam somon kağıtta 15 dk, bulaşık yok.", meals: [
+      {"k":"k","t":"2 haşlanmış yumurta + ½ avokado + roka + limon","E":"2 yumurta · ¼–½ avokado · 1 dilim ekmek","K":"2 yumurta · ½ avokado · 1 ince dilim","r":[],"s":[["Yumurta",4,"adet","sut",false],["Avokado",1,"adet","sebze",false],["Roka",1,"demet","sebze",false],["Limon",1,"adet","sebze",false],["Ekşi mayalı ekmek",1,"adet","firin",false]]},
+      {"k":"a1","t":"1 elma + ceviz","E":"5 yarım","K":"4 yarım","r":[],"s":[["Elma",2,"adet","sebze",false],["Ceviz",25,"g","kiler",false]]},
+      {"k":"o","t":"Perşembe'nin mercimek çorbası (2. gün) + yoğurtlu kırmızı lahana-havuç salatası + beyaz peynir","E":"1 kase · 1 kase salata · 50 g peynir · 1 dilim ekmek","K":"1 kase · 1 kase salata · 40 g peynir","r":["mercimek","lahanasalata"],"s":[["Kırmızı lahana",300,"g","sebze",false],["Havuç",1,"adet","sebze",false],["Yoğurt",200,"g","sut",false],["Ceviz",15,"g","kiler",false],["Maydanoz",1,"demet","sebze",false],["Sarımsak",1,"baş","sebze",false],["Beyaz peynir",90,"g","sut",false],["Ekşi mayalı ekmek",1,"adet","firin",false]]},
+      {"k":"a2","t":"Kefir","E":"200 ml + 20 g kabak çekirdeği","K":"200 ml","r":[],"s":[["Kefir",400,"ml","sut",false],["Kabak çekirdeği",20,"g","kiler",false]]},
+      {"k":"ak","t":"Fırında somon (kağıtta) + buharda brokoli-karnabahar (hardal tohumu veya rende turpla)","E":"170 g somon · 1 yk yağ","K":"130 g somon · 2 tk yağ","r":["somon"],"s":[["Somon",300,"g","et",false],["Limon",1,"adet","sebze",false],["Dereotu",1,"demet","sebze",false],["Brokoli",1,"adet","sebze",false],["Karnabahar",1,"adet","sebze",false],["Turp",1,"demet","sebze",false]]},
+      {"k":"g","t":"Papatya çayı","E":"","K":"","r":[],"s":[]}
+    ] },
+    6: { name: "Cumartesi", tip: "Haftanın serbest kahvaltısı; közlenmiş patlıcan ezmesi sofraya renk katar. Öğle kısır + lor, 16:00 fırın ayva, akşam köfte ile pancar-bal kabağı aynı fırında; sebzenin yarısı Pazar öğleye.", meals: [
+      {"k":"k","t":"Hafta sonu kahvaltısı (08:30): sahanda yumurta, beyaz peynir, zeytin, sarımsaklı yoğurtlu közlenmiş patlıcan ezmesi, bol yeşillik, ekmek, kahve","E":"2 yumurta · 40 g peynir · 1 tk tahin · 1–2 dilim ekmek","K":"2 yumurta · 40 g peynir · 1 tk tahin + 1 tk pekmez · 1 dilim ekmek","r":["patlicansalata"],"s":[["Yumurta",4,"adet","sut",false],["Beyaz peynir",80,"g","sut",false],["Zeytin",60,"g","kiler",false],["Közlenmiş patlıcan",1,"adet","sebze",true],["Yoğurt",100,"g","sut",false],["Roka",1,"demet","sebze",false],["Turp",1,"demet","sebze",false],["Ekşi mayalı ekmek",1,"adet","firin",false],["Tahin",20,"g","kiler",false],["Pekmez",20,"g","kiler",false]]},
+      {"k":"a1","t":"Atla; 11:30'da açlık olursa 1 meyve","E":"","K":"","r":[],"s":[]},
+      {"k":"o","t":"Narlı kısır (4 porsiyon, yarısı Pazar'a) + lor + yoğurt + marul (13:30)","E":"6 yk kısır · 120 g lor · 100 g yoğurt","K":"4 yk kısır · 80 g lor · 100 g yoğurt","r":["kisir"],"s":[["İnce bulgur",200,"g","kiler",false],["Maydanoz",2,"demet","sebze",false],["Taze nane",1,"demet","sebze",false],["Taze soğan",1,"demet","sebze",false],["Nar",1,"adet","sebze",false],["Limon",1,"adet","sebze",false],["Lor peyniri",200,"g","sut",false],["Yoğurt",200,"g","sut",false],["Marul",1,"adet","sebze",false]]},
+      {"k":"a2","t":"Planlı tatlı: fırında tarçınlı elma veya ayva + yoğurt + ceviz","E":"1 adet","K":"1 adet","r":["ayva"],"s":[["Ayva",2,"adet","sebze",false],["Ceviz",15,"g","kiler",false],["Yoğurt",50,"g","sut",false]]},
+      {"k":"ak","t":"Fırında köfte + fırında pancar, bal kabağı, kırmızı soğan (4 porsiyon, yarısı Pazar öğleye) + sarımsaklı yoğurt + roka","E":"150 g köfte · 1 yk yağ · 100 g yoğurt","K":"110 g köfte · 2 tk yağ · 100 g yoğurt","r":["kofte","firinkoksebze"],"s":[["Yağsız dana kıyma",500,"g","et",false],["Soğan",1,"adet","sebze",false],["Maydanoz",1,"demet","sebze",false],["Pancar",2,"adet","sebze",false],["Bal kabağı",600,"g","sebze",false],["Kırmızı soğan",2,"adet","sebze",false],["Yoğurt",200,"g","sut",false],["Sarımsak",1,"baş","sebze",false],["Roka",1,"demet","sebze",false]]},
+      {"k":"g","t":"Melisa çayı","E":"","K":"","r":[],"s":[]}
+    ] },
+    0: { name: "Pazar", tip: "Hazırlık günü (2 saat): gelecek hafta için 6 haşlanmış yumurta, yıkanıp kurutulmuş yeşillik, bir tencere çorba ve bir zeytinyağlı. Öğle tamamen dünden (kısır, köfte, fırın sebze); akşam sote 20 dk.", meals: [
+      {"k":"k","t":"Yoğurt + yulaf + meyve + 1 haşlanmış yumurta (K isterse kefirli hafif kase)","E":"150 g yoğurt · 40 g yulaf · 1 meyve · 6 ceviz yarımı · 1 yumurta","K":"120 g yoğurt veya 200 ml kefir · 30 g yulaf · 1 meyve · 4 ceviz yarımı · 1 yumurta","r":["yulaf"],"s":[["Yoğurt",270,"g","sut",false],["Kefir",200,"ml","sut",false],["Yulaf",70,"g","kiler",false],["Elma",2,"adet","sebze",false],["Ceviz",30,"g","kiler",false],["Keten tohumu",10,"g","kiler",false],["Yumurta",2,"adet","sut",false]]},
+      {"k":"a1","t":"1 elma + kuşburnu çayı","E":"","K":"","r":[],"s":[["Elma",2,"adet","sebze",false],["Kuşburnu",10,"g","kiler",false]]},
+      {"k":"o","t":"Dünkü narlı kısır (2. gün) + dünkü soğuk köfte + dünkü fırın sebze (2. gün) + ayran","E":"6 yk kısır · 80 g köfte · 1 porsiyon sebze · 1 bardak ayran","K":"4 yk kısır · 60 g köfte · 1 porsiyon sebze · 1 bardak ayran","r":["kisir","kofte","firinkoksebze"],"s":[["Ayran",2,"adet","sut",false]]},
+      {"k":"a2","t":"Kefir + közlenmiş kestane","E":"200 ml · 6 kestane","K":"200 ml · 5 kestane","r":[],"s":[["Kefir",400,"ml","sut",false],["Kestane",300,"g","sebze",false]]},
+      {"k":"ak","t":"Sebzeli tavuk sote (mantar, kapya biber, brokoli) + roka-turp salatası","E":"150 g tavuk · 1 yk yağ","K":"120 g tavuk · 2 tk yağ","r":["sote"],"s":[["Tavuk göğsü",400,"g","et",false],["Mantar",200,"g","sebze",false],["Kapya biber",1,"adet","sebze",false],["Brokoli",1,"adet","sebze",false],["Soğan",1,"adet","sebze",false],["Roka",1,"demet","sebze",false],["Turp",1,"demet","sebze",false]]},
+      {"k":"g","t":"Papatya veya ıhlamur · 23:00 uyku","E":"","K":"","r":[],"s":[]}
+    ] }
   }
 };
 // Alışveriş kalemleri (2 kişi): [ad, miktar, birim, kategori, evdeVar]. Kategoriler: sebze, et, sut, kiler, firin.
@@ -778,7 +785,14 @@ WEEK_MENUS['2026-11-16'] = {
     { k: 'ak', t: 'Tarhana çorbası (4 kase, yarısı Pazartesi akşama) + 1 haşlanmış yumurta + peynir-zeytin-yeşillik tabağı (hafif akşam)', E: '1 kase · 1 yumurta · 30 g peynir', K: '1 kase · 1 yumurta · 30 g peynir', r: ['tarhana'], s: [['Tarhana', 80, 'g', 'kiler'], ['Yumurta', 2, 'adet', 'sut'], ['Beyaz peynir', 60, 'g', 'sut'], ['Zeytin', 40, 'g', 'kiler'], ['Roka', 1, 'demet', 'sebze']] },
     { k: 'g', t: 'Papatya veya ıhlamur · 23:00 uyku', E: '', K: '', r: [], s: [] }] }
 };
+// 9–15 Kasım uzman revizyonundan gelen tarifler (Per–Paz)
+RECIPES.push(
+  {"id":"limonlutavuk","name":"Fırında yoğurt-limon marineli tavuk göğsü","time":25,"kcal":{"E":330,"K":260},"tags":["akşam","tavuk","hızlı"],"ing":["400 g tavuk göğsü (2 parça, hafif dövülmüş)","2 yk yoğurt","1 limon (suyu ve kabuk rendesi)","2 diş sarımsak (ezilmiş)","1 yk zeytinyağı","2 sakız kabağı (kalın dilim)","200 g mantar (ikiye bölünmüş)","kekik, kırmızı toz biber, karabiber, az tuz"],"steps":["Sabah: tavuğu yoğurt, limon suyu ve kabuğu, sarımsak, baharat ve ½ yk zeytinyağıyla kapaklı kapta buzdolabında beklet (en az 20 dk).","Akşam fırını 210 °C'ye ısıt; kabak ve mantarı ½ yk zeytinyağı ve kekikle harmanla, tepsinin kenarlarına yay, tavuğu ortaya koy.","20 dk pişir, 3 dk dinlendir; bol limon ve roka ile servis et. Artan tavuk soğuk olarak Cuma öğle kutusuna."],"por":{"E":"150 g tavuk + sebzenin yarısı","K":"120 g tavuk + sebzenin yarısı"},"tip":"Yoğurtlu marinat göğüs etini kurutmaz; sabah 2 dakika, akşam tek tepsi 25 dakika, bulaşık yok.","servings":2},
+  {"id":"lahanasalata","name":"Yoğurtlu kırmızı lahana-havuç salatası","time":10,"kcal":{"E":140,"K":110},"tags":["öğle","pişirmesiz","mevsim"],"ing":["¼ kırmızı lahana (yaklaşık 300 g, ince kıyılmış)","1 havuç (rendelenmiş)","200 g yoğurt","1 diş sarımsak","4 ceviz yarımı (kırılmış)","½ demet maydanoz","limon, 1 tk zeytinyağı, kimyon"],"steps":["Lahanayı ince kıy, az tuz ve limonla 2 dk ov (yumuşar, rengi açılır).","Rende havuç, yoğurt, ezilmiş sarımsak ve zeytinyağıyla karıştır.","Ceviz, maydanoz ve kimyonla servis et; kapaklı kapta ofise taşınır."],"por":{"E":"1 kase","K":"1 kase"},"tip":"Kırmızı lahananın C vitamini mercimek çorbasındaki demirin emilimini artırır; Cuma öğle, kereviz yerine.","servings":2},
+  {"id":"firinkoksebze","name":"Fırında pancar, bal kabağı ve kırmızı soğan","time":40,"kcal":{"E":150,"K":110},"tags":["akşam","sebze","mevsim"],"ing":["2 orta pancar (soyulmuş, parmak dilim)","600 g bal kabağı (kalın dilim)","2 kırmızı soğan (dörde bölünmüş)","1,5 yk zeytinyağı","kekik, kimyon, karabiber, pul biber","servis: 200 g sarımsaklı yoğurt"],"steps":["Fırını 200 °C'ye ısıt; sebzeleri zeytinyağı ve baharatla harmanla.","Pancarı tepsiye tek sıra yay, 15 dk pişir; kabak ve soğanı ekleyip 20–25 dk daha. Köfte tepsisi son 20 dk aynı fırına.","Yarısını sıcak, sarımsaklı yoğurtla ye; kalan yarısı soğuk, Pazar öğle kısırın yanına."],"por":{"E":"1 yk yağlı büyük porsiyon","K":"2 tk yağlı orta porsiyon"},"tip":"Pancarın nitratı sabah koşusu ve tansiyon için iyi; idrar renginin pembeleşmesi normaldir.","servings":4}
+);
 const WEEK_META = {
+  "2026-11-09": { source: "seed", createdAt: "2026-11-09T15:39:58.211Z", by: "E", rationale: "İskelet kurallara uygun: haftada 2 balık (Salı hamsi, Cuma somon), 1 kırmızı et pişirimi (Cumartesi köfte, kalanı Pazar öğle soğuk), 3 tavuk (Pazartesi, Perşembe, Pazar), baklagil yalnız öğlede ve tek tencere mercimek çorbasıyla Perşembe–Cuma 2 öğün; kahvaltılar 5–10 dakika, hafta içi akşamlar 25 dakikanın altında. Asıl açık protein: E için hedef 130 g/gün iken orijinal planda Pazartesi ~85, Salı ~95, Çarşamba ~55 g; ana öğünlerin yarısı 25 g eşiğinin altında (Pazartesi öğle ~14 g, Çarşamba öğle ~17 g, Perşembe öğle ~18 g, Cumartesi öğle ~11 g, Pazar akşam ~8 g). Revizyonla Perşembe–Pazar ana öğünleri 25–45 g bandına çekildi; gün toplamı E'de 90–110 g, K'de 70–85 g; 130 g'a yaklaşmak için Pazartesi–Çarşamba kahvaltılarına da yumurta veya lor eklemek gerekir. Düzeltilen kural ihlalleri: Perşembe 16:00 humus (baklagil ara öğünde, aynı gün ikinci baklagil), Cuma 'levrek' (gelecek haftanın balığı), kereviz Çarşamba–Cumartesi arası 4 gün, brokoli Perşembe–Cuma ardışık, Cumartesi fırın sebzede pırasa (gelecek hafta zeytinyağlı pırasa); Salı ve Çarşamba'daki 3'er yumurta dokunulmayan günlerde kaldı. Karbonhidrat düzeni doğru: bulgur, kısır ve ekmek öğlede, akşamlar tahılsız; sebze çeşidi pancar ve kırmızı lahana ile 20'nin üzerine çıktı. E'nin şişkinliği için baklagil iki öğleyle sınırlı, iyi pişmiş ve blenderdan geçmiş, ara öğünde kefir; tuz yükü en çok Cumartesi kahvaltısında (peynir + zeytin + ekmek) ve Cuma sabahki tartıdan sonra geldiği için ölçümü bozmaz. K için Cumartesi 16:0" },
   '2026-11-16': { source: 'seed', createdAt: '2026-11-07T13:00:00Z', by: 'E', rationale: 'Sebze yemekleri ve çorbalar 4 porsiyon pişip ardışık iki günde yenecek şekilde kuruldu: mercimekli bulgur Pzt–Sal öğle, pırasa Çar–Per öğle, tavuklu sebze çorbası Çar akşam–Cum öğle, kıymalı ıspanak Per akşam–Cmt öğle, kuru fasulye ve tarhana Pazar\'dan Pazartesi\'ye. Denge: 2 balık (palamut, levrek), 3 hindi/tavuk, 1 kırmızı et, baklagiller yalnız öğlede. Protein her ana öğünde 25–40 g; kahvaltılar yoğurt-yulaf-yumurta veya lor. Çeşitlilik: 9–15 Kasım\'daki taze fasulye, kereviz, patlıcan, hamsi, somon, dana köfte ve karnabahar tekrarlanmadı. Alışveriş kalemleri yalnız yemeğin pişirildiği güne yazıldı.' }
 };
 </script>
@@ -786,7 +800,7 @@ const WEEK_META = {
 <script>
 'use strict';
 // Tariflerden türetilen, öğün listelerinde eksik olan alışveriş kalemleri (audit_data.js üretir; elle düzenlemeyin).
-const SHOP_PATCH = {"2026-11-09":{"1":{"k":[["Keten tohumu",10,"g","kiler"]],"ak":[["Bal kabağı",400,"g","sebze"],["Havuç",3,"adet","sebze"],["Brokoli",1,"adet","sebze"]]},"4":{"a2":[["Sarımsak",1,"baş","sebze"]]},"6":{"ak":[["Kereviz",2,"adet","sebze"],["Pırasa",2,"adet","sebze"],["Havuç",3,"adet","sebze"]]}},"2026-11-16":{"0":{"ak":[["Sarımsak",1,"baş","sebze"]]},"1":{"k":[["Keten tohumu",10,"g","kiler"]]},"2":{"ak":[["Maydanoz",1,"demet","sebze"]]},"4":{"a2":[["Sarımsak",1,"baş","sebze"]]}},"default":{"0":{"o":[["Dereotu",1,"demet","sebze"]],"ak":[["Sarımsak",1,"baş","sebze"]]},"1":{"k":[["Dereotu",1,"demet","sebze"]],"ak":[["Sarımsak",1,"baş","sebze"]]},"4":{"a2":[["Sarımsak",1,"baş","sebze"]]}}};
+const SHOP_PATCH = {"2026-11-16":{"0":{"ak":[["Sarımsak",1,"baş","sebze"]]},"1":{"k":[["Keten tohumu",10,"g","kiler"]]},"2":{"ak":[["Maydanoz",1,"demet","sebze"]]},"4":{"a2":[["Sarımsak",1,"baş","sebze"]]}},"default":{"0":{"o":[["Dereotu",1,"demet","sebze"]],"ak":[["Sarımsak",1,"baş","sebze"]]},"1":{"k":[["Dereotu",1,"demet","sebze"]],"ak":[["Sarımsak",1,"baş","sebze"]]},"4":{"a2":[["Sarımsak",1,"baş","sebze"]]}}};
 </script>
 
 <script>
@@ -1481,7 +1495,6 @@ function renderToday() {
     else { cycleSub = ci.day + '. gün · ' + ci.phase + ' · sonraki ' + fmtD(ci.next); cycleBody = '<div class="row"><span class="pill' + (ci.pms ? ' warn' : ci.phase === 'Adet' ? ' accent' : ' good') + '">' + ci.phase + '</span><span class="tiny">döngü ' + c.cycleLen + ' gün</span></div><p class="muted">' + esc(ci.tip) + '</p><div class="row"><button type="button" class="btn ghost small" data-action="cycleStart">Adet başladı</button></div>'; }
   }
   $('#view-bugun').innerHTML = loginCardHtml() + heroHtml(p, L, c) + questsHtml(p, L, c) +
-    subSec('sub-yemek', '🍽', 'Ne yedik?', (L.foods.length ? L.foods.length + ' kayıt' + (total ? ' · ' + Math.round(total) + ' / ' + c.kcal + ' kcal' : ' · hedef ' + c.kcal + ' kcal') : 'Öğün kaydı · hedef ' + c.kcal + ' kcal'), foodsBody(L, p)) +
     (p === 'K' ? subSec('sub-dongu', '🌙', 'Döngü', cycleSub, cycleBody) : '');
   restorePane();
   const st = $('#saveStatus'); if (st) st.textContent = saveStatusText(L);
@@ -1683,9 +1696,9 @@ function auditWeekDoc(doc) {
     const pool = LEFTOVER_RE.test(text) ? (coverage[id] || []).concat(all) : (coverage[id] || []);
     recipeItems(r).forEach(it => {
       const key = id + '|' + normName(it.name); if (seen.has(key)) return;
-      const hit = pool.find(s => itemMatches(it, s[0]));
+      const hits = pool.filter(s => itemMatches(it, s[0])), mine = it.alts || [normName(it.name)], exact = hits.filter(s => altNames(s[0]).some(y => mine.indexOf(y) >= 0)), use = exact.length ? exact : hits, hit = use[0], have = use.filter(s => s[2] === it.u).reduce((sum, s) => sum + Number(s[1]), 0);
       if (!hit) { seen.add(key); rows.push({ dow: d, k: m.k, recipe: r.name, rid: id, item: it, kind: 'missing' }); }
-      else if (hit[2] === it.u && Number(hit[1]) < it.q * 0.6) { seen.add(key); rows.push({ dow: d, k: m.k, recipe: r.name, rid: id, item: it, have: hit, kind: 'low' }); }
+      else if (hit[2] === it.u && have < it.q * 0.6) { seen.add(key); rows.push({ dow: d, k: m.k, recipe: r.name, rid: id, item: it, have: [hit[0], have, hit[2]], kind: 'low' }); }
     });
   })));
   return rows;
@@ -1738,9 +1751,7 @@ function renderProgram() {
   let curI = -1; RHYTHM.forEach((r, i) => { if (r[0] <= hm) curI = i; });
   const tl = RHYTHM.map((r, i) => '<div class="tl' + (i === curI ? ' now' : '') + '"><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>').join('');
   $('#view-program').innerHTML = plannerCard() +
-    '<div class="card"><div class="card-h"><h2>Günlük ritim</h2><span class="meta">Hafta sonu: koşu 07:00, kahvaltı 08:30</span></div><div class="timeline">' + tl + '</div></div>' +
-    '<div class="card"><div class="card-h"><h2>Ara öğün havuzu</h2><span class="meta">100–150 kcal</span></div><ul class="plain">' + SNACKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
-    '<div class="card"><div class="card-h"><h2>İçecekler</h2></div><ul class="plain">' + DRINKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>';
+    '<div class="card"><div class="card-h"><h2>Günlük ritim</h2><span class="meta">Hafta sonu: koşu 07:00, kahvaltı 08:30</span></div><div class="timeline">' + tl + '</div></div>';
 }
 </script>
 
@@ -1914,22 +1925,49 @@ function bindPlanner() {
 <script>
 'use strict';
 // ---------- recipes ----------
+const RECIPE_CATS = [
+  { id: 'kahvalti', name: 'Kahvaltı', tags: ['kahvaltı'], words: ['omlet', 'çılbır', 'yulaf'] },
+  { id: 'corba', name: 'Çorbalar', tags: ['çorba'], words: ['çorba'] },
+  { id: 'balik', name: 'Balık', tags: ['balık'], words: ['balık', 'hamsi', 'palamut', 'somon', 'levrek', 'çipura'] },
+  { id: 'tavuk', name: 'Tavuk ve hindi', tags: ['tavuk', 'hindi'], words: ['tavuk', 'hindi'] },
+  { id: 'et', name: 'Kırmızı et', tags: ['et', 'köfte', 'kıyma'], words: ['etli', 'kıymalı', 'köfte', 'dana', 'kuzu'] },
+  { id: 'baklagil', name: 'Baklagil', tags: ['baklagil', 'nohut', 'mercimek'], words: ['nohut', 'mercimek', 'fasulye', 'humus'] },
+  { id: 'sebze', name: 'Sebze ve meze', tags: ['sebze', 'meze', 'pişirmesiz', 'salata', 'zeytinyağlı'], words: ['sebze', 'salata', 'zeytinyağlı', 'kereviz', 'pırasa', 'ıspanak', 'patlıcan', 'karnabahar', 'brokoli', 'kabak'] },
+  { id: 'tahil', name: 'Tahıl ve yumurta', tags: ['tahıl', 'yumurta', 'bulgur'], words: ['bulgur', 'kısır', 'yumurta', 'pilav'] },
+  { id: 'tatli', name: 'Tatlı', tags: ['tatlı'], words: ['tatlı', 'ayva'] },
+  { id: 'diger', name: 'Diğer', tags: [], words: [] }
+];
+// Soups by name first, then explicit tags, then words in the name.
+function recipeCat(r) {
+  const t = (r.tags || []).map(x => String(x).toLowerCase()), n = String(r.name || '').toLowerCase();
+  if (n.indexOf('çorba') >= 0) return RECIPE_CATS[1];
+  for (const c of RECIPE_CATS) if (c.tags.some(x => t.indexOf(x) >= 0)) return c;
+  for (const c of RECIPE_CATS) if (c.words.some(w => n.indexOf(w) >= 0)) return c;
+  return RECIPE_CATS[RECIPE_CATS.length - 1];
+}
 function renderRecipes() {
   const p = state.person, rc = id => state.recipes[id] || normRecipe(null);
-  const list = allRecipes().map((r, i) => ({ r: r, i: i, d: rc(r.id) })).sort((a, b) => (b.d.fav[p] - a.d.fav[p]) || (b.d.rating[p] - a.d.rating[p]) || (a.i - b.i));
+  const ws = mondayOf(state.today), weekDoc = state.weekmenus[ws] || codeWeekDoc(ws), used = new Set();
+  if (weekDoc) Object.keys(weekDoc.days).forEach(d => weekDoc.days[d].meals.forEach(m => (m.r || []).forEach(id => used.add(id))));
+  const all = allRecipes().map((r, i) => ({ r: r, i: i, d: rc(r.id) })).sort((a, b) => (b.d.fav[p] - a.d.fav[p]) || (b.d.rating[p] - a.d.rating[p]) || (a.i - b.i));
+  const list = all.filter(x => used.has(x.r.id)), rest = all.filter(x => !used.has(x.r.id));
   const stars = (id, v) => '<span class="stars" data-rate="' + id + '">' + [1, 2, 3, 4, 5].map(n => '<button type="button" data-v="' + n + '"' + (n <= v ? ' class="on"' : '') + ' aria-label="' + n + ' yıldız">★</button>').join('') + '</span>';
-  const items = list.map(x => { const r = x.r, d = x.d, other = p === 'E' ? 'K' : 'E';
+  const item = x => { const r = x.r, d = x.d, other = p === 'E' ? 'K' : 'E';
     return '<details id="rec-' + r.id + '"' + (state.open.has('rec-' + r.id) ? ' open' : '') + '><summary><span>' + (d.fav[p] ? '♥ ' : '') + esc(r.name) + '<span class="sub">' + r.time + ' dk · E ' + r.kcal.E + ' · K ' + r.kcal.K + ' kcal' + (r.servings ? ' · ' + r.servings + ' porsiyon' : '') + (d.rating[p] ? ' · ' + '★'.repeat(d.rating[p]) : '') + '</span></span></summary>' +
       '<div class="mlist"><div class="rec-h">' + stars(r.id, d.rating[p]) + '<button type="button" class="chip' + (d.fav[p] ? ' on' : '') + '" data-fav="' + r.id + '">' + (d.fav[p] ? 'Favori' : 'Favorilere ekle') + '</button></div>' +
       (d.rating[other] || d.fav[other] ? '<p class="tiny">' + esc(cfg(other).name) + ': ' + (d.rating[other] ? '★'.repeat(d.rating[other]) : '') + (d.fav[other] ? ' ♥' : '') + '</p>' : '') +
       '<div><div class="eyebrow">Malzeme · ' + (r.servings ? r.servings + ' porsiyon (2 kişi × ' + (r.servings / 2) + ' gün)' : '2 kişilik') + '</div>' + (r.tags.length ? '<p class="tiny">' + esc(r.tags.join(' · ')) + '</p>' : '') + '<ul class="plain">' + r.ing.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
       '<div><div class="eyebrow">Yapılışı</div><ol class="plain">' + r.steps.map(s => '<li>' + esc(s) + '</li>').join('') + '</ol></div>' +
       '<p class="muted"><b>Porsiyon</b> · E: ' + esc(r.por.E) + ' · K: ' + esc(r.por.K) + '</p><div class="tipbox">' + esc(r.tip) + '</div>' +
-      '<div class="field"><label for="rn-' + r.id + '">Not</label><input type="text" id="rn-' + r.id + '" data-note="' + r.id + '" value="' + esc(d.note) + '" maxlength="300" placeholder="Örn. kimyonu artırdık"></div></div></details>'; }).join('');
-  const dayTips = [1, 2, 3, 4, 5, 6, 0].map(k => '<li><b>' + MENU[k].name + ':</b> ' + esc(MENU[k].tip) + '</li>').join('');
-  $('#view-tarifler').innerHTML = shoppingCard() + '<div class="card"><div class="card-h"><h2>Pratik tarifler</h2><span class="meta">' + list.length + ' tarif</span></div><div>' + items + '</div></div>' +
+      '<div class="field"><label for="rn-' + r.id + '">Not</label><input type="text" id="rn-' + r.id + '" data-note="' + r.id + '" value="' + esc(d.note) + '" maxlength="300" placeholder="Örn. kimyonu artırdık"></div></div></details>'; };
+  const groups = RECIPE_CATS.map(c => { const rows = list.filter(x => recipeCat(x.r) === c); if (!rows.length) return ''; const id = 'cat-' + c.id, favs = rows.filter(x => x.d.fav[p]).length; return '<details class="item" id="' + id + '"' + (state.open.has(id) ? ' open' : '') + '><summary>' + c.name + '<span class="sub">' + rows.length + ' tarif' + (favs ? ' · ' + favs + ' favori' : '') + '</span></summary><div class="mlist">' + rows.map(item).join('') + '</div></details>'; }).join('') +
+    (rest.length ? '<details class="item" id="cat-rest"' + (state.open.has('cat-rest') ? ' open' : '') + '><summary>Diğer tarifler<span class="sub">' + rest.length + ' tarif · bu haftanın planında yok</span></summary><div class="mlist">' + rest.map(item).join('') + '</div></details>' : '');
+  const todayDay = weekDoc && weekDoc.days[parseD(state.today).getDay()], todayTip = todayDay && todayDay.tip ? todayDay.tip : '';
+  $('#view-tarifler').innerHTML = shoppingCard() + '<div class="card"><div class="card-h"><h2>Tarifler</h2><span class="meta">' + list.length + ' tarif · bu hafta</span></div><div>' + groups + '</div></div>' +
+    '<div class="card"><div class="card-h"><h2>Ara öğün havuzu</h2><span class="meta">100–150 kcal</span></div><ul class="plain">' + SNACKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
+    '<div class="card"><div class="card-h"><h2>İçecekler</h2></div><ul class="plain">' + DRINKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
     '<div class="card"><div class="card-h"><h2>Püf noktaları</h2><span class="meta">Neyi neyle, nasıl pişir</span></div><ul class="plain">' + RULES.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
-    '<div class="card"><div class="card-h"><h2>Günün püf noktası</h2><span class="meta">Haftalık menüye göre</span></div><ul class="plain">' + dayTips + '</ul></div>';
+    (todayTip ? '<div class="card"><div class="card-h"><h2>Bugünün püf noktası</h2></div><p class="muted">' + esc(todayTip) + '</p></div>' : '');
 }
 function bindRecipes() {
   const v = $('#view-tarifler'); const timers = new Map();
@@ -2011,7 +2049,7 @@ function openRecipe(id) {
   if (!findRecipe(id)) return;
   state.open.add('rec-' + id); lsSet('bt_open', Array.from(state.open));
   setTab('tarifler');
-  const d = document.getElementById('rec-' + id); if (d) { d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  const d = document.getElementById('rec-' + id); if (d) { d.open = true; let el = d.parentElement; while (el) { if (el.tagName === 'DETAILS') el.open = true; el = el.parentElement; } d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
 function boot() {
   state.open = new Set(lsGet('bt_open', []) || []);
