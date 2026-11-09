@@ -25,7 +25,7 @@
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 img { max-width: 100%; }
 [hidden] { display: none !important; }
-/* Layout: one 560px column, no header or footer. A game-card hero (points ring, reward bars), the day's quest list, then collapsible sections for everything else. */
+/* Layout: one 560px column with a fixed bottom tab bar (Bugün · Menü · Tarifler · Ayarlar). Bugün = game-card hero (points ring, reward bar) + the quests of the day in swipeable panes + collapsible extras. Mobile first; 44px touch targets; small text kept at 4.5:1. */
 :root {
   --bg: #F2F3EE;
   --surface: #FFFFFF;
@@ -33,52 +33,58 @@ img { max-width: 100%; }
   --line: #D7DACF;
   --ink: #1E221B;
   --ink-2: #585E52;
-  --ink-3: #8B9085;
+  --ink-3: #62685C;
   --accent: #9B2F45;
   --accent-ink: #FFFFFF;
   --accent-soft: #F5E1E5;
-  --good: #4C7A28;
+  --good: #3F6E1C;
   --good-ink: #FFFFFF;
   --good-soft: #E3EED6;
-  --warn: #B4660C;
+  --warn: #8F4D06;
   --warn-soft: #FBE9D2;
-  --water: #2F6F9F;
-  --chart-area: rgba(155, 47, 69, 0.12);
+  --water: #2B6893;
+  --water-soft: #DCEAF5;
   --hero: linear-gradient(135deg, #FBE9EC 0%, #FFFFFF 55%, #EDF2E4 100%);
+  --nav-bg: rgba(255, 255, 255, 0.92);
   --shadow: 0 1px 2px rgba(30, 34, 27, 0.06), 0 6px 20px rgba(30, 34, 27, 0.05);
   --font-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
   --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  --radius: 16px;
+  --radius: 18px;
+  --nav-h: 64px;
+  --pop: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #15180F; --surface: #1F2319; --surface-2: #2A2F23; --line: #3A4033;
-    --ink: #EEEDE6; --ink-2: #B7BAAF; --ink-3: #80857A;
+    --ink: #EEEDE6; --ink-2: #B7BAAF; --ink-3: #9BA094;
     --accent: #E6808F; --accent-ink: #1E0A0E; --accent-soft: #3B2229;
     --good: #9FC86B; --good-ink: #10200A; --good-soft: #263A18; --warn: #E9AA5B; --warn-soft: #3D2C13;
-    --water: #7FB3DC; --chart-area: rgba(230, 128, 143, 0.16);
+    --water: #7FB3DC; --water-soft: #1D3446;
     --hero: linear-gradient(135deg, #332026 0%, #1F2319 55%, #1F2A17 100%);
+    --nav-bg: rgba(31, 35, 25, 0.92);
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #15180F; --surface: #1F2319; --surface-2: #2A2F23; --line: #3A4033;
-  --ink: #EEEDE6; --ink-2: #B7BAAF; --ink-3: #80857A;
+  --ink: #EEEDE6; --ink-2: #B7BAAF; --ink-3: #9BA094;
   --accent: #E6808F; --accent-ink: #1E0A0E; --accent-soft: #3B2229;
   --good: #9FC86B; --good-ink: #10200A; --good-soft: #263A18; --warn: #E9AA5B; --warn-soft: #3D2C13;
-  --water: #7FB3DC; --chart-area: rgba(230, 128, 143, 0.16);
+  --water: #7FB3DC; --water-soft: #1D3446;
   --hero: linear-gradient(135deg, #332026 0%, #1F2319 55%, #1F2A17 100%);
+  --nav-bg: rgba(31, 35, 25, 0.92);
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
-  font-family: var(--font-body); font-size: 16px; line-height: 1.45;
+  font-family: var(--font-body); font-size: 16px; line-height: 1.5;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 12px 28px;
+  padding-top: 12px;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 20px);
   -webkit-tap-highlight-color: transparent;
 }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
@@ -87,8 +93,10 @@ h2 { font-size: 1.1rem; font-weight: 700; }
 h3 { font-size: 0.95rem; font-weight: 700; }
 p { margin: 0; }
 button { font: inherit; color: inherit; cursor: pointer; }
-input, textarea, select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 16px; min-width: 0; max-width: 100%; }
-input:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+input, textarea, select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 16px; min-width: 0; max-width: 100%; min-height: 44px; }
+input[type="time"], input[type="date"] { min-height: 40px; }
+input:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus-visible, [role="checkbox"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.svgi { width: 22px; height: 22px; flex: none; vertical-align: -5px; }
 .wrap { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
 .view { display: flex; flex-direction: column; gap: 14px; }
 .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -100,118 +108,110 @@ input:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus
 .num { font-variant-numeric: tabular-nums; }
 .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .grow { flex: 1; min-width: 0; }
-/* hero */
-.hero { background: var(--hero); border-radius: 20px; box-shadow: var(--shadow); padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 12px; }
+/* bottom tab bar (in-page views, not site navigation) */
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; justify-content: center; gap: 4px; background: var(--nav-bg); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-right, 0px)); }
+.tabs button { flex: 1; max-width: 136px; min-height: 52px; border: 0; background: transparent; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-family: var(--font-display); font-weight: 700; font-size: 0.72rem; color: var(--ink-3); transition: background 0.2s, color 0.2s; }
+.tabs button svg { width: 24px; height: 24px; }
+.tabs button.on { color: var(--accent); background: var(--accent-soft); }
+/* hero: the game card */
+.hero { background: var(--hero); border-radius: 22px; box-shadow: var(--shadow); padding: 16px; display: flex; flex-direction: column; gap: 14px; }
 .hero-top { display: flex; align-items: center; gap: 12px; }
-.avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; font-size: 1.7rem; box-shadow: var(--shadow); flex: none; }
-.hname { font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; line-height: 1.1; }
-.hsub { font-size: 0.82rem; color: var(--ink-2); }
+.avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; font-size: 1.65rem; box-shadow: var(--shadow); flex: none; }
+.greet { font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; line-height: 1.1; }
+.hsub { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
 .pchips { display: flex; gap: 6px; flex: none; }
-.pchip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 10px; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); }
+.pchip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 12px; min-height: 40px; font-size: 0.85rem; font-weight: 600; color: var(--ink-2); }
 .pchip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.ringrow { display: flex; align-items: center; gap: 14px; }
-.ring { width: 96px; height: 96px; flex: none; }
+.ringrow { display: grid; grid-template-columns: 120px 1fr; gap: 14px; align-items: center; }
+.ring { width: 120px; height: 120px; }
 .ring circle { fill: none; stroke-width: 9; stroke-linecap: round; }
-.ring .bg { stroke: var(--surface-2); }
-.ring .fg { stroke: var(--accent); transition: stroke-dasharray 0.4s; }
+.ring .bg { stroke: var(--surface); }
+.ring .fg { stroke: var(--accent); transition: stroke-dasharray 0.5s var(--pop); }
 .ring.full .fg { stroke: var(--good); }
 .ring text { font-family: var(--font-display); font-weight: 800; fill: var(--ink); }
-.hstats { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
-.hstat { display: flex; align-items: center; gap: 8px; font-size: 0.92rem; }
-.hstat b { font-family: var(--font-display); }
-.wbar { display: flex; align-items: center; gap: 8px; }
-.wbar .bar { flex: 1; height: 12px; border-radius: 8px; }
-.wbar .em { font-size: 1.3rem; flex: none; filter: grayscale(1); opacity: 0.6; }
-.wbar.done .em { filter: none; opacity: 1; }
-.wlabel { display: flex; justify-content: space-between; gap: 8px; font-size: 0.82rem; color: var(--ink-2); }
-.lvl { background: var(--surface); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
-.lvl .t { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
-.lvl .t b { font-family: var(--font-display); font-size: 1rem; }
-.motto { font-style: italic; color: var(--ink-2); font-size: 0.92rem; }
-.celebrate { background: var(--good-soft); color: var(--ink); border-radius: 12px; padding: 10px 12px; font-weight: 600; text-align: center; animation: pop 0.5s ease-out; }
-@keyframes pop { from { transform: scale(0.96); opacity: 0.4; } to { transform: scale(1); opacity: 1; } }
+.ring.full { filter: drop-shadow(0 0 10px rgba(76, 122, 40, 0.35)); animation: pop 0.5s var(--pop); }
+.hstats { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.hstat { display: flex; align-items: center; gap: 10px; background: var(--surface); border-radius: 14px; padding: 8px 12px; min-height: 48px; }
+.hstat .em { font-size: 1.35rem; flex: none; }
+.hstat b { font-family: var(--font-display); font-size: 1.2rem; line-height: 1; }
+.hstat small { display: block; color: var(--ink-3); font-size: 0.78rem; margin-top: 2px; }
+.reward { background: var(--surface); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.reward .wlabel { display: flex; align-items: center; gap: 10px; }
+.reward .wlabel .em { font-size: 1.7rem; flex: none; filter: grayscale(1); opacity: 0.6; transition: filter 0.3s, opacity 0.3s; }
+.reward.done .wlabel .em { filter: none; opacity: 1; animation: pop 0.5s var(--pop); }
+.reward .wlabel b { font-family: var(--font-display); font-size: 1.02rem; display: block; line-height: 1.15; }
+.reward .wlabel small { color: var(--ink-3); font-size: 0.78rem; }
+.reward .score { font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; line-height: 1; flex: none; }
+.reward .score small { font-weight: 600; font-size: 0.85rem; color: var(--ink-3); }
+.reward .rsub { font-size: 0.84rem; color: var(--ink-2); }
+.nextrung { display: flex; flex-direction: column; gap: 6px; font-size: 0.84rem; color: var(--ink-2); padding-top: 8px; border-top: 1px solid var(--line); }
+.nextrung .nr { display: flex; align-items: center; gap: 10px; }
+.nextrung b { color: var(--ink); font-family: var(--font-display); }
+.nextrung .bar { flex: 1; height: 6px; }
+.nextrung .num { flex: none; color: var(--ink-3); }
+.motto { font-style: italic; color: var(--ink-2); font-size: 0.92rem; text-align: center; }
+.celebrate { background: var(--good-soft); color: var(--ink); border-radius: 14px; padding: 10px 12px; font-weight: 600; text-align: center; animation: pop 0.5s var(--pop); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+@keyframes pop { from { transform: scale(0.9); opacity: 0.4; } to { transform: scale(1); opacity: 1; } }
+@keyframes popin { 0% { transform: scale(0.6); } 100% { transform: scale(1); } }
 .bar { height: 8px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
-.bar i { display: block; height: 100%; background: var(--accent); border-radius: 6px; transition: width 0.25s; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 6px; transition: width 0.4s var(--pop); }
 .bar.good i { background: var(--good); }
 .bar.big { height: 14px; border-radius: 8px; }
 /* quests */
 .daterow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.daterow .d { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; text-align: center; flex: 1; }
-.daterow .d small { display: block; font-family: var(--font-body); font-weight: 400; font-size: 0.78rem; color: var(--ink-3); }
-.iconbtn { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: 1.1rem; display: grid; place-items: center; flex: none; }
+.daterow .d { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; text-align: center; flex: 1; }
+.daterow .d small { display: block; font-family: var(--font-body); font-weight: 400; font-size: 0.8rem; color: var(--ink-3); }
+.iconbtn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; flex: none; color: var(--ink-2); }
+.iconbtn svg { width: 22px; height: 22px; }
 .iconbtn:disabled { opacity: 0.35; cursor: default; }
-.next { display: flex; align-items: center; gap: 10px; background: var(--accent-soft); color: var(--ink); border-radius: 12px; padding: 8px 12px; font-size: 0.9rem; }
+.next { display: flex; align-items: center; gap: 10px; background: var(--accent-soft); color: var(--ink); border-radius: 12px; padding: 8px 12px; font-size: 0.9rem; min-height: 44px; }
 .next b { font-family: var(--font-display); color: var(--accent); white-space: nowrap; }
-.qlist { display: flex; flex-direction: column; }
-.q { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); cursor: pointer; }
-.q:first-child { border-top: 0; }
-.q .em { width: 42px; height: 42px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-size: 1.3rem; border: 2px solid transparent; }
-.q.on .em { background: var(--good-soft); border-color: var(--good); }
-.q.on .nm { text-decoration: line-through; color: var(--ink-2); }
-.q .nm { font-family: var(--font-display); font-weight: 700; }
-.q .tm { font-size: 0.78rem; color: var(--ink-3); margin-left: 6px; font-weight: 400; font-family: var(--font-body); }
-.q .mn { font-size: 0.84rem; color: var(--ink-2); }
-.q .pr { font-size: 0.82rem; color: var(--ink); background: var(--surface-2); border-radius: 8px; padding: 2px 8px; display: inline-block; margin-top: 3px; }
-.q .pt { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; color: var(--ink-3); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
-.q.on .pt { background: var(--good); border-color: var(--good); color: var(--good-ink); }
-.q.zero .pt { opacity: 0.6; }
-.rl { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
-.rlink { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 3px 9px; font-size: 0.78rem; color: var(--accent); font-weight: 600; }
-.q.sleepq { cursor: default; }
-.q.sleepq .row { margin-top: 6px; gap: 12px; }
-.q.sleepq input[type="time"] { padding: 4px 6px; font-size: 0.95rem; margin-left: 4px; }
-.panetabs { display: flex; gap: 6px; }
-.panetabs button { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 4px; font-size: 0.8rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.next span small { color: var(--ink-3); font-size: 0.78rem; display: block; line-height: 1.1; }
+.panetabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.panetabs button { position: relative; min-height: 56px; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 0.74rem; font-weight: 600; color: var(--ink-2); padding: 4px 2px; transition: background 0.2s, border-color 0.2s; }
+.panetabs button svg { width: 22px; height: 22px; }
 .panetabs button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
-.panetabs .cnt { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 0.72rem; line-height: 18px; }
+.panetabs button.on svg { color: var(--accent); }
+.panetabs .cnt { position: absolute; top: 4px; right: 5px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 0.7rem; line-height: 18px; font-weight: 700; }
+.segs { display: flex; gap: 6px; }
+.segs button { flex: 1; min-width: 0; min-height: 44px; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 6px 4px; font-size: 0.8rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.segs button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
 .panes { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
 .panes::-webkit-scrollbar { display: none; }
 .pane { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; padding: 2px 2px 0; }
-.waterbox { display: flex; flex-direction: column; gap: 8px; }
-.planmeal { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 6px 0; border-top: 1px solid var(--line); font-size: 0.9rem; }
-.planmeal:first-child { border-top: 0; }
-.planmeal .acts { display: flex; gap: 4px; flex: none; }
-.planmeal .acts button { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 3px 7px; font-size: 0.8rem; }
-.planmeal .edit { display: flex; flex-direction: column; gap: 6px; grid-column: 1 / -1; }
-.planmeal .edit input { width: 100%; }
-.logrow { display: grid; grid-template-columns: 92px 1fr; gap: 8px; font-size: 0.84rem; padding: 4px 0; border-top: 1px solid var(--line); }
-.logrow:first-child { border-top: 0; }
-.logrow .when { color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.feed { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.feed div { background: var(--surface-2); border-radius: 10px; padding: 8px 10px; font-size: 0.84rem; }
-.feed b { display: block; font-family: var(--font-display); font-size: 1rem; }
-.shopgrp { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
-.shop { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--line); font-size: 0.92rem; cursor: pointer; }
-.shop input { width: 20px; height: 20px; margin: 0; accent-color: var(--good); flex: none; }
-.shop.on .grow { text-decoration: line-through; color: var(--ink-3); }
-.shop.have { opacity: 0.6; }
-.waterslider { width: 100%; accent-color: var(--water); height: 32px; margin: 0; padding: 0; background: transparent; border: 0; touch-action: none; }
-.drops { display: flex; flex-wrap: wrap; gap: 2px; }
-.drop { background: none; border: 0; font-size: 1.45rem; line-height: 1; padding: 3px; filter: grayscale(1); opacity: 0.35; }
-.drop.on { filter: none; opacity: 1; }
-.waterline { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
-.waterline b { font-family: var(--font-display); color: var(--water); }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 12px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; }
-.chip.on { background: var(--good-soft); border-color: var(--good); color: var(--ink); }
-.chip.on::before { content: "✓"; color: var(--good); font-weight: 700; }
-/* tabs (in-page views, not site navigation) */
-.tabs { display: flex; gap: 4px; background: var(--surface-2); border-radius: 14px; padding: 4px; }
-.tabs button { flex: 1; min-width: 0; border: 0; background: transparent; border-radius: 10px; padding: 9px 4px; font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tabs button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
-/* sections */
-.sec { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); min-width: 0; }
-.sec > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 13px 16px; }
-.sec > summary::-webkit-details-marker { display: none; }
-.sec > summary::after { content: "+"; color: var(--ink-3); font-size: 1.4rem; font-weight: 300; }
-.sec[open] > summary::after { content: "−"; }
-.sec[open] > summary { border-bottom: 1px solid var(--line); }
-.sec .ic { font-size: 1.45rem; width: 36px; text-align: center; flex: none; }
-.sec .st { flex: 1; min-width: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
-.sec .sub { display: block; font-family: var(--font-body); font-weight: 400; font-size: 0.8rem; color: var(--ink-3); white-space: normal; }
-.sec > .view { padding: 12px 10px 14px; background: var(--bg); border-radius: 0 0 var(--radius) var(--radius); }
+.qlist { display: flex; flex-direction: column; }
+.q { display: grid; grid-template-columns: 46px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; min-height: 60px; border-top: 1px solid var(--line); cursor: pointer; }
+.q:first-child { border-top: 0; }
+.q .em { width: 44px; height: 44px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-size: 1.35rem; border: 2px solid transparent; }
+.q.on .em { background: var(--good-soft); border-color: var(--good); animation: popin 0.35s var(--pop); }
+.q.on .nm { text-decoration: line-through; color: var(--ink-2); }
+.q .nm { font-family: var(--font-display); font-weight: 700; }
+.q .tm { font-size: 0.78rem; color: var(--ink-3); margin-left: 6px; font-weight: 400; font-family: var(--font-body); }
+.q .mn { font-size: 0.86rem; color: var(--ink-2); }
+.q .pr { font-size: 0.82rem; color: var(--ink); background: var(--surface-2); border-radius: 8px; padding: 2px 8px; display: inline-block; margin-top: 3px; }
+.q .pt { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; color: var(--ink-3); border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; min-width: 44px; text-align: center; white-space: nowrap; }
+.q.on .pt { background: var(--good); border-color: var(--good); color: var(--good-ink); }
+.q.zero .pt { opacity: 0.6; }
+.rl { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+.rlink { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 10px; min-height: 36px; font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+.q.sleepq { cursor: default; }
+.q.sleepq .row { margin-top: 6px; gap: 12px; }
+.q.sleepq input[type="time"] { padding: 6px 8px; font-size: 0.95rem; margin-left: 4px; }
+.waterbox { display: flex; flex-direction: column; gap: 10px; }
+.waterline { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.waterline b { font-family: var(--font-display); color: var(--water); font-size: 1.15rem; display: inline-flex; align-items: center; gap: 6px; }
+.waterslider { width: 100%; accent-color: var(--water); height: 44px; margin: 0; padding: 0; background: transparent; border: 0; touch-action: none; min-height: 0; }
+.drops { display: flex; flex-wrap: wrap; }
+.drop { width: 44px; height: 44px; background: none; border: 0; font-size: 1.5rem; line-height: 1; padding: 0; display: grid; place-items: center; filter: grayscale(1); opacity: 0.3; transition: opacity 0.2s; }
+.drop.on { filter: none; opacity: 1; animation: popin 0.3s var(--pop); }
+.pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 4px 10px; font-size: 0.8rem; font-weight: 600; background: var(--surface-2); color: var(--ink-2); }
+.pill.good { background: var(--good-soft); color: var(--good); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.accent { background: var(--accent-soft); color: var(--accent); }
+.pill.water { background: var(--water-soft); color: var(--water); }
+/* collapsible sections on Bugün */
 .sub-sec { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); }
-.sub-sec > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
+.sub-sec > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 12px 16px; min-height: 56px; }
 .sub-sec > summary::-webkit-details-marker { display: none; }
 .sub-sec > summary::after { content: "+"; color: var(--ink-3); font-size: 1.3rem; font-weight: 300; }
 .sub-sec[open] > summary::after { content: "−"; }
@@ -224,63 +224,26 @@ input:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus
 .sync.ok i { background: var(--good); }
 .sync.local i { background: var(--warn); }
 /* generic pieces */
-.weightline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.weightline input { width: 110px; font-family: var(--font-display); font-weight: 700; font-size: 1.4rem; text-align: center; padding: 6px 8px; }
-.delta { font-size: 0.9rem; color: var(--ink-2); }
-.delta b { color: var(--ink); }
-.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 600; text-decoration: underline; font-size: 0.9rem; }
+.linkbtn { background: none; border: 0; padding: 8px 0; color: var(--accent); font-weight: 600; text-decoration: underline; font-size: 0.9rem; min-height: 44px; }
 .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .field label { font-size: 0.82rem; color: var(--ink-2); font-weight: 600; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 @media (max-width: 380px) { .three { grid-template-columns: 1fr 1fr; } }
 textarea { width: 100%; min-height: 64px; resize: vertical; }
-.status { font-size: 0.8rem; color: var(--ink-3); text-align: right; }
-.tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.tile { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.tile .v { font-family: var(--font-display); font-weight: 700; font-size: 1.55rem; line-height: 1.1; }
-.tile .v small { font-size: 0.9rem; font-weight: 500; color: var(--ink-2); }
-.tile .l { font-size: 0.78rem; color: var(--ink-3); }
-.pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 3px 10px; font-size: 0.8rem; font-weight: 600; background: var(--surface-2); color: var(--ink-2); }
-.pill.good { background: var(--good-soft); color: var(--good); }
-.pill.warn { background: var(--warn-soft); color: var(--warn); }
-.pill.accent { background: var(--accent-soft); color: var(--accent); }
-.ladder { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
-.rung { text-align: center; font-size: 0.68rem; color: var(--ink-3); line-height: 1.2; }
-.rung .ic { display: block; font-size: 1.35rem; line-height: 1.3; }
-.rung.done { color: var(--good); font-weight: 600; }
-.rung.next { color: var(--accent); font-weight: 700; }
-.rung.lock { opacity: 0.55; }
+.status { font-size: 0.8rem; color: var(--ink-3); text-align: right; min-height: 1.2em; }
 .food { display: grid; grid-template-columns: 56px 1fr; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); align-items: start; }
-.food img, .food .ph { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; background: var(--surface-2); display: grid; place-items: center; color: var(--ink-3); font-size: 1.3rem; }
+.food img, .food .ph { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; background: var(--surface-2); display: grid; place-items: center; color: var(--ink-3); font-size: 1.3rem; }
 .food .hd { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 .food .hd b { font-family: var(--font-display); }
 .food .kc { font-family: var(--font-display); font-weight: 700; white-space: nowrap; }
 .food .cm { font-size: 0.86rem; color: var(--ink-2); }
 .food .busy { font-size: 0.86rem; color: var(--ink-3); font-style: italic; }
-.food .del { background: none; border: 0; color: var(--ink-3); font-size: 0.8rem; padding: 0; text-decoration: underline; }
+.food .del { background: none; border: 0; color: var(--ink-3); font-size: 0.8rem; padding: 8px 0; text-decoration: underline; min-height: 36px; }
 .addfood { display: flex; gap: 8px; align-items: center; }
 .addfood input[type="text"], .addfood input[type="date"] { flex: 1; min-width: 0; }
-.filebtn { position: relative; overflow: hidden; flex: none; }
+.filebtn { position: relative; overflow: hidden; flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; }
 .filebtn input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; font-size: 0; }
-.chart { width: 100%; height: auto; display: block; }
-.chart text { font-family: var(--font-body); font-size: 11px; fill: var(--ink-3); }
-.chart .grid { stroke: var(--line); stroke-width: 1; }
-.chart .goal { stroke: var(--ink-3); stroke-width: 1.5; stroke-dasharray: 6 5; }
-.chart .plan { stroke: var(--ink-3); stroke-width: 1.5; stroke-dasharray: 2 4; }
-.chart .line { stroke: var(--accent); stroke-width: 2; fill: none; stroke-linejoin: round; stroke-linecap: round; }
-.chart .area { fill: var(--chart-area); }
-.chart .dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
-.chart .lbl { fill: var(--ink); font-weight: 600; }
-.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.8rem; color: var(--ink-2); }
-.legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--accent); vertical-align: middle; margin-right: 5px; }
-.legend i.goal { border-top: 2px dashed var(--ink-3); }
-.legend i.plan { border-top: 2px dotted var(--ink-3); }
-.tablewrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
-th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
-td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
 .timeline { display: flex; flex-direction: column; }
 .tl { display: grid; grid-template-columns: 52px 1fr; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 0.92rem; }
 .tl:first-child { border-top: 0; }
@@ -289,7 +252,7 @@ td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
 .tl.now b { color: var(--accent); }
 .view details.item, .card details { border-top: 1px solid var(--line); padding: 6px 0; }
 .view details.item:first-of-type, .card details:first-of-type { border-top: 0; }
-.card details summary, .view details.item summary { cursor: pointer; font-family: var(--font-display); font-weight: 700; padding: 6px 0; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.card details summary, .view details.item summary { cursor: pointer; font-family: var(--font-display); font-weight: 700; padding: 10px 0; min-height: 44px; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .card details summary::-webkit-details-marker, .view details.item summary::-webkit-details-marker { display: none; }
 .card details summary::after, .view details.item summary::after { content: "+"; color: var(--ink-3); font-size: 1.2rem; flex: none; }
 .card details[open] summary::after, .view details.item[open] summary::after { content: "−"; }
@@ -300,35 +263,55 @@ summary .sub { font-family: var(--font-body); font-weight: 400; font-size: 0.8re
 .mi .p { display: block; color: var(--ink-2); font-size: 0.85rem; }
 .tipbox { background: var(--surface-2); border-radius: 10px; padding: 8px 10px; font-size: 0.86rem; color: var(--ink-2); }
 ul.plain, ol.plain { margin: 0; padding-left: 18px; font-size: 0.9rem; color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; }
-.stars { display: inline-flex; gap: 2px; }
-.stars button { background: none; border: 0; font-size: 1.5rem; line-height: 1; color: var(--line); padding: 2px; }
+.stars { display: inline-flex; gap: 0; }
+.stars button { background: none; border: 0; width: 40px; height: 44px; font-size: 1.5rem; line-height: 1; color: var(--line); padding: 0; }
 .stars button.on { color: var(--warn); }
 .rec-h { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
-.btn { border: 0; border-radius: 10px; padding: 11px 16px; font-weight: 700; font-family: var(--font-display); background: var(--accent); color: var(--accent-ink); }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; }
+.chip.on { background: var(--good-soft); border-color: var(--good); color: var(--ink); }
+.chip.on::before { content: "✓"; color: var(--good); font-weight: 700; }
+.btn { border: 0; border-radius: 12px; padding: 11px 16px; min-height: 44px; font-weight: 700; font-family: var(--font-display); background: var(--accent); color: var(--accent-ink); }
 .btn.ghost { background: var(--surface-2); color: var(--ink); }
-.btn.small { padding: 7px 12px; font-size: 0.9rem; }
+.btn.small { padding: 8px 12px; min-height: 40px; font-size: 0.9rem; }
 .btn:disabled { opacity: 0.5; cursor: default; }
 .note { font-size: 0.86rem; color: var(--ink-2); background: var(--surface-2); border-radius: 10px; padding: 10px 12px; }
-.analysis { font-size: 0.92rem; display: flex; flex-direction: column; gap: 6px; white-space: pre-wrap; }
 .listrow { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); font-size: 0.9rem; }
 .listrow:first-child { border-top: 0; }
-@media (prefers-reduced-motion: reduce) { .bar i, .ring .fg { transition: none; } .celebrate { animation: none; } }
+/* planner & shopping */
+.planmeal { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 8px 0; border-top: 1px solid var(--line); font-size: 0.9rem; }
+.planmeal:first-child { border-top: 0; }
+.planmeal .acts { display: flex; gap: 4px; flex: none; }
+.planmeal .acts button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; min-width: 40px; min-height: 40px; padding: 4px 8px; font-size: 0.85rem; }
+.planmeal .edit { display: flex; flex-direction: column; gap: 6px; grid-column: 1 / -1; }
+.planmeal .edit input { width: 100%; }
+.logrow { display: grid; grid-template-columns: 92px 1fr; gap: 8px; font-size: 0.84rem; padding: 4px 0; border-top: 1px solid var(--line); }
+.logrow:first-child { border-top: 0; }
+.logrow .when { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.feed { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.feed div { background: var(--surface-2); border-radius: 10px; padding: 8px 10px; font-size: 0.84rem; }
+.feed b { display: block; font-family: var(--font-display); font-size: 1rem; }
+.shopgrp { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
+.shop { display: flex; align-items: center; gap: 10px; padding: 10px 0; min-height: 44px; border-top: 1px solid var(--line); font-size: 0.92rem; cursor: pointer; }
+.shop input { width: 22px; height: 22px; min-height: 0; margin: 0; accent-color: var(--good); flex: none; }
+.shop.on .grow { text-decoration: line-through; color: var(--ink-3); }
+.shop.have { opacity: 0.6; }
+@media (prefers-reduced-motion: reduce) { .bar i, .ring .fg, .tabs button, .panetabs button { transition: none; } .celebrate, .q.on .em, .drop.on, .ring.full, .reward.done .wlabel .em { animation: none; } }
 </style>
 </head>
 <body>
 <main class="wrap">
-  <nav class="tabs" aria-label="Bölümler">
-    <button type="button" data-tab="bugun" id="tab-bugun">☑ Bugün</button>
-    <button type="button" data-tab="menu" id="tab-menu">📋 Menü</button>
-    <button type="button" data-tab="tarifler" id="tab-tarifler">👩‍🍳 Tarifler</button>
-    <button type="button" data-tab="ayarlar" id="tab-ayarlar">⚙️ Ayarlar</button>
-  </nav>
   <section class="view" id="view-bugun"></section>
   <section class="view" id="view-program" hidden></section>
   <section class="view" id="view-tarifler" hidden></section>
   <section class="view" id="view-ayarlar" hidden></section>
-  <p class="foot">Kayıtlar <span id="syncText">bağlanıyor</span><span id="sync" class="sync"><i></i></span></p>
+  <p class="foot"><span id="sync" class="sync"><i></i></span><span id="syncText">bağlanıyor</span></p>
 </main>
+<nav class="tabs" aria-label="Bölümler">
+  <button type="button" data-tab="bugun" id="tab-bugun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><span>Bugün</span></button>
+  <button type="button" data-tab="menu" id="tab-menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg><span>Menü</span></button>
+  <button type="button" data-tab="tarifler" id="tab-tarifler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M17 21a1 1 0 0 0 1-1v-5.35c0-.457.316-.844.727-1.041a4 4 0 0 0-2.134-7.589 5 5 0 0 0-9.186 0 4 4 0 0 0-2.134 7.588c.411.198.727.585.727 1.041V20a1 1 0 0 0 1 1Z"/><path d="M6 17h12"/></svg><span>Tarifler</span></button>
+  <button type="button" data-tab="ayarlar" id="tab-ayarlar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 4h-7"/><path d="M10 4H3"/><path d="M21 12h-9"/><path d="M8 12H3"/><path d="M21 20h-5"/><path d="M12 20H3"/><path d="M14 2v4"/><path d="M8 10v4"/><path d="M16 18v4"/></svg><span>Ayarlar</span></button>
+</nav>
 <script>
 'use strict';
 const DEFAULTS = {
@@ -1072,12 +1055,12 @@ async function saveRewards() { state.rewards = normRewards(state.rewards); retur
 async function saveRecipe(id, patch) { const cur = state.recipes[id] || normRecipe(null); const next = normRecipe(Object.assign({}, cur, patch, { rating: Object.assign({}, cur.rating, patch.rating || {}), fav: Object.assign({}, cur.fav, patch.fav || {}) })); state.recipes[id] = next; return writeDoc('recipes/' + id, next); }
 async function connect() {
   loadLocal(); renderAll();
-  if (STATIC_HOST) { setMode('local', 'bu cihazda saklanıyor'); state.modeNote = 'Girdiler yalnızca bu cihazda saklanıyor.'; renderAll(); return; }
+  if (STATIC_HOST) { setMode('local', 'bu cihazda'); state.modeNote = 'Girdiler yalnızca bu cihazda saklanıyor.'; renderAll(); return; }
   let db = null;
   try { db = await window.claude.use('db'); } catch (e) { db = null; }
   window.claude.use('sample').then(async s => { state.sample = s; if (s && s.limits) { try { const lim = await s.limits(); state.imgOk = !!(lim && lim.images); } catch (e) { state.imgOk = false; } } renderAll(); }).catch(() => {});
   window.claude.use('assets').then(a => { state.assets = a; renderAll(); }).catch(() => {});
-  if (!db) { setMode('local', 'bu cihazda saklanıyor'); state.modeNote = 'Paylaşımlı kayıt bu görünümde kapalı; girdiler yalnızca bu cihazda saklanıyor.'; renderAll(); return; }
+  if (!db) { setMode('local', 'bu cihazda'); state.modeNote = 'Paylaşımlı kayıt bu görünümde kapalı; girdiler yalnızca bu cihazda saklanıyor.'; renderAll(); return; }
   state.db = db;
   let loaded = false;
   const timer = setTimeout(() => { if (!loaded) setMode('loading', 'veriye ulaşılamıyor'); }, 10000);
@@ -1089,7 +1072,7 @@ async function connect() {
     state.pendingLocal.forEach(id => { if (state.logs[id]) { next[id] = state.logs[id]; state.dirty.add(id); clearTimeout(state.timers.get(id)); state.timers.set(id, setTimeout(() => flush(id), 300)); } });
     state.pendingLocal.clear();
     state.logs = next;
-    setMode('db', snap.metadata.fromCache ? 'önbellekten' : 'paylaşımlı, ikinizde de görünür');
+    setMode('db', snap.metadata.fromCache ? 'önbellekten' : 'ortak kayıt açık');
     renderAll();
   }, err => { clearTimeout(timer); fallbackLocal('Paylaşımlı veriye ulaşılamadı (' + (err && err.code ? err.code : 'hata') + '); girdiler bu cihazda saklanıyor.'); renderAll(); });
   db.collection('settings').onSnapshot(snap => { snap.docs.forEach(d => { if (d.id === 'E' || d.id === 'K') state.settings[d.id] = d.data(); else if (d.id === 'rewards') state.rewards = normRewards(d.data()); }); renderAll(); }, () => {});
@@ -1101,16 +1084,34 @@ async function connect() {
 
 <script>
 'use strict';
-// ---------- today: hero, water, quests, archive, sub-sections ----------
+// ---------- today: hero (game card), quests in swipeable panes, water, food log, cycle ----------
 const EMOJI = { run: '🏃', k: '🍳', a1: '🍎', o: '🥗', a2: '🥛', ak: '🍲', walkNoon: '🚶', walkEve: '🌙', vinegar: '🍶', strength: '💪', weigh: '⚖️', sleep: '😴' };
+const ICON = {
+  su: '<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>',
+  ogun: '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+  hareket: '<path d="M22 12h-2.5a2 2 0 0 0-1.9 1.5l-2.4 8.3a.25.25 0 0 1-.5 0L9.2 2.2a.25.25 0 0 0-.5 0L6.4 10.5A2 2 0 0 1 4.5 12H2"/>',
+  uyku: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  prev: '<path d="m15 18-6-6 6-6"/>',
+  next: '<path d="m9 18 6-6-6-6"/>',
+  camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>'
+};
+function svgIcon(name) { return '<svg class="svgi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + ICON[name] + '</svg>'; }
 const LEVELS = [[26, 'Efsane'], [13, 'Usta'], [8, 'Demir irade'], [4, 'Kararlı'], [2, 'Düzenli'], [1, 'Isınmış'], [0, 'Çaylak']];
 function levelName(n) { for (const l of LEVELS) if (n >= l[0]) return l[1]; return 'Çaylak'; }
+function greeting() { const h = Number(nowHM().slice(0, 2)); return h < 5 ? 'İyi geceler' : h < 12 ? 'Günaydın' : h < 18 ? 'İyi günler' : 'İyi akşamlar'; }
 function recipeLinks(dow, mealKey, meal) {
   const ids = (meal && meal.r) || (MENU_RECIPES[dow] && MENU_RECIPES[dow][mealKey]) || [];
   const html = ids.map(id => { const r = findRecipe(id); return r ? '<button type="button" class="rlink" data-recipe="' + id + '">📖 ' + esc(r.name) + '</button>' : ''; }).join('');
   return html ? '<div class="rl">' + html + '</div>' : '';
 }
 function nextRhythm() { const hm = nowHM(); for (const r of RHYTHM) if (r[0] > hm) return r; return null; }
+function shortRhythm(t) {
+  const s = String(t).replace(/\s*\([^)]*\)/g, '').replace(/:\s*/, ' · ').trim();
+  if (s.length <= 46) return s;
+  const cut = Math.max(s.lastIndexOf(';', 46), s.lastIndexOf(',', 46));
+  if (cut > 12) return s.slice(0, cut).trim();
+  const sp = s.lastIndexOf(' ', 44); return s.slice(0, sp > 12 ? sp : 44).trim() + '…';
+}
 function weightDelta(L, c, prev) {
   if (L.weight != null) { const a = L.weight - c.startWeight, b = prev ? L.weight - prev.weight : null; return 'Başlangıca göre <b>' + sgn(a) + ' kg</b>' + (b != null ? ' · önceki tartıya göre ' + sgn(b) : ''); }
   if (prev) return 'Son tartı <b>' + n1(prev.weight) + ' kg</b> · ' + fmtD(prev.date);
@@ -1131,33 +1132,43 @@ function motto(L, c, pts, p, lp) {
   if (p === 'K') { const ci = cycleInfo(c, state.date); if (ci && ci.pms) return 'PMS haftası: tatlı isteği normal, planlı tatlı cebinde 🍐'; }
   if (meals === 5) return 'Beş öğün tamam, kan şekeri dümdüz 📈';
   if (lp.streak >= 2) return lp.streak + ' haftalık seri sürüyor, zincir kırılmasın 🔗';
-  if (pts >= 8) return 'Bir iki adım kaldı: yürüyüş, su ya da erken yatış, gün senin 🚶';
+  if (pts >= 8) return 'Bir iki adım kaldı: yürüyüş, su ya da erken yatış 🚶';
   const pool = ['Küçük adımlar, büyük merdiven 🪜', 'Bugünün puanı yarının ödülü 🎁', 'Her görev bir puan, her puan ödüle bir adım 🎯', 'Zincir kırılmasın; bugün de işaretle 🔗', 'On puan = kazanılmış gün. Hadi 🙌', 'Hafta sonu ödülü için bugünden başla 🌟', 'Haftada bir tartı, her gün bir görev ⚖️'];
   return pool[parseD(state.date).getDay()];
 }
 function heroHtml(p, L, c) {
   const lp = ladderProgress(p), pts = dayPoints(L, c), th = lp.threshold, cw = lp.current, isToday = state.date === state.today;
   const circ = 2 * Math.PI * 40, dash = (Math.min(DAY_MAX, pts) / DAY_MAX * circ).toFixed(1);
-  const streak = dayStreak(p), daysLeft = 6 - daysBetween(cw.ws, state.today), weekly = state.rewards.ladder[p][0];
+  const streak = dayStreak(p), daysLeft = Math.max(0, 6 - daysBetween(cw.ws, state.today)), weekly = state.rewards.ladder[p][0];
   const chips = PERSON_LOCK ? '' : '<div class="pchips">' + ['E', 'K'].map(q => '<button type="button" class="pchip' + (q === state.person ? ' on' : '') + '" data-person="' + q + '">' + esc(cfg(q).name) + '</button>').join('') + '</div>';
-  let lvl;
-  if (lp.warmup) lvl = '<div class="lvl"><div class="t"><b>Program ' + fmtD(mondayOf(c.startDate)) + ' Pazartesi başlıyor</b></div><p class="tiny">Bu hafta ısınma turu; puanlar ve ödül merdiveni o gün çalışmaya başlar.</p></div>';
-  else if (lp.next) {
-    const pct = Math.min(100, lp.progress / lp.next.weeks * 100), remainW = lp.next.weeks - lp.count;
-    lvl = '<div class="lvl"><div class="t"><b>Sıradaki: ' + esc(lp.next.icon) + ' ' + esc(lp.next.title) + '</b><span class="tiny num">' + lp.count + ' / ' + lp.next.weeks + ' hafta</span></div><div class="bar big"><i style="width:' + pct + '%"></i></div><p class="tiny">' + (remainW === 1 ? 'Bu hafta da tutarsa senin! ' : remainW + ' başarılı hafta kaldı. ') + 'Seviye: <b>' + levelName(lp.count) + '</b>' + (lp.streak >= 2 ? ' · seri ' + lp.streak + ' hafta 🔥' : '') + '</p></div>';
-  } else lvl = '<div class="lvl"><div class="t"><b>Merdiven tamamlandı 🏆</b></div><p class="tiny">6 aylık ödül dahil hepsi hak edildi. Seviye: Efsane.</p></div>';
+  const defaultName = /^(Erkek|Kadın)$/i.test(c.name.trim());
+  const greet = isToday ? greeting() + (defaultName ? '' : ', ' + esc(c.name)) + ' 👋' : fmtDL(state.date);
+  const sub = '<div class="hsub"><span class="pill accent">⭐ ' + levelName(lp.count) + '</span>' + (lp.warmup ? '' : '<span class="pill">🪜 ' + lp.count + ' başarılı hafta</span>') + '</div>';
+  const stats = '<div class="hstats">' +
+    '<div class="hstat"><span class="em">🔥</span><div><b>' + streak + '</b> <small>' + (streak ? 'günlük seri' : 'seri · bugün başla') + '</small></div></div>' +
+    '<div class="hstat"><span class="em">⭐</span><div><b class="num">' + cw.points + '</b> <small>bu hafta · hedef ' + th + '</small></div></div></div>';
+  let reward;
+  if (lp.warmup) reward = '<div class="reward"><div class="wlabel"><span class="em" style="filter:none;opacity:1">🏁</span><div class="grow"><b>Program ' + fmtD(mondayOf(c.startDate)) + ' Pazartesi başlıyor</b><small>Bu hafta ısınma turu</small></div></div></div>';
+  else {
+    const remain = th - cw.points;
+    const sub2 = cw.ok ? 'Hak edildi 🎉 Hafta sonu senin.' : remain + ' puan kaldı · Pazar\'a ' + daysLeft + ' gün' + (weekPoints(p, cw.ws).weighed ? '' : ' · tartı +5 bekliyor');
+    let rung = '';
+    if (lp.next) { const pct = Math.min(100, lp.progress / lp.next.weeks * 100); rung = '<div class="nextrung"><span>Sıradaki ' + esc(lp.next.icon) + ' <b>' + esc(lp.next.title) + '</b></span><div class="nr"><span class="bar"><i style="width:' + pct + '%"></i></span><span class="num">' + lp.count + '/' + lp.next.weeks + ' hafta</span></div></div>'; }
+    else rung = '<div class="nextrung"><span>Merdiven tamamlandı 🏆 Seviye: <b>Efsane</b></span></div>';
+    reward = '<div class="reward' + (cw.ok ? ' done' : '') + '"><div class="wlabel"><span class="em">' + esc(weekly.icon) + '</span><div class="grow"><b>' + esc(weekly.title) + '</b><small>bu haftanın ödülü</small></div><span class="score num">' + cw.points + '<small> / ' + th + '</small></span></div>' +
+      '<div class="bar big' + (cw.ok ? ' good' : '') + '"><i style="width:' + Math.min(100, cw.points / th * 100) + '%"></i></div><div class="rsub">' + sub2 + '</div>' + rung + '</div>';
+  }
   const earned = lp.earned.map(r => '<div class="celebrate">🎉 ' + esc(r.icon) + ' ' + esc(r.title) + ' hak edildi! <button type="button" class="btn small" data-action="claimRung" data-w="' + r.weeks + '">Ödülü aldım</button></div>').join('');
-  const wbar = lp.warmup ? '' : '<div><div class="wlabel"><span>' + esc(weekly.icon) + ' <b>' + esc(weekly.title) + '</b> · haftalık ödül</span><span class="num">' + cw.points + ' / ' + th + ' puan</span></div><div class="wbar' + (cw.ok ? ' done' : '') + '"><div class="bar' + (cw.ok ? ' good' : '') + '"><i style="width:' + Math.min(100, cw.points / th * 100) + '%"></i></div><span class="em">' + esc(weekly.icon) + '</span></div><p class="tiny">' + (cw.ok ? 'Bu haftanın ödülü hak edildi; hafta sonu keyfini çıkar.' : (th - cw.points) + ' puan kaldı · Pazar\'a ' + daysLeft + ' gün' + (weekPoints(p, cw.ws).weighed ? '' : ' · tartı +5 bekliyor')) + '</p></div>';
   return '<div class="hero">' +
-    '<div class="hero-top"><div class="avatar">' + (p === 'E' ? '🧔' : '👩') + '</div><div class="grow"><div class="hname">' + esc(c.name) + '</div><div class="hsub">' + n1(c.startWeight) + ' → ' + n1(c.goalWeight) + ' kg · ' + c.kcal + ' kcal · ' + levelName(lp.count) + '</div></div>' + chips + '</div>' +
-    '<div class="ringrow"><svg class="ring' + (pts >= DAY_WIN ? ' full' : '') + '" viewBox="0 0 96 96" role="img" aria-label="Günün puanı ' + pts + ' / ' + DAY_MAX + '"><circle class="bg" cx="48" cy="48" r="40"/><circle class="fg" cx="48" cy="48" r="40" transform="rotate(-90 48 48)" stroke-dasharray="' + dash + ' ' + circ.toFixed(1) + '"/><text x="48" y="44" text-anchor="middle" font-size="22">' + pts + '</text><text x="48" y="62" text-anchor="middle" font-size="11" fill="var(--ink-3)">/ ' + DAY_MAX + ' puan</text></svg>' +
-    '<div class="hstats"><div class="hstat">🔥 <b>' + streak + '</b> günlük seri <span class="tiny">(' + DAY_WIN + '+ puanlı günler)</span></div><div class="hstat">⭐ Hafta <b class="num">' + cw.points + '</b> / ' + th + '</div><div class="hstat">🪜 <b>' + lp.count + '</b> başarılı hafta</div>' + (isToday ? '' : '<div class="hstat tiny">' + fmtD(state.date) + ' günü gösteriliyor</div>') + '</div></div>' +
-    (isToday && pts >= DAY_WIN ? '<div class="celebrate">' + (pts >= DAY_MAX ? 'Mükemmel gün! 11/11 🏆' : 'Gün kazanıldı! ' + pts + '/11 🎉') + ' Yarın aynı saatte.</div>' : '') + wbar + lvl + earned +
+    '<div class="hero-top"><div class="avatar">' + (p === 'E' ? '🧔' : '👩') + '</div><div class="grow"><div class="greet">' + greet + '</div>' + sub + '</div>' + chips + '</div>' +
+    '<div class="ringrow"><svg class="ring' + (pts >= DAY_WIN ? ' full' : '') + '" viewBox="0 0 96 96" role="img" aria-label="Günün puanı ' + pts + ' / ' + DAY_MAX + '"><circle class="bg" cx="48" cy="48" r="40"/><circle class="fg" cx="48" cy="48" r="40" transform="rotate(-90 48 48)" stroke-dasharray="' + dash + ' ' + circ.toFixed(1) + '"/><text x="48" y="45" text-anchor="middle" font-size="24">' + pts + '</text><text x="48" y="62" text-anchor="middle" font-size="10.5" fill="var(--ink-3)">/ ' + DAY_MAX + ' puan</text></svg>' + stats + '</div>' +
+    (isToday && pts >= DAY_WIN ? '<div class="celebrate">' + (pts >= DAY_MAX ? 'Mükemmel gün! 11/11 🏆' : 'Gün kazanıldı! ' + pts + '/11 🎉') + '</div>' : '') + reward + earned +
     '<p class="motto">' + esc(motto(L, c, pts, p, lp)) + '</p></div>';
 }
+function waterLabel(L, c) { return n1(L.water * 0.25) + ' L' + (L.water >= c.waterGoal ? ' · +2 puan ✓' : ''); }
 function updateWaterUI(L, c) {
-  const cnt = $('#waterCount'), lit = $('#waterLitre'); if (cnt) cnt.textContent = L.water; if (lit) lit.textContent = n1(L.water * 0.25) + ' L · hedefte +2 puan';
-  const drops = document.querySelectorAll('#drops .drop'); drops.forEach(d => d.classList.toggle('on', Number(d.dataset.n) <= L.water));
+  const cnt = $('#waterCount'), lit = $('#waterLitre'); if (cnt) cnt.textContent = L.water; if (lit) { lit.textContent = waterLabel(L, c); lit.className = 'pill ' + (L.water >= c.waterGoal ? 'good' : 'water'); }
+  document.querySelectorAll('#drops .drop').forEach(d => d.classList.toggle('on', Number(d.dataset.n) <= L.water));
 }
 function questRow(q, L) {
   const body = '<div class="em">' + EMOJI[q.id] + '</div><div class="grow"><div class="nm">' + q.name + '<span class="tm">' + q.t + '</span></div>' + (q.menu ? '<div class="mn">' + esc(q.menu) + '</div>' : '') + (q.por ? '<div class="pr">' + esc(q.por) + '</div>' : '') + (q.rl || '');
@@ -1172,11 +1183,11 @@ function questsHtml(p, L, c) {
   const items = [{ id: 'run', f: 'run', t: '06:15', name: 'Sabah koşusu', pts: 1, on: L.run, kind: 'toggle' }];
   if (dow === c.weighDay) items.push({ id: 'weigh', t: '06:05', name: 'Haftalık tartı', pts: 5, on: L.weight != null, kind: 'weigh', menu: 'Tuvaletten sonra, kahvaltıdan önce', delta: weightDelta(L, c, prev) });
   menu.meals.filter(m => m.k !== 'g').forEach(m => items.push({ id: m.k, k: m.k, t: MEAL_TIMES[m.k], name: MEAL_NAMES[m.k], pts: 1, on: !!L.meals[m.k], kind: 'meal', menu: m.t, por: m[p], rl: recipeLinks(dow, m.k, m) }));
-  items.push({ id: 'vinegar', f: 'vinegar', t: '12:15', name: 'Sirkeli su', pts: 0, on: L.vinegar, kind: 'toggle', menu: '1 yk elma sirkesi + 1 bardak su, öğleden önce' });
-  items.push({ id: 'walkNoon', f: 'walkNoon', t: '13:15', name: 'Öğle yürüyüşü', pts: 1, on: L.walkNoon, kind: 'toggle', menu: '10–15 dk dışarıda, gün ışığı' });
-  items.push({ id: 'walkEve', f: 'walkEve', t: '19:45', name: 'Akşam yürüyüşü', pts: 1, on: L.walkEve, kind: 'toggle', menu: '10 dk, sonra mutfak kapanır' });
-  items.push({ id: 'strength', f: 'strength', t: '20:00', name: 'Kuvvet 15 dk', pts: 0, on: L.strength, kind: 'toggle', menu: '3 tur: 15 squat, 10 şınav, 30 sn plank, 10 köprü · haftada 2' });
-  items.push({ id: 'sleep', t: '23:00', name: 'Uyku düzeni', pts: 1, on: sleepOk(L), kind: 'sleep', menu: 'Yatış en geç 23:15, kalkış en geç ' + wakeLimit(d) + (L.sleep != null ? ' · ' + n1(L.sleep) + ' saat uyku' : '') });
+  items.push({ id: 'vinegar', f: 'vinegar', t: '12:15', name: 'Sirkeli su', pts: 0, on: L.vinegar, kind: 'toggle', menu: '1 yk elma sirkesi + 1 bardak su' });
+  items.push({ id: 'walkNoon', f: 'walkNoon', t: '13:15', name: 'Öğle yürüyüşü', pts: 1, on: L.walkNoon, kind: 'toggle', menu: '10–15 dk dışarıda' });
+  items.push({ id: 'walkEve', f: 'walkEve', t: '19:45', name: 'Akşam yürüyüşü', pts: 1, on: L.walkEve, kind: 'toggle', menu: '10 dk · sonra mutfak kapanır' });
+  items.push({ id: 'strength', f: 'strength', t: '20:00', name: 'Kuvvet 15 dk', pts: 0, on: L.strength, kind: 'toggle', menu: '3 tur · squat, şınav, plank, köprü' });
+  items.push({ id: 'sleep', t: '23:00', name: 'Uyku düzeni', pts: 1, on: sleepOk(L), kind: 'sleep', menu: 'Yatış en geç 23:15 · kalkış en geç ' + wakeLimit(d) + (L.sleep != null ? ' · ' + n1(L.sleep) + ' saat uyku' : '') });
   items.sort((a, b) => a.t < b.t ? -1 : 1);
   const expired = q => { if (!isToday) return false; if (q.kind === 'sleep') return !!(L.bed && L.wake); const lim = (Number(q.t.slice(0, 2)) * 60 + Number(q.t.slice(3, 5)) + 90); return (Number(hm.slice(0, 2)) * 60 + Number(hm.slice(3, 5))) > lim; };
   const active = isToday ? items.filter(q => !q.on && !expired(q)) : items;
@@ -1184,32 +1195,32 @@ function questsHtml(p, L, c) {
   const doneCount = items.filter(q => q.on).length, missed = archived.filter(q => !q.on && q.pts);
   const groupOf = q => (['k', 'a1', 'o', 'a2', 'ak', 'vinegar'].indexOf(q.id) >= 0 ? 'ogun' : ['run', 'walkNoon', 'walkEve', 'strength'].indexOf(q.id) >= 0 ? 'hareket' : 'uyku');
   const PANES = [
-    { key: 'su', label: '💧 Su', count: L.water >= c.waterGoal ? 0 : 1 },
-    { key: 'ogun', label: '🍽 Öğünler', count: active.filter(q => groupOf(q) === 'ogun' && q.pts).length },
-    { key: 'hareket', label: '🏃 Hareket', count: active.filter(q => groupOf(q) === 'hareket' && q.pts).length },
-    { key: 'uyku', label: dow === c.weighDay ? '😴 Uyku · ⚖️' : '😴 Uyku', count: active.filter(q => groupOf(q) === 'uyku').length }
+    { key: 'su', label: 'Su', count: L.water >= c.waterGoal ? 0 : 1 },
+    { key: 'ogun', label: 'Öğün', count: active.filter(q => groupOf(q) === 'ogun' && q.pts).length },
+    { key: 'hareket', label: 'Hareket', count: active.filter(q => groupOf(q) === 'hareket' && q.pts).length },
+    { key: 'uyku', label: dow === c.weighDay ? 'Uyku · ⚖️' : 'Uyku', count: active.filter(q => groupOf(q) === 'uyku').length }
   ];
   const paneBody = key => {
     if (key === 'su') return waterPane(L, c);
     const rows = active.filter(q => groupOf(q) === key);
     if (rows.length) return '<div class="qlist">' + rows.map(q => questRow(q, L)).join('') + '</div>';
     const done = items.filter(q => groupOf(q) === key && q.on).length, tot = items.filter(q => groupOf(q) === key).length;
-    return '<div class="celebrate">' + (done === tot ? 'Bu bölüm tamam ✓' : 'Kalan yok; kaçanlar arşivde, geç de işaretlenebilir.') + '</div>';
+    return '<div class="celebrate">' + (done === tot ? 'Bu bölüm tamam ✓' : 'Kalan yok · kaçanlar arşivde') + '</div>';
   };
-  const tabs = '<div class="panetabs" role="tablist">' + PANES.map((pn, i) => '<button type="button" role="tab" data-pane="' + i + '"' + (i === state.pane ? ' class="on"' : '') + '>' + pn.label + (pn.count ? ' <span class="cnt">' + pn.count + '</span>' : '') + '</button>').join('') + '</div>';
+  const tabs = '<div class="panetabs" role="tablist">' + PANES.map((pn, i) => '<button type="button" role="tab" aria-selected="' + (i === state.pane) + '" data-pane="' + i + '"' + (i === state.pane ? ' class="on"' : '') + '>' + svgIcon(pn.key) + '<span>' + pn.label + '</span>' + (pn.count ? '<span class="cnt">' + pn.count + '</span>' : '') + '</button>').join('') + '</div>';
   const panes = '<div class="panes" id="panes">' + PANES.map(pn => '<div class="pane" data-key="' + pn.key + '">' + paneBody(pn.key) + '</div>').join('') + '</div>';
-  const archiveHtml = archived.length ? '<details class="item" id="sub-arsiv"' + (state.open.has('sub-arsiv') ? ' open' : '') + '><summary>Arşiv<span class="sub">' + doneCount + ' tamamlandı' + (missed.length ? ' · ' + missed.length + ' kaçtı (geç de işaretlenebilir)' : '') + '</span></summary><div class="qlist">' + archived.map(q => questRow(q, L)).join('') + '</div></details>' : '';
-  return '<div class="card"><div class="daterow"><button type="button" class="iconbtn" data-action="prevday" aria-label="Önceki gün">‹</button><div class="d">' + (isToday ? 'Bugünün görevleri' : fmtD(d)) + '<small>' + fmtDL(d) + ' · ' + menu.name + (isToday ? ' · ' + active.length + ' görev kaldı' : '') + '</small></div><button type="button" class="iconbtn" data-action="nextday" aria-label="Sonraki gün"' + (isToday ? ' disabled' : '') + '>›</button></div>' +
-    (nx ? '<div class="next"><b>' + nx[0] + '</b><span>Sırada: ' + esc(nx[1]) + '</span></div>' : '') +
+  const archiveHtml = archived.length ? '<details class="item" id="sub-arsiv"' + (state.open.has('sub-arsiv') ? ' open' : '') + '><summary>Arşiv<span class="sub">' + doneCount + ' tamam' + (missed.length ? ' · ' + missed.length + ' kaçtı' : '') + '</span></summary><div class="qlist">' + archived.map(q => questRow(q, L)).join('') + '</div></details>' : '';
+  return '<div class="card"><div class="daterow"><button type="button" class="iconbtn" data-action="prevday" aria-label="Önceki gün">' + svgIcon('prev') + '</button><div class="d">' + (isToday ? 'Günün görevleri' : fmtD(d)) + '<small>' + fmtDL(d) + (isToday ? ' · ' + active.length + ' kaldı' : '') + '</small></div><button type="button" class="iconbtn" data-action="nextday" aria-label="Sonraki gün"' + (isToday ? ' disabled' : '') + '>' + svgIcon('next') + '</button></div>' +
+    (nx ? '<div class="next"><b>' + nx[0] + '</b><span><small>Sırada</small>' + esc(shortRhythm(nx[1])) + '</span></div>' : '') +
     tabs + panes +
     archiveHtml + '<div class="status" id="saveStatus"></div></div>';
 }
 function waterPane(L, c) {
   const goal = c.waterGoal, max = Math.max(goal + 4, L.water), nDrops = Math.max(goal, L.water);
-  let drops = ''; for (let i = 1; i <= nDrops; i++) drops += '<button type="button" class="drop' + (i <= L.water ? ' on' : '') + '" data-action="drop" data-n="' + i + '" aria-label="' + i + '. bardak">💧</button>';
-  return '<div class="waterbox"><div class="waterline"><b>💧 Su <span id="waterCount">' + L.water + '</span> / ' + goal + ' bardak</b><span class="tiny num" id="waterLitre">' + n1(L.water * 0.25) + ' L · hedefte +2 puan</span></div>' +
+  let drops = ''; for (let i = 1; i <= nDrops; i++) drops += '<button type="button" class="drop' + (i <= L.water ? ' on' : '') + '" data-action="drop" data-n="' + i + '" aria-label="' + i + '. bardak" aria-pressed="' + (i <= L.water) + '">💧</button>';
+  return '<div class="waterbox"><div class="waterline"><b>' + svgIcon('su') + '<span id="waterCount">' + L.water + '</span> / ' + goal + ' bardak</b><span class="pill ' + (L.water >= goal ? 'good' : 'water') + '" id="waterLitre">' + waterLabel(L, c) + '</span></div>' +
     '<input type="range" id="waterRange" class="waterslider" min="0" max="' + max + '" step="1" value="' + L.water + '" aria-label="Su bardak sayısı">' +
-    '<div class="drops" id="drops">' + drops + '</div><p class="tiny">Çubuğu kaydır ya da damlalara dokun · 1 bardak = 250 ml · hedefe ulaşınca +2 puan</p></div>';
+    '<div class="drops" id="drops">' + drops + '</div></div>';
 }
 function restorePane() { const el = $('#panes'); if (!el) return; const w = el.clientWidth; if (w) el.scrollLeft = (state.pane || 0) * w; }
 function foodsBody(L, p) {
@@ -1221,10 +1232,9 @@ function foodsBody(L, p) {
     return '<div class="food">' + img + '<div>' + head + (f.text ? '<div>' + esc(f.text) + '</div>' : '') + cm + '<button type="button" class="del" data-action="foodDel" data-id="' + f.id + '">sil</button></div></div>';
   }).join('');
   const canPhoto = !STATIC_HOST && state.assets && state.imgOk;
-  const add = '<div class="addfood">' + (canPhoto ? '<label class="filebtn btn ghost small" aria-label="Fotoğraf ekle">📷<input type="file" id="foodPhoto" accept="image/*" capture="environment"></label>' : '') +
-    '<input type="text" id="foodText" placeholder="Ne yediniz? (örn. 1 kase mercimek, 1 dilim ekmek)" maxlength="300"><button type="button" class="btn small" data-action="foodAdd">Ekle</button></div>';
-  const note = STATIC_HOST ? '<p class="tiny">Bu adreste yazılı kayıt tutulur; fotoğraf ve kalori yorumu Claude sürümünde.</p>' : (state.sample ? '<p class="tiny">Fotoğraf veya yazı ekleyin; Claude porsiyonu tahmin edip kalori ve kısa yorum yazar. Tahminidir, ±%20 sapma normaldir.</p>' : '<p class="tiny">Claude yorumu bu görünümde kapalı; yazılı kayıt tutulur.</p>');
-  return (rows ? '<div>' + rows + '</div>' : '') + add + note;
+  const add = '<div class="addfood">' + (canPhoto ? '<label class="filebtn btn ghost" aria-label="Fotoğraf ekle">' + svgIcon('camera') + '<input type="file" id="foodPhoto" accept="image/*" capture="environment"></label>' : '') +
+    '<input type="text" id="foodText" placeholder="Ne yedin? Örn. 1 kase mercimek" aria-label="Öğün" maxlength="300"><button type="button" class="btn" data-action="foodAdd">Ekle</button></div>';
+  return (rows ? '<div>' + rows + '</div>' : '') + add;
 }
 function subSec(id, icon, title, sub, body) { return '<details class="sub-sec" id="' + id + '"' + (state.open.has(id) ? ' open' : '') + '><summary><span class="ic">' + icon + '</span><span class="st">' + title + '<span class="sub">' + sub + '</span></span></summary><div class="body">' + body + '</div></details>'; }
 function renderToday() {
@@ -1233,14 +1243,14 @@ function renderToday() {
   let cycleBody = '', cycleSub = '';
   if (p === 'K') {
     const ci = cycleInfo(c, d);
-    if (!ci) { cycleSub = 'Son adet tarihini girin'; cycleBody = '<p class="muted">Son adetin başladığı günü girin; döngü günü, PMS haftası ve tahmini sonraki tarih burada görünür.</p><div class="addfood"><input type="date" id="cycleDate" max="' + state.today + '"><button type="button" class="btn small" data-action="cycleSave">Kaydet</button></div>'; }
+    if (!ci) { cycleSub = 'Son adet tarihini gir'; cycleBody = '<div class="field"><label for="cycleDate">Son adetin başladığı gün</label><div class="addfood"><input type="date" id="cycleDate" max="' + state.today + '"><button type="button" class="btn" data-action="cycleSave">Kaydet</button></div></div>'; }
     else { cycleSub = ci.day + '. gün · ' + ci.phase + ' · sonraki ' + fmtD(ci.next); cycleBody = '<div class="row"><span class="pill' + (ci.pms ? ' warn' : ci.phase === 'Adet' ? ' accent' : ' good') + '">' + ci.phase + '</span><span class="tiny">döngü ' + c.cycleLen + ' gün</span></div><p class="muted">' + esc(ci.tip) + '</p><div class="row"><button type="button" class="btn ghost small" data-action="cycleStart">Adet başladı</button></div>'; }
   }
   $('#view-bugun').innerHTML = heroHtml(p, L, c) + questsHtml(p, L, c) +
-    subSec('sub-yemek', '🍽', 'Ne yedik?', (L.foods.length ? L.foods.length + ' kayıt' + (total ? ' · ' + Math.round(total) + ' kcal' : '') : 'Fotoğraf veya yazıyla öğün kaydı') + ' · hedef ' + c.kcal + ' kcal', foodsBody(L, p)) +
+    subSec('sub-yemek', '🍽', 'Ne yedik?', (L.foods.length ? L.foods.length + ' kayıt' + (total ? ' · ' + Math.round(total) + ' / ' + c.kcal + ' kcal' : ' · hedef ' + c.kcal + ' kcal') : 'Öğün kaydı · hedef ' + c.kcal + ' kcal'), foodsBody(L, p)) +
     (p === 'K' ? subSec('sub-dongu', '🌙', 'Döngü', cycleSub, cycleBody) : '');
   restorePane();
-  const st = $('#saveStatus'); if (st) st.textContent = state.mode === 'db' ? (state.dirty.size ? 'Kaydediliyor…' : (L.updatedAt ? 'Son kayıt ' + localTime(L.updatedAt) + ' · ikinizde de görünür' : '')) : (state.mode === 'local' ? 'Girdiler bu cihazda saklanıyor' : '');
+  const st = $('#saveStatus'); if (st) st.textContent = state.mode === 'db' ? (state.dirty.size ? 'Kaydediliyor…' : (L.updatedAt ? 'Kaydedildi ' + localTime(L.updatedAt) : '')) : (state.mode === 'local' ? 'Bu cihazda saklı' : '');
 }
 </script>
 
@@ -1486,7 +1496,7 @@ function shoppingCard() {
   }
   nextMarketDays(today).forEach(m => { const dowM = parseD(m).getDay(); const win = shoppingWindow(m); lists.push(shoppingListHtml((dowM === 3 ? 'Çarşamba' : 'Cuma') + ' pazarı · ' + fmtD(m), fmtD(m) + ' akşam → ' + fmtD(win[win.length - 1].d) + ' öğle', win, 'market_' + m)); });
   const thisWs = mondayOf(today), status = [thisWs, addDays(thisWs, 7)].map((w, i) => { const d = state.weekmenus[w]; const ok = d && d.meta && d.meta.approved; return '<span class="pill ' + (ok ? 'good' : 'warn') + '">' + (i ? 'Gelecek hafta' : 'Bu hafta') + ': ' + (ok ? 'onaylı' : 'kontrol edilmedi') + '</span>'; }).join(' ');
-  return '<div class="card"><div class="card-h"><h2>Pazar alışverişi</h2><span class="meta">Menüden hesaplanır · 2 kişi</span></div><div class="row">' + status + '</div><p class="tiny">Pazar Çarşamba ve Cuma kuruluyor: Çarşamba listesi Cuma öğleye, Cuma listesi Çarşamba öğleye kadar yeter. Kiler kalemleri stokta yoksa alınır; "evde var" olanlar düşüldü. Onay için Haftalık plan → Tarif–liste uyumu.</p><div>' + lists.join('') + '</div></div>';
+  return '<div class="card"><div class="card-h"><h2>Pazar alışverişi</h2><span class="meta">Menüden hesaplanır · 2 kişi</span></div><div class="row">' + status + '</div><div>' + lists.join('') + '</div></div>';
 }
 function bindProgram() {
   $('#view-program').addEventListener('change', e => { const cb = e.target.closest('input[data-shop]'); if (!cb) return; const key = cb.dataset.shop, set = new Set(lsGet(key, []) || []); if (cb.checked) set.add(cb.dataset.key); else set.delete(cb.dataset.key); lsSet(key, Array.from(set)); cb.closest('.shop').classList.toggle('on', cb.checked); });
@@ -1502,8 +1512,8 @@ function renderProgram() {
   if (ws) weekCard = '<div class="card"><div class="card-h"><h2>Bu haftanın menüsü</h2><span class="meta">' + fmtD(ws) + ' – ' + fmtD(addDays(ws, 6)) + '</span></div><div>' + menuDays(srcFor(ws), p, name, dow) + '</div></div>';
   if (nextWs && nextWs !== ws) weekCard += '<div class="card"><div class="card-h"><h2>Gelecek haftanın menüsü</h2><span class="meta">' + fmtD(nextWs) + ' – ' + fmtD(addDays(nextWs, 6)) + '</span></div><div>' + menuDays(srcFor(nextWs), p, name, -1) + '</div></div>';
   $('#view-program').innerHTML = plannerCard() + shoppingCard() + weekCard +
-    '<div class="card"><div class="card-h"><h2>' + (weekCard ? 'Standart haftalık menü' : 'Haftalık menü') + '</h2><span class="meta">' + esc(name) + ' porsiyonları · 📖 tarife gider</span></div><div>' + menuDays(MENU, p, name, weekCard ? -1 : dow) + '</div></div>' +
-    '<div class="card"><div class="card-h"><h2>Günlük ritim</h2><span class="meta">Hafta içi · hafta sonu koşu 07:00, kahvaltı 08:30</span></div><div class="timeline">' + tl + '</div></div>' +
+    '<div class="card"><div class="card-h"><h2>' + (weekCard ? 'Standart haftalık menü' : 'Haftalık menü') + '</h2><span class="meta">' + esc(name) + ' porsiyonları</span></div><div>' + menuDays(MENU, p, name, weekCard ? -1 : dow) + '</div></div>' +
+    '<div class="card"><div class="card-h"><h2>Günlük ritim</h2><span class="meta">Hafta sonu: koşu 07:00, kahvaltı 08:30</span></div><div class="timeline">' + tl + '</div></div>' +
     '<div class="card"><div class="card-h"><h2>Ara öğün havuzu</h2><span class="meta">100–150 kcal</span></div><ul class="plain">' + SNACKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
     '<div class="card"><div class="card-h"><h2>İçecekler</h2></div><ul class="plain">' + DRINKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>';
 }
@@ -1605,28 +1615,29 @@ function planDaysHtml(doc, scope, ws) {
 function plannerCard() {
   const ws = planWeek(), saved = state.weekmenus[ws] || codeWeekDoc(ws), draft = state.plan.draft && state.plan.draft.ws === ws ? state.plan.draft : null, inp = planInputs(), fb = weekFeedback(ws);
   const thisWs = mondayOf(state.today), weeks = [thisWs, addDays(thisWs, 7), addDays(thisWs, 14)];
-  const weekSwitch = '<div class="panetabs">' + weeks.map((w, i) => '<button type="button" data-plan="week" data-ws="' + w + '"' + (w === ws ? ' class="on"' : '') + '>' + (i === 0 ? 'Bu hafta' : i === 1 ? 'Gelecek hafta' : 'Sonraki') + ' · ' + parseD(w).getDate() + ' ' + MONTHS_TR[parseD(w).getMonth()] + '</button>').join('') + '</div>';
+  const weekSwitch = '<div class="segs">' + weeks.map((w, i) => '<button type="button" data-plan="week" data-ws="' + w + '"' + (w === ws ? ' class="on"' : '') + '>' + (i === 0 ? 'Bu hafta' : i === 1 ? 'Gelecek hafta' : 'Sonraki') + ' · ' + parseD(w).getDate() + ' ' + MONTHS_TR[parseD(w).getMonth()] + '</button>').join('') + '</div>';
   const feed = ['E', 'K'].map(p => { const f = fb.kisiler[p]; return '<div><b>' + esc(f.ad) + '</b>' + (f.kayitli_gun ? f.kazanilan_gun + '/' + f.kayitli_gun + ' kazanılan gün · su ' + (f.su_ortalama_bardak == null ? '—' : f.su_ortalama_bardak) + '/' + f.su_hedef + '<br>en çok atlanan: ' + (f.en_cok_atlanan || '—') : 'Son 14 günde kayıt yok') + (f.gelecek_hafta_dongu ? '<br>döngü: ' + esc(f.gelecek_hafta_dongu) : '') + '</div>'; }).join('');
   const liked = fb.begenilen_tarifler.concat(fb.favori_tarifler);
-  const feedHtml = '<div class="feed">' + feed + '</div><p class="tiny">' + (liked.length ? 'Beğenilen/favori: ' + esc(uniq(liked).slice(0, 6).join(', ')) + '. ' : '') + (fb.begenilmeyen_tarifler.length ? 'Konmayacak: ' + esc(fb.begenilmeyen_tarifler.join(', ')) + '. ' : '') + 'Bu haftanın yemekleri tekrar edilmez.</p>';
+  const feedNotes = (liked.length ? 'Beğenilen: ' + esc(uniq(liked).slice(0, 6).join(', ')) + '. ' : '') + (fb.begenilmeyen_tarifler.length ? 'Konmayacak: ' + esc(fb.begenilmeyen_tarifler.join(', ')) + '.' : '');
+  const feedHtml = '<div class="feed">' + feed + '</div>' + (feedNotes ? '<p class="tiny">' + feedNotes + '</p>' : '');
   const inputs = '<div class="field"><label for="plFridge">Buzdolabında / elde olanlar</label><textarea id="plFridge" rows="2" placeholder="Örn. 1 kg ıspanak, 6 yumurta, kalan tavuk, közlenmiş biber">' + esc(inp.fridge) + '</textarea></div><div class="two"><div class="field"><label for="plAvoid">Bu hafta istenmeyenler</label><input type="text" id="plAvoid" value="' + esc(inp.avoid) + '" maxlength="300" placeholder="Örn. kuru fasulye, karnabahar"></div><div class="field"><label for="plNotes">Notlar</label><input type="text" id="plNotes" value="' + esc(inp.notes) + '" maxlength="300" placeholder="Örn. Çarşamba akşam dışarıda, misafir Cumartesi"></div></div>';
-  const genBtn = STATIC_HOST ? '<p class="tiny">Claude ile planlama yalnızca Claude sürümünde; buradan hazır plan kodu yüklenebilir.</p>' : (state.sample ? '<div class="row"><button type="button" class="btn" data-plan="generate" data-ws="' + ws + '"' + (state.plan.busy ? ' disabled' : '') + '>' + (saved ? 'Claude ile yeniden planla' : 'Claude ile planla') + '</button><span class="tiny">' + esc(state.plan.msg) + '</span></div>' : '<p class="tiny">Claude bağlantısı yok; plan kodu yükleyebilirsiniz.</p>');
-  const draftHtml = draft ? '<div class="note"><b>Taslak · ' + fmtD(ws) + ' haftası</b><br>' + esc(draft.meta.rationale || '') + '</div><div>' + planDaysHtml(draft, 'draft', ws) + '</div>' + (draft.recipes.length ? '<p class="tiny">Yeni tarifler: ' + esc(draft.recipes.map(r => r.name).join(', ')) + ' (kaydedince Tarifler\'e eklenir)</p>' : '') + '<div class="row"><button type="button" class="btn" data-plan="save" data-ws="' + ws + '">Planı kaydet</button><button type="button" class="btn ghost" data-plan="discard">Vazgeç</button></div>' : '';
+  const genBtn = !STATIC_HOST && state.sample ? '<div class="row"><button type="button" class="btn" data-plan="generate" data-ws="' + ws + '"' + (state.plan.busy ? ' disabled' : '') + '>' + (saved ? 'Claude ile yeniden planla' : 'Claude ile planla') + '</button><span class="tiny">' + esc(state.plan.msg) + '</span></div>' : '';
+  const draftHtml = draft ? '<div class="note"><b>Taslak · ' + fmtD(ws) + ' haftası</b><br>' + esc(draft.meta.rationale || '') + '</div><div>' + planDaysHtml(draft, 'draft', ws) + '</div>' + (draft.recipes.length ? '<p class="tiny">Yeni tarifler: ' + esc(draft.recipes.map(r => r.name).join(', ')) + '</p>' : '') + '<div class="row"><button type="button" class="btn" data-plan="save" data-ws="' + ws + '">Planı kaydet</button><button type="button" class="btn ghost" data-plan="discard">Vazgeç</button></div>' : '';
   const srcLabel = saved ? (saved.meta.source === 'claude' ? 'Claude planı' : saved.meta.source === 'seed' ? 'Uzman planı' : saved.meta.source === 'code' ? 'Hazır plan' : 'Elle düzenlendi') : '';
   const savedHtml = saved && !draft ? '<div class="row"><span class="pill good">Planlı</span><span class="tiny">' + srcLabel + (saved.meta.createdAt ? ' · ' + fmtD(saved.meta.createdAt.slice(0, 10)) : '') + (saved.meta.updatedAt ? ' · güncellendi ' + fmtD(saved.meta.updatedAt.slice(0, 10)) + ' ' + localTime(saved.meta.updatedAt) : '') + '</span></div>' + (saved.meta.rationale ? '<div class="note">' + esc(saved.meta.rationale) + '</div>' : '') + '<div>' + planDaysHtml(saved, 'saved', ws) + '</div><div class="row"><button type="button" class="btn ghost small" data-plan="copy" data-ws="' + ws + '">Plan kodunu kopyala</button><span class="tiny" id="planCopyMsg"></span></div>' : (!draft ? '<p class="muted">' + fmtD(ws) + ' haftası henüz planlanmadı; standart menü geçerli.</p>' : '');
-  const bridge = '<details class="item" id="plan-load"' + (state.open.has('plan-load') ? ' open' : '') + '><summary>Plan kodu yükle<span class="sub">Claude sürümünden kopyalanan planı buraya yapıştırın</span></summary><div class="mlist"><textarea id="planCode" rows="3" placeholder="{&quot;ws&quot;: ... }"></textarea><div class="row"><button type="button" class="btn ghost small" data-plan="load">Planı yükle</button><span class="tiny" id="planLoadMsg"></span></div></div></details>';
+  const bridge = '<details class="item" id="plan-load"' + (state.open.has('plan-load') ? ' open' : '') + '><summary>Plan kodu yükle<span class="sub">Claude sürümünden kopyalanan kod</span></summary><div class="mlist"><textarea id="planCode" rows="3" placeholder="{&quot;ws&quot;: ... }"></textarea><div class="row"><button type="button" class="btn ghost small" data-plan="load">Planı yükle</button><span class="tiny" id="planLoadMsg"></span></div></div></details>';
   const aud = state.plan.audit && state.plan.audit.ws === ws ? state.plan.audit : null;
   const approved = saved && saved.meta.approved;
-  let audBody = '<p class="tiny">Bağlı tariflerin malzemeleri öğünlerin alışveriş kalemleriyle karşılaştırılır; eksikler tek tıkla eklenir. Eksik kalmayınca plan onaylanır.</p><div class="row"><button type="button" class="btn ghost small" data-plan="audit" data-ws="' + ws + '"' + (saved ? '' : ' disabled') + '>Kontrol et</button>' + (approved ? '<span class="pill good">Onaylı · ' + fmtD(approved.at.slice(0, 10)) + ' ' + localTime(approved.at) + '</span>' : '<span class="pill warn">Kontrol edilmedi</span>') + '</div>';
+  let audBody = '<div class="row"><button type="button" class="btn ghost small" data-plan="audit" data-ws="' + ws + '"' + (saved ? '' : ' disabled') + '>Kontrol et</button>' + (approved ? '<span class="pill good">Onaylı · ' + fmtD(approved.at.slice(0, 10)) + ' ' + localTime(approved.at) + '</span>' : '<span class="pill warn">Kontrol edilmedi</span>') + '</div>';
   if (aud) {
     if (!aud.rows.length) audBody += '<div class="celebrate">Uyumlu: tüm tarif malzemeleri alışveriş listesinde ✓</div>' + (approved ? '' : '<div class="row"><button type="button" class="btn small" data-plan="approve" data-ws="' + ws + '">Planı onayla</button></div>');
-    else audBody += '<div>' + aud.rows.map((r, i) => '<div class="planmeal"><div><b>' + DAY_NAMES[r.dow] + ' ' + MEAL_NAMES[r.k] + '</b> · ' + esc(r.recipe) + '<br><span class="muted">' + esc(r.item.name) + (r.kind === 'low' ? ' <span class="tiny">(listede ' + esc(String(r.have[1])) + ' ' + esc(r.have[2]) + ', tarif ' + r.item.q + ' ' + esc(r.item.u) + ')</span>' : '') + '</span><div class="row" style="margin-top:4px"><input type="number" id="aq-' + i + '" value="' + (r.kind === 'low' ? Math.max(1, Math.ceil(r.item.q - Number(r.have[1]))) : r.item.q) + '" min="0.5" step="0.5" style="width:84px"><span class="tiny">' + esc(r.item.u) + ' · ' + SHOP_CATS[r.item.c] + '</span></div></div><div class="acts"><button type="button" data-plan="auditadd" data-ws="' + ws + '" data-i="' + i + '">Ekle</button></div></div>').join('') + '</div><div class="row"><button type="button" class="btn small" data-plan="auditaddall" data-ws="' + ws + '">Hepsini ekle</button><span class="tiny">' + aud.rows.length + ' eksik · eklenince kontrol kendiliğinden yenilenir</span></div>';
+    else audBody += '<div>' + aud.rows.map((r, i) => '<div class="planmeal"><div><b>' + DAY_NAMES[r.dow] + ' ' + MEAL_NAMES[r.k] + '</b> · ' + esc(r.recipe) + '<br><span class="muted">' + esc(r.item.name) + (r.kind === 'low' ? ' <span class="tiny">(listede ' + esc(String(r.have[1])) + ' ' + esc(r.have[2]) + ', tarif ' + r.item.q + ' ' + esc(r.item.u) + ')</span>' : '') + '</span><div class="row" style="margin-top:4px"><input type="number" id="aq-' + i + '" value="' + (r.kind === 'low' ? Math.max(1, Math.ceil(r.item.q - Number(r.have[1]))) : r.item.q) + '" min="0.5" step="0.5" style="width:84px"><span class="tiny">' + esc(r.item.u) + ' · ' + SHOP_CATS[r.item.c] + '</span></div></div><div class="acts"><button type="button" data-plan="auditadd" data-ws="' + ws + '" data-i="' + i + '">Ekle</button></div></div>').join('') + '</div><div class="row"><button type="button" class="btn small" data-plan="auditaddall" data-ws="' + ws + '">Hepsini ekle</button><span class="tiny">' + aud.rows.length + ' eksik</span></div>';
   }
   const auditHtml = '<details class="item" id="plan-audit"' + (state.open.has('plan-audit') || aud ? ' open' : '') + '><summary>Tarif–liste uyumu<span class="sub">' + (approved ? 'Onaylı' : aud ? (aud.rows.length ? aud.rows.length + ' eksik kalem' : 'Uyumlu, onay bekliyor') : 'Kontrol edilmedi') + '</span></summary><div class="mlist">' + audBody + '</div></details>';
   const log = state.changelog.slice(0, 30).map(e => '<div class="logrow"><span class="when">' + (e.at ? fmtD(e.at.slice(0, 10)) + ' ' + localTime(e.at) : '') + '</span><span>' + esc(e.text) + (e.by ? ' <span class="tiny">· ' + esc(cfg(e.by).name) + '</span>' : '') + '</span></div>').join('');
   const logHtml = '<details class="item" id="plan-log"' + (state.open.has('plan-log') ? ' open' : '') + '><summary>Değişiklik kaydı<span class="sub">' + state.changelog.length + ' kayıt</span></summary><div class="mlist">' + (log || '<p class="tiny">Henüz kayıt yok.</p>') + '</div></details>';
   return '<div class="card"><div class="card-h"><h2>Haftalık plan</h2><span class="meta">' + fmtD(ws) + ' – ' + fmtD(addDays(ws, 6)) + '</span></div>' + weekSwitch +
-    '<div class="eyebrow">Sistem girdileri (son 14 gün)</div>' + feedHtml + inputs + genBtn + draftHtml + savedHtml + auditHtml + bridge + logHtml + '</div>';
+    '<div class="eyebrow">Son 14 gün</div>' + feedHtml + inputs + genBtn + draftHtml + savedHtml + auditHtml + bridge + logHtml + '</div>';
 }
 function runAudit(ws) { const doc = planDoc('saved', ws); state.plan.audit = { ws: ws, rows: doc ? auditWeekDoc(doc) : [] }; }
 async function auditAdd(ws, idxs) {
@@ -1678,15 +1689,15 @@ function renderRecipes() {
   const list = allRecipes().map((r, i) => ({ r: r, i: i, d: rc(r.id) })).sort((a, b) => (b.d.fav[p] - a.d.fav[p]) || (b.d.rating[p] - a.d.rating[p]) || (a.i - b.i));
   const stars = (id, v) => '<span class="stars" data-rate="' + id + '">' + [1, 2, 3, 4, 5].map(n => '<button type="button" data-v="' + n + '"' + (n <= v ? ' class="on"' : '') + ' aria-label="' + n + ' yıldız">★</button>').join('') + '</span>';
   const items = list.map(x => { const r = x.r, d = x.d, other = p === 'E' ? 'K' : 'E';
-    return '<details id="rec-' + r.id + '"' + (state.open.has('rec-' + r.id) ? ' open' : '') + '><summary><span>' + (d.fav[p] ? '♥ ' : '') + esc(r.name) + '<span class="sub">' + r.time + ' dk · ' + r.kcal.E + ' / ' + r.kcal.K + ' kcal (E / K)' + (r.servings ? ' · ' + r.servings + ' porsiyon = 2 kişi × ' + (r.servings / 2) + ' gün' : '') + ' · ' + r.tags.join(', ') + (d.rating[p] ? ' · ' + '★'.repeat(d.rating[p]) : '') + '</span></span></summary>' +
+    return '<details id="rec-' + r.id + '"' + (state.open.has('rec-' + r.id) ? ' open' : '') + '><summary><span>' + (d.fav[p] ? '♥ ' : '') + esc(r.name) + '<span class="sub">' + r.time + ' dk · E ' + r.kcal.E + ' · K ' + r.kcal.K + ' kcal' + (r.servings ? ' · ' + r.servings + ' porsiyon' : '') + (d.rating[p] ? ' · ' + '★'.repeat(d.rating[p]) : '') + '</span></span></summary>' +
       '<div class="mlist"><div class="rec-h">' + stars(r.id, d.rating[p]) + '<button type="button" class="chip' + (d.fav[p] ? ' on' : '') + '" data-fav="' + r.id + '">' + (d.fav[p] ? 'Favori' : 'Favorilere ekle') + '</button></div>' +
       (d.rating[other] || d.fav[other] ? '<p class="tiny">' + esc(cfg(other).name) + ': ' + (d.rating[other] ? '★'.repeat(d.rating[other]) : '') + (d.fav[other] ? ' ♥' : '') + '</p>' : '') +
-      '<div><div class="eyebrow">Malzeme (' + (r.servings ? r.servings + ' porsiyon: 2 kişi × ' + (r.servings / 2) + ' gün' : '2 kişilik, taze') + ')</div><ul class="plain">' + r.ing.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
+      '<div><div class="eyebrow">Malzeme · ' + (r.servings ? r.servings + ' porsiyon (2 kişi × ' + (r.servings / 2) + ' gün)' : '2 kişilik') + '</div>' + (r.tags.length ? '<p class="tiny">' + esc(r.tags.join(' · ')) + '</p>' : '') + '<ul class="plain">' + r.ing.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
       '<div><div class="eyebrow">Yapılışı</div><ol class="plain">' + r.steps.map(s => '<li>' + esc(s) + '</li>').join('') + '</ol></div>' +
       '<p class="muted"><b>Porsiyon</b> · E: ' + esc(r.por.E) + ' · K: ' + esc(r.por.K) + '</p><div class="tipbox">' + esc(r.tip) + '</div>' +
-      '<div class="field"><label for="rn-' + r.id + '">Notunuz (değişiklik, beğeni)</label><input type="text" id="rn-' + r.id + '" data-note="' + r.id + '" value="' + esc(d.note) + '" maxlength="300" placeholder="Örn. kimyonu artırdık, çocuklar sevdi"></div></div></details>'; }).join('');
+      '<div class="field"><label for="rn-' + r.id + '">Not</label><input type="text" id="rn-' + r.id + '" data-note="' + r.id + '" value="' + esc(d.note) + '" maxlength="300" placeholder="Örn. kimyonu artırdık"></div></div></details>'; }).join('');
   const dayTips = [1, 2, 3, 4, 5, 6, 0].map(k => '<li><b>' + MENU[k].name + ':</b> ' + esc(MENU[k].tip) + '</li>').join('');
-  $('#view-tarifler').innerHTML = '<div class="card"><div class="card-h"><h2>Pratik tarifler</h2><span class="meta">' + list.length + ' tarif · favoriler üstte</span></div><p class="tiny">Programdaki yemeklerin iki kişilik tarifleri. Yıldızlayın, favorilere alın, notunuzu yazın; ikiniz de görürsünüz.</p><div>' + items + '</div></div>' +
+  $('#view-tarifler').innerHTML = '<div class="card"><div class="card-h"><h2>Pratik tarifler</h2><span class="meta">' + list.length + ' tarif</span></div><div>' + items + '</div></div>' +
     '<div class="card"><div class="card-h"><h2>Püf noktaları</h2><span class="meta">Neyi neyle, nasıl pişir</span></div><ul class="plain">' + RULES.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
     '<div class="card"><div class="card-h"><h2>Günün püf noktası</h2><span class="meta">Haftalık menüye göre</span></div><ul class="plain">' + dayTips + '</ul></div>';
 }
@@ -1717,7 +1728,7 @@ function renderSettings() {
   const fld = (id, label, type, val, extra) => '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" type="' + type + '" value="' + esc(val) + '"' + (extra || '') + '></div>';
   const daySel = '<div class="field"><label for="sWeigh">Tartı günü</label><select id="sWeigh">' + [1, 2, 3, 4, 5, 6, 0].map(d => '<option value="' + d + '"' + (d === c.weighDay ? ' selected' : '') + '>' + DAY_NAMES[d] + '</option>').join('') + '</select></div>';
   const cycle = p === 'K' ? '<div class="card"><div class="card-h"><h2>Döngü ayarları</h2></div><div class="three">' + fld('sCycleStart', 'Son adet başlangıcı', 'date', c.cycleStart, ' max="' + state.today + '"') + fld('sCycleLen', 'Döngü (gün)', 'number', c.cycleLen, ' min="20" max="45" step="1" inputmode="numeric"') + fld('sPeriodLen', 'Adet süresi (gün)', 'number', c.periodLen, ' min="2" max="10" step="1" inputmode="numeric"') + '</div>' +
-    (c.cycleHistory.length ? '<p class="tiny">Önceki başlangıçlar: ' + c.cycleHistory.slice(-6).map(fmtD).join(', ') + '. İki döngüden sonra süre otomatik güncellenir.</p>' : '<p class="tiny">"Adet başladı" düğmesi Bugün sekmesinde; her kullanımda geçmiş birikir ve döngü süresi kendini düzeltir.</p>') + '<div class="row"><button type="button" class="btn ghost" id="saveCycle">Döngüyü kaydet</button><span class="tiny" id="cycleStatus"></span></div></div>' : '';
+    (c.cycleHistory.length ? '<p class="tiny">Önceki başlangıçlar: ' + c.cycleHistory.slice(-6).map(fmtD).join(', ') + '</p>' : '') + '<div class="row"><button type="button" class="btn ghost" id="saveCycle">Döngüyü kaydet</button><span class="tiny" id="cycleStatus"></span></div></div>' : '';
   const ladderRows = state.rewards.ladder[p].map(r => '<div class="listrow"><span class="tiny" style="width:64px;flex:none">' + RUNG_LABELS[r.weeks] + '</span><input type="text" id="li' + r.weeks + '" value="' + esc(r.icon) + '" maxlength="4" aria-label="Simge" style="width:52px;text-align:center;flex:none"><input type="text" id="lw' + r.weeks + '" value="' + esc(r.title) + '" maxlength="80" aria-label="Ödül" class="grow">' + (state.rewards.claimed[p]['w' + r.weeks] ? '<span class="tiny" style="flex:none">alındı ' + fmtD(state.rewards.claimed[p]['w' + r.weeks]) + '</span>' : '') + '</div>').join('');
   $('#view-ayarlar').innerHTML =
     '<div class="card"><div class="card-h"><h2>' + esc(c.name) + ' · plan ayarları</h2></div>' + fld('sName', 'Görünen ad', 'text', c.name, ' maxlength="20"') +
@@ -1725,14 +1736,14 @@ function renderSettings() {
     '<div class="two">' + fld('sDate', 'Başlangıç tarihi', 'date', c.startDate, '') + fld('sRate', 'Hedef tempo (kg/hafta)', 'number', c.rate, ' step="0.1" min="0.2" max="1" inputmode="decimal"') + '</div>' +
     '<div class="three">' + fld('sWater', 'Su hedefi (bardak)', 'number', c.waterGoal, ' step="1" min="4" max="20" inputmode="numeric"') + fld('sKcal', 'Günlük kcal', 'number', c.kcal, ' step="50" min="1200" max="3000" inputmode="numeric"') + daySel + '</div>' +
     '<div class="row"><button type="button" class="btn" id="saveSettings">Kaydet</button><span class="tiny" id="settingsStatus"></span></div>' +
-    '<p class="tiny">Güvenli tempo: erkek 0,6–0,8, kadın 0,5 kg/hafta. Kadın için 62 kg bu tempoyla yaklaşık 24 haftada gelir; 3 ay sonunda 67–68 kg ara hedeftir.</p></div>' + cycle +
-    '<div class="card"><div class="card-h"><h2>' + esc(c.name) + ' · ödül merdiveni</h2><span class="meta">Simge ve ödül düzenlenebilir</span></div><div>' + ladderRows + '</div>' +
-    '<div class="field"><label for="rTh">Başarılı hafta eşiği (puan, 20–75; ikiniz için ortak)</label><input type="number" id="rTh" min="20" max="75" step="5" value="' + state.rewards.threshold + '" inputmode="numeric"></div>' +
+    '<p class="tiny">Güvenli tempo: E 0,6–0,8 · K 0,5 kg/hafta.</p></div>' + cycle +
+    '<div class="card"><div class="card-h"><h2>' + esc(c.name) + ' · ödül merdiveni</h2><span class="meta">düzenlenebilir</span></div><div>' + ladderRows + '</div>' +
+    '<div class="field"><label for="rTh">Başarılı hafta eşiği (puan)</label><input type="number" id="rTh" min="20" max="75" step="5" value="' + state.rewards.threshold + '" inputmode="numeric"></div>' +
     '<div class="row"><button type="button" class="btn ghost" id="saveLadder">Ödülleri kaydet</button><span class="tiny" id="ladderStatus"></span></div>' +
-    '<p class="tiny">Puanlar: her öğün 1 (günde 5), su hedefi 2, koşu 1, öğle ve akşam yürüyüşü 1+1, uyku düzeni 1 (yatış en geç 23:15, kalkış en geç 06:30, hafta sonu 07:30) → günde 11; 10 puan alan gün kazanılmış sayılır. Haftalık tartı +5, haftada en çok ' + WEEK_MAX + '. Haftada ' + state.rewards.threshold + ' puan = başarılı hafta; başarılı haftalar birikir (2 hafta, 1 ay = 4, 2 ay = 8, 3 ay = 13, 6 ay = 26). Haftalık ödül her başarılı haftada yenilenir.</p></div>' +
-    '<div class="card"><div class="card-h"><h2>Kayıt durumu</h2></div><p>' + (state.mode === 'db' ? 'Paylaşımlı kayıt açık: iki telefonda da aynı veriler görünür.' : state.mode === 'local' ? 'Girdiler yalnızca bu cihazda saklanıyor.' : 'Bağlanıyor…') + '</p>' +
-    (STATIC_HOST ? '<div class="note">Bu adreste girdiler telefonun kendi tarayıcı hafızasında tutulur ve iki telefon arasında eşzamanlanmaz. Her kişi kendi telefonundan girsin; tarayıcı verilerini silmek kayıtları siler, arada yedek alın.</div>' : (state.modeNote ? '<p class="tiny">' + esc(state.modeNote) + '</p>' : '') + '<div class="note">İki telefonda ortak takip için aynı Claude hesabıyla açın ya da sayfayı Paylaş menüsünden "Düzenleyici" veya "Katkıda bulunan" olarak e-posta ile davet edin. Yalnızca görüntüleme bağlantısıyla açan kişi veri giremez.</div>') + '</div>' +
-    '<div class="card"><div class="card-h"><h2>Yedek</h2><span class="meta">Kopyala, sakla, gerekirse geri yükle</span></div><div class="row"><button type="button" class="btn ghost" id="copyBackup">Yedeği kopyala</button><span class="tiny" id="backupStatus"></span></div><textarea id="backupText" placeholder="Geri yüklemek için yedek metnini buraya yapıştırın" rows="3"></textarea><div class="row"><button type="button" class="btn ghost" id="restoreBackup">Yedeği geri yükle</button></div><p class="tiny">Yedek iki kişinin tüm kayıtlarını, ödülleri, tarif puanlarını ve ayarları içerir. Başka telefona taşımak için orada geri yükleyin; aynı günün daha yeni kaydı korunur.</p></div>';
+    '<details class="item" id="set-puan"' + (state.open.has('set-puan') ? ' open' : '') + '><summary>Puanlar nasıl hesaplanır?</summary><ul class="plain"><li>Her öğün 1 (günde 5), su hedefi 2, koşu 1, öğle ve akşam yürüyüşü 1+1, uyku düzeni 1 → günde 11.</li><li>10 puan alan gün kazanılmış sayılır. Haftalık tartı +5; haftada en çok ' + WEEK_MAX + '.</li><li>Haftada ' + state.rewards.threshold + ' puan = başarılı hafta; başarılı haftalar birikir (2 hafta, 1 ay = 4, 2 ay = 8, 3 ay = 13, 6 ay = 26).</li></ul></details></div>' +
+    '<div class="card"><div class="card-h"><h2>Kayıt</h2></div><p class="muted">' + (state.mode === 'db' ? 'Ortak kayıt açık; iki telefonda da aynı veriler görünür.' : state.mode === 'local' ? 'Girdiler yalnızca bu cihazda saklanıyor' + (STATIC_HOST ? '; tarayıcı verisi silinirse kayıtlar da gider, arada yedek alın.' : '.') : 'Bağlanıyor…') + '</p>' +
+    (!STATIC_HOST && state.modeNote ? '<p class="tiny">' + esc(state.modeNote) + '</p>' : '') + '</div>' +
+    '<div class="card"><div class="card-h"><h2>Yedek</h2></div><div class="row"><button type="button" class="btn ghost" id="copyBackup">Yedeği kopyala</button><span class="tiny" id="backupStatus"></span></div><textarea id="backupText" placeholder="Geri yüklemek için yedek metnini buraya yapıştırın" rows="3"></textarea><div class="row"><button type="button" class="btn ghost" id="restoreBackup">Yedeği geri yükle</button></div></div>';
 }
 function bindSettings() {
   $('#view-ayarlar').addEventListener('click', async e => {
