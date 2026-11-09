@@ -21,21 +21,57 @@ function recipeCat(r) {
   for (const c of RECIPE_CATS) if (c.words.some(w => n.indexOf(w) >= 0)) return c;
   return RECIPE_CATS[RECIPE_CATS.length - 1];
 }
-const TIP_EMOJI = ['🥗', '🥕', '🍋', '🧄', '🥦', '🐟', '🍲'];
-// One tip per day: the plan's own tip for that day plus the knowledge rule that best matches the day's dishes.
+// Günün bilgi cümlesi: menüdeki yemeklerle eşleşen bir beslenme bilgisi; eşleşme yoksa tarihe göre sırayla.
+const DAILY_TIPS = [
+  { t: 'Karbonhidratı tek başına yemeyin: meyvenin yanına kuruyemiş ya da yoğurt, ekmeğin yanına yumurta ya da peynir koyun; kan şekeri daha yavaş yükselir.', k: ['meyve', 'ekmek', 'bulgur', 'kısır', 'yulaf', 'mandalina', 'elma', 'armut'] },
+  { t: 'Mercimek, ıspanak ve nohut gibi bitkisel demir kaynaklarını limon, nar ya da maydanozla birlikte yiyin; C vitamini demirin emilimini iki üç kat artırır.', k: ['mercimek', 'ıspanak', 'nohut', 'fasulye'] },
+  { t: 'Demir içeren bir öğünden sonra çay ya da kahve için en az bir saat bekleyin; çaydaki tanenler demirin emilimini azaltır.', k: ['mercimek', 'ıspanak', 'kıymalı', 'köfte'] },
+  { t: 'Havuç, bal kabağı, yeşillik ve avokadodaki A, D, E ve K vitaminleri yağ olmadan emilmez; tabağa bir tatlı kaşığı zeytinyağı eklemek yeter.', k: ['havuç', 'kabağ', 'avokado', 'salata', 'yeşillik', 'roka'] },
+  { t: 'Zerdeçalı karabiber ve biraz yağla birlikte kullanın; karabiberdeki piperin, zerdeçalın emilimini yaklaşık yirmi kat artırır.', k: ['tavuk', 'çorba', 'sote', 'hindi'] },
+  { t: 'Yemeğe önce sebze ya da çorbayla başlayın, sonra proteine geçin, karbonhidratı en sona bırakın; bu sıra yemek sonrası kan şekerini belirgin biçimde düşürür.', k: ['çorba', 'bulgur', 'kısır', 'pilav'] },
+  { t: 'Keten tohumunu öğütülmüş kullanın; bütün tane sindirilmeden geçer ve içindeki omega-3 alınamaz.', k: ['keten'] },
+  { t: 'Sarımsağı ezdikten sonra on dakika bekletip öyle pişirin; koruyucu bileşik allisin ancak bu sürede oluşur.', k: ['sarımsak', 'humus', 'sarımsaklı'] },
+  { t: 'Brokoliyi üç dört dakika buharda pişirin ve yanına çiğ turp gibi bir sebze koyun; sulforafan böyle korunur.', k: ['brokoli', 'turp', 'karnabahar'] },
+  { t: 'Pişirip soğuttuğunuz bulgur, patates ve pirinçte dirençli nişasta oluşur; ertesi gün yendiğinde kan şekerini daha az yükseltir.', k: ['bulgur', 'kısır', 'pilav', 'patates', '2. gün'] },
+  { t: 'Haftada iki kez balık yemek omega-3 ihtiyacını karşılar; fırında ya da buğulama pişirmek yağ asitlerini korur.', k: ['balık', 'hamsi', 'somon', 'palamut', 'levrek', 'çipura'] },
+  { t: 'Yoğurt ve kefir gibi fermente ürünlerden her gün bir porsiyon almak bağırsak florasını destekler ve şişkinliği azaltır.', k: ['yoğurt', 'kefir', 'ayran', 'lor'] },
+  { t: 'Her ana öğünde 25–40 gram protein almak kas kaybını önler ve tokluğu uzatır; avuç içi büyüklüğünde et, balık ya da tavuk yaklaşık 25 gramdır.', k: ['tavuk', 'hindi', 'köfte', 'balık', 'et'] },
+  { t: 'Kuruyemişi ölçülü tutun: günde bir avuç, yani yaklaşık 30 gram yeterlidir; fazlası kolayca 300 kaloriyi geçer.', k: ['ceviz', 'badem', 'fındık', 'kuruyemiş'] },
+  { t: 'Suyu gün içine yayın; öğünden yarım saat önce içilen bir bardak su iştahı dengeler ve sindirime yardım eder.', k: [] },
+  { t: 'Akşam yemeğini uykudan en az üç saat önce bitirmek hem uykuyu hem de sabah açlık şekerini iyileştirir.', k: [] },
+  { t: 'Kahveyi günde iki fincanla sınırlayın ve son fincanı öğleden sonra ikiden önce için; kafeinin yarı ömrü beş altı saattir.', k: ['kahve'] },
+  { t: 'Elma sirkesini suyla seyreltip yemekten hemen önce içmek yemek sonrası kan şekeri yükselişini azaltabilir; dişleri korumak için ardından ağzı suyla çalkalayın.', k: ['sirke'] },
+  { t: 'Sebzeleri az suyla ve kısa sürede pişirin; uzun haşlama, suda çözünen vitaminlerin çoğunu kaybettirir.', k: ['zeytinyağlı', 'pırasa', 'kereviz', 'fasulye', 'sebze'] },
+  { t: 'Yumurtayı günde iki taneyle sınırlamak yeterli bir ölçüdür; sarısı D vitamini ve kolin için en zengin bölümdür.', k: ['yumurta', 'omlet', 'çılbır'] },
+  { t: 'Baklagilleri bir gece önceden ıslatıp suyunu dökerek pişirin; şişkinlik yapan şekerler böyle azalır.', k: ['fasulye', 'nohut', 'mercimek', 'humus'] },
+  { t: 'Fırın tavuğu iç sıcaklığı 75 dereceye gelince çıkarın; daha uzun pişirmek proteini kurutur, lezzeti de düşürür.', k: ['tavuk', 'hindi'] },
+  { t: 'Közlenmiş sebzelerin kabuğunu soyduktan sonra limon ve sarımsaklı yoğurtla servis edin; yağ eklemeden doyurucu bir öğün olur.', k: ['közlenmiş', 'patlıcan'] },
+  { t: 'Tatlı isteği geldiğinde fırında tarçınlı elma ya da ayva gibi şekersiz bir meyve tatlısı seçin; tarçın da kan şekeri dengesine yardım eder.', k: ['tatlı', 'ayva', 'tarçın'] },
+  { t: 'Yemeği yavaş yiyin ve her lokmayı iyice çiğneyin; tokluk sinyalinin beyne ulaşması yaklaşık yirmi dakika sürer.', k: [] },
+  { t: 'Sabah koşusundan sonraki bir saat içinde protein içeren bir kahvaltı yapın; kaslar bu pencerede en iyi toparlanır.', k: ['yulaf', 'lor', 'kahvaltı'] },
+  { t: 'Salataya kabak çekirdeği ya da ceviz ekleyin; magnezyum ve iyi yağlar hem tokluğa hem de kas gevşemesine yardım eder.', k: ['salata', 'çekirde', 'ceviz'] },
+  { t: 'Koyu kıvamlı bir çorbayı öğünün başında içmek hem doyurur hem de ana yemek porsiyonunu küçültür.', k: ['çorba', 'tarhana'] }
+];
+function tipTextFor(date, cache) {
+  const ws = mondayOf(date); if (!cache[ws]) cache[ws] = state.weekmenus[ws] || codeWeekDoc(ws);
+  const day = cache[ws] && cache[ws].days[parseD(date).getDay()];
+  return day ? trLower(day.meals.map(m => m.t).join(' ')) : '';
+}
+function pickTip(date, text, recent) {
+  const n = DAILY_TIPS.length, idx = ((daysBetween('2026-01-01', date) % n) + n) % n;
+  const scored = DAILY_TIPS.map((tip, i) => ({ i: i, tip: tip, score: tip.k.filter(w => text.indexOf(w) >= 0).length }));
+  const order = scored.filter(x => !recent.has(x.i)).sort((a, b) => (b.score - a.score) || (((a.i - idx + n) % n) - ((b.i - idx + n) % n)));
+  return order.length ? order[0] : scored[idx];
+}
+// Program başından bugüne gün gün ilerler; son 13 günün cümleleri dışlanır, böylece iki hafta boyunca tekrar olmaz.
 function dayTipFor(date) {
-  const ws = mondayOf(date), doc = state.weekmenus[ws] || codeWeekDoc(ws), dow = parseD(date).getDay(), day = doc && doc.days[dow];
-  const text = day ? trLower(day.meals.map(m => m.t).join(' ')) : '';
-  const words = s => trLower(s).replace(/[^a-zçğıöşü\s]/g, ' ').split(/\s+/).filter(w => w.length >= 4);
-  let best = null, bestScore = 0;
-  RULES.forEach(r => { const score = words(r).filter(w => text.indexOf(w.slice(0, 5)) >= 0).length; if (score > bestScore) { bestScore = score; best = r; } });
-  if (!best) best = RULES[(daysBetween('2026-01-01', date) % RULES.length + RULES.length) % RULES.length];
-  return { plan: day && day.tip ? day.tip : '', fact: best, dow: dow };
+  const cache = {}, used = []; let pick = null;
+  for (let d = '2026-11-02'; d <= date; d = addDays(d, 1)) { pick = pickTip(d, tipTextFor(d, cache), new Set(used.slice(-13))); used.push(pick.i); }
+  return pick ? pick.tip.t : DAILY_TIPS[0].t;
 }
 function tipCardHtml() {
   const t = dayTipFor(state.today);
-  if (!t.plan && !t.fact) return '';
-  return '<div class="tipcard"><div class="em">' + TIP_EMOJI[t.dow] + '</div><div><h2>Bugünün püf noktası</h2>' + (t.plan ? '<p>' + esc(t.plan) + '</p>' : '') + (t.fact ? '<div class="fact">💡 ' + esc(t.fact) + '</div>' : '') + '</div></div>';
+  return t ? '<div class="tipcard"><div class="em">💡</div><div><h2>Bugünün püf noktası</h2><p>' + esc(t) + '</p></div></div>' : '';
 }
 function renderRecipes() {
   const p = state.person, rc = id => state.recipes[id] || normRecipe(null);
@@ -53,9 +89,9 @@ function renderRecipes() {
       '<p class="muted"><b>Porsiyon</b> · E: ' + esc(r.por.E) + ' · K: ' + esc(r.por.K) + '</p><div class="tipbox">' + esc(r.tip) + '</div>' +
       '<div class="field"><label for="rn-' + r.id + '">Not</label><input type="text" id="rn-' + r.id + '" data-note="' + r.id + '" value="' + esc(d.note) + '" maxlength="300" placeholder="Örn. kimyonu artırdık"></div></div></details>'; };
   const groups = RECIPE_CATS.map(c => { const rows = list.filter(x => recipeCat(x.r) === c); if (!rows.length) return ''; const id = 'cat-' + c.id, favs = rows.filter(x => x.d.fav[p]).length; return '<details class="item" id="' + id + '"' + (state.open.has(id) ? ' open' : '') + '><summary>' + c.name + '<span class="sub">' + rows.length + ' tarif' + (favs ? ' · ' + favs + ' favori' : '') + '</span></summary><div class="mlist">' + rows.map(item).join('') + '</div></details>'; }).join('');
-  $('#view-tarifler').innerHTML = tipCardHtml() + '<div class="card"><div class="card-h"><h2>Tarifler</h2><span class="meta">' + list.length + ' tarif · bu hafta</span></div><div>' + groups + '</div></div>' +
-    '<div class="card"><div class="card-h"><h2>Ara öğün havuzu</h2><span class="meta">100–150 kcal</span></div><ul class="plain">' + SNACKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>' +
-    '<div class="card"><div class="card-h"><h2>İçecekler</h2></div><ul class="plain">' + DRINKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></div>';
+  const snacksHtml = '<details class="item" id="cat-ara"' + (state.open.has('cat-ara') ? ' open' : '') + '><summary>Ara öğün havuzu<span class="sub">' + SNACKS.length + ' seçenek · 100–150 kcal</span></summary><ul class="plain">' + SNACKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></details>';
+  const drinksHtml = '<details class="item" id="cat-icecek"' + (state.open.has('cat-icecek') ? ' open' : '') + '><summary>İçecekler<span class="sub">' + DRINKS.length + ' seçenek</span></summary><ul class="plain">' + DRINKS.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></details>';
+  $('#view-tarifler').innerHTML = tipCardHtml() + '<div class="card"><div class="card-h"><h2>Tarifler</h2><span class="meta">' + list.length + ' tarif · bu hafta</span></div><div>' + groups + snacksHtml + drinksHtml + '</div></div>';
 }
 function bindRecipes() {
   const v = $('#view-tarifler'); const timers = new Map();
