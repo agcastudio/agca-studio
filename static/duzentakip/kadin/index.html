@@ -364,14 +364,6 @@ const HOME_WORKOUTS = {
   6: { title: 'Mobilite ve yoga · 20 dk', text: '3 tur güneşe selam, kalça açıcılar, omuz esnetme, 5 dk nefes' },
   0: { title: 'Dinlenme yürüyüşü · 30 dk', text: 'Açık havada rahat tempo; haftayı değerlendir, gelecek haftayı planla' }
 };
-const SEVINC_RULES = [
-  'Günde iki ana öğün: 09:30 kahvaltı ve 18:30 akşam; ikisinde de 25–35 g protein (yumurta, lor, yoğurt, balık, tavuk, baklagil). Esas olan öğün atlamak değil, öğünü doyurucu kurmak.',
-  'Kahve kalkar kalkmaz değil: önce 2 bardak su, ilk kahve en az 1 saat sonra ya da kahvaltıyla; günde en fazla 2 fincan, sonuncusu 14:00\'ten önce.',
-  'Açlık olursa 15:00 civarı hafif bir ara: yoğurt + meyve ya da bir avuç kuruyemiş. 20:30\'dan sonra mutfak kapalı.',
-  'Haftada 2 kuvvet, 1 core, 1 kardiyo, 1 mobilite günü ve her gün 20 dk yürüyüş: 42 yaşında kas ve kemik kütlesini koruyan en etkili düzen. İki hafta sonra tur ya da tekrar sayısını artır.',
-  'Su günde 8 bardak (2 L); uyku 23:00–07:00. Tartı haftada bir, Cuma sabahı.',
-  'Hedef kilo değil kuvvet: 57 kg, 155 cm için sağlıklı aralık. Amaç enerji, duruş ve kas; tartı 55–57 bandında kalsın.'
-];
 const DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 const REWARD_DEFAULT_POINTS = 55;
 const MEAL_KEYS = ['k', 'a1', 'o', 'a2', 'ak'];
@@ -1827,8 +1819,7 @@ function renderProgram() {
   const tl = RH.map((r, i) => '<div class="tl' + (i === curI ? ' now' : '') + '"><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>').join('');
   $('#view-program').innerHTML = plannerCard() +
     '<div class="card"><div class="card-h"><h2>Günlük ritim</h2></div><div class="timeline">' + tl + '</div></div>' +
-    (prog === PROGRAMS.ikiogun ? '<div class="card"><div class="card-h"><h2>Ev egzersizi programı</h2><span class="meta">20 dk · ekipmansız</span></div><div class="timeline">' + [1, 2, 3, 4, 5, 6, 0].map(dd => '<div class="tl' + (dd === dow ? ' now' : '') + '"><b>' + DAY_NAMES[dd].slice(0, 3) + '</b><span><b>' + esc(HOME_WORKOUTS[dd].title) + '</b><br>' + esc(HOME_WORKOUTS[dd].text) + '</span></div>').join('') + '</div></div>' +
-    '<div class="card"><div class="card-h"><h2>' + esc(c.name) + '\'in düzeni</h2><span class="meta">yaşam koçu notları</span></div><ul class="plain">' + SEVINC_RULES.map(r => '<li>' + esc(r) + '</li>').join('') + '</ul></div>' : '');
+    (prog === PROGRAMS.ikiogun ? '<div class="card"><div class="card-h"><h2>Ev egzersizi programı</h2><span class="meta">20 dk · ekipmansız</span></div><div class="timeline">' + [1, 2, 3, 4, 5, 6, 0].map(dd => '<div class="tl' + (dd === dow ? ' now' : '') + '"><b>' + DAY_NAMES[dd].slice(0, 3) + '</b><span><b>' + esc(HOME_WORKOUTS[dd].title) + '</b><br>' + esc(HOME_WORKOUTS[dd].text) + '</span></div>').join('') + '</div></div>' : '');
 }
 </script>
 

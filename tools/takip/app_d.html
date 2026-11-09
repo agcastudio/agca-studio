@@ -36,7 +36,6 @@ function renderProgram() {
   const tl = RH.map((r, i) => '<div class="tl' + (i === curI ? ' now' : '') + '"><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>').join('');
   $('#view-program').innerHTML = plannerCard() +
     '<div class="card"><div class="card-h"><h2>Günlük ritim</h2></div><div class="timeline">' + tl + '</div></div>' +
-    (prog === PROGRAMS.ikiogun ? '<div class="card"><div class="card-h"><h2>Ev egzersizi programı</h2><span class="meta">20 dk · ekipmansız</span></div><div class="timeline">' + [1, 2, 3, 4, 5, 6, 0].map(dd => '<div class="tl' + (dd === dow ? ' now' : '') + '"><b>' + DAY_NAMES[dd].slice(0, 3) + '</b><span><b>' + esc(HOME_WORKOUTS[dd].title) + '</b><br>' + esc(HOME_WORKOUTS[dd].text) + '</span></div>').join('') + '</div></div>' +
-    '<div class="card"><div class="card-h"><h2>' + esc(c.name) + '\'in düzeni</h2><span class="meta">yaşam koçu notları</span></div><ul class="plain">' + SEVINC_RULES.map(r => '<li>' + esc(r) + '</li>').join('') + '</ul></div>' : '');
+    (prog === PROGRAMS.ikiogun ? '<div class="card"><div class="card-h"><h2>Ev egzersizi programı</h2><span class="meta">20 dk · ekipmansız</span></div><div class="timeline">' + [1, 2, 3, 4, 5, 6, 0].map(dd => '<div class="tl' + (dd === dow ? ' now' : '') + '"><b>' + DAY_NAMES[dd].slice(0, 3) + '</b><span><b>' + esc(HOME_WORKOUTS[dd].title) + '</b><br>' + esc(HOME_WORKOUTS[dd].text) + '</span></div>').join('') + '</div></div>' : '');
 }
 </script>
