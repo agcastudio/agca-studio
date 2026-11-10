@@ -36,15 +36,15 @@
       "konu": "Fine-Tuning Workflow and Token Loss",
       "zorluk": 2,
       "slayt": 7,
-      "soru": "In an SFT example, the model assigns the first response token Positive 30%, Negative 40%, Other 30% probability; the gold target is \"Positive\". What is the cross-entropy loss at this step?",
+      "soru": "During SFT on the review \"The movie was amazing.\", the model gives the first answer token a higher probability for \"Negative\" than for the gold \"Positive\". Which statement correctly explains how this step turns into learning?",
       "secenekler": [
-        "−ln(0.30) ≈ 1.20; the loss is computed only from the gold token's probability",
-        "−ln(0.40) ≈ 0.92; the loss is computed from the token with the highest probability",
-        "−ln(0.40 − 0.30) ≈ 2.30; the loss measures the difference between prediction and target",
-        "−ln(0.30) − ln(0.30) ≈ 2.41; Positive and Other are penalized together"
+        "The loss is high because the gold token received a low probability; backprop turns that loss into gradients and the optimizer updates the trainable weights",
+        "The loss is high because the wrong token received the highest probability; the gradient lowers that token alone and leaves the gold token's probability untouched",
+        "The loss depends only on whether the most probable token matches the gold token, so the exact probabilities assigned at this step make no difference at all",
+        "The loss is spread over the instruction and review tokens as well, so a mistake on the answer token is diluted across the whole input sequence"
       ],
       "dogru": 0,
-      "aciklama": "Cross-entropy is the negative logarithm of the probability assigned to the gold token (Positive): −ln(0.30) ≈ 1.20. Negative receiving a higher probability does not enter the formula directly; because the model puts more probability on a wrong token, the gold token's probability stays low and the loss is therefore high."
+      "aciklama": "Cross-entropy is taken on the gold token, so a low probability for Positive means a high loss; backpropagation converts that loss into gradients and the optimizer uses them to update the trainable weights so the gold token becomes more likely. The high probability on Negative matters only indirectly, through the probability it takes away from the gold token, and the loss is a graded quantity rather than a hard match/mismatch check."
     },
     {
       "id": "d3b-03",
@@ -141,30 +141,30 @@
       "konu": "LoRA Hyperparameters: r, α, Dropout, Target Modules",
       "zorluk": 2,
       "slayt": 16,
-      "soru": "LoRA with r = 2 is used on a 4×4 layer. If α is raised from 2 to 4, how do the number of trainable parameters and the update change?",
+      "soru": "A practitioner has two separate goals for a LoRA setup: let the adapter represent a richer, higher-rank correction, and apply an already-learned correction more strongly to the frozen weights. Which hyperparameter serves each goal, and why?",
       "secenekler": [
-        "The parameter count rises from 16 to 32; the update's scale (α/r) stays unchanged",
-        "The parameter count rises from 8 to 16; the update is scaled from ×1 to ×2",
-        "The parameter count stays at 16; the update (α/r)BA is scaled from ×1 to ×2",
-        "The parameter count stays at 16; the update (α/r)BA is scaled from ×1 to ×4"
+        "Rank r for the richer correction, because it sets the inner dimension of A and B; scaling α for the strength, because it rescales the update (α/r)BA",
+        "Scaling α for the richer correction, because a larger α lets BA span more directions; rank r for the strength, because it multiplies the learned update",
+        "Rank r for both goals, because α is derived from r when the adapter is loaded and cannot be set independently of it",
+        "Target modules for the richer correction, because more projections raise the rank; LoRA dropout for the strength, because it sets how much of the branch is kept"
       ],
-      "dogru": 2,
-      "aciklama": "For r = 2, A (2×4) and B (4×2) give 16 trainable values in total; α only changes the factor (α/r): α = 2 → ×1, α = 4 → ×2. The last option forgets to divide α by r; the first option assumes α adds parameters, whereas \"changing α alone does not add trainable parameters\"."
+      "dogru": 0,
+      "aciklama": "r fixes the inner dimension of A (r × din) and B (dout × r), so it decides the maximum rank and the trainable capacity of the correction; α only rescales the learned BA through (α/r), controlling how strongly it is applied without adding parameters. The swapped option confuses the two knobs: α cannot add directions to BA, and r is not a multiplier on the update."
     },
     {
       "id": "d3b-10",
       "konu": "LoRA Hyperparameters: r, α, Dropout, Target Modules",
       "zorluk": 3,
       "slayt": 17,
-      "soru": "For a 3584×3584 q_proj in Qwen2.5-7B, LoRA with r = 8 gives 57,344 trainable parameters (≈224× reduction). What happens if r = 16 is chosen for the same projection?",
+      "soru": "In a large model, a single attention projection W₀ is a square matrix with both dimensions in the thousands. Why does a LoRA adapter with a small rank r need only a tiny fraction of that projection's parameter count?",
       "secenekler": [
-        "≈114,688 parameters; the reduction ratio drops to ≈112×",
-        "≈57,344 parameters remain; r only changes the scale of the update",
-        "≈229,376 parameters; both dimensions of A and B double",
-        "≈28,672 parameters; a single matrix suffices for a higher r"
+        "A and B are sparse slices cut out of W₀, and only the entries that differ from the pretrained values are counted as trainable parameters",
+        "A single A/B pair is shared by every projection in every layer of the model, so its parameters are counted only once for the whole network",
+        "Each of A and B pairs one large layer dimension with the small r, so their size grows with r rather than with the product of both layer dimensions",
+        "The factor α/r shrinks the stored values of A and B, so they can be held in far fewer parameters than the frozen projection they are attached to"
       ],
-      "dogru": 0,
-      "aciklama": "A: r×din = 16×3584 = 57,344 and B: dout×r = 3584×16 = 57,344, for a total of 114,688; 12,845,056 / 114,688 ≈ 112. The parameter count grows linearly with r (only one dimension of each matrix is r), so it doubles rather than quadrupling (229,376); the idea that r is only a scale factor confuses it with α."
+      "dogru": 2,
+      "aciklama": "A is r × din and B is dout × r: each has one dimension fixed by the layer and one equal to r, so together they hold r·(din + dout) values, which grows linearly with r, while W₀ holds din·dout. A and B are new matrices rather than pieces of W₀, every selected projection has its own pair, and α/r only rescales the update without changing how many values are stored."
     },
     {
       "id": "d3b-11",
@@ -214,17 +214,17 @@
     {
       "id": "d3b-14",
       "konu": "QLoRA and Quantization (NF4)",
-      "zorluk": 3,
+      "zorluk": 2,
       "slayt": 22,
-      "soru": "If a weight of 0.46 is encoded and decoded with a symmetric uniform quantizer (s = 0.1; z = 0), what are the stored code and the dequantized value?",
+      "soru": "In the uniform quantizer example, a weight of 0.73 is stored as the code 7 and read back as 0.70. The integer code itself is stored without any loss, so where does the approximation error come from?",
       "secenekler": [
-        "Code 5, value 0.50; approximation error 0.04",
-        "Code 4, value 0.40; approximation error 0.06",
-        "Code 5, value 0.46; approximation error zero",
-        "Code 46, value 0.46; approximation error zero"
+        "Encoding rounds the weight to the nearest of a fixed set of equally spaced levels; decoding returns that level, not the original value",
+        "Decoding drops a low-order bit of the code each time it runs, so the error is introduced while reading and grows with every forward pass",
+        "The scale s is drawn at random for each weight when the model is loaded, so the same code decodes to a different value on every run",
+        "Decoding is carried out in BF16/FP16, whose precision is lower than the stored 4-bit code, so the loss happens at the computation step"
       ],
       "dogru": 0,
-      "aciklama": "Encode: q = round(0.46 / 0.1) = round(4.6) = 5; decode: ŵ = 5 × 0.1 = 0.50; error |0.46 − 0.50| = 0.04 (the same steps as in the 0.73 → 7 → 0.70 example). The code 4 option truncates downward instead of rounding; lossless recovery of the original value is not possible in quantization."
+      "aciklama": "With scale s = 0.1 and zero point z = 0, only multiples of s can be represented, so 0.73 is rounded to the nearest level 0.70 at encoding time and the code 7 simply points to that level; the error |0.73 − 0.70| is fixed at encoding and does not grow with repeated decoding. BF16/FP16 is far more precise than a 4-bit code, so the computation precision is not where the information is lost."
     },
     {
       "id": "d3b-15",

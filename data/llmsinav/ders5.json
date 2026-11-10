@@ -66,46 +66,46 @@
       "id": "d5-04",
       "konu": "Bradley–Terry and reward model",
       "zorluk": 2,
-      "slayt": 15,
-      "soru": "The reward model assigns r = 3.0 to the chosen response and r = 1.0 to the rejected one. According to Bradley–Terry, what is the probability that chosen is preferred, and how does it change relative to an example with scores 2.0 vs. 1.0 (σ(1) ≈ 0.73)?",
+      "slayt": 14,
+      "soru": "A reward model is trained with the Bradley–Terry formulation. Adding the same constant to the scores of both responses in a pair leaves the predicted preference unchanged. What does this reveal about the scores?",
       "secenekler": [
-        "σ(3.0) ≈ 0.95; because the chosen score is larger, the probability rises above 0.73.",
-        "σ(1.0) ≈ 0.73; because Bradley–Terry looks only at the ranking, the probability does not change.",
-        "σ(2.0) ≈ 0.88; because the score gap is larger, the probability rises above 0.73.",
-        "3.0 / (3.0 + 1.0) = 0.75; the probability is computed directly from the ratio of the scores."
+        "Each score is squashed into [0, 1] on its own, so any single score can be read as a calibrated probability of being good.",
+        "Only the ordering of the two scores matters, so widening the gap between them cannot change the predicted probability.",
+        "Only the gap between the two scores matters, so a score has meaning relative to other responses, not as an absolute value.",
+        "Scores are normalized across all responses to a prompt, so each score is the share of annotators who preferred that one."
       ],
       "dogru": 2,
-      "aciklama": "In Bradley–Terry, P(A ≻ B) = σ(r(A) − r(B)); the gap is 2.0, so σ(2) ≈ 0.88. The first option applies the sigmoid to the chosen response's absolute score rather than the gap; the last uses a ratio of raw scores instead of a ratio of e^r."
+      "aciklama": "Bradley–Terry applies the sigmoid to the difference of the two scores, so a shared shift cancels out and only the relative gap carries information. It is not ranking-only: a larger chosen–rejected gap gives a higher preference probability and a lower loss."
     },
     {
       "id": "d5-05",
       "konu": "Bradley–Terry and reward model",
       "zorluk": 2,
       "slayt": 15,
-      "soru": "During training with the RM loss −log σ(r(x, yw) − r(x, yl)), the reward model gives chosen 1.0 and rejected 2.0 for a pair. What happens for this pair?",
+      "soru": "A reward model is being trained with the loss −log σ(r(x, yw) − r(x, yl)). For one pair it currently scores the rejected response above the chosen one. How does the loss treat this pair?",
       "secenekler": [
-        "Because the difference is negative, the loss is also negative; this pair lowers the total loss and rewards the model.",
-        "Because the sigmoid squashes the difference into [0, 1], the loss stays near zero; the pair barely affects training.",
-        "Reward model scores cannot be negative, so such a ranking can never occur during training.",
-        "Because the difference is −1, σ ≈ 0.27 and −log σ is large; the gradient pushes the chosen score upward."
+        "The negative gap makes the loss negative, so the pair lowers the total loss and the current ranking is reinforced.",
+        "The sigmoid squashes the gap into [0, 1], so the loss stays near zero and the pair barely influences training.",
+        "The loss depends only on the chosen score, so the update raises it and leaves the rejected score where it was.",
+        "The predicted preference falls below one half, so the loss is large and the update pushes the gap toward positive."
       ],
       "dogru": 3,
-      "aciklama": "σ(−1) ≈ 0.27 and −log 0.27 ≈ 1.3, which is a high loss; minimization raises the chosen score and lowers the rejected one to make the difference positive. Since −log σ is always ≥ 0, the loss cannot be negative; moreover, reward scores can be negative."
+      "aciklama": "A negative gap means the model gives the human-chosen response less than an even chance, and −log of a small probability is large; minimizing it raises the chosen score relative to the rejected one. The loss can never be negative, because −log of a probability is always at least zero."
     },
     {
       "id": "d5-06",
       "konu": "Policy, reward, and advantage",
-      "zorluk": 3,
+      "zorluk": 2,
       "slayt": 19,
-      "soru": "A response receives a reward of 7. In PPO the critic estimates V(s) = 9 for this state; in GRPO the same response sits in a group whose mean reward is 5. What is the sign of the advantage under each method?",
+      "soru": "During RL training, two sampled responses receive exactly the same reward, yet the update makes one more likely and the other less likely. Which explanation accounts for this?",
       "secenekler": [
-        "PPO: A = 7 − 9 = −2 → discourage; GRPO: the reward is above the group mean → A > 0, encourage.",
-        "In both methods the reward is 7 → encouraged in the same direction with the same strength; the baseline only changes the scale.",
-        "PPO: A = 9 − 7 = +2 → encourage; GRPO: because the reward is above the mean, A < 0 → discourage.",
-        "PPO: the advantage is the reward itself (7); GRPO: the reward is divided by the mean (7 / 5 = 1.4); both are positive."
+        "The update follows the advantage, reward minus expected reward, and the expectation differed between the two cases.",
+        "The KL penalty reverses the direction of the update for whichever response has drifted further from the reference.",
+        "Clipping flips the sign of the objective for whichever response had the larger probability ratio to the old policy.",
+        "The reward model is updated between the two samples, so equal scores no longer reflect equal quality of response."
       ],
       "dogru": 0,
-      "aciklama": "Advantage A = r − expected value; in PPO the critic supplies the expectation (9) → −2, in GRPO the group mean (5) does → +2 (the sign stays positive even with std normalization). The same reward can yield opposite-signed signals under different baselines; the second option misses this by assuming the baseline only rescales."
+      "aciklama": "The direction of the update comes from the advantage: a reward above the baseline is encouraged and the same reward below a higher baseline is discouraged. Clipping only limits how far an update goes; it never changes its direction."
     },
     {
       "id": "d5-07",
@@ -157,15 +157,15 @@
       "konu": "PPO: four models and clipping",
       "zorluk": 3,
       "slayt": 23,
-      "soru": "Suppose ρ = πθ(y|x)/πold(y|x) = 0.6 / 0.4 = 1.5, ε = 0.2, and Â = +1. What is the value of the clipped objective for this token, and what does it mean?",
+      "soru": "PPO's objective takes the smaller of the unclipped term ρ·Â and a version in which ρ is clipped to [1 − ε, 1 + ε]. For a token whose advantage is positive, what does this achieve?",
       "secenekler": [
-        "1.5: although the ratio exceeds the bound, Â > 0 so the unclipped term is selected; the probability increase is fully rewarded.",
-        "0.8: when Â > 0 the ratio is pulled to the lower bound (1 − ε); only a small, safe increase is rewarded for this token.",
-        "1.2: min() selects the clipped term; the gradient is cut off beyond 1 + ε, so excessive increases are not encouraged.",
-        "1.0: since Â = +1 the ratio is neutralized; the policy is not updated for this token and the current ratio is preserved as is."
+        "The token's probability is held at its πold value, because rollouts from πold are valid only for an unchanged policy.",
+        "The policy is kept close to the frozen SFT reference, so a separate KL penalty becomes redundant for such tokens.",
+        "Once the probability has risen enough relative to πold, further increases earn nothing more from the objective.",
+        "The advantage estimate itself is capped at 1 + ε, so a noisy critic cannot assign too much credit to a single token."
       ],
       "dogru": 2,
-      "aciklama": "L_CLIP = min(ρÂ, clip(ρ, 1−ε, 1+ε)Â) = min(1.5, 1.2) = 1.2; since ρ exceeds the upper bound, the clipped term is the smaller one and, being constant, gives no gradient for further increase. The first option ignores the min() operation; when Â > 0, the smaller term is the clipped one, not the unclipped one."
+      "aciklama": "Beyond the upper bound the clipped term is the smaller one and stays flat, so the token's probability is still increased but excessive increases are not encouraged. Clipping compares the policy with πold, the snapshot that generated the rollouts, not with the SFT reference, so it does not replace the KL penalty."
     },
     {
       "id": "d5-11",
@@ -202,30 +202,30 @@
       "konu": "Verifiable rewards and GRPO",
       "zorluk": 2,
       "slayt": 29,
-      "soru": "For the same prompt and policy, how does the number of models held during training change when GRPO is used instead of PPO, and why?",
+      "soru": "GRPO drops the value model (critic) that PPO relies on. What takes over the critic's job, and what else stays in place?",
       "secenekler": [
-        "It drops from 4 to 2: GRPO removes both the critic and the reference model; the group comparison makes the KL penalty unnecessary.",
-        "It drops from 4 to 3: GRPO removes the reward model; the reward can come only from a rule-based verifier, never a learned scorer.",
-        "It drops from 4 to 3: GRPO removes the critic; the baseline is the group's mean reward; the reward and reference models stay.",
-        "It does not change: GRPO removes the critic but must keep a separate frozen reference snapshot for every rollout in the group."
+        "The frozen reference model predicts the expected reward, so the KL penalty and the reward model are both dropped.",
+        "A rule-based verifier supplies the expected reward, so GRPO cannot be combined with a learned reward model.",
+        "The mean reward of the rollouts sampled for the same prompt is the baseline; the reward source and KL term stay.",
+        "The reward model is trained alongside the policy to predict expected reward, so GAE is still used for advantages."
       ],
       "dogru": 2,
-      "aciklama": "PPO uses a policy, reference, reward, and value model (4); GRPO removes the value model and GAE, the baseline is the group's mean reward, and KL moves into the loss (3 models). The second option removes the wrong model: in GRPO the reward can come from either a learned RM or a verifier."
+      "aciklama": "GRPO removes the value model and GAE and uses the group's mean reward as the baseline, while the frozen reference still provides the KL term. The verifier option confuses reward source with optimizer: GRPO rewards may come from a learned reward model or from rule checks."
     },
     {
       "id": "d5-14",
       "konu": "Verifiable rewards and GRPO",
       "zorluk": 3,
       "slayt": 28,
-      "soru": "You are training with GRPO on a math task; for one prompt, all G = 4 generated rollouts receive 1 from the verifier. What happens for this prompt?",
+      "soru": "You train with GRPO using a pass/fail verifier. Which prompts contribute a reward-based learning signal, and why?",
       "secenekler": [
-        "All four responses are strongly encouraged, because the advantage is taken as equal to the reward itself (1) rather than the group mean.",
-        "Since std = 0, the normalized advantage is undefined (0/0); an ε or masking is applied, and the reward-based signal is zero.",
-        "The critic steps in and estimates the expected reward for this case; the advantages are recomputed based on that estimate.",
-        "Since the group mean is 1, the KL penalty is zeroed out; for this prompt the policy only moves closer to the reference model."
+        "Prompts where every rollout passes, because uniformly high reward gives the strongest encouragement to all of them.",
+        "Prompts whose rollouts get mixed outcomes, because each advantage measures a rollout against its own group.",
+        "Prompts where every rollout fails, because the largest errors produce the largest corrective push on the policy.",
+        "All prompts equally, because the critic supplies a baseline whenever the rewards within a group happen to coincide."
       ],
       "dogru": 1,
-      "aciklama": "Aᵢ = (rᵢ − mean)/std; if all rewards are equal, std = 0 and 0/0 is undefined; an ε or masking is used, and the relative reward signal is zero (there is no ranking within the group). GRPO has no critic, so the third option is impossible; the KL penalty persists regardless of the rewards."
+      "aciklama": "The advantage is group-relative, so when all rollouts score alike there is nothing to rank and the reward-based signal is zero; prompts that are far too easy or far too hard for the current policy therefore teach nothing. Uniform success is not encouraged, since no rollout is better than its group, and GRPO has no critic to fall back on."
     },
     {
       "id": "d5-15",

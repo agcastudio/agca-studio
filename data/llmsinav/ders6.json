@@ -96,15 +96,15 @@
       "konu": "Embeddings, cosine similarity, and indexing hyperparameters",
       "zorluk": 2,
       "slayt": 16,
-      "soru": "A 2,500-token document is split with the sliding window method using typical values (chunk size 500 tokens, overlap 100 tokens). If each new chunk repeats the last 100 tokens of the previous one, how many chunks are produced?",
+      "soru": "A pipeline indexes with fixed-size chunks and no overlap. For the query 'How fast is the Moon drifting away?' the top chunk ends with 'It drifts 3' and the model replies that the figure is missing, although the document states it. What happened, and which indexing hyperparameter prevents it?",
       "secenekler": [
-        "5",
-        "6",
-        "7",
-        "8"
+        "The chunk was too small to hold a whole fact; a larger embedding size lets each vector carry more of the text",
+        "The fact was cut in half at a chunk boundary; overlap repeats the boundary text at the start of the next chunk",
+        "Both halves were blurred into one vector with other topics; a smaller chunk size separates the fact from them",
+        "The two halves received almost identical vectors; a stricter similarity threshold drops the duplicate half"
       ],
       "dogru": 1,
-      "aciklama": "With an overlap of 100, the window advances 400 tokens per step: the starts are 0, 400, 800, 1200, 1600, 2000, and the last chunk covers the range 2000–2500; 6 chunks in total. The answer 5 ignores the overlap (2500/500), while 7 rounds 2500/400 up and overlooks that the first chunk covers 500 tokens."
+      "aciklama": "Cutting purely by length is blind to the text, so a boundary can fall inside a number; overlap repeats the end of the previous chunk so the boundary fact survives whole in one chunk, at the price of a larger index. The embedding-size option is misleading: the vector's dimension controls how richly meaning is represented, not how much text a chunk holds or where it is cut."
     },
     {
       "id": "d6-07",
@@ -124,17 +124,17 @@
     {
       "id": "d6-08",
       "konu": "Embeddings, cosine similarity, and indexing hyperparameters",
-      "zorluk": 1,
+      "zorluk": 2,
       "slayt": 15,
-      "soru": "Using the definition of cosine similarity, what is the similarity of the vectors q = (1, 1, 0) and d = (0, 1, 1)?",
+      "soru": "Cosine similarity divides the dot product q·d by the product of the vector lengths ‖q‖‖d‖ before chunks are ranked. What does this division accomplish, and what would go wrong if chunks were ranked by the raw dot product alone?",
       "secenekler": [
-        "1.00",
-        "0.71",
-        "0.50",
-        "0.25"
+        "It corrects for the number of tokens in each chunk; long chunks would otherwise outrank short ones however little they actually say",
+        "It squeezes every score into the range from zero to one; negative scores would otherwise be discarded by the vector index",
+        "It makes the score depend only on the angle between the vectors; longer vectors would otherwise score high whatever they mean",
+        "It cancels the dimensions on which the two vectors disagree; unrelated dimensions would otherwise add noise to the score"
       ],
       "dogru": 2,
-      "aciklama": "Since q·d = 1 and ‖q‖ = ‖d‖ = √2, cos = 1/(√2·√2) = 0.50. The answer 1.00 takes only the dot product and skips dividing by the norms; 0.71 (1/√2) divides by only one of the norms."
+      "aciklama": "Dividing by the norms removes each vector's length, so the score reflects only how closely the two directions agree, which is what 'similar meaning lands close together' relies on; a raw dot product would also reward sheer magnitude. The token-count option is misleading: normalizing by chunk length is what BM25 does, whereas a norm is the geometric length of the embedding, not the size of the chunk."
     },
     {
       "id": "d6-09",
@@ -169,17 +169,17 @@
     {
       "id": "d6-11",
       "konu": "Dense, sparse, and hybrid retrieval; vector databases and ANN",
-      "zorluk": 2,
+      "zorluk": 3,
       "slayt": 21,
-      "soru": "In a hybrid search example, 'Exam schedule' is 1st and 'Midterm rooms' is 2nd in the semantic list; in the keyword list, 'Midterm rooms' is 1st and 'Exam schedule' is 3rd. After RRF, why does 'Midterm rooms' move to the top of the hybrid list?",
+      "soru": "Hybrid retrieval merges a dense list and a BM25 list with RRF, which looks only at each chunk's position in each list and ignores the cosine and BM25 scores themselves. Why is throwing away the raw scores a sound design, and which chunks does the merge push to the top?",
       "secenekler": [
-        "RRF applies a higher weight coefficient to the BM25 list than to the dense list",
-        "RRF normalizes the cosine and BM25 scores and takes their arithmetic mean",
-        "RRF keeps only chunks present in both lists and drops the others",
-        "RRF sums the reciprocals of the ranks in each list; 1/1 + 1/2 exceeds 1/1 + 1/3"
+        "Cosine and BM25 scores live on different scales, so summing them would let one search dominate; chunks ranked well by both searches",
+        "Ranks are cheaper to store than floating-point scores, so the merge stays within the latency budget; chunks high in the longer list",
+        "Both scores are already normalized to the same range, so only the order carries extra information; chunks with the highest single score",
+        "List positions are exact while scores are only approximate under ANN search, so ranks are trusted more; chunks only the dense search found"
       ],
-      "dogru": 3,
-      "aciklama": "The RRF score is computed as Σ 1/(k + rank); the total for Midterm rooms (ranks 2 and 1) is greater than that for Exam schedule (ranks 1 and 3). The score normalization option is misleading: RRF looks only at ranks, not raw scores, which is how it can combine cosine and BM25 scores of different scales; also, Syllabus and Class calendar remain in the hybrid list, so it does not keep only common chunks."
+      "dogru": 0,
+      "aciklama": "A cosine value and a BM25 sum of weighted word matches come from unrelated formulas, so adding them would let whichever runs larger decide the order; ranks put both lists on equal footing, and a chunk placed high in both collects two large reciprocal-rank terms. The 'already normalized' option is misleading: the scores are not comparable at all, which is exactly why the merge works on positions."
     },
     {
       "id": "d6-12",
@@ -216,15 +216,15 @@
       "konu": "Evaluation: retrieval metrics, golden set, correctness vs. faithfulness",
       "zorluk": 3,
       "slayt": 28,
-      "soru": "In a golden set of three questions, the first relevant chunk is found at ranks 1, 2, and 4, respectively. By the standard definition, what is the approximate MRR?",
+      "soru": "Two retrievers are compared on the same golden set. Both place every gold chunk somewhere in their top-10, so their Recall@10 is identical, yet one scores clearly higher on MRR. What does MRR capture here that Recall@10 does not, and why does that matter downstream?",
       "secenekler": [
-        "0.33",
-        "0.43",
-        "0.58",
-        "0.75"
+        "What share of the ten returned chunks is gold rather than noise; irrelevant chunks lengthen the prompt and distract the model",
+        "Whether every gold chunk, weighted by its position, is ordered near the top; a perfect ordering of all of them scores one",
+        "Whether at least one gold chunk appears anywhere in the top-10; a miss at this stage cannot be repaired by any reranker",
+        "How high the first gold chunk sits in each list; a chunk ranked low can fall below the top-n cut or sit mid-prompt"
       ],
-      "dogru": 2,
-      "aciklama": "MRR = (1/1 + 1/2 + 1/4) / 3 = 1.75 / 3 ≈ 0.58. The answer 0.43 is misleading: it takes the reciprocal of the mean rank (7/3), whereas the definition first takes the reciprocal for each question and then averages. 0.33 is just the fraction of questions found at rank 1 (Hit@1)."
+      "dogru": 3,
+      "aciklama": "Recall@10 only asks whether the gold chunks are inside the cutoff and is blind to where; MRR rewards finding the first gold chunk near rank 1, which matters because only the best few chunks reach the prompt and evidence in the middle is often ignored. The position-weighted option describes nDCG, which scores the order of all relevant chunks, whereas MRR looks only at the first one."
     },
     {
       "id": "d6-15",

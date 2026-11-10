@@ -35,17 +35,17 @@
     {
       "id": "d3-02",
       "konu": "RMSNorm and LayerNorm",
-      "zorluk": 2,
+      "zorluk": 3,
       "slayt": 7,
-      "soru": "The vector h = [1, 3, 5, 7] is fed into an RMSNorm layer, and γ = 1 is assumed. By the RMSNorm definition, approximately what value are the components of h divided by?",
+      "soru": "The same constant is added to every component of a vector before it enters a normalization layer. How do LayerNorm and RMSNorm respond to this shift?",
       "secenekler": [
-        "4.00",
-        "2.24",
-        "4.58",
-        "9.17"
+        "RMSNorm's output is unchanged because RMS ignores offsets; LayerNorm's output changes because β absorbs the shift.",
+        "Both outputs are unchanged, because each layer divides by a statistic that grows along with the added constant.",
+        "LayerNorm's output is unchanged because the mean is subtracted; RMSNorm's output changes because it only rescales.",
+        "Both outputs change, because neither layer removes an offset; they differ only in the learned γ and β parameters."
       ],
       "dogru": 2,
-      "aciklama": "RMS(h) = √mean(h²) = √((1+9+25+49)/4) = √21 ≈ 4.58. 2.24 (√5) is the standard deviation of the mean-subtracted components, which would be LayerNorm's divisor, whereas RMSNorm does not subtract the mean. 9.17 (√84) results from forgetting to divide the sum of squares by 4, and 4.00 is the arithmetic mean of the components."
+      "aciklama": "LayerNorm subtracts the mean before scaling, so a uniform offset is removed, whereas RMSNorm skips the mean subtraction and only divides by the root mean square, so the offset survives in its output. Dividing by a larger statistic shrinks the vector but does not cancel a shift, which is why the 'both unchanged' option fails."
     },
     {
       "id": "d3-03",
@@ -142,7 +142,7 @@
       "konu": "Prefill vs. decode and KV cache",
       "zorluk": 2,
       "slayt": 17,
-      "soru": "Why is the decode phase generally memory-bandwidth-bound at small batch sizes, while prefill is compute-bound?",
+      "soru": "Why is the decode phase often limited by memory bandwidth at small batch sizes, while prefill is limited by arithmetic throughput?",
       "secenekler": [
         "Decode processes a single token, so there is little computation per byte of weights/KV read; prefill reuses the weights across many tokens.",
         "In decode, the N × N attention score matrix is recomputed from scratch at every step; in prefill, the scores are computed once and stored in HBM.",
@@ -155,32 +155,32 @@
     {
       "id": "d3-10",
       "konu": "Prefill vs. decode and KV cache",
-      "zorluk": 3,
+      "zorluk": 2,
       "slayt": 18,
-      "soru": "The prompt has 5 tokens and the model generates 4 tokens. Counting the positions processed, how many positions are processed in total without the KV cache and with the KV cache?",
+      "soru": "With a KV cache, each decode step processes only the newest token instead of the whole prefix. Which statement correctly describes what the cache removes and what it leaves in place?",
       "secenekler": [
-        "26 and 8",
-        "35 and 9",
-        "26 and 4",
-        "20 and 4"
+        "It removes attention to earlier tokens; the new token sees only a pooled summary of them.",
+        "It removes recomputing K/V for earlier tokens; the new token still attends to all of them.",
+        "It removes the prefill pass; the prompt K/V are produced lazily during the decode steps.",
+        "It removes the per-step pass through the decoder stack; only the output softmax is rerun."
       ],
-      "dogru": 0,
-      "aciklama": "Generating 4 tokens requires 4 forward passes: prefill processes 5 positions, then the decode steps without a cache process 6, 7, and 8 positions (total 26); with the cache, prefill 5 + only the newest token at each decode step (1+1+1) = 8. There is no extra pass that processes the last generated token; '35 and 9' counts this extra step. The cached count also includes the 5 prefill positions, which is why '26 and 4' is wrong."
+      "dogru": 1,
+      "aciklama": "The cache stores the K/V already computed for earlier positions, so each step only pushes the newest token through the stack, but that token's query still attends over every cached key and value. Caching therefore saves re-computation of the prefix and does not shorten what attention looks at, which is the confusion in the first option."
     },
     {
       "id": "d3-11",
       "konu": "Prefill vs. decode and KV cache",
       "zorluk": 2,
       "slayt": 19,
-      "soru": "Consider a GQA model with 32 layers, 8 KV heads, head dimension 128, and BF16, which needs 128 KiB of KV cache per token and 512 MiB for 4,096 tokens. If the same model used MHA with 32 KV heads instead of GQA, approximately how large would the KV cache be for a single 4,096-token request?",
+      "soru": "During a busy period a server's KV-cache memory keeps climbing although the model weights never change. Which explanation matches how the cache is sized?",
       "secenekler": [
-        "512 MiB",
-        "1 GiB",
-        "2 GiB",
-        "8 GiB"
+        "The cache is shared by all requests, so memory follows only the longest context currently being served.",
+        "The cache stores the N × N attention scores of each request, so memory follows the square of its context.",
+        "Each request keeps its own K/V for every token in every layer, so memory follows context and concurrency.",
+        "Each request keeps one K/V entry per layer, so memory follows concurrency but not the length of a context."
       ],
       "dogru": 2,
-      "aciklama": "In the formula 2 (K,V) × layers × KV heads × head dimension × bytes, raising the KV head count from 8 to 32 increases the per-token cost by 4×: 512 KiB/token × 4,096 ≈ 2 GiB. 8 GiB is the value obtained by additionally multiplying by 4 concurrent requests; 512 MiB assumes the number of KV heads does not affect the cache size."
+      "aciklama": "Every token contributes K and V in every layer, so the cache grows with conversation length, and separate conversations need separate caches, so it also grows with the number of concurrent requests. The cache holds K/V vectors rather than score matrices, so its growth is per token and not quadratic."
     },
     {
       "id": "d3-12",
@@ -200,17 +200,17 @@
     {
       "id": "d3-13",
       "konu": "PagedAttention, vLLM, and continuous batching",
-      "zorluk": 3,
+      "zorluk": 2,
       "slayt": 22,
-      "soru": "A GPU has 24 physical KV blocks. Requests A, B, and C use 2, 4, and 6 blocks respectively; a fixed-reservation scheme allocates 8 blocks to each request. In which scheme does a new request D that needs 3 blocks find space immediately?",
+      "soru": "Under fixed-size KV reservation, a GPU turns away a new request even though most of the reserved blocks hold no data. Why can paged allocation admit that request?",
       "secenekler": [
-        "In both schemes; in each, 12 blocks are in use and 12 blocks are free.",
-        "Only in paged allocation; in fixed reservation, all 24 blocks are already allocated.",
-        "Only in fixed reservation; in paged allocation, the blocks are scattered, so 3 contiguous blocks cannot be found.",
-        "In neither; adding 3 more blocks to the 12 used blocks exceeds the capacity limit."
+        "Blocks are handed out only as a request grows, so unused capacity stays free for other requests.",
+        "Blocks are stored at a lower bit width, so each request's reservation occupies fewer bytes of memory.",
+        "Blocks are kept physically contiguous per request, so idle gaps between reservations can be merged.",
+        "Blocks of finished requests are refilled at every decode step, so no slot waits for the longest request."
       ],
-      "dogru": 1,
-      "aciklama": "In fixed reservation, 3 × 8 = 24 blocks are allocated; even though 12 of them sit unused, they are 'reserved but idle' and cannot be given to D. Paged allocation occupies only the 12 blocks actually in use, 12 blocks are genuinely free, and blocks need not be physically contiguous (the block table maps logical blocks to scattered pages); therefore the reasoning of the third option is invalid."
+      "dogru": 0,
+      "aciklama": "Fixed reservation sets aside peak space per request, so idle blocks are locked to their owner, while paged allocation gives out blocks on demand and leaves the rest genuinely available. Physical contiguity is not required, since a block table maps logical blocks to scattered pages, and refilling freed slots describes continuous batching."
     },
     {
       "id": "d3-14",
@@ -247,30 +247,30 @@
       "konu": "Quantization",
       "zorluk": 2,
       "slayt": 29,
-      "soru": "Using symmetric integer quantization (q = round(w / s), ŵ = q × s), the weight w = 0.736 is quantized with scale s = 0.05. What are the stored integer q and the reconstructed ŵ?",
+      "soru": "Why does storing the same weights in INT4 instead of INT8 tend to increase the reconstruction error?",
       "secenekler": [
-        "q = 14, ŵ = 0.70",
-        "q = 15, ŵ = 0.736",
-        "q = 74, ŵ = 0.74",
-        "q = 15, ŵ = 0.75"
+        "Fewer bits force a smaller scale s, so weights divided by it overflow the available integer code range.",
+        "The restore step q × s is skipped at low bit widths, so the integer code is used directly as the weight.",
+        "Rounding is replaced by truncation at four bits, so every weight is biased toward zero by one full step.",
+        "Fewer integer codes must cover the weights, so the step s is coarser and rounding lands farther away."
       ],
       "dogru": 3,
-      "aciklama": "0.736 / 0.05 = 14.72 → rounding gives q = 15; ŵ = 15 × 0.05 = 0.75 (reconstruction error +0.014). q = 14 is a round-down error; ŵ is always q × s, so the original 0.736 is not recovered; q = 74 would result from a scale of s = 0.01."
+      "aciklama": "With far fewer codes available, one integer step has to represent a larger slice of the value range, so rounding w / s to the nearest code can leave a bigger gap after restoring with q × s. The scale gets larger rather than smaller at lower bit widths, which is the opposite of the first option."
     },
     {
       "id": "d3-17",
       "konu": "Speculative decoding and serving engines",
       "zorluk": 3,
       "slayt": 30,
-      "soru": "In speculative decoding, the draft model proposes 'on, the, mat'; the target accepts 'on' and 'the' and picks 'sofa' instead of 'mat'. For these three output tokens, how many sequential forward passes does the large target model make, compared with standard decode?",
+      "soru": "Why does the speed-up from speculative decoding depend on how often the target model agrees with the draft model?",
       "secenekler": [
-        "1 vs. 3: a single verification pass scores all positions and picks 'sofa' at the first mismatch.",
-        "2 vs. 3: one verification pass, followed by a separate correction pass for 'sofa'.",
-        "3 vs. 3: the target still computes each position one by one; the gain comes only from the draft being cheap.",
-        "4 vs. 3: the three draft passes are added to the target cost, so the total number of passes increases."
+        "Each accepted draft token lets the target skip verification; only rejected tokens must be scored by it.",
+        "Each accepted draft token saves a sequential target pass; a mismatch discards the remaining draft.",
+        "Each rejected draft token is proposed again by the draft model until the target finally accepts it.",
+        "Each accepted draft token alters the final text, so low acceptance mainly reduces the answer quality."
       ],
-      "dogru": 0,
-      "aciklama": "Standard decode requires three sequential target passes; in speculative decoding, the target scores all draft positions in a single verification pass, accepts the matching ones, and supplies its own choice ('sofa') at the first mismatch, so no separate correction pass is needed. The draft passes belong to the small model and are not counted toward the target cost; the speedup depends on the acceptance rate and the verification cost."
+      "dogru": 1,
+      "aciklama": "The target verifies all drafted positions in one pass, so every accepted token stands in for an expensive sequential target step, while at the first mismatch the target substitutes its own token and generation continues from there, wasting the rest of the draft. Acceptance never bypasses verification, and the final text follows the target's choices, so quality is not what is traded."
     },
     {
       "id": "d3-18",

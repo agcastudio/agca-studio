@@ -80,30 +80,30 @@
       "konu": "Self-attention and Q/K/V computation (scaled dot-product)",
       "zorluk": 2,
       "slayt": 15,
-      "soru": "For the query q_it = [0.5, 0.5, 0.5, 0.5] and the key k_tired = [1.0, 0.0, 0.5, 0.5] with dk = 4, what are the raw dot-product score and the score scaled by √dk for 'tired', respectively?",
+      "soru": "Raw query–key dot products are divided by √dk and then passed through softmax before they are used. What does each of these two steps contribute?",
       "secenekler": [
-        "2.0 and 1.00",
-        "1.0 and 0.25",
-        "1.0 and 0.50",
-        "0.5 and 0.25"
+        "Scaling makes the scores sum to 1; softmax then stabilizes the resulting dot products",
+        "Scaling injects the position signal; softmax then removes the scores of future tokens",
+        "Scaling centers each token vector on mean 0; softmax then picks the single best key",
+        "Scaling stabilizes the dot products; softmax makes them positive weights summing to 1"
       ],
-      "dogru": 2,
-      "aciklama": "The dot product is 0.5·1 + 0.5·0 + 0.5·0.5 + 0.5·0.5 = 1.0; dividing by √dk = √4 = 2 gives 0.50. The option '1.0 and 0.25' reflects the error of dividing by dk = 4 instead of √dk, and '2.0 and 1.00' is the score of the token 'animal'."
+      "dogru": 3,
+      "aciklama": "Dividing by √dk keeps the dot products in a stable range, and softmax converts the scaled scores into a probability distribution: positive weights that sum to 1. The swapped option reverses the two roles; centering a vector on mean 0 is LayerNorm's job, and softmax gives a soft weighting, not a hard pick."
     },
     {
       "id": "d2-06",
       "konu": "Self-attention and Q/K/V computation (scaled dot-product)",
       "zorluk": 3,
-      "slayt": 16,
-      "soru": "Given the attention weights ('animal' 0.481, 'street' 0.227, 'tired' 0.292) and the value vectors (v_animal = [1,0,0,1], v_street = [0,1,0,1], v_tired = [1,1,1,0]), approximately what is the second component of the output vector for 'it'?",
+      "slayt": 13,
+      "soru": "Suppose the value vector of the token 'animal' is altered while its key vector and the query of 'it' stay exactly the same. How does the attention step for 'it' change?",
       "secenekler": [
-        "0.292",
-        "0.519",
-        "0.708",
-        "0.773"
+        "The weight on 'animal' changes, but the content it adds to the output of 'it' stays the same",
+        "The weight on 'animal' stays the same, but the content it adds to the output of 'it' changes",
+        "Both the weight on 'animal' and the content it adds change, since softmax is recomputed on values",
+        "Neither changes, because the output of 'it' is built from the query and key vectors only"
       ],
       "dogru": 1,
-      "aciklama": "Only v_street and v_tired have the value 1 in the second component: 0.227 + 0.292 = 0.519. 0.773 is the first component (animal + tired) and 0.708 is the fourth component (animal + street); one must note which value vector carries a 1 in which component."
+      "aciklama": "Weights come only from query–key matching, so an unchanged key keeps the same weight; the value is the content mixed into the weighted sum, so the output changes. The reversed option confuses the roles: keys decide the match, values carry the content."
     },
     {
       "id": "d2-07",
@@ -123,17 +123,17 @@
     {
       "id": "d2-08",
       "konu": "Real-scale dimensions and attention cost",
-      "zorluk": 3,
+      "zorluk": 2,
       "slayt": 27,
-      "soru": "A model has sequence length n = 8192, dmodel = 4096, h = 32 heads and dhead = 128. What are the dimensions of a single head's Q_hK_hᵀ score matrix and of the concatenated output of all heads (the matrix fed into W_O), respectively?",
+      "soru": "In a large model, each head works with vectors far narrower than the model width. If the head width were halved while the sequence length stayed fixed, what would happen to a single head's query–key score matrix?",
       "secenekler": [
-        "8192 × 8192 and 8192 × 4096",
-        "8192 × 128 and 8192 × 128",
-        "8192 × 8192 and 8192 × 128",
-        "128 × 128 and 4096 × 4096"
+        "It would shrink to half its size in both directions, because scores are stored per feature dimension",
+        "It would shrink to half as many columns, because each key vector would then have half the entries",
+        "It would keep its shape, because it holds one score per query–key pair, set by sequence length",
+        "It would grow to twice its size, because narrower heads need more scores to carry the same content"
       ],
-      "dogru": 0,
-      "aciklama": "Multiplying Q_h (8192×128) by K_hᵀ (128×8192) gives an 8192×8192 score matrix, an n×n matrix independent of dhead; each of the 32 heads produces an 8192×128 output, and the concatenation is 8192×(32·128) = 8192×4096. The option '8192 × 8192 and 8192 × 128' confuses a single head's output with the concatenated result."
+      "dogru": 2,
+      "aciklama": "Each score is a dot product between one query and one key, so the matrix has one entry per token pair and its shape depends only on sequence length; head width only changes the length of the vectors being multiplied. Halving the columns confuses the width of the key vectors with the number of keys."
     },
     {
       "id": "d2-09",
@@ -183,17 +183,17 @@
     {
       "id": "d2-12",
       "konu": "Attention mask and causal self-attention",
-      "zorluk": 2,
+      "zorluk": 3,
       "slayt": 23,
-      "soru": "In a causal mask example, if the scaled scores are [1, 2, 1, 2] and the mask is [0, 0, −∞, −∞], which of the following is approximately the attention weights after softmax?",
+      "soru": "Why is the causal mask applied by adding −∞ to the scores before softmax, instead of setting the unwanted weights to zero after softmax?",
       "secenekler": [
-        "[0.13, 0.37, 0.13, 0.37]",
-        "[0.50, 0.50, 0, 0]",
-        "[0, 0, 0.27, 0.73]",
-        "[0.27, 0.73, 0, 0]"
+        "Because softmax cannot process positive scores unless the future scores are made negative first",
+        "Because adding −∞ removes the future tokens from the sequence, so the score matrix gets smaller",
+        "Because −∞ flips the order of the scores, so that earlier tokens always outweigh the later tokens",
+        "Because softmax then gives blocked positions weight 0 while the allowed weights still sum to 1"
       ],
       "dogru": 3,
-      "aciklama": "The mask is added before softmax: [1, 2, −∞, −∞] → since exp(−∞) = 0, the last two positions get 0, and the first two become e¹/(e¹+e²) ≈ 0.27 and e²/(e¹+e²) ≈ 0.73. [0.13, 0.37, 0.13, 0.37] is the softmax of all four scores as if no mask were applied; [0.50, 0.50, 0, 0] is the error of giving the allowed positions equal weight regardless of the scores."
+      "aciklama": "Softmax maps −∞ to weight 0, so future value vectors contribute nothing, and since normalization happens afterwards the allowed positions still form a proper distribution; zeroing after softmax would leave weights that no longer sum to 1. The mask does not delete tokens or shrink the matrix; it only blocks their influence."
     },
     {
       "id": "d2-13",
@@ -275,15 +275,15 @@
       "konu": "Real-scale dimensions and attention cost",
       "zorluk": 3,
       "slayt": 30,
-      "soru": "If the context length of a model using standard self-attention is increased from 2,048 to 8,192 tokens, by roughly what factor does the number of attention scores of a single head grow, according to the scaling rule of attention?",
+      "soru": "Standard self-attention is valued for letting any token interact directly with any other. Why does this same property become a burden as the context gets longer?",
       "secenekler": [
-        "4×",
-        "16×",
-        "32×",
-        "64×"
+        "Each token needs its own feed-forward network, so the parameter count grows with the square of the length",
+        "Every query is scored against every key, so the score count grows quadratically with sequence length",
+        "Every block must be repeated once per token, so the depth of the stack grows linearly with the length",
+        "Each position needs its own learned key matrix, so the projection weights grow with sequence length"
       ],
       "dogru": 1,
-      "aciklama": "The number of scores scales with n²; when n grows 4× (2,048 → 8,192), the number of scores grows 4² = 16× (8192² / 2048² = 16). The answer '4×' is the mistake of assuming cost is linear in sequence length; the relationship is quadratic: 2n tokens give about 4× the scores."
+      "aciklama": "Direct token-to-token paths exist because every query is compared with every key, which gives a pairwise score matrix that grows quadratically: doubling the tokens gives about four times the scores. The feed-forward option is wrong because the same network is shared across positions, so its parameters do not depend on length."
     }
   ]
 }

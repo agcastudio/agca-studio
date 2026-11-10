@@ -37,30 +37,30 @@
       "konu": "Decoding: temperature, top-k, and top-p",
       "zorluk": 2,
       "slayt": 7,
-      "soru": "The next-token probabilities at T=1.0 are A=0.40, B=0.30, C=0.20, D=0.10. Which statement is correct when the temperature is changed?",
+      "soru": "With the same prompt and model, raising the temperature makes sampled outputs more varied, yet greedy decoding still returns exactly the same token as before. Which mechanism explains both observations?",
       "secenekler": [
-        "At T=2.0 the distribution flattens, so even greedy decoding starts to pick a random token",
-        "At T=0.5 all tokens except the most likely one get zero probability, so sampling becomes equivalent to greedy",
-        "At T=2.0 the probability ranking changes and B overtakes A to become the most likely token",
-        "At T=0.5 the distribution sharpens (A≈0.53), but B, C, and D can still be selected by sampling"
+        "Temperature removes low-probability tokens from the eligible set, so sampling varies while the top token is untouched",
+        "Temperature reorders the tokens at random, while greedy decoding ignores the new order and reads the original scores",
+        "Temperature changes how concentrated the probabilities are but keeps their ranking, so the top token stays the same",
+        "Temperature adjusts the model weights for that request only, which alters sampling but leaves greedy decoding fixed"
       ],
-      "dogru": 3,
-      "aciklama": "A low temperature sharpens the distribution (A 0.533, D 0.033), but even D is not zero; under sampling, low-probability tokens continue to appear. Temperature does not change the ranking of tokens (at T=2.0 A is still first with 0.325) and greedy picks the top token at every temperature, so the claims that 'greedy picks randomly' and 'B moves ahead' are wrong."
+      "dogru": 2,
+      "aciklama": "Temperature only makes the next-token distribution sharper or flatter: a flatter distribution gives lower-ranked tokens more chance under sampling, but the order of tokens is preserved, so greedy decoding keeps picking the same top token. Removing tokens from the eligible set is what top-k and top-p filtering do, not temperature."
     },
     {
       "id": "d4-03",
       "konu": "Decoding: temperature, top-k, and top-p",
       "zorluk": 2,
       "slayt": 8,
-      "soru": "With sorted probabilities A=40%, B=30%, C=20%, D=10%, which statement is correct for the top-k (k=2) and top-p (p=0.80) filters?",
+      "soru": "At one generation step the model is very confident in a single token; at another step the probability is spread over many tokens. Why does top-p filtering behave differently from top-k across these two steps?",
       "secenekler": [
-        "For p=0.80 the set is {A, B, C}; if p is lowered to 0.70, the set shrinks to {A, B}",
-        "For p=0.80 the set is {A, B}, because 70% gives the cumulative mass closest to the threshold",
-        "For k=2 the set is {A, B}; if the distribution flattens, the set grows on its own even though k stays fixed",
-        "Top-k and top-p cannot be used together; when one is applied, the temperature parameter is disabled"
+        "Top-p keeps a fixed number of tokens, whereas top-k keeps adding tokens until a probability threshold is reached",
+        "Top-p keeps the smallest set reaching a mass threshold, so its size follows the distribution; k is a fixed count",
+        "Top-p flattens the distribution before filtering, whereas top-k sharpens it, so the eligible sets end up different",
+        "Top-p always selects the single most likely token, whereas top-k samples uniformly among the k highest-ranked ones"
       ],
-      "dogru": 0,
-      "aciklama": "Top-p takes the smallest set whose mass reaches p: 40%+30%=70% < 80%, so C is added as well and the set is {A, B, C} (90%); at p=0.70, {A, B} suffices with exactly 70%. The 'closest to the threshold' reading is wrong because the rule is to reach the threshold; in top-k, k is a fixed number so the set does not grow with the distribution, and temperature and filters can in fact be combined."
+      "dogru": 1,
+      "aciklama": "Top-p uses a probability threshold, so a peaked distribution needs only a few tokens to reach it while a flat one needs many; top-k keeps the same number of tokens regardless of the shape. The first option swaps the two definitions, and neither filter reshapes the distribution; they only restrict which tokens are eligible before renormalizing and sampling."
     },
     {
       "id": "d4-04",
@@ -97,15 +97,15 @@
       "konu": "Reasoning prompts: CoT, Self-Consistency, ToT, Least-to-Most, PAL",
       "zorluk": 2,
       "slayt": 16,
-      "soru": "For a math question, 5 reasoning paths are sampled with self-consistency and the final answers are 18, 26, 18, 14, 18; greedy decoding gave 14. Which answer does the method select, and why?",
+      "soru": "Self-consistency samples several reasoning paths for one question and takes a majority vote over their final answers instead of trusting a single greedy path. What is the logic behind this design?",
       "secenekler": [
-        "14; because greedy decoding is the single most likely path, it always takes priority over the other sampled paths",
-        "26; the answer of the most detailed and longest reasoning path is considered the most reliable",
-        "18; the reasoning paths are marginalized out and a majority vote is taken over the final answers",
-        "18.8; because the answers are numeric, the final answers of the paths are averaged"
+        "The longest sampled path contains the most steps, so its final answer is treated as the most carefully checked one",
+        "Each path is scored at its intermediate steps, so weak branches are pruned before the remaining answers are counted",
+        "Different correct paths tend to reach the same answer while mistakes scatter, so agreement signals a reliable answer",
+        "Sampling makes each later path more concentrated, so the answer generated last is taken as the most reliable one"
       ],
       "dogru": 2,
-      "aciklama": "Self-consistency (Wang et al., 2023) samples diverse reasoning paths, marginalizes out the content of the paths, and applies a majority vote over the final answers only; 18 is selected because it appears three times. Here the single greedy path gives the wrong answer (14) while voting finds the correct one (18); greedy has no priority and no averaging is performed."
+      "aciklama": "Self-consistency marginalizes over the reasoning paths: how an answer was reached is ignored and only the final answers are counted, because many different valid routes converge on the correct answer while errors tend to disagree with each other. Scoring and pruning intermediate steps describes Tree of Thoughts, not self-consistency."
     },
     {
       "id": "d4-07",
@@ -172,30 +172,30 @@
       "konu": "Evaluation basics: task types, Accuracy, Exact Match, F1",
       "zorluk": 2,
       "slayt": 21,
-      "soru": "The reference answer is '8' and the model produced 'The answer is 8.' Which is the most accurate assessment for Exact Match in this case?",
+      "soru": "A model answers a numeric question with a full sentence that contains the right number. Exact Match gives the answer 0, while token-level F1 gives it partial credit. What explains the difference?",
       "secenekler": [
-        "Raw EM = 1, because the reference string ('8') appears verbatim inside the model's prediction text",
-        "Raw EM = 0, and token F1 is also 0 because the token lengths of the two strings differ in size",
-        "Raw EM = 0; normalization can change the score, so the preprocessing must be defined in advance",
-        "EM cannot be computed; for such free-text outputs only a rubric or an LLM judge can be used"
+        "Exact Match compares meanings through embeddings, whereas token F1 compares only the lengths of the two strings",
+        "Exact Match is averaged over several sampled outputs, whereas token F1 is decided by the first generated token",
+        "Exact Match rewards recall of the reference tokens, whereas token F1 rewards only precision of predicted tokens",
+        "Exact Match is all-or-nothing on the whole string, whereas token F1 credits each overlapping token separately"
       ],
-      "dogru": 2,
-      "aciklama": "EM gives 1 only if the strings are exactly equal; although 'The answer is 8.' is semantically correct, raw EM = 0, and since applying number parsing/normalization can change the score, the preprocessing must be defined and reported in advance. Token F1 is not zero because the token '8' overlaps (precision 1/4, recall 1/1); since a numeric-answer task is closed-ended, a rubric or judge is not required."
+      "dogru": 3,
+      "aciklama": "Exact Match is 1 only when the prediction string equals the target, so a correct answer with different wording scores 0 unless a normalization step is defined beforehand; token F1 combines precision and recall over shared tokens, so the matching number still earns credit. Neither metric looks at meaning, and F1 uses both precision and recall, not precision alone."
     },
     {
       "id": "d4-12",
       "konu": "Reference-based metrics: BLEU, ROUGE, METEOR, chrF, BERTScore",
       "zorluk": 3,
       "slayt": 22,
-      "soru": "For the reference 'the cat sat on the mat' and the candidate 'the cat sat on mat', the n-gram precisions are p1=1.000, p2=0.750, p3=0.667, p4=0.500, and BP=0.819. Which statement is correct?",
+      "soru": "BLEU is built on the n-gram precision of the candidate with respect to the reference. What would go wrong if its brevity penalty were removed?",
       "secenekler": [
-        "BLEU-1 = 1.000; since all candidate words appear in the reference, no brevity penalty is applied to the score",
-        "BLEU-1 = 0.819; unigram precision is perfect, but BP lowers the score because the candidate is shorter",
-        "BLEU-4 is higher than BLEU-1, because higher n-gram orders reward long exact matches more strongly",
-        "If the candidate were longer than the reference, the formula BP = e^(1 − r/c) would exceed 1 and raise the score"
+        "A very short candidate made of a few safe reference words could score highly while omitting most of the content",
+        "A very long candidate could repeat a reference word many times and be rewarded again for each single repetition",
+        "A paraphrased candidate built from synonyms would receive full credit although no surface n-grams overlap at all",
+        "A candidate with the right words in scrambled order would receive the same score at every n-gram order considered"
       ],
-      "dogru": 1,
-      "aciklama": "BLEU-N = BP × (p1 … pN)^(1/N); even though unigram precision is 1.000, c=5 < r=6, so BP = e^(1−6/5) ≈ 0.819 and BLEU-1 = 0.819. Higher n-gram orders reward long matches but the score drops when matches are missing (BLEU-4 = 0.579 < BLEU-1); when the candidate is longer than the reference (c > r), BP = 1 and it never exceeds 1."
+      "dogru": 0,
+      "aciklama": "Precision only asks how many candidate n-grams appear in the reference and has no recall term, so dropping words never hurts it; the brevity penalty is what punishes candidates shorter than the reference. Rewarding repeated words is prevented by clipping the n-gram counts, which is a separate component from the brevity penalty."
     },
     {
       "id": "d4-13",
@@ -215,47 +215,47 @@
     {
       "id": "d4-14",
       "konu": "Code evaluation: pass@k",
-      "zorluk": 1,
+      "zorluk": 2,
       "slayt": 27,
-      "soru": "In a coding evaluation, k=3 programs are sampled for each task. In Task A, 1 of 3 candidates passes the unit tests; in Task B, 0; in Task C, 1. What is the observed pass@3?",
+      "soru": "For a code benchmark, k programs are sampled for each task and pass@k is reported. Why is success counted per task instead of as the share of all generated programs that pass?",
       "secenekler": [
-        "2/9; of the 9 total attempts, 2 passed, counting every sampled program instead of every task",
-        "0/3; only tasks whose three candidates all pass the unit tests count as successful, so no task is counted",
-        "2/3; the number of tasks with at least one passing candidate divided by the total number of tasks",
-        "3%; the value of k corresponds directly to an accuracy percentage, so pass@3 equals 3 percent"
+        "Because the unit tests can be executed only once per task, the remaining sampled programs are never actually run",
+        "Because the k programs are merged into one final program, only a single combined result exists for every task",
+        "Because the metric asks whether a task gets solved within k tries, a single passing attempt settles that task",
+        "Because k is the number of unit tests per task, a task passes only when all k of those tests are satisfied"
       ],
       "dogru": 2,
-      "aciklama": "pass@k is defined at the task level: a task is successful if at least one of k attempts passes the unit tests; since A and C succeed and B fails, pass@3 = 2/3. The 2/9 answer counts attempts, whereas k counts attempts per task, not tests, and pass@k is not 'k% accuracy'."
+      "aciklama": "pass@k measures success with up to k tries: a task succeeds when at least one of its k independently sampled solutions passes the unit tests, so failed attempts on a solved task do not count against it. k counts attempts, not tests, which is why the last option confuses the two, and the result is only as trustworthy as the tests themselves."
     },
     {
       "id": "d4-15",
       "konu": "Groundedness, faithfulness, and safety metrics",
       "zorluk": 2,
-      "slayt": 29,
-      "soru": "A RAG output 'Atlas started in 2023; it has 12 members; it is funded by NASA.' contains three claims; the source text supports the first two and does not mention the third at all. Which is the most accurate assessment of this output?",
+      "slayt": 28,
+      "soru": "A generated summary contains a statement that is true in the real world but appears nowhere in the retrieved passages. How does a groundedness check treat this statement, and why?",
       "secenekler": [
-        "Claim support rate is 2/3; since the third claim does not appear in the source, it is considered proven false",
-        "Claim support rate is 2/3; the third claim is 'not in the source', which does not mean it is actually false",
-        "Claim support rate is 3/3; if the NASA claim is true in the real world, the faithfulness score is not negatively affected",
-        "Claim support rate is 1/3; only the numerically verifiable claim (12 members) counts as fully supported"
+        "As supported, because faithfulness is in the end a measure of whether the claims hold in the real world",
+        "As unsupported, because faithfulness measures consistency with the given evidence, not real-world truth",
+        "As false, because any claim that is missing from the provided source is taken as contradicted by it",
+        "As a safety violation, because adding outside content counts as obeying an injected instruction"
       ],
       "dogru": 1,
-      "aciklama": "Faithfulness ≈ supported claims / total claims = 2/3, and under the principle that 'unsupported by this source does not necessarily mean false', the third claim is merely outside the source, not declared false. Faithfulness measures consistency with the source, not real-world truth; so even if the NASA claim is actually true, it counts as unsupported and the score is not 3/3."
+      "aciklama": "Groundedness asks whether each claim follows from the provided evidence, so a claim absent from the source is unsupported even if it happens to be true. The same logic works in the other direction: being unsupported by this source does not make a claim false, so labeling it as contradicted confuses support with truth."
     },
     {
       "id": "d4-16",
       "konu": "Human evaluation and Cohen's kappa",
       "zorluk": 3,
       "slayt": 31,
-      "soru": "Two raters label 10 model answers as Yes/No and agree on 8/10 (80%). When both say 5 Yes / 5 No, κ = 0.60. With the same 80% observed agreement, how would κ change if both raters had said 9 Yes / 1 No?",
+      "soru": "Two raters give the same Yes/No label to a large share of model answers. Why can this raw percent agreement overstate how reliable the annotation is, and what does Cohen's kappa correct?",
       "secenekler": [
-        "κ stays the same (0.60), because Cohen's kappa depends only on the observed agreement (Pₒ)",
-        "κ increases, because when raters concentrate on the same label, their consistency is considered higher",
-        "κ drops below zero (≈ −0.11), because Pₑ = 0.9² + 0.1² = 0.82 exceeds Pₒ = 0.80",
-        "κ = 0.80, because no chance correction is applied when the label distribution becomes imbalanced"
+        "Percent agreement ignores how many items were rated; kappa rescales the agreement by the size of the sample",
+        "Percent agreement treats human labels as ground truth; kappa swaps them for labels produced by an LLM judge",
+        "Part of the agreement would occur by chance given how often each rater uses a label; kappa removes that part",
+        "Percent agreement counts only the Yes/Yes matches; kappa adds the No/No matches that the raw figure leaves out"
       ],
       "dogru": 2,
-      "aciklama": "κ = (Pₒ − Pₑ)/(1 − Pₑ); when both raters say 90% Yes, chance agreement is Pₑ = 0.81 + 0.01 = 0.82 and (0.80 − 0.82)/0.18 ≈ −0.11, which is even below chance level. That the same 80% agreement gives such a different result in kappa shows that 80% agreement does not by itself mean strong reliability; kappa depends not only on Pₒ but also on Pₑ, which comes from the label distribution."
+      "aciklama": "Raters who each use the labels at certain rates would agree on some items even if they labeled independently, and this expected chance agreement grows when both favor the same label; kappa reports only the agreement beyond chance, so it is 0 at chance level and can even be negative. Raw agreement already counts both Yes/Yes and No/No matches, so the last option misdescribes it."
     },
     {
       "id": "d4-17",
