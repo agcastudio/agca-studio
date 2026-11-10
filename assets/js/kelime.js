@@ -1,7 +1,7 @@
-/* İngilizce Kartlar (layouts/kelime/single.html). İfadeler sayfaya gömülü JSON'dan okunur (data/ingilizce/*.json).
-   Ezber sistemi: Leitner kutuları (1–5). Bilinen kart bir üst kutuya çıkar ve daha geç tekrar edilir; bilinmeyen kart
-   1. kutuya döner ve aynı oturumda yeniden sorulur. Kartlar, test ve yazma çalışması aynı kutuları günceller.
-   Sunucuya veri gitmez: ilerleme ziyaretçinin tarayıcısında (localStorage). */
+/* İngilizce Kartlar (layouts/kelime/single.html). İfadeler sayfaya gömülü JSON'dan okunur (data/ingilizce/ifadeler.json).
+   Ders ayrımı yok: tüm ifadeler tek havuz. Ezber sistemi Leitner kutuları (1–5): bilinen kart bir üst kutuya çıkar ve
+   daha geç tekrar edilir; bilinmeyen kart 1. kutuya döner ve aynı oturumda yeniden sorulur. Kartlar, test ve yazma
+   aynı kutuları günceller. Sunucuya veri gitmez: ilerleme ziyaretçinin tarayıcısında (localStorage). */
 (function () {
   'use strict';
 
@@ -9,21 +9,19 @@
   var VERI = {};
   try { VERI = JSON.parse(kaynakEl ? kaynakEl.textContent : '{}') || {}; } catch (e) { VERI = {}; }
 
-  var DERSLER = Object.keys(VERI).sort(function (a, b) { return a.localeCompare(b, 'tr', { numeric: true }); })
-    .map(function (k) { return VERI[k]; })
-    .filter(function (d) { return d && Array.isArray(d.ogeler) && d.ogeler.length; });
-  var OGE = {};
   var TUM = [];
-  DERSLER.forEach(function (d) {
+  var OGE = {};
+  Object.keys(VERI).forEach(function (k) {
+    var d = VERI[k];
+    if (!d || !Array.isArray(d.ogeler)) return;
     d.ogeler.forEach(function (o) {
-      o._ders = d.id;
       o.anlam = Array.isArray(o.anlam) ? o.anlam : [];
       o.grup = Array.isArray(o.grup) ? o.grup : [];
       OGE[o.id] = o; TUM.push(o);
     });
   });
 
-  var DEPO = 'ingkelime_v1';
+  var DEPO = 'ingkelime_v2';
   var GUN = 86400000;
   var ARALIK = [0, 0, 1, 3, 7, 16];          // kutuya göre tekrar aralığı (gün); 1. kutu hemen
   var YENI_LIMIT = 15;                         // bir kart oturumuna eklenen en çok yeni kart
@@ -32,6 +30,21 @@
 
   var ekran = document.getElementById('ekran');
   var klavye = null;                           // etkin ekranın klavye işleyicisi
+
+  /* ---------- simgeler (satır içi SVG, currentColor) ---------- */
+  function svg(yol, boyut) {
+    return '<svg viewBox="0 0 24 24" width="' + (boyut || 20) + '" height="' + (boyut || 20) + '" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + yol + '</svg>';
+  }
+  var IKON = {
+    kart: svg('<rect x="3" y="6" width="14" height="14" rx="2"/><path d="M7 3h11a3 3 0 0 1 3 3v11"/>'),
+    test: svg('<circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>'),
+    yaz: svg('<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>'),
+    liste: svg('<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>'),
+    ok: svg('<path d="M9 6l6 6-6 6"/>', 18),
+    geri: svg('<path d="M15 6l-6 6 6 6"/>', 18),
+    tamam: svg('<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>', 28),
+    ses: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+  };
 
   /* ---------- depo ---------- */
   function depoOku() {
@@ -43,12 +56,10 @@
   var depo = depoOku();
   if (!depo.kutu || typeof depo.kutu !== 'object') depo.kutu = {};
   if (!Array.isArray(depo.denemeler)) depo.denemeler = [];
-  var ayar = Object.assign({ dersler: DERSLER.map(function (d) { return d.id; }), n: 10, yon: 'en' }, depo.ayar || {});
-  ayar.dersler = (ayar.dersler || []).filter(function (id) { return DERSLER.some(function (d) { return d.id === id; }); });
-  if (!ayar.dersler.length) ayar.dersler = DERSLER.map(function (d) { return d.id; });
+  var ayar = Object.assign({ n: 10, yon: 'en' }, depo.ayar || {});
   if (ayar.n !== 'tum' && SAYILAR.indexOf(ayar.n) < 0) ayar.n = 10;
   if (ayar.yon !== 'en' && ayar.yon !== 'tr') ayar.yon = 'en';
-  function ayarKaydet() { depo.ayar = { dersler: ayar.dersler, n: ayar.n, yon: ayar.yon }; depoYaz(); }
+  function ayarKaydet() { depo.ayar = { n: ayar.n, yon: ayar.yon }; depoYaz(); }
 
   /* ---------- yardımcılar ---------- */
   function h(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -57,11 +68,10 @@
   function yuzde(a, b) { return b ? Math.round(100 * a / b) : 0; }
   function rozetSinif(p) { return p >= 80 ? 'iyi' : p >= 60 ? 'orta' : 'zayif'; }
   function tarihMetni(t) { try { return new Date(t).toLocaleString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
-  function ders(id) { for (var i = 0; i < DERSLER.length; i++) if (DERSLER[i].id === id) return DERSLER[i]; return null; }
-  function dersKisa(id) { var d = ders(id); return d ? d.ders : id; }
   function ornekHtml(s) { return h(s).replace(/\[\[(.+?)\]\]/g, '<mark>$1</mark>'); }
   function goster(html) { ekran.innerHTML = html; window.scrollTo(0, 0); ekran.focus({ preventScroll: true }); }
-  function secili() { return TUM.filter(function (o) { return ayar.dersler.indexOf(o._ders) >= 0; }); }
+  function bagla(id, fn) { var el = document.getElementById(id); if (el) el.addEventListener('click', fn); }
+  function siralamaAnahtari(o) { return o.ifade.toLowerCase().replace(/^(to|a|an|the)\s+/, ''); }
 
   /* ---------- seslendirme (tarayıcının kendi İngilizce sesi) ---------- */
   var SES = 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
@@ -77,10 +87,9 @@
       window.speechSynthesis.speak(u);
     } catch (e) { /* ses yok */ }
   }
-  function sesDugme(metin) {
+  function sesDugme(metin, sinif) {
     if (!SES) return '';
-    return '<button type="button" class="ses" data-ses="' + h(metin) + '" aria-label="Sesli oku: ' + h(metin) + '" title="Sesli oku">' +
-      '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>';
+    return '<button type="button" class="ses' + (sinif ? ' ' + sinif : '') + '" data-ses="' + h(metin) + '" aria-label="Sesli oku: ' + h(metin) + '" title="Sesli oku">' + IKON.ses + '</button>';
   }
   function sesBagla(kok) {
     (kok || ekran).querySelectorAll('[data-ses]').forEach(function (b) {
@@ -100,20 +109,20 @@
     depo.kutu[id] = r;
     depoYaz();
   }
-  function durumAd(k) { return k >= 5 ? 'öğrenildi' : k >= 3 ? 'pekişiyor' : k >= 1 ? 'öğreniliyor' : 'yeni'; }
+  var DURUMLAR = [
+    { id: 'yeni', ad: 'Yeni' },
+    { id: 'ogreniliyor', ad: 'Öğreniliyor' },
+    { id: 'pekisiyor', ad: 'Pekişiyor' },
+    { id: 'ogrenildi', ad: 'Öğrenildi' }
+  ];
   function durumSinif(k) { return k >= 5 ? 'ogrenildi' : k >= 3 ? 'pekisiyor' : k >= 1 ? 'ogreniliyor' : 'yeni'; }
+  function durumAd(k) { var s = durumSinif(k); for (var i = 0; i < DURUMLAR.length; i++) if (DURUMLAR[i].id === s) return DURUMLAR[i].ad; return ''; }
   function dagilim(liste) {
     var d = { yeni: 0, ogreniliyor: 0, pekisiyor: 0, ogrenildi: 0 };
     liste.forEach(function (o) { d[durumSinif(kutuNo(o.id))]++; });
     return d;
   }
-  function dagilimCubuk(d, toplam) {
-    function p(x) { return (toplam ? 100 * x / toplam : 0).toFixed(2) + '%'; }
-    return '<div class="dagilim" aria-hidden="true">' +
-      '<span class="ogrenildi" style="width:' + p(d.ogrenildi) + '"></span>' +
-      '<span class="pekisiyor" style="width:' + p(d.pekisiyor) + '"></span>' +
-      '<span class="ogreniliyor" style="width:' + p(d.ogreniliyor) + '"></span></div>';
-  }
+  function pil(k) { return '<span class="pil ' + durumSinif(k) + '">' + durumAd(k) + '</span>'; }
 
   /* ---------- cevap karşılaştırma (yazma çalışması) ---------- */
   function normal(s) {
@@ -180,7 +189,7 @@
 
   /* ---------- çeldirici seçimi ----------
      Aynı anlam grubundaki (grup etiketi ortak) ifadeler birbirine çeldirici yapılmaz; böylece birden çok doğru
-     cevap gibi görünen seçenek çıkmaz. Çeldiriciler tüm derslerden seçilir. */
+     cevap gibi görünen seçenek çıkmaz. */
   function cakisir(a, b) {
     if (a.id === b.id) return true;
     for (var i = 0; i < a.grup.length; i++) if (b.grup.indexOf(a.grup[i]) >= 0) return true;
@@ -211,21 +220,19 @@
     var q = { o: o, tur: tur, cevap: null };
     var dogru, yanlislar;
     if (tur === 'anlam') {
+      q.metin = o.ifade; q.ses = o.ifade;
       if (o.zit) {
-        q.baslik = 'Zıt anlamlısı hangisi?'; q.metin = o.ifade; q.ses = o.ifade;
+        q.baslik = 'Zıt anlamlısı hangisi?';
         dogru = o.zit.ifade;
         yanlislar = celdiriciler(o, function (x) { return x.ifade; }, dogru, 3);
       } else {
-        q.baslik = 'Anlamı hangisi?'; q.metin = o.ifade; q.ses = o.ifade;
+        q.baslik = 'Anlamı hangisi?';
         dogru = rastgele(o.anlam);
         yanlislar = celdiriciler(o, function (x) { return x.anlam.length ? rastgele(x.anlam) : ''; }, dogru, 3);
       }
     } else if (tur === 'ters') {
-      if (o.zit) {
-        q.baslik = 'Zıt anlamlısı bu olan ifade hangisi?'; q.metin = o.zit.ifade;
-      } else {
-        q.baslik = 'Bu anlama gelen ifade hangisi?'; q.metin = rastgele(o.anlam);
-      }
+      if (o.zit) { q.baslik = 'Zıt anlamlısı bu olan ifade hangisi?'; q.metin = o.zit.ifade; }
+      else { q.baslik = 'Bu anlama gelen ifade hangisi?'; q.metin = rastgele(o.anlam); }
       dogru = o.ifade;
       yanlislar = celdiriciler(o, function (x) { return x.ifade; }, dogru, 3);
     } else if (tur === 'bosluk') {
@@ -241,100 +248,92 @@
     return q;
   }
   /* Önce az bilinenler: kutu numarası küçük olan ifadeler öncelikli, eşitlerde rastgele. */
-  function oncelikli(liste, n) {
-    var sirali = karistir(liste).sort(function (a, b) { return kutuNo(a.id) - kutuNo(b.id); });
+  function oncelikli(n) {
+    var sirali = karistir(TUM).sort(function (a, b) { return kutuNo(a.id) - kutuNo(b.id); });
     return karistir(sirali.slice(0, n));
   }
-  function sayi(liste) { return ayar.n === 'tum' ? liste.length : Math.min(ayar.n, liste.length); }
+  function sayi() { return ayar.n === 'tum' ? TUM.length : Math.min(ayar.n, TUM.length); }
 
-  /* ---------- ortak kart arka yüzü ---------- */
+  /* ---------- ifade ayrıntısı (kart arka yüzü, geri bildirim, liste) ---------- */
   function ayrintiHtml(o, ifadeGoster) {
-    return (ifadeGoster ? '<p class="ay-ifade"><span>' + h(o.ifade) + '</span>' + sesDugme(o.ifade) + '</p>' : '') +
-      (o.anlam.length ? '<ul class="ay-anlam">' + o.anlam.map(function (a) { return '<li><span class="isaret" aria-label="eş anlam">=</span>' + h(a) + '</li>'; }).join('') + '</ul>' : '') +
-      (o.zit ? '<ul class="ay-anlam zit"><li><span class="isaret" aria-label="zıt anlam">≠</span><span><b>' + h(o.zit.ifade) + '</b> <span class="muted">· ' + h(o.zit.tr) + '</span></span></li></ul>' : '') +
+    return (ifadeGoster ? '<p class="ay-ifade" lang="en"><span>' + h(o.ifade) + '</span>' + sesDugme(o.ifade) + '</p>' : '') +
+      (o.anlam.length ? '<ul class="ay-anlam" lang="en">' + o.anlam.map(function (a) { return '<li><span class="isaret" title="eş anlam">=</span><span>' + h(a) + '</span></li>'; }).join('') + '</ul>' : '') +
+      (o.zit ? '<ul class="ay-anlam zit"><li><span class="isaret" title="zıt anlam">≠</span><span><b lang="en">' + h(o.zit.ifade) + '</b> <span class="muted">· ' + h(o.zit.tr) + '</span></span></li></ul>' : '') +
       '<p class="ay-tr">' + h(o.tr) + '</p>' +
-      (o.ornek ? '<p class="ay-ornek">' + ornekHtml(o.ornek) + '</p>' : '') +
+      (o.ornek ? '<p class="ay-ornek" lang="en">' + ornekHtml(o.ornek) + '</p>' : '') +
       (o.not ? '<p class="ay-not">' + h(o.not) + '</p>' : '');
   }
+  function ustBar(orta, sag) {
+    return '<div class="ust-bar"><button type="button" class="geri-dugme" id="cik">' + IKON.geri + '<span>Ana sayfa</span></button>' +
+      '<span class="bosluk"></span>' + (orta || '') + (sag ? '<span class="durum">' + sag + '</span>' : '') + '</div>';
+  }
+  function ilerleme(oran) { return '<div class="ilerleme" aria-hidden="true"><span style="width:' + oran + '%"></span></div>'; }
 
   /* ---------- ana ekran ---------- */
   function anaEkran() {
     klavye = null;
-    var liste = secili(), simdi = Date.now();
-    var vade = liste.filter(function (o) { return vadesiGeldi(o.id, simdi); }).length;
-    var yeni = liste.filter(function (o) { return !kayit(o.id); }).length;
+    var simdi = Date.now();
+    var vade = TUM.filter(function (o) { return vadesiGeldi(o.id, simdi); }).length;
+    var yeni = TUM.filter(function (o) { return !kayit(o.id); }).length;
     var kartSayi = vade + Math.min(YENI_LIMIT, yeni);
-    var dTum = dagilim(TUM);
-
-    var dersHtml = DERSLER.map(function (d) {
-      var dd = dagilim(d.ogeler), sec = ayar.dersler.indexOf(d.id) >= 0;
-      return '<label class="ders">' +
-        '<input type="checkbox" data-ders="' + h(d.id) + '"' + (sec ? ' checked' : '') + '>' +
-        '<span class="ders-orta"><span class="ders-ad">' + h(d.ders) + '</span><span class="ders-alt">' + h(d.baslik) + '</span>' + dagilimCubuk(dd, d.ogeler.length) + '</span>' +
-        '<span class="ders-sag">' + d.ogeler.length + ' ifade<b>' + dd.ogrenildi + ' öğrenildi</b></span>' +
-        '</label>';
-    }).join('');
+    var d = dagilim(TUM), N = TUM.length;
+    function w(x) { return (N ? 100 * x / N : 0).toFixed(2) + '%'; }
 
     var sayiHtml = SAYILAR.map(function (n) {
-      return '<button type="button" data-n="' + n + '" aria-pressed="' + (ayar.n === n) + '"' + (liste.length < n ? ' disabled' : '') + '>' + n + '</button>';
-    }).join('') + '<button type="button" data-n="tum" aria-pressed="' + (ayar.n === 'tum') + '">Tümü · ' + liste.length + '</button>';
+      return '<button type="button" data-n="' + n + '" aria-pressed="' + (ayar.n === n) + '">' + n + '</button>';
+    }).join('') + '<button type="button" data-n="tum" aria-pressed="' + (ayar.n === 'tum') + '">Tümü</button>';
 
-    var gecmis = depo.denemeler.slice(-5).reverse();
+    var gecmis = depo.denemeler.slice(-4).reverse();
     var gecmisHtml = gecmis.map(function (g) {
       var p = yuzde(g.dogru, g.n);
-      return '<div class="gecmis-satir"><div><div>' + (g.tur === 'yaz' ? 'Yazma' : 'Test') + ' · ' + g.n + ' soru · ' + h((g.dersler || []).map(dersKisa).join(', ')) + '</div>' +
-        '<div class="muted">' + h(tarihMetni(g.t)) + '</div></div>' +
-        '<span class="skor-rozet ' + rozetSinif(p) + '">%' + p + '</span></div>';
+      return '<li class="gecmis-satir"><span class="gecmis-ikon">' + (g.tur === 'yaz' ? IKON.yaz : IKON.test) + '</span>' +
+        '<span><span class="gecmis-ad">' + (g.tur === 'yaz' ? 'Yazma' : 'Test') + ' · ' + g.n + ' soru</span><span class="muted">' + h(tarihMetni(g.t)) + '</span></span>' +
+        '<span class="skor-rozet ' + rozetSinif(p) + '">%' + p + '</span></li>';
     }).join('');
 
+    var gunluk = kartSayi
+      ? '<p class="gunluk-sayi"><b>' + kartSayi + '</b> kart hazır</p>' +
+        '<p class="gunluk-alt">' + (vade ? vade + ' tekrar' : '') + (vade && Math.min(YENI_LIMIT, yeni) ? ' · ' : '') + (Math.min(YENI_LIMIT, yeni) ? Math.min(YENI_LIMIT, yeni) + ' yeni ifade' : '') + '</p>'
+      : '<p class="gunluk-sayi bitti">' + IKON.tamam + '<span>Bugünkü tekrar bitti</span></p>' +
+        '<p class="gunluk-alt">Sıradaki kartlar zamanı gelince burada görünecek.</p>';
+
     goster(
-      '<div class="giris">' +
-      '<header class="giris-baslik"><h1>İngilizce Kartlar</h1><p>' + DERSLER.length + ' ders · ' + TUM.length + ' collocation, deyim ve ifade · yalnız ders notlarındakiler</p></header>' +
+      '<div class="ana">' +
+      '<header class="ana-ust"><h1>İngilizce Kartlar</h1>' +
+      '<button type="button" class="btn ikincil kucuk-btn" id="liste">' + IKON.liste + '<span>Liste</span></button></header>' +
 
-      '<section class="ozet" aria-label="İlerleme">' +
-      dagilimCubuk(dTum, TUM.length) +
-      '<ul class="lejant">' +
-      '<li><i class="ogrenildi"></i>Öğrenildi <b>' + dTum.ogrenildi + '</b></li>' +
-      '<li><i class="pekisiyor"></i>Pekişiyor <b>' + dTum.pekisiyor + '</b></li>' +
-      '<li><i class="ogreniliyor"></i>Öğreniliyor <b>' + dTum.ogreniliyor + '</b></li>' +
-      '<li><i class="yeni"></i>Yeni <b>' + dTum.yeni + '</b></li></ul></section>' +
+      '<section class="panel ilerleme-panel" aria-label="İlerleme">' +
+      '<div class="ip-ust"><p class="ip-sayi"><b>' + d.ogrenildi + '</b><span>/ ' + N + ' öğrenildi</span></p><span class="ip-oran">%' + yuzde(d.ogrenildi, N) + '</span></div>' +
+      '<div class="dagilim" role="img" aria-label="' + d.ogrenildi + ' öğrenildi, ' + d.pekisiyor + ' pekişiyor, ' + d.ogreniliyor + ' öğreniliyor, ' + d.yeni + ' yeni">' +
+      '<span class="ogrenildi" style="width:' + w(d.ogrenildi) + '"></span><span class="pekisiyor" style="width:' + w(d.pekisiyor) + '"></span><span class="ogreniliyor" style="width:' + w(d.ogreniliyor) + '"></span></div>' +
+      '<ul class="lejant">' + DURUMLAR.slice().reverse().map(function (s) { return '<li><i class="' + s.id + '"></i>' + s.ad + ' <b>' + d[s.id] + '</b></li>'; }).join('') + '</ul>' +
+      '</section>' +
 
-      '<section aria-labelledby="b-dersler"><div class="bolum-baslik"><h2 id="b-dersler">Dersler</h2>' +
-      '<span class="ipucu"><button type="button" class="baglanti" data-tum="1">tümü</button> · <button type="button" class="baglanti" data-tum="0">hiçbiri</button></span></div>' +
-      '<div class="dersler">' + dersHtml + '</div>' +
-      (liste.length ? '' : '<p class="uyari" style="margin-top:8px">En az bir ders seç.</p>') + '</section>' +
-
-      '<section class="mod" aria-labelledby="b-kart"><div class="bolum-baslik"><h2 id="b-kart">1 · Kartlar</h2><span class="ipucu">' + vade + ' tekrar · ' + yeni + ' yeni</span></div>' +
-      '<p class="mod-aciklama">Kartı çevir, bildiysen “Bildim” de. Bildiğin kart daha seyrek, bilemediğin kart hemen yeniden gelir.</p>' +
-      '<div class="segment" data-grup="yon"><button type="button" data-yon="en" aria-pressed="' + (ayar.yon === 'en') + '">İngilizce → anlam</button>' +
+      '<section class="panel gunluk" aria-labelledby="b-gunluk">' +
+      '<div class="panel-baslik"><span class="panel-ikon">' + IKON.kart + '</span><h2 id="b-gunluk">Bugünkü tekrar</h2></div>' +
+      gunluk +
+      '<div class="segment tam" role="group" aria-label="Kart yönü"><button type="button" data-yon="en" aria-pressed="' + (ayar.yon === 'en') + '">İngilizce → anlam</button>' +
       '<button type="button" data-yon="tr" aria-pressed="' + (ayar.yon === 'tr') + '">Türkçe → İngilizce</button></div>' +
-      '<div class="btn-satir"><button type="button" class="btn vurgu" id="kart-basla"' + (kartSayi ? '' : ' disabled') + '>' + (kartSayi ? 'Kartlara başla · ' + kartSayi : 'Bugünlük tekrar yok') + '</button>' +
-      '<button type="button" class="baglanti" id="kart-tum"' + (liste.length ? '' : ' disabled') + '>tüm kartları karışık çalış</button></div></section>' +
+      (kartSayi
+        ? '<button type="button" class="btn vurgu buyuk tam" id="kart-basla">Kartlara başla</button>'
+        : '<button type="button" class="btn buyuk tam" id="kart-tum">Tüm kartları karışık çalış</button>') +
+      (kartSayi ? '<button type="button" class="baglanti ortala" id="kart-tum">ya da tüm kartları karışık çalış</button>' : '') +
+      '</section>' +
 
-      '<section class="mod" aria-labelledby="b-test"><div class="bolum-baslik"><h2 id="b-test">2 · Test ve yazma</h2></div>' +
-      '<p class="mod-aciklama">Test: anlam, Türkçe karşılık, zıt anlam ve eksik kelime soruları. Yazma: ifadeyi kendin yaz. Önce az bildiğin ifadeler sorulur.</p>' +
-      '<div class="segment" data-grup="n">' + sayiHtml + '</div>' +
-      '<div class="btn-satir"><button type="button" class="btn" id="test-basla"' + (liste.length ? '' : ' disabled') + '>Testi başlat</button>' +
-      '<button type="button" class="btn ikincil" id="yaz-basla"' + (liste.length ? '' : ' disabled') + '>Yazarak çalış</button></div></section>' +
+      '<section aria-labelledby="b-sina">' +
+      '<div class="bolum-baslik"><h2 id="b-sina">Kendini sına</h2></div>' +
+      '<div class="karolar">' +
+      '<button type="button" class="karo" id="test-basla"><span class="karo-ikon">' + IKON.test + '</span><span class="karo-metin"><b>Test</b><span>Çoktan seçmeli, anında geri bildirim</span></span><span class="karo-ok">' + IKON.ok + '</span></button>' +
+      '<button type="button" class="karo" id="yaz-basla"><span class="karo-ikon">' + IKON.yaz + '</span><span class="karo-metin"><b>Yazma</b><span>Türkçesini gör, İngilizcesini yaz</span></span><span class="karo-ok">' + IKON.ok + '</span></button>' +
+      '</div>' +
+      '<div class="ayar-satir"><span class="ayar-ad" id="b-sayi">Soru sayısı</span><div class="segment kucuk" role="group" aria-labelledby="b-sayi" data-grup="n">' + sayiHtml + '</div></div>' +
+      '</section>' +
 
-      '<section class="mod" aria-labelledby="b-liste"><div class="bolum-baslik"><h2 id="b-liste">3 · Liste</h2></div>' +
-      '<div class="btn-satir"><button type="button" class="btn ikincil" id="liste">Tüm ifadeleri gör</button></div></section>' +
-
-      (gecmisHtml ? '<section aria-labelledby="b-gecmis"><div class="bolum-baslik"><h2 id="b-gecmis">Son denemeler</h2></div><div class="gecmis">' + gecmisHtml + '</div></section>' : '') +
-      '<p class="dipnot">İlerleme yalnız bu tarayıcıda saklanır. <button type="button" class="baglanti" id="sifirla">İlerlemeyi sıfırla</button></p>' +
+      (gecmisHtml ? '<section aria-labelledby="b-gecmis"><div class="bolum-baslik"><h2 id="b-gecmis">Son denemeler</h2></div><ul class="gecmis">' + gecmisHtml + '</ul></section>' : '') +
+      '<p class="dipnot">İlerleme yalnız bu tarayıcıda saklanır · <button type="button" class="baglanti" id="sifirla">sıfırla</button></p>' +
       '</div>'
     );
 
-    ekran.querySelectorAll('input[data-ders]').forEach(function (inp) {
-      inp.addEventListener('change', function () {
-        var id = inp.getAttribute('data-ders'), k = ayar.dersler.indexOf(id);
-        if (inp.checked && k < 0) ayar.dersler.push(id); else if (!inp.checked && k >= 0) ayar.dersler.splice(k, 1);
-        ayarKaydet(); anaEkran();
-      });
-    });
-    ekran.querySelectorAll('[data-tum]').forEach(function (b) {
-      b.addEventListener('click', function () { ayar.dersler = b.getAttribute('data-tum') === '1' ? DERSLER.map(function (d) { return d.id; }) : []; ayarKaydet(); anaEkran(); });
-    });
     ekran.querySelectorAll('[data-grup="n"] button').forEach(function (b) {
       b.addEventListener('click', function () { var v = b.getAttribute('data-n'); ayar.n = v === 'tum' ? 'tum' : parseInt(v, 10); ayarKaydet(); anaEkran(); });
     });
@@ -343,30 +342,25 @@
     });
     bagla('kart-basla', function () { kartBaslat(false); });
     bagla('kart-tum', function () { kartBaslat(true); });
-    bagla('test-basla', function () { testBaslat(oncelikli(secili(), sayi(secili()))); });
-    bagla('yaz-basla', function () { yazBaslat(oncelikli(secili(), sayi(secili()))); });
-    bagla('liste', listeEkran);
+    bagla('test-basla', function () { testBaslat(oncelikli(sayi())); });
+    bagla('yaz-basla', function () { yazBaslat(oncelikli(sayi())); });
+    bagla('liste', function () { listeEkran(''); });
     bagla('sifirla', function () {
       if (window.confirm('Tüm kart ilerlemesi ve deneme geçmişi bu tarayıcıdan silinsin mi?')) { depo.kutu = {}; depo.denemeler = []; depoYaz(); anaEkran(); }
     });
   }
-  function bagla(id, fn) { var el = document.getElementById(id); if (el) el.addEventListener('click', fn); }
-  function ustBar(sol, sag) {
-    return '<div class="soru-ust"><button type="button" class="baglanti" id="cik">← Ana sayfa</button><span class="bosluk"></span>' +
-      (sol || '') + (sag ? '<span class="durum">' + sag + '</span>' : '') + '</div>';
-  }
 
   /* ---------- kartlar ---------- */
-  var kart = null;   // { kuyruk: [oge], i, cevrildi, bildim: {}, tekrar: {}, yon }
+  var kart = null;   // { kuyruk: [oge], i, cevrildi, bildim: {}, tekrar: {}, ilk }
 
   function kartBaslat(hepsi, idler) {
     var liste;
     if (idler) liste = karistir(idler.map(function (id) { return OGE[id]; }).filter(Boolean));
-    else if (hepsi) liste = karistir(secili());
+    else if (hepsi) liste = karistir(TUM);
     else {
-      var simdi = Date.now(), s = secili();
-      var vade = karistir(s.filter(function (o) { return vadesiGeldi(o.id, simdi); })).sort(function (a, b) { return kutuNo(a.id) - kutuNo(b.id); });
-      var yeni = karistir(s.filter(function (o) { return !kayit(o.id); })).slice(0, YENI_LIMIT);
+      var simdi = Date.now();
+      var vade = karistir(TUM.filter(function (o) { return vadesiGeldi(o.id, simdi); })).sort(function (a, b) { return kutuNo(a.id) - kutuNo(b.id); });
+      var yeni = karistir(TUM.filter(function (o) { return !kayit(o.id); })).slice(0, YENI_LIMIT);
       liste = vade.concat(yeni);
     }
     if (!liste.length) return anaEkran();
@@ -377,23 +371,26 @@
   function kartCiz() {
     var o = kart.kuyruk[kart.i];
     var on = ayar.yon === 'tr'
-      ? '<p class="kart-etiket">Türkçe</p><p class="kart-on tr">' + h(o.tr) + '</p>' +
-        (o.anlam.length ? '<p class="kart-alt">= ' + h(o.anlam[0]) + '</p>' : '') +
-        (o.zit ? '<p class="kart-alt">≠ ' + h(o.zit.ifade) + '</p>' : '')
-      : '<p class="kart-etiket">' + h(dersKisa(o._ders)) + '</p><p class="kart-on">' + h(o.ifade) + '</p>';
+      ? '<p class="kart-on tr">' + h(o.tr) + '</p>' +
+        (o.anlam.length ? '<p class="kart-alt" lang="en">= ' + h(o.anlam[0]) + '</p>' : '') +
+        (o.zit ? '<p class="kart-alt" lang="en">≠ ' + h(o.zit.ifade) + '</p>' : '')
+      : '<p class="kart-on" lang="en">' + h(o.ifade) + '</p>';
     var kalan = kart.kuyruk.length - kart.i;
     goster(
-      ustBar('', kalan + ' kart kaldı') +
-      '<div class="ilerleme" aria-hidden="true"><span style="width:' + yuzde(kart.i, kart.kuyruk.length) + '%"></span></div>' +
-      '<div class="kart' + (kart.cevrildi ? ' cevrik' : '') + '" id="kart" role="button" tabindex="0" aria-label="' + (kart.cevrildi ? 'Kartın arka yüzü' : 'Kartı çevir') + '">' +
+      ustBar('', kalan + ' kart') +
+      ilerleme(yuzde(kart.i, kart.kuyruk.length)) +
+      '<div class="kart' + (kart.cevrildi ? ' cevrik' : '') + '" id="kart"' + (kart.cevrildi ? '' : ' role="button" tabindex="0" aria-label="Kartı çevir"') + '>' +
+      '<div class="kart-kose">' + pil(kutuNo(o.id)) + (ayar.yon === 'en' || kart.cevrildi ? sesDugme(o.ifade) : '') + '</div>' +
       '<div class="kart-yuz">' + on + (kart.cevrildi ? '' : '<p class="kart-ipucu">Çevirmek için dokun</p>') + '</div>' +
       (kart.cevrildi ? '<div class="kart-arka">' + ayrintiHtml(o, ayar.yon === 'tr') + '</div>' : '') +
       '</div>' +
+      '<div class="eylem-cubugu">' +
       (kart.cevrildi
         ? '<div class="kart-dugmeler"><button type="button" class="btn karar yanlis" id="bilemedim">Bilemedim</button><button type="button" class="btn karar dogru" id="bildim">Bildim</button></div>' +
           '<p class="klavye ortala"><kbd>1</kbd> bilemedim · <kbd>2</kbd> bildim</p>'
-        : '<div class="kart-dugmeler"><button type="button" class="btn buyuk" id="cevir">Çevir</button>' + (ayar.yon === 'en' ? sesDugme(o.ifade) : '') + '</div>' +
-          '<p class="klavye ortala"><kbd>Boşluk</kbd> çevir</p>')
+        : '<div class="kart-dugmeler"><button type="button" class="btn buyuk tam" id="cevir">Çevir</button></div>' +
+          '<p class="klavye ortala"><kbd>Boşluk</kbd> çevir</p>') +
+      '</div>'
     );
     sesBagla();
     bagla('cik', anaEkran);
@@ -425,11 +422,12 @@
     var ilkte = 0, zor = [];
     Object.keys(kart.bildim).forEach(function (id) { if (!kart.tekrar[id]) ilkte++; });
     Object.keys(kart.tekrar).forEach(function (id) { zor.push(OGE[id]); });
+    var p = yuzde(ilkte, kart.ilk);
     goster(
-      '<div class="giris">' +
-      '<header class="giris-baslik"><h1>Kartlar bitti</h1><p>' + kart.ilk + ' kartın ' + ilkte + ' tanesini ilk seferde bildin.</p></header>' +
-      (zor.length ? '<section><div class="bolum-baslik"><h2>Zorlandıkların · ' + zor.length + '</h2></div><ul class="zayif">' +
-        zor.map(function (o) { return '<li><span>' + h(o.ifade) + '</span><span class="muted">' + h(o.tr) + '</span></li>'; }).join('') + '</ul></section>' : '') +
+      '<div class="ana">' +
+      '<div class="sonuc-ozet">' + halka(p, ilkte + ' / ' + kart.ilk) +
+      '<div><h1>Kartlar bitti</h1><p class="muted">' + kart.ilk + ' kartın ' + ilkte + ' tanesini ilk seferde bildin.</p></div></div>' +
+      (zor.length ? '<section><div class="bolum-baslik"><h2>Zorlandıkların · ' + zor.length + '</h2></div>' + kisaListe(zor) + '</section>' : '') +
       '<div class="btn-satir">' +
       (zor.length ? '<button type="button" class="btn vurgu" id="zor-test">Zorlandıklarımı test et</button>' : '') +
       '<button type="button" class="btn ikincil" id="ana">Ana sayfa</button></div>' +
@@ -438,35 +436,44 @@
     bagla('zor-test', function () { testBaslat(karistir(zor)); });
     bagla('ana', anaEkran);
   }
+  function halka(p, alt) { return '<div class="halka" style="--p:' + p + '"><div><span>%' + p + '</span><small>' + alt + '</small></div></div>'; }
+  function kisaListe(liste) {
+    return '<ul class="kisa-liste">' + liste.map(function (o) {
+      return '<li><span class="kl-ifade" lang="en">' + h(o.ifade) + '</span><span class="kl-tr">' + h(o.tr) + '</span></li>';
+    }).join('') + '</ul>';
+  }
 
   /* ---------- test (çoktan seçmeli, anında geri bildirim) ---------- */
-  var test = null;   // { sorular: [q], i, dogru }
+  var test = null;   // { sorular: [q], i }
 
   function testBaslat(liste) {
     if (!liste.length) return anaEkran();
-    test = { sorular: liste.map(soruUret), i: 0, dogru: 0 };
+    test = { sorular: liste.map(soruUret), i: 0 };
     testCiz();
   }
   function testCiz() {
     var q = test.sorular[test.i], n = test.sorular.length, bitti = q.cevap !== null;
+    var dilEn = q.tur === 'tr' ? '' : ' lang="en"';
+    var secDil = q.tur === 'anlam' || q.tur === 'ters' || q.tur === 'tr' || q.tur === 'bosluk' ? ' lang="en"' : '';
     var secHtml = q.secenekler.map(function (s, k) {
       var sinif = '';
       if (bitti) sinif = s.dogru ? ' dogru' : (q.cevap === k ? ' yanlis' : ' soluk');
       return '<li><button type="button" class="secenek' + sinif + '" data-k="' + k + '"' + (bitti ? ' aria-disabled="true"' : '') + '>' +
-        '<span class="harf" aria-hidden="true">' + (bitti && s.dogru ? '✓' : bitti && q.cevap === k ? '✗' : HARF[k]) + '</span><span>' + h(s.metin) + '</span></button></li>';
+        '<span class="harf" aria-hidden="true">' + (bitti && s.dogru ? '✓' : bitti && q.cevap === k ? '✗' : HARF[k]) + '</span><span' + secDil + '>' + h(s.metin) + '</span></button></li>';
     }).join('');
     var dogruMu = bitti && q.secenekler[q.cevap].dogru;
     goster(
-      ustBar('<span class="soru-no">' + (test.i + 1) + ' <span class="muted">/ ' + n + '</span></span>', '') +
-      '<div class="ilerleme" aria-hidden="true"><span style="width:' + yuzde(test.i + (bitti ? 1 : 0), n) + '%"></span></div>' +
+      ustBar('', '<b>' + (test.i + 1) + '</b> / ' + n) +
+      ilerleme(yuzde(test.i + (bitti ? 1 : 0), n)) +
       '<p class="soru-tur">' + h(q.baslik) + '</p>' +
-      '<h2 class="soru-metin ifade-soru" id="soru">' + h(q.metin) + (q.ses ? ' ' + sesDugme(q.ses) : '') + '</h2>' +
+      '<h2 class="soru-metin ifade-soru" id="soru"><span' + dilEn + '>' + h(q.metin) + '</span>' + (q.ses ? sesDugme(q.ses) : '') + '</h2>' +
       (q.ipucu ? '<p class="soru-ipucu">' + h(q.ipucu) + '</p>' : '') +
       '<ul class="secenekler" aria-labelledby="soru">' + secHtml + '</ul>' +
       (bitti
         ? '<div class="geri-bildirim ' + (dogruMu ? 'dogru' : 'yanlis') + '" role="status"><p class="gb-baslik">' + (dogruMu ? '✓ Doğru' : '✗ Yanlış') + '</p>' + ayrintiHtml(q.o, true) + '</div>' +
-          '<div class="soru-alt"><span class="klavye"><kbd>Enter</kbd> devam</span><span class="bosluk"></span><button type="button" class="btn vurgu" id="ileri">' + (test.i === n - 1 ? 'Sonucu gör' : 'Sonraki') + '</button></div>'
-        : '<div class="soru-alt"><span class="klavye"><kbd>1</kbd>–<kbd>4</kbd> seç</span></div>')
+          '<div class="eylem-cubugu"><button type="button" class="btn vurgu buyuk tam" id="ileri">' + (test.i === n - 1 ? 'Sonucu gör' : 'Sonraki soru') + '</button>' +
+          '<p class="klavye ortala"><kbd>Enter</kbd> devam</p></div>'
+        : '<p class="klavye"><kbd>1</kbd>–<kbd>4</kbd> seç</p>')
     );
     sesBagla();
     bagla('cik', anaEkran);
@@ -479,22 +486,27 @@
       if (q2.cevap === null && /^[1-4]$/.test(e.key)) { e.preventDefault(); testSec(parseInt(e.key, 10) - 1); }
       else if (q2.cevap !== null && (e.key === 'Enter' || e.key === 'ArrowRight')) { e.preventDefault(); testIleri(); }
     };
-    var ileri = document.getElementById('ileri');
-    if (ileri) ileri.focus({ preventScroll: true });
+    if (bitti) {
+      var gb = ekran.querySelector('.geri-bildirim');
+      if (gb && gb.scrollIntoView) gb.scrollIntoView({ block: 'nearest' });
+      var ileri = document.getElementById('ileri');
+      if (ileri) ileri.focus({ preventScroll: true });
+    }
   }
   function testSec(k) {
     var q = test.sorular[test.i];
     if (q.cevap !== null || !q.secenekler[k]) return;
     q.cevap = k;
-    var d = q.secenekler[k].dogru;
-    if (d) test.dogru++;
-    kutuGuncelle(q.o.id, d);
+    kutuGuncelle(q.o.id, q.secenekler[k].dogru);
     testCiz();
   }
-  function testIleri() { if (test.i < test.sorular.length - 1) { test.i++; testCiz(); } else sonucEkran('test', test.sorular.map(function (q) { return { o: q.o, dogru: q.secenekler[q.cevap].dogru }; })); }
+  function testIleri() {
+    if (test.i < test.sorular.length - 1) { test.i++; testCiz(); }
+    else sonucEkran('test', test.sorular.map(function (q) { return { o: q.o, dogru: q.secenekler[q.cevap].dogru }; }));
+  }
 
   /* ---------- yazma ---------- */
-  var yaz = null;   // { liste: [oge], i, sonuclar: [{o, dogru, yazilan, durum}], ipucu }
+  var yaz = null;   // { liste: [oge], i, sonuclar: [{o, dogru, yazilan, durum, onceki}], ipucu }
 
   function yazBaslat(liste) {
     if (!liste.length) return anaEkran();
@@ -507,25 +519,27 @@
     if (s) {
       var baslik = s.durum === 'tam' ? '✓ Doğru' : s.durum === 'yakin' ? '✓ Doğru sayıldı (küçük yazım hatası)' : s.durum === 'elle' ? '✓ Doğru sayıldı' : '✗ Yanlış';
       gb = '<div class="geri-bildirim ' + (s.dogru ? 'dogru' : 'yanlis') + '" role="status"><p class="gb-baslik">' + baslik + '</p>' +
-        (s.yazilan && s.durum !== 'tam' ? '<p class="gb-yazilan">Senin cevabın: <b>' + h(s.yazilan) + '</b></p>' : '') +
-        ayrintiHtml(o, true) + '</div>' +
-        '<div class="soru-alt">' + (s.durum === 'yanlis' && s.yazilan ? '<button type="button" class="baglanti" id="elle">Cevabım doğruydu, doğru say</button>' : '') +
-        '<span class="bosluk"></span><button type="button" class="btn vurgu" id="ileri">' + (yaz.i === n - 1 ? 'Sonucu gör' : 'Sonraki') + '</button></div>';
+        (s.yazilan && s.durum !== 'tam' ? '<p class="gb-yazilan">Senin cevabın: <b lang="en">' + h(s.yazilan) + '</b></p>' : '') +
+        ayrintiHtml(o, true) +
+        (s.durum === 'yanlis' && s.yazilan ? '<button type="button" class="baglanti" id="elle">Cevabım doğruydu, doğru say</button>' : '') +
+        '</div>' +
+        '<div class="eylem-cubugu"><button type="button" class="btn vurgu buyuk tam" id="ileri">' + (yaz.i === n - 1 ? 'Sonucu gör' : 'Sonraki soru') + '</button>' +
+        '<p class="klavye ortala"><kbd>Enter</kbd> devam</p></div>';
     }
     goster(
-      ustBar('<span class="soru-no">' + (yaz.i + 1) + ' <span class="muted">/ ' + n + '</span></span>', '') +
-      '<div class="ilerleme" aria-hidden="true"><span style="width:' + yuzde(yaz.i + (s ? 1 : 0), n) + '%"></span></div>' +
-      '<p class="soru-tur">İngilizce ifadeyi yaz</p>' +
+      ustBar('', '<b>' + (yaz.i + 1) + '</b> / ' + n) +
+      ilerleme(yuzde(yaz.i + (s ? 1 : 0), n)) +
+      '<p class="soru-tur">İngilizcesini yaz</p>' +
       '<h2 class="soru-metin" id="soru">' + h(o.tr) + '</h2>' +
-      (o.anlam.length ? '<p class="soru-ipucu">= ' + h(o.anlam[0]) + '</p>' : '') +
-      (o.zit ? '<p class="soru-ipucu">≠ ' + h(o.zit.ifade) + '</p>' : '') +
-      (yaz.ipucu || s ? '<p class="soru-ipucu harfler">İpucu: ' + h(ipucu(o.ifade)) + '</p>' : '') +
+      (o.anlam.length ? '<p class="soru-ipucu" lang="en">= ' + h(o.anlam[0]) + '</p>' : '') +
+      (o.zit ? '<p class="soru-ipucu" lang="en">≠ ' + h(o.zit.ifade) + '</p>' : '') +
+      (yaz.ipucu && !s ? '<p class="soru-ipucu harfler" lang="en">' + h(ipucu(o.ifade)) + '</p>' : '') +
       '<form class="yaz-form" id="yaz-form" autocomplete="off">' +
-      '<input type="text" id="yaz-girdi" class="yaz-girdi" aria-labelledby="soru" spellcheck="false" autocapitalize="none" autocorrect="off" lang="en"' +
+      '<input type="text" id="yaz-girdi" class="yaz-girdi" aria-labelledby="soru" spellcheck="false" autocapitalize="none" autocorrect="off" lang="en" enterkeyhint="done"' +
       (s ? ' value="' + h(s.yazilan) + '" disabled' : '') + ' placeholder="to …">' +
-      (s ? '' : '<div class="btn-satir"><button type="submit" class="btn">Kontrol et</button>' +
+      (s ? '' : '<div class="btn-satir"><button type="submit" class="btn vurgu">Kontrol et</button>' +
         (yaz.ipucu ? '' : '<button type="button" class="btn ikincil" id="ipucu">İpucu</button>') +
-        '<button type="button" class="baglanti" id="bilmiyorum">Bilmiyorum</button></div>') +
+        '<span class="bosluk"></span><button type="button" class="baglanti" id="bilmiyorum">Bilmiyorum</button></div>') +
       '</form>' + gb
     );
     sesBagla();
@@ -566,15 +580,14 @@
     klavye = null;
     var n = sonuclar.length, dogru = sonuclar.filter(function (r) { return r.dogru; }).length, p = yuzde(dogru, n);
     var yanlis = sonuclar.filter(function (r) { return !r.dogru; }).map(function (r) { return r.o; });
-    depo.denemeler.push({ t: Date.now(), tur: tur, n: n, dogru: dogru, dersler: ayar.dersler.slice() });
+    depo.denemeler.push({ t: Date.now(), tur: tur, n: n, dogru: dogru });
     if (depo.denemeler.length > 50) depo.denemeler = depo.denemeler.slice(-50);
     depoYaz();
     goster(
-      '<div class="giris">' +
-      '<div class="sonuc-ozet"><div class="halka" style="--p:' + p + '"><div><span>%' + p + '</span><small>' + dogru + ' / ' + n + '</small></div></div>' +
-      '<div><h1>' + (p >= 80 ? 'Çok iyi' : p >= 60 ? 'İyi gidiyor' : 'Biraz daha tekrar') + '</h1><p class="muted">' + (tur === 'yaz' ? 'Yazma çalışması' : 'Test') + ' · ' + n + ' soru</p></div></div>' +
-      (yanlis.length ? '<section><div class="bolum-baslik"><h2>Yanlışların · ' + yanlis.length + '</h2></div><ul class="zayif">' +
-        yanlis.map(function (o) { return '<li><span>' + h(o.ifade) + '</span><span class="muted">' + h(o.tr) + '</span></li>'; }).join('') + '</ul></section>' : '') +
+      '<div class="ana">' +
+      '<div class="sonuc-ozet">' + halka(p, dogru + ' / ' + n) +
+      '<div><h1>' + (p >= 80 ? 'Çok iyi' : p >= 60 ? 'İyi gidiyor' : 'Biraz daha tekrar') + '</h1><p class="muted">' + (tur === 'yaz' ? 'Yazma' : 'Test') + ' · ' + n + ' soru</p></div></div>' +
+      (yanlis.length ? '<section><div class="bolum-baslik"><h2>Yanlışların · ' + yanlis.length + '</h2></div>' + kisaListe(yanlis) + '</section>' : '') +
       '<div class="btn-satir">' +
       (yanlis.length ? '<button type="button" class="btn vurgu" id="yanlis-kart">Yanlışları kartlarla çalış</button>' : '') +
       (yanlis.length ? '<button type="button" class="btn ikincil" id="yanlis-tekrar">Yanlışları yeniden ' + (tur === 'yaz' ? 'yaz' : 'çöz') + '</button>' : '') +
@@ -588,33 +601,43 @@
   }
 
   /* ---------- liste ---------- */
-  function listeEkran() {
+  function listeEkran(suzgec) {
     klavye = null;
+    var d = dagilim(TUM);
+    var cipler = '<button type="button" data-suz="" aria-pressed="' + (!suzgec) + '">Tümü <span>' + TUM.length + '</span></button>' +
+      DURUMLAR.map(function (s) { return '<button type="button" data-suz="' + s.id + '" aria-pressed="' + (suzgec === s.id) + '">' + s.ad + ' <span>' + d[s.id] + '</span></button>'; }).join('');
     goster(
-      ustBar('', TUM.length + ' ifade') +
-      '<div class="giris"><header class="giris-baslik"><h1>Tüm ifadeler</h1></header>' +
-      '<input type="search" id="ara" class="yaz-girdi" placeholder="Ara: İngilizce, anlam veya Türkçe" aria-label="İfadelerde ara">' +
-      '<div id="liste-govde"></div></div>'
+      ustBar('', '') +
+      '<div class="ana"><header class="ana-ust"><h1>Tüm ifadeler</h1></header>' +
+      '<div class="liste-arac"><input type="search" id="ara" class="yaz-girdi" placeholder="İngilizce, anlam ya da Türkçe ara" aria-label="İfadelerde ara">' +
+      '<div class="cipler" role="group" aria-label="Duruma göre süz">' + cipler + '</div></div>' +
+      '<p class="liste-sayac muted" id="sayac" aria-live="polite"></p>' +
+      '<div id="liste-govde" class="liste-govde"></div></div>'
     );
     bagla('cik', anaEkran);
-    var ara = document.getElementById('ara'), govde = document.getElementById('liste-govde');
+    var ara = document.getElementById('ara'), govde = document.getElementById('liste-govde'), sayac = document.getElementById('sayac');
+    var sirali = TUM.slice().sort(function (a, b) { return siralamaAnahtari(a).localeCompare(siralamaAnahtari(b), 'en'); });
     function ciz() {
       var q = ara.value.toLocaleLowerCase('tr').trim();
-      govde.innerHTML = DERSLER.map(function (d) {
-        var ogeler = d.ogeler.filter(function (o) {
-          if (!q) return true;
-          return [o.ifade, o.tr, o.anlam.join(' '), o.zit ? o.zit.ifade : ''].join(' ').toLocaleLowerCase('tr').indexOf(q) >= 0;
-        });
-        if (!ogeler.length) return '';
-        return '<section class="liste-ders"><div class="bolum-baslik"><h2>' + h(d.ders) + ' · <span lang="en">' + h(d.baslik) + '</span></h2><span class="ipucu">' + ogeler.length + '</span></div>' +
-          ogeler.map(function (o) {
-            var k = kutuNo(o.id);
-            return '<article class="liste-oge"><div class="liste-ust"><span class="liste-ifade">' + h(o.ifade) + '</span>' + sesDugme(o.ifade) +
-              '<span class="bosluk"></span><span class="pil ' + durumSinif(k) + '">' + durumAd(k) + '</span></div>' + ayrintiHtml(o, false) + '</article>';
-          }).join('') + '</section>';
-      }).join('') || '<p class="muted">Sonuç yok.</p>';
+      var ogeler = sirali.filter(function (o) {
+        if (suzgec && durumSinif(kutuNo(o.id)) !== suzgec) return false;
+        if (!q) return true;
+        return [o.ifade, o.tr, o.anlam.join(' '), o.zit ? o.zit.ifade : ''].join(' ').toLocaleLowerCase('tr').indexOf(q) >= 0;
+      });
+      sayac.textContent = ogeler.length + ' ifade';
+      govde.innerHTML = ogeler.map(function (o) {
+        return '<article class="liste-oge"><div class="liste-ust"><span class="liste-ifade" lang="en">' + h(o.ifade) + '</span>' + sesDugme(o.ifade) +
+          '<span class="bosluk"></span>' + pil(kutuNo(o.id)) + '</div>' + ayrintiHtml(o, false) + '</article>';
+      }).join('') || '<p class="bos-durum">Bu aramaya uyan ifade yok.</p>';
       sesBagla(govde);
     }
+    ekran.querySelectorAll('[data-suz]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        suzgec = b.getAttribute('data-suz');
+        ekran.querySelectorAll('[data-suz]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        ciz();
+      });
+    });
     ara.addEventListener('input', ciz);
     ciz();
   }
