@@ -13,6 +13,7 @@ site/
   assets/img/          portreler, paylaşım kartı
   layouts/             şablonlar
   data/llmsinav/       LLM Sınav soruları (kişisel çalışma sayfası /llm-sinav/, KARARLAR 2026-11-09)
+  data/ingilizce/      İngilizce Kartlar ifadeleri (kişisel çalışma sayfası /ingilizce/, KARARLAR 2026-11-10)
   static/              logo, yazı tipleri, simgeler, _headers, _redirects
   tools/               hazirla.py · ikonlar.py · logo_svg.py · yayin_bildir.py
   KARARLAR.md          karar kaydı · BAKIM.md bakım takvimi · YAYIN.md yayına alma adımları
