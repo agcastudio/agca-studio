@@ -20,272 +20,272 @@
     {
       "id": "d7-01",
       "konu": "LLM size and the memory problem (weights and KV cache)",
-      "zorluk": 2,
-      "slayt": 4,
-      "soru": "A 7B model's weights fit easily on a GPU, yet the server runs out of memory once it handles many users with long conversations. Which mechanism best explains this?",
+      "zorluk": 1,
+      "slayt": 3,
+      "soru": "A large model fits on one GPU, but it still produces each new token slowly. What is the main reason?",
       "secenekler": [
-        "The weights are copied once for each user, so weight memory grows in proportion to the number of open conversations",
-        "Longer prompts force the weights to be held at higher precision, so every extra token widens the weight format a little",
-        "Every new token adds keys and values in every layer for each user, so the cache grows while the weights stay fixed",
-        "Each step re-encodes all past tokens and keeps the results, so the temporary buffers end up outgrowing the KV cache"
+        "For each new token, the model processes the whole prompt again from the start",
+        "For each new token, the GPU turns all weights into a higher precision first",
+        "For each new token, the GPU must read every weight of the model from memory",
+        "For each new token, the model runs a small training step on all its weights"
       ],
       "dogru": 2,
-      "aciklama": "The KV cache holds keys and values for every past token in every layer, separately for each user, so it scales with context length and user count and can outgrow the weights, whose size is fixed. The per-user copy option is wrong: the weights are shared by all conversations; only the cache is per user."
+      "aciklama": "To make one new token, the GPU must read every weight from memory, so a bigger model means more reading and slower tokens. The KV cache keeps the keys and values of old tokens, so the model does not process the whole prompt again."
     },
     {
       "id": "d7-02",
       "konu": "Quantization basics: number formats, scale, and rounding",
-      "zorluk": 2,
+      "zorluk": 1,
       "slayt": 7,
-      "soru": "A model is stored with weight-only INT4 quantization, and the integers are dequantized before each matrix multiplication. Why does this setup shrink memory use without automatically reducing the work done per token?",
+      "soru": "Which sentence best describes what quantization does to a model?",
       "secenekler": [
-        "Fewer bits are stored and moved per weight, but the same multiplications still run on the read-back values",
-        "Fewer weights remain after rounding, but the hardware cannot skip the removed ones without special sparse kernels",
-        "Fewer bits are stored per weight, but the activations and the KV cache must grow to absorb the rounding error",
-        "Fewer bits are stored per weight, but a short training run is needed at load time to restore the original values"
+        "It sets the least important weights to zero and keeps the others",
+        "It keeps every weight but stores each one with fewer bits",
+        "It trains a smaller model to copy the outputs of the big model",
+        "It replaces each weight matrix with two thinner matrices"
       ],
-      "dogru": 0,
-      "aciklama": "Quantization keeps every weight and only stores each one in fewer bits, which cuts storage and memory bandwidth; the number of operations is unchanged, and reducing compute requires quantizing activations as well. The sparse-kernel option describes pruning, which removes weights, whereas quantization keeps them all."
+      "dogru": 1,
+      "aciklama": "Quantization keeps all the weights and stores each number with fewer bits, which saves memory but adds a small rounding error. Setting the least important weights to zero is pruning, which removes weights instead of storing them more cheaply."
     },
     {
       "id": "d7-03",
-      "konu": "The outlier problem, granularity, and calibration",
-      "zorluk": 2,
-      "slayt": 10,
-      "soru": "In a group of weights quantized to 4 bits with one shared scale, adding a single very large weight leaves that weight almost error-free but makes all the others far less precise. What is the mechanism behind this?",
+      "konu": "Quantization basics: number formats, scale, and rounding",
+      "zorluk": 1,
+      "slayt": 9,
+      "soru": "Quantization stores small integers plus one scale for each group of weights. Why does it need the scale?",
       "secenekler": [
-        "The large weight exceeds the integer range, so it is clipped and its residual error is spread across the other weights",
-        "The scale is set by the largest magnitude, so the step widens and the normal weights collapse onto a few coarse levels",
-        "Rounding error is inversely proportional to magnitude, so weights with small absolute values inherently lose the most",
-        "The scale is unaffected; the loss comes from converting the integers back to floating point in the dequantize step"
+        "It marks which weights were set to zero so the GPU can skip them",
+        "It saves the rounding error of each weight so it can be undone later",
+        "It shows which values are outliers that must stay in high precision",
+        "It turns the integers back into values close to the real weights"
       ],
-      "dogru": 1,
-      "aciklama": "With one scale derived from the largest |w|, an outlier stretches the grid so that it lands exactly on the top level, while the step becomes so wide that the ordinary weights round to zero or to one coarse level. The clipping option is wrong: nothing is clipped in this scheme; the outlier stays in range and harms the others by enlarging the step."
+      "dogru": 3,
+      "aciklama": "Each integer counts steps on the grid, and the scale is the size of one step, so integer times scale gives a value close to the real weight. The rounding error is not saved anywhere, because saving it would cost as much memory as the weights."
     },
     {
       "id": "d7-04",
       "konu": "The outlier problem, granularity, and calibration",
       "zorluk": 3,
-      "slayt": 12,
-      "soru": "Two remedies for an outlier in quantized weights are giving each small group its own scale and clipping the range before the scale is chosen. How do the prices paid by these two remedies differ?",
+      "slayt": 11,
+      "soru": "Giving each small group of weights its own scale improves quality. Why don't methods give every single weight its own scale?",
       "secenekler": [
-        "Per-group scales sacrifice the outlier's value; clipping keeps the outlier exact but adds metadata and kernel complexity",
-        "Both keep every value exact; per-group scales cost a training run, whereas clipping only costs a small calibration set",
-        "Per-group scales raise the bit width of every weight; clipping lowers it, so only clipping still saves any memory",
-        "Per-group scales confine the damage but add metadata; clipping keeps common values precise but distorts the outlier"
+        "The scales alone would then cost more memory than the fewer bits save",
+        "The rounding error would grow, because each scale covers fewer values",
+        "The grid would then have fewer steps, so each weight would lose precision",
+        "Per-weight scales only work with QAT, so the model would need retraining"
       ],
-      "dogru": 3,
-      "aciklama": "With finer granularity the outlier spoils only its own small group, at the price of more stored scales and more complex kernels; a narrow clipped range keeps the common values precise, but the outlier is pulled to the edge of the range and alone carries a large error. The first option swaps the two costs."
+      "dogru": 0,
+      "aciklama": "Every group stores one extra scale, so one scale per weight would cost more memory than the fewer bits save. Smaller groups lower the rounding error instead of raising it, because each scale fits its few values more closely."
     },
     {
       "id": "d7-05",
       "konu": "Weight / activation / KV-cache quantization and LLM.int8()",
-      "zorluk": 2,
-      "slayt": 15,
-      "soru": "What solution does the LLM.int8() work by Dettmers et al. (2022) offer against the collapse of plain 8-bit quantization from 6.7B parameters onward?",
+      "zorluk": 3,
+      "slayt": 14,
+      "soru": "Plain 8-bit quantization works well for smaller models but breaks down for very large ones. What changes as the models grow?",
       "secenekler": [
-        "Clipping all activations to |x| ≤ 6 and converting them to INT8 with a single per-tensor scale",
-        "Multiplying the few outlier feature columns with |x| > 6 in FP16 and the remaining >99.9% in INT8, then summing the two results",
-        "Pruning the weight columns that correspond to the outlier features and converting the remaining smaller matrix to INT8",
-        "Splitting the weights into groups of 128 and giving each group its own scale, so an outlier's effect is limited to its own group"
+        "All values grow larger together, so each value needs more bits to store",
+        "Most weights grow very small, so they round to zero much more often than before",
+        "A few hidden features grow huge, so one scale cannot fit them and the rest",
+        "The weights become more alike, so the grid can no longer tell them apart"
       ],
-      "dogru": 1,
-      "aciklama": "LLM.int8() splits the matrix multiplication in two: the very few outlier columns are computed in 16-bit and the rest in 8-bit, and the results are summed; this gives '8-bit memory, 16-bit quality' and matches the 16-bit curve even beyond 6.7B. Per-group scaling (the last option) is a genuine remedy for outliers, but it belongs to the general list of outlier remedies, not to the mechanism of LLM.int8()."
+      "dogru": 2,
+      "aciklama": "In large models a few hidden features become much larger than the rest, so one shared scale cannot fit both them and the normal values. If all values grew together, one bigger scale would still fit them all, so more bits would not be needed."
     },
     {
       "id": "d7-06",
       "konu": "PTQ and QAT",
-      "zorluk": 1,
+      "zorluk": 2,
       "slayt": 16,
-      "soru": "What is the usual division of labor between PTQ (post-training quantization) and QAT (quantization-aware training)?",
+      "soru": "PTQ works well for most models, but at very low bit widths it can lose too much quality. Why can QAT do better there?",
       "secenekler": [
-        "QAT is the first choice because it needs no calibration data; PTQ is reserved only for very low bit widths such as 2–3 bits",
-        "Both give the same quality; the difference is that QAT can also quantize the KV cache while PTQ is limited to weights",
-        "QAT is cheaper because it requires no extra training; PTQ needs a separate training run because it puts rounding into the training loop",
-        "PTQ is the first choice: it works well down to 4-bit with a small calibration set; QAT is for 2–3 bits and comes with a training cost"
+        "It uses a larger calibration set, so the range is chosen more exactly",
+        "It trains with rounding in the loop, so the weights adapt to the grid",
+        "It keeps the outliers in high precision, so no large errors remain",
+        "It drops the weights that round badly, so the rest stay more precise"
       ],
-      "dogru": 3,
-      "aciklama": "PTQ is applied to a trained model with a small calibration set, is cheap, and works well down to 4-bit; QAT brings rounding into the training loop, so it costs a training run and is used when PTQ is not enough (2–3 bits). The third option reverses the roles: QAT is the one that requires training."
+      "dogru": 1,
+      "aciklama": "QAT puts the rounding into training, so the weights can adapt to a very coarse grid, but it costs a training run. A larger calibration set only helps PTQ place its range better, and it cannot teach the weights to handle the rounding."
     },
     {
       "id": "d7-07",
       "konu": "Pruning basics and sparsity patterns",
       "zorluk": 2,
-      "slayt": 19,
-      "soru": "In an LLM that has reached 50% unstructured sparsity, the number of nonzero parameters is halved, yet it is often warned that 'speedup is not automatic'. What is the reason for this warning?",
+      "slayt": 26,
+      "soru": "A team can prune freely, or use a fixed pattern that keeps two of every four weights. Why might it choose the fixed pattern?",
       "secenekler": [
-        "The zeros have no fixed pattern; dense kernels multiply the zeros too, so a gain requires special sparse kernels or the 2:4 pattern",
-        "Unstructured pruning can only be applied to the attention projections, so the computational load of the MLP layers stays entirely unchanged",
-        "The LoRA recovery step required after pruning adds an extra adapter multiplication to every layer at inference time, which cancels the speed gain",
-        "SparseGPT's δ updates put new nonzero values in place of the deleted weights, so the total number of operations actually does not change"
+        "It keeps more quality than free pruning at the same sparsity",
+        "It turns the model into a smaller dense model with fewer layers",
+        "It fits GPU kernels that skip the zeros, so it can run faster",
+        "It needs no extra memory to store where the kept weights are"
       ],
-      "dogru": 0,
-      "aciklama": "Unstructured sparsity has 'no fixed pattern; special sparse kernels needed': hardware cannot skip irregular zeros, so any speedup depends on hardware and kernel support, whereas structured pruning directly yields a smaller dense architecture and a speed gain is nearly guaranteed. The SparseGPT option is wrong: the δ updates are applied to the kept weights and do not change the sparsity ratio."
+      "dogru": 2,
+      "aciklama": "The fixed pattern is regular, so many GPUs have kernels that skip its zeros and give real speed. The price is a little more quality loss than free pruning, because the pattern forces which weights can go."
     },
     {
       "id": "d7-08",
       "konu": "Pruning scoring methods: Magnitude, Wanda, SparseGPT",
-      "zorluk": 3,
-      "slayt": 22,
-      "soru": "Under the same per-row pruning rule, Wanda keeps a small weight that magnitude pruning would remove and removes a larger one instead. What reasoning lies behind multiplying each weight's magnitude by the norm of its input?",
+      "zorluk": 2,
+      "slayt": 20,
+      "soru": "A team prunes a medical chatbot. For the importance scores, it uses example texts from children's stories. What is the main risk?",
       "secenekler": [
-        "A removed weight's effect can be pushed into the remaining weights, so small weights become cheap to keep in the row",
-        "A weight fed by a strong input was trained for longer, so its magnitude is a more reliable estimate than the others",
-        "A weight's contribution to the output depends on its input too, so a small weight on a strong input can matter more",
-        "A weight on a strong input is enlarged by a short retraining pass, so its magnitude rises above the row threshold"
+        "The scores may not match medical inputs, so useful weights get removed",
+        "The model may start to write stories, because pruning trains on the texts",
+        "The weights that stories use may be cut, so the model loses story skills",
+        "The zeros may fall in a random pattern, so the GPU cannot skip them"
       ],
-      "dogru": 2,
-      "aciklama": "Magnitude pruning never looks at the inputs, yet what a weight adds to the layer output is the weight times its input; Wanda therefore scores each weight by |W| times the input norm measured on a few calibration texts. Pushing the effect of a removed weight into the remaining ones is SparseGPT's idea; Wanda neither updates weights nor retrains."
+      "dogru": 0,
+      "aciklama": "The scores measure how much each weight matters on the example texts, so weights needed only for medical questions can look unimportant and get cut. Weights that stories use get high scores and stay, so the danger is to the medical skills."
     },
     {
       "id": "d7-09",
       "konu": "Pruning scoring methods: Magnitude, Wanda, SparseGPT",
       "zorluk": 2,
-      "slayt": 25,
-      "soru": "In a comparison of pruning methods on LLaMA-7B at 50% sparsity, what is the main difference between Wanda and SparseGPT?",
+      "slayt": 24,
+      "soru": "When one pruning method removes a weight, it also changes some of the weights that are left. What is the goal of these changes?",
       "secenekler": [
-        "Wanda uses no calibration data while SparseGPT does; therefore SparseGPT's perplexity is clearly better",
-        "Both use calibration data; only SparseGPT updates the remaining weights with H⁻¹ to compensate for the error, and the ppl gap is small",
-        "Wanda updates the remaining weights while SparseGPT only selects what to remove; therefore their perplexities are nearly equal",
-        "SparseGPT performs a short retraining on labeled data, whereas Wanda settles for a single forward pass and is about 10 ppl points worse"
+        "To make the remaining weights small enough to store in fewer bits",
+        "To move the zeros into a regular pattern that the GPU can skip",
+        "To retrain the layer on labeled data so that it relearns the task",
+        "To keep the layer's outputs almost the same as before the removal"
       ],
-      "dogru": 1,
-      "aciklama": "In the table, the 'calibration data' row is 'yes' for both Wanda and SparseGPT, while 'updates kept weights' is 'yes' only for SparseGPT; perplexities of 7.26 and 7.22 are nearly equal, a loss of ~1.5 points versus dense at 5.68. The method that uses no calibration data and loses ~11.6 points is magnitude pruning (17.29), not Wanda."
+      "dogru": 3,
+      "aciklama": "Deleting a weight moves the layer's output a little, and changing the weights that are left can cancel most of that change. This happens in one pass on example inputs, with no labels and no retraining, so it is not a fine-tuning step."
     },
     {
       "id": "d7-10",
       "konu": "Structured pruning, low-rank factorization, and recovery",
       "zorluk": 2,
-      "slayt": 42,
-      "soru": "A team wants to run LLaMA-7B with genuinely lower latency on its own GPU; the hardware has no sparse kernel support, and memory is not a problem. A few hours of LoRA training are affordable. Which approach is the most appropriate?",
+      "slayt": 28,
+      "soru": "Pruning and low-rank factorization both make a weight matrix cheaper to store. How are they different?",
       "secenekler": [
-        "Apply 50% unstructured magnitude pruning and then recover the lost quality with LoRA",
-        "Convert the weights to weight-only INT4 and thereby automatically halve activation memory and compute cost as well",
-        "Define a smaller student architecture from scratch and train it with response-based distillation",
-        "Use structured pruning (e.g., LLM-Pruner, width/depth) to produce a smaller dense model and recover it with LoRA"
+        "Pruning keeps the matrix in a smaller form, while low-rank removes parts of it",
+        "Pruning removes parts of the matrix, while low-rank keeps it in a smaller form",
+        "Pruning stores each weight in fewer bits, while low-rank sets small ones to zero",
+        "Pruning always needs a teacher model, while low-rank needs no training at all"
       ],
-      "dogru": 3,
-      "aciklama": "For real speed on your own hardware, structured pruning is the answer: when whole blocks, heads, or MLP neurons are removed, the model becomes smaller but stays dense, and no special kernel is needed; in an LLM-Pruner example, 20% of the structure is removed and ~3 hours of LoRA bring the score from 56.82 back up to 60.07. Unstructured pruning gives no speedup without sparse kernels; weight-only INT4 mainly targets memory and bandwidth and does not automatically reduce compute."
+      "dogru": 1,
+      "aciklama": "Pruning deletes some weights or whole rows, while low-rank factorization keeps the whole matrix and writes it as two thin matrices with fewer numbers. Low-rank does not delete parts of the matrix, and storing weights in fewer bits is quantization, not pruning."
     },
     {
       "id": "d7-11",
       "konu": "Knowledge distillation: soft targets and temperature",
       "zorluk": 1,
-      "slayt": 33,
-      "soru": "In the context of Hinton et al. (2015), what is meant by 'dark knowledge'?",
+      "slayt": 31,
+      "soru": "A student model is weak on legal questions. It learned only from its teacher, and the teacher is weak there too. What would help most?",
       "secenekler": [
-        "Internal representations hidden in the teacher's hidden states and attention features that are never reflected in the logit layer",
-        "Implicit knowledge about examples the teacher never saw in its training data, which can in no way be transferred to the student",
-        "The relative preference information in the small nonzero probabilities the teacher gives wrong classes (e.g., dog 0.018)",
-        "Knowledge the student acquires by discovering, on its own, patterns the teacher did not show, enabling it to surpass the teacher"
+        "Use a teacher that is strong on legal questions and filter its bad answers",
+        "Raise the temperature so the student sees more of the teacher's preferences",
+        "Make the student bigger so it can take in more from the same teacher",
+        "Train longer on the same teacher outputs so the student copies them better"
       ],
-      "dogru": 2,
-      "aciklama": "In soft targets, 'dog 0.018 ≠ 0' tells us the input also looks slightly like a dog, whereas a hard label says only 'cat'. The student thus learns the teacher's whole distribution, i.e., its relative preferences between classes. The first option describes feature-based KD; dark knowledge is the information in the output distribution (response-based)."
+      "dogru": 0,
+      "aciklama": "A student can only learn what its teacher shows it, so the real fix is a better teacher and cleaner teacher data. A bigger student or more training on the same outputs would only copy the same gaps more closely."
     },
     {
       "id": "d7-12",
       "konu": "Knowledge distillation: soft targets and temperature",
       "zorluk": 2,
-      "slayt": 34,
-      "soru": "In distillation, suppose the teacher gives 'cat 0.982 / dog 0.018' at T = 1 and '0.731 / 0.269' at T = 4. What is the rationale for using T > 1 in distillation?",
+      "slayt": 33,
+      "soru": "The teacher predicts the next word: 'cat' gets a high probability, 'dog' a small one, and 'car' almost zero. What does the student learn from this?",
       "secenekler": [
-        "At T = 1 the distribution is almost one-hot, close to the hard label; T > 1 keeps the argmax but makes small probabilities visible",
-        "T > 1 changes the teacher's argmax; the student thus gives equal weight not only to the most probable class but also to the alternatives",
-        "T > 1 scales up the student's logits and thereby increases the gradient scale by τ², making training converge much faster",
-        "T > 1 filters out the teacher's low-confidence predictions; only the high-probability classes are transferred to the student"
+        "That 'cat' is right and every other word is equally wrong",
+        "That 'dog' fits a little here, but 'car' does not fit at all",
+        "That the teacher is unsure, so this example should be thrown away",
+        "That 'dog' will become the top answer once the temperature is raised"
       ],
-      "dogru": 0,
-      "aciklama": "Temperature divides every logit by T: the argmax does not change but the distribution flattens, so signals of 'dark knowledge' such as 0.018 reach a magnitude the student can learn (dog 0.401 at T = 10). The third option is wrong: T > 1 shrinks the gradient, and a τ² factor is added to the loss to compensate."
+      "dogru": 1,
+      "aciklama": "Soft targets keep the teacher's small probabilities, and these show which wrong answers are close to the right one. A hard label only says 'cat' and treats 'dog' and 'car' as equally wrong, so it carries much less information."
     },
     {
       "id": "d7-13",
-      "konu": "KD loss and types of knowledge",
-      "zorluk": 3,
-      "slayt": 35,
-      "soru": "In the formula L_KD = α·L(W_S, x) + (1 − α)·τ²·KLdiv(Q_S, Q_T) used in knowledge distillation, what is the meaning of the τ² factor and of choosing α = 0?",
+      "konu": "Knowledge distillation: soft targets and temperature",
+      "zorluk": 1,
+      "slayt": 34,
+      "soru": "We soften the teacher's outputs with a higher temperature. What stays the same?",
       "secenekler": [
-        "τ² softens the teacher output even further; α = 0 means the student learns only from the hard (true) labels, ignoring the teacher",
-        "τ² restores the gradient scale shrunk by softening; α = 0 switches off the label term, leaving only the teacher",
-        "τ² makes the KL divergence equivalent to cross-entropy; α = 0 disables the teacher term and uses only the ground truth",
-        "τ² balances the label and teacher terms; α = 0 indicates a switch from white-box KD to black-box KD in this setting"
+        "The probability of the top answer",
+        "The gap between the top answer and the rest",
+        "The small probabilities of the other answers",
+        "The answer with the highest probability"
       ],
-      "dogru": 1,
-      "aciklama": "When logits are divided by τ, gradients with respect to the soft targets shrink by roughly 1/τ²; the τ² factor restores this scale ('restores the gradient scale'). α balances labels against the teacher; α = 0 is the 'no labels' case and only the distillation term remains. The first and third options interpret α = 0 in reverse, as label-only."
+      "dogru": 3,
+      "aciklama": "Temperature divides every logit by the same number, so the order of the answers does not change and the top answer stays on top. The probability of the top answer does change: it goes down while the small probabilities go up."
     },
     {
       "id": "d7-14",
       "konu": "KD loss and types of knowledge",
-      "zorluk": 2,
+      "zorluk": 3,
       "slayt": 36,
-      "soru": "TinyBERT copies not only the output probabilities but also the 'hidden layers'. Under the classification of Gou et al. (2021), which type of knowledge is this, and what is its prerequisite?",
+      "soru": "A team can reach a big teacher only through an online service that returns text. Which kind of distillation can it still do?",
       "secenekler": [
-        "Response-based; access to only the text the teacher generates or its token probabilities is sufficient",
-        "Relation-based; the similarity structure between examples or features must be taken from the teacher",
-        "Feature-based; access to the teacher's internal representations (white-box access) is needed",
-        "Black-box KD; the teacher behaves like an API and returns only softened probabilities"
+        "Train the student to match the teacher's hidden states",
+        "Train the student to match the teacher's softened logits",
+        "Train the student to match the teacher's written answers",
+        "Train the student to match how the teacher's features relate"
       ],
       "dogru": 2,
-      "aciklama": "Feature-based KD matches 'hidden states or attention features' and 'deeper knowledge gives a richer signal, but you need the teacher's internals'; TinyBERT's copying of intermediate layers is exactly this. Response-based KD uses only the teacher's predictions (probabilities / text) and does not need internal representations."
+      "aciklama": "A service that returns only text shows what the teacher writes, so the student can still learn from those answers. Logits, hidden states and feature relations live inside the teacher, so they need white-box access to its internals."
     },
     {
       "id": "d7-15",
       "konu": "KD case studies: DistilBERT/TinyBERT, Step-by-Step, Minitron",
-      "zorluk": 1,
+      "zorluk": 3,
       "slayt": 38,
-      "soru": "In Distilling Step-by-Step (Hsieh et al., 2023), what happens when the student is deployed?",
+      "soru": "In step-by-step distillation, the student learns to write the teacher's reasons, but at test time it gives only the answer. Why learn the reasons at all?",
       "secenekler": [
-        "The student first runs the [rationale] task to generate the rationale, then gives the final answer based on that rationale",
-        "The 540B PaLM teacher writes the rationale at test time, and the student derives the final answer from that rationale alone",
-        "The student uses only the [rationale] task; the answer is read from the last line of the generated rationale",
-        "Only the [label] task is used; at test time no rationale is generated and no large LLM is needed"
+        "Writing reasons is an extra task that shows the student how to get the answer",
+        "Writing reasons lets the teacher check each answer of the student at test time",
+        "Writing reasons replaces the answer labels, so no answer data is needed at all",
+        "Writing reasons makes the student bigger, so it can hold more of the knowledge"
       ],
-      "dogru": 3,
-      "aciklama": "In training, the student learns two tasks on the same question with two prefixes ([label] → answer, [rationale] → rationale), and λ sets the weight of the rationale; at deployment only the answer task is used: 'no rationale and no LLM at test time'. The first option describes chain-of-thought inference; here the rationale is only a training signal and has no test-time cost."
+      "dogru": 0,
+      "aciklama": "Writing the reason is a second training task, and it gives the student a richer signal about how the answer is reached. At test time only the answer task runs, so there is no teacher and no reason, and the answer task still uses answer labels in training."
     },
     {
       "id": "d7-16",
       "konu": "KD case studies: DistilBERT/TinyBERT, Step-by-Step, Minitron",
       "zorluk": 2,
       "slayt": 39,
-      "soru": "A company has trained a 15B-parameter model and now wants 8B and 4B variants of the same family, but it lacks the token budget to train each from scratch. Following the Minitron approach, what is the most efficient path?",
+      "soru": "A team needs a smaller model. Pruning its big model and then distilling from it needs far less training than starting from zero. Why?",
       "secenekler": [
-        "Prune the 15B model in width/depth and distill with the 15B as teacher; ~40× fewer tokens than training from scratch suffice",
-        "Quantize the 15B model to INT4 to match the memory footprint of 8B and 4B FP16 models; no additional training is needed",
-        "Collect the 15B model's rationales and train a small T5 from scratch with Distilling Step-by-Step; data needs drop to 80%",
-        "Randomly initialize the 8B and 4B architectures and train them with the 15B's soft targets; with no pruning, initial quality is preserved"
+        "The small model keeps all weights in fewer bits, so it has nothing to relearn",
+        "The small model gets fresh random weights, so soft targets teach it faster",
+        "The small model uses soft targets only, so it needs no training text at all",
+        "The small model starts from trained weights, so it only has to recover"
       ],
-      "dogru": 0,
-      "aciklama": "'Train the biggest model once; get the smaller ones by pruning + distillation': the pruned model starts from trained weights and recovers quickly under teacher supervision, and Minitron 8B reaches the level of Mistral 7B / Gemma 7B with ~40× fewer tokens. A randomly initialized student (the last option) brings back exactly the 'from scratch' cost (40 units) that one wants to avoid; quantization does not change the parameter count and does not produce a separate 8B/4B architecture."
+      "dogru": 3,
+      "aciklama": "Pruning keeps most of the trained weights, so the smaller model already knows a lot and distillation only has to repair what was lost. A student with fresh random weights would have to learn everything again, which is the costly path from zero."
     },
     {
       "id": "d7-17",
       "konu": "KV-cache compression and choosing a method",
       "zorluk": 2,
       "slayt": 40,
-      "soru": "Quantizing the KV cache (e.g., KIVI) and evicting tokens from it (e.g., StreamingLLM, H2O) both reduce cache memory. How do the two approaches differ in what they give up?",
+      "soru": "To keep the KV cache small in a very long chat, one method keeps only the first and the most recent tokens. What is the risk?",
       "secenekler": [
-        "Quantization drops the oldest tokens entirely; eviction keeps all tokens but lets several query heads share one K/V head",
-        "Quantization shrinks the model weights that produce K and V; eviction removes whole layers so fewer entries are written",
-        "Quantization keeps every past token at lower precision; eviction keeps full precision but drops the middle of the context",
-        "Quantization keeps only the first and the recent tokens; eviction stores every token but with fewer bits for each entry"
+        "Each kept token is stored in fewer bits, so all its values lose precision",
+        "The model can no longer see the dropped tokens, so it may miss facts",
+        "Several query heads must share one key-value head, so quality drops",
+        "The model must run the prefill again for every token that it drops"
       ],
-      "dogru": 2,
-      "aciklama": "Quantization lowers the bits per stored entry while every past token stays in the cache; eviction keeps the first ('sink') tokens and a recent window and discards what lies between. The last option swaps the two, and sharing one K/V head among several query heads is a third, separate lever (GQA)."
+      "dogru": 1,
+      "aciklama": "Evicting tokens frees memory by deleting their keys and values, so later tokens cannot attend to them and facts from the middle of the chat can be lost. Storing values in fewer bits is quantization, a different method that keeps every token."
     },
     {
       "id": "d7-18",
       "konu": "KV-cache compression and choosing a method",
-      "zorluk": 3,
-      "slayt": 41,
-      "soru": "In a LLaMA-7B / FreebaseQA experiment comparing GPTQ quantization with pruning (Magnitude, Wanda, SparseGPT), which conclusion can correctly be drawn?",
+      "zorluk": 2,
+      "slayt": 42,
+      "soru": "A model's weights are too big for the team's GPU. Chats are short, and speed is fine. The team wants a cheap first step. What fits best?",
       "secenekler": [
-        "8-bit GPTQ is lossless on this knowledge-heavy task; loss begins only at 4-bit, and even there it stays at the same level as 50% pruning",
-        "At the same 2× compression, 8-bit GPTQ is ≈ −10% while 50% pruning is −50% or worse; even 4-bit, at 4× compression, beats 2× pruning",
-        "Magnitude, Wanda, and SparseGPT stay in the green zone up to 50% sparsity; a marked collapse starts only beyond 60% sparsity",
-        "The pruning curves are flat up to 20–25% sparsity, and quantization causes more loss than pruning at every bit level"
+        "KV-cache compression, since it shrinks memory that grows with chat length",
+        "Structured pruning, since it gives real speed on normal hardware",
+        "Distillation, since it trains a new and smaller model from the big one",
+        "Quantization, since it stores each weight in fewer bits with no retraining"
       ],
-      "dogru": 1,
-      "aciklama": "In this experiment, 8-bit ≈ −10% and 4-bit ≈ −31%; pruning is fine up to 20–25%, then collapses and reaches −50% or worse at 50%, so at the same size quantization beats pruning. The first option is wrong: 8-bit is not free on knowledge-heavy tasks; even 8-bit shows a loss of ≈ −10%."
+      "dogru": 3,
+      "aciklama": "When the weights are the problem, quantization is the usual first step, because it shrinks every weight and PTQ needs no training run. KV-cache compression helps with long chats and many users, but here the chats are short, so the cache is not the problem."
     }
   ]
 }

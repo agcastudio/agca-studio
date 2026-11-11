@@ -22,270 +22,270 @@
       "konu": "Pre-norm decoder block (post-LayerNorm vs. pre-RMSNorm)",
       "zorluk": 2,
       "slayt": 6,
-      "soru": "What is the main rationale for using pre-RMSNorm (y = x + F(RMSNorm(x))) instead of post-LayerNorm (y = LN(x + F(x)))?",
+      "soru": "A very deep post-norm model is hard to train. Which change helps with this most directly?",
       "secenekler": [
-        "Because normalization is applied after the residual addition, the output scale of each block is fixed.",
-        "Because the residual path carries x forward directly, gradient flow is easier in deep stacks.",
-        "Because RMSNorm has no β parameter, the number of learned parameters per block is reduced.",
-        "Because attention and the FFN share a single normalization layer, the computational cost is lower."
+        "Replace LayerNorm with RMSNorm, but keep the norm after the residual add",
+        "Move the norm before each sublayer, so x passes straight to the output",
+        "Replace the ReLU FFN with SwiGLU, so each token gets a learned gate",
+        "Replace absolute positions with RoPE, so attention sees token distance"
       ],
       "dogru": 1,
-      "aciklama": "In pre-norm, the residual path carries x forward without passing through any normalization; this is why gradient flow is easier in deep Transformer stacks. The first option is the definition of post-LayerNorm; the absence of β is a difference between RMSNorm and LayerNorm and has nothing to do with pre/post placement of the norm."
+      "aciklama": "Pre-norm keeps a direct residual path, so x and its gradients can skip every norm on their way through the deep stack. Using RMSNorm after the add still leaves a norm on the main path, so the flow problem stays."
     },
     {
       "id": "d3-02",
       "konu": "RMSNorm and LayerNorm",
-      "zorluk": 3,
+      "zorluk": 1,
       "slayt": 7,
-      "soru": "The same constant is added to every component of a vector before it enters a normalization layer. How do LayerNorm and RMSNorm respond to this shift?",
+      "soru": "Modern LLMs put RMSNorm before attention and before the FFN. What is its main job there?",
       "secenekler": [
-        "RMSNorm's output is unchanged because RMS ignores offsets; LayerNorm's output changes because β absorbs the shift.",
-        "Both outputs are unchanged, because each layer divides by a statistic that grows along with the added constant.",
-        "LayerNorm's output is unchanged because the mean is subtracted; RMSNorm's output changes because it only rescales.",
-        "Both outputs change, because neither layer removes an offset; they differ only in the learned γ and β parameters."
+        "It adds position information, so the next layer knows where each token is",
+        "It decides which feature channels can pass and which ones are blocked",
+        "It shrinks the stored keys and values, so the KV cache uses less memory",
+        "It keeps the scale of each token vector steady for the next layer"
       ],
-      "dogru": 2,
-      "aciklama": "LayerNorm subtracts the mean before scaling, so a uniform offset is removed, whereas RMSNorm skips the mean subtraction and only divides by the root mean square, so the offset survives in its output. Dividing by a larger statistic shrinks the vector but does not cancel a shift, which is why the 'both unchanged' option fails."
+      "dogru": 3,
+      "aciklama": "RMSNorm divides each vector by its root mean square and skips the mean step of LayerNorm, so each sublayer gets inputs of a steady scale. Deciding which channels pass is the job of the SwiGLU gate, not of the norm."
     },
     {
       "id": "d3-03",
       "konu": "SwiGLU FFN",
       "zorluk": 2,
       "slayt": 8,
-      "soru": "In the expression SwiGLU(x) = (SiLU(xW_gate) ⊙ xW_up)W_down, what is the function of the SiLU(xW_gate) path?",
+      "soru": "The old ReLU FFN and the modern SwiGLU FFN work in different ways. What do they have in common?",
       "secenekler": [
-        "Clipping negative intermediate activations to zero to produce a sparse intermediate representation like ReLU",
-        "Mixing information across tokens to complete the work of the attention sublayer",
-        "Scaling the channels produced by xW_up element-wise with a learned gate",
-        "Normalizing the scale of the intermediate representation with RMS before the W_down projection"
+        "Both update each token on its own, without looking at other tokens",
+        "Both use a learned gate that decides how much of each feature passes",
+        "Both set every negative value to zero before the final projection",
+        "Both mix information across tokens, like a second attention step"
       ],
-      "dogru": 2,
-      "aciklama": "SwiGLU learns which feature channels pass through by multiplying one projection (xW_up) element-wise with the SiLU-activated version of the other (the gate). Clipping negatives to zero is the behavior of a ReLU FFN; since the FFN transforms each token independently, mixing across tokens belongs to attention."
+      "dogru": 0,
+      "aciklama": "Both FFNs transform each token separately, and only attention moves information between tokens. The learned gate is the part SwiGLU adds, and the ReLU FFN does not have one."
     },
     {
       "id": "d3-04",
       "konu": "RoPE (Rotary Positional Embedding)",
-      "zorluk": 2,
+      "zorluk": 3,
       "slayt": 9,
-      "soru": "What is the key difference that distinguishes RoPE from classical absolute positional encoding?",
+      "soru": "The words 'red car' appear at the start of one text and near the end of another. Why can RoPE give the two words a similar attention score in both texts?",
       "secenekler": [
-        "The position vector is added to the token embedding before the Transformer block; each slot receives its own vector.",
-        "Position information is added to the V vector; the attention output directly carries the token's absolute position.",
-        "Position is added to the pre-softmax scores as a learned bias that depends on the distance between tokens.",
-        "Q and K are rotated according to position; the Q·Kᵀ score depends on content match and the relative offset i−j."
+        "RoPE rotates only the value vectors, so the scores do not see position",
+        "RoPE adds a position vector once at the input, and deeper layers forget it",
+        "RoPE makes the score depend on the gap between the words, not their slots",
+        "RoPE removes position from the score, so only the word meaning counts"
       ],
-      "dogru": 3,
-      "aciklama": "RoPE rotates the Q and K vectors according to position; the score (Rᵢqᵢ)·(Rⱼkⱼ) depends on both content match and the relative offset between i and j. The first option is classical absolute encoding of the form xᵢ = tokenᵢ + pᵢ; RoPE does not touch V and performs rotation rather than addition."
+      "dogru": 2,
+      "aciklama": "RoPE rotates the query and the key by their positions, so their dot product depends on the content and on the offset between them. Position still matters, but as the distance between the words, not as their slot number."
     },
     {
       "id": "d3-05",
       "konu": "MHA / GQA / MQA / MLA",
-      "zorluk": 2,
-      "slayt": 11,
-      "soru": "Which statement about the relationship between GQA and KV cache is correct?",
+      "zorluk": 1,
+      "slayt": 10,
+      "soru": "GQA and MQA let several query heads share the same key and value heads. What is the main reason for this?",
       "secenekler": [
-        "GQA is an inference technique that replaces the KV cache; because past K/V are not stored at all, decode memory is reduced.",
-        "The KV cache can be applied only in models that use GQA or MQA; past K/V representations cannot be reused in MHA.",
-        "GQA takes effect only at inference; during training each Q head continues to use its own K/V head.",
-        "GQA is an architectural choice that reduces the number of cached K/V heads; the KV cache is a separate reuse mechanism."
+        "The KV cache gets smaller, so each new token needs less memory to read",
+        "Each query head sees fewer tokens, so attention needs less calculation",
+        "Shared heads act like experts, so only a few of them run for each token",
+        "Shared heads are rebuilt at each step, so no KV cache is needed"
       ],
-      "dogru": 3,
-      "aciklama": "GQA changes the attention architecture, whereas KV caching separately reuses previous token representations. GQA is used in both training and inference; having 8 Q heads share 2 K/V pairs reduces the amount of K/V written to the cache by 4× but does not eliminate the cache. The KV cache also does not depend on GQA; it is used in MHA models as well."
+      "dogru": 0,
+      "aciklama": "Fewer key and value heads mean fewer K/V entries to store and to read at every decoding step. Each query head still looks at all the tokens, so the saving does not come from seeing fewer tokens."
     },
     {
       "id": "d3-06",
       "konu": "MHA / GQA / MQA / MLA",
       "zorluk": 3,
-      "slayt": 13,
-      "soru": "Which of the following correctly describes the mechanism that distinguishes MLA from GQA and MQA?",
+      "slayt": 12,
+      "soru": "Among MHA, GQA and MQA, MQA has the smallest KV cache. Why might a team still pick GQA?",
       "secenekler": [
-        "It ties all Q heads to a single shared K/V head; Q diversity is preserved, and the cached representation is common.",
-        "It compresses the K/V state into a learned low-dimensional latent and caches that; K/V are recovered through projection.",
-        "It splits the Q heads into groups and ties each group to a small number of K/V heads; the number of cached heads drops to the number of groups.",
-        "It stores K/V values at a low bit width and rescales them at compute time; the head count and structure do not change."
+        "GQA keeps more query heads than MQA, so it can read the text in more ways",
+        "GQA keeps a few K/V heads, so query heads do not all read the same K/V",
+        "GQA packs K/V into a learned latent, so its cache is even smaller",
+        "GQA gives each query head its own K/V head, so nothing is shared"
       ],
       "dogru": 1,
-      "aciklama": "While GQA/MQA reduce the number of K/V heads through sharing, MLA reduces the token state to a compressed latent c via a down-projection; this compact latent is what is kept in the cache, and K/V-equivalent features are recovered through projection when needed. The first option is the definition of MQA and the third is that of GQA; MLA is more than merely a single shared KV head."
+      "aciklama": "In MQA every query head reads one shared K/V head, which limits variety, while GQA shares within groups and still keeps the cache small. MQA also keeps many query heads, so the number of query heads is not the difference."
     },
     {
       "id": "d3-07",
       "konu": "Mixture-of-Experts (MoE) and modern model families",
-      "zorluk": 1,
+      "zorluk": 2,
       "slayt": 14,
-      "soru": "In an MoE layer, the router scores are Expert 1: 0.72, Expert 2: 0.08, Expert 3: 0.15, Expert 4: 0.61, and top-2 routing is applied. How is the output produced for this token?",
+      "soru": "An MoE model stores many expert FFNs, but each token needs only a little GPU work. Why?",
       "secenekler": [
-        "Only Expert 1 and Expert 4 are run; their outputs are combined using the routing weights.",
-        "All four experts are run; only the outputs of the two experts with the highest scores are summed.",
-        "Only Expert 1 is run; Expert 4 is a backup expert that is activated when the router is undecided.",
-        "The outputs of all four experts are averaged; the scores are used only for load balancing during training."
+        "All experts run for each token, but each one is too small to cost much",
+        "The experts share one set of weights, so only one expert is really stored",
+        "The router lets tokens skip attention, so each token only runs an FFN",
+        "A router picks a few experts for each token, so most of them do not run"
       ],
-      "dogru": 0,
-      "aciklama": "Top-2 routing selects the two experts with the highest scores (1 and 4); only these run, and their outputs are combined as a weighted sum using the routing weights, so computation per token stays sparse even though the total parameter count is large. Running all four experts would eliminate the 'sparse computation' advantage of MoE."
+      "dogru": 3,
+      "aciklama": "The router scores the experts, runs only the top few for each token and mixes their outputs. Running every expert would make the GPU work grow with each new expert, which is what MoE avoids."
     },
     {
       "id": "d3-08",
-      "konu": "Mixture-of-Experts (MoE) and modern model families",
+      "konu": "Prefill vs. decode and KV cache",
       "zorluk": 1,
-      "slayt": 15,
-      "soru": "Which pairing of model family and architectural features is correct?",
+      "slayt": 17,
+      "soru": "Why can the model read the whole prompt in one pass, but must write its answer one token per pass?",
       "secenekler": [
-        "Mistral 7B — MLA-compressed KV latent and shared + routed MoE",
-        "LLaMA / Llama 2 — GQA and RMSNorm at all model sizes",
-        "DeepSeek V2/V3 — standard RoPE and a dense SwiGLU FFN",
-        "Mixtral 8×7B — GQA and an 8-expert MoE (Expert FFNs)"
+        "The prompt goes into the KV cache, but answer tokens can never be cached",
+        "The prompt goes to the large model, but a small draft model writes the answer",
+        "The prompt tokens are all known, but each new token needs the one before",
+        "The prompt is usually short, but the answer is almost always much longer"
       ],
-      "dogru": 3,
-      "aciklama": "Mixtral 8×7B uses RMSNorm, RoPE, GQA, and expert FFNs with 8 experts. In Llama 2, GQA is used only in the 70B model (the others use MHA); MLA and shared + routed MoE belong to DeepSeek V2/V3, and DeepSeek uses decoupled RoPE; Mistral 7B, meanwhile, is a dense model with GQA + sliding-window attention."
+      "dogru": 2,
+      "aciklama": "In prefill all prompt tokens are already there, so they pass through the model together. In decode the next token does not exist until the step before it ends, and its K/V is cached as well."
     },
     {
       "id": "d3-09",
       "konu": "Prefill vs. decode and KV cache",
       "zorluk": 2,
-      "slayt": 17,
-      "soru": "Why is the decode phase often limited by memory bandwidth at small batch sizes, while prefill is limited by arithmetic throughput?",
+      "slayt": 18,
+      "soru": "A model without a KV cache writes a long answer. Each new token takes longer than the one before. Why?",
       "secenekler": [
-        "Decode processes a single token, so there is little computation per byte of weights/KV read; prefill reuses the weights across many tokens.",
-        "In decode, the N × N attention score matrix is recomputed from scratch at every step; in prefill, the scores are computed once and stored in HBM.",
-        "In prefill, the weights are read from HBM separately for each token; in decode, the weights stay in on-chip SRAM and are not read.",
-        "In decode, softmax and sampling are executed on the CPU; in prefill, all matrix multiplications remain parallel on the GPU."
+        "Each step runs the whole text again, and that text grows at every step",
+        "Each step updates the weights again, as if the model were still training",
+        "Each step reads all the weights again, and the weights grow with the text",
+        "Each step rotates vectors by larger angles, and big angles cost more work"
       ],
       "dogru": 0,
-      "aciklama": "Prefill processes many prompt tokens together, arithmetic intensity is high, and the weights are reused across tokens; in decode, all weights and the KV cache are read for a single token, so memory reads become the dominant cost. Thanks to the KV cache, decode does not recompute the N × N scores from scratch, which is why the second option is wrong."
+      "aciklama": "Without a cache, the K/V of every earlier token is calculated again at each step, so the work grows with the answer. The weights keep the same size and are not updated during inference."
     },
     {
       "id": "d3-10",
       "konu": "Prefill vs. decode and KV cache",
-      "zorluk": 2,
-      "slayt": 18,
-      "soru": "With a KV cache, each decode step processes only the newest token instead of the whole prefix. Which statement correctly describes what the cache removes and what it leaves in place?",
+      "zorluk": 3,
+      "slayt": 28,
+      "soru": "In a long chat, the user sends a short follow-up: 'Can you shorten that?' How can prefix caching make the reply start sooner?",
       "secenekler": [
-        "It removes attention to earlier tokens; the new token sees only a pooled summary of them.",
-        "It removes recomputing K/V for earlier tokens; the new token still attends to all of them.",
-        "It removes the prefill pass; the prompt K/V are produced lazily during the decode steps.",
-        "It removes the per-step pass through the decoder stack; only the output softmax is rerun."
+        "It reuses the earlier reply as it is, so the model does not run again",
+        "It drops the earlier turns, so the model reads only the short new message",
+        "It reuses the K/V of the earlier turns, so only the new tail is processed",
+        "It splits the earlier turns into chunks, so other users can run in between"
       ],
-      "dogru": 1,
-      "aciklama": "The cache stores the K/V already computed for earlier positions, so each step only pushes the newest token through the stack, but that token's query still attends over every cached key and value. Caching therefore saves re-computation of the prefix and does not shorten what attention looks at, which is the confusion in the first option."
+      "dogru": 2,
+      "aciklama": "The K/V of the earlier turns is already stored, so prefill only has to handle the new tail. The old turns are not dropped, because the new tokens still attend to their cached K/V."
     },
     {
       "id": "d3-11",
-      "konu": "Prefill vs. decode and KV cache",
-      "zorluk": 2,
-      "slayt": 19,
-      "soru": "During a busy period a server's KV-cache memory keeps climbing although the model weights never change. Which explanation matches how the cache is sized?",
-      "secenekler": [
-        "The cache is shared by all requests, so memory follows only the longest context currently being served.",
-        "The cache stores the N × N attention scores of each request, so memory follows the square of its context.",
-        "Each request keeps its own K/V for every token in every layer, so memory follows context and concurrency.",
-        "Each request keeps one K/V entry per layer, so memory follows concurrency but not the length of a context."
-      ],
-      "dogru": 2,
-      "aciklama": "Every token contributes K and V in every layer, so the cache grows with conversation length, and separate conversations need separate caches, so it also grows with the number of concurrent requests. The cache holds K/V vectors rather than score matrices, so its growth is per token and not quadratic."
-    },
-    {
-      "id": "d3-12",
       "konu": "FlashAttention",
       "zorluk": 2,
       "slayt": 20,
-      "soru": "Which of the following statements about FlashAttention is false?",
+      "soru": "FlashAttention gives the same result as standard attention. Where does its speed-up come from?",
       "secenekler": [
-        "It normalizes the softmax of each Q/K tile independently and then sums the tile outputs.",
-        "It produces the same mathematical result as standard attention; the gain comes from memory traffic.",
-        "It avoids writing the entire N × N intermediate score matrix to HBM and reading it back.",
-        "It updates running softmax statistics while processing small tiles on-chip."
+        "It skips token pairs with low scores, so it does less math than usual",
+        "It stores the attention scores with fewer bits, so they take less space",
+        "It reuses the scores from earlier steps, so they are not calculated again",
+        "It works on small tiles on the chip, so less data goes to slow GPU memory"
       ],
-      "dogru": 0,
-      "aciklama": "Tiles share running softmax statistics and each tile is not normalized independently; otherwise the result would deviate from standard attention. The other three statements are accurate: the same math, the N × N matrix not being written to HBM, and the online softmax update."
+      "dogru": 3,
+      "aciklama": "Standard attention writes a big score table to slow GPU memory and reads it back. FlashAttention keeps small tiles on the chip and updates the softmax as it goes, so the math is the same and no token pair is skipped."
+    },
+    {
+      "id": "d3-12",
+      "konu": "PagedAttention, vLLM, and continuous batching",
+      "zorluk": 2,
+      "slayt": 23,
+      "soru": "With PagedAttention, the KV blocks of one request can sit anywhere in GPU memory. How does the system still find them in the right order?",
+      "secenekler": [
+        "The GPU moves the blocks back into one row before every decode step",
+        "A block table records which physical page holds each logical block",
+        "A prefix cache keeps a second copy of the blocks in their first order",
+        "RoPE marks each block with its position, so attention sorts them again"
+      ],
+      "dogru": 1,
+      "aciklama": "Each request has a block table, so its logical blocks can live in physical pages anywhere in memory and a new block can take any free page. Moving the blocks back into one row would bring back the copying and waste that paging avoids."
     },
     {
       "id": "d3-13",
       "konu": "PagedAttention, vLLM, and continuous batching",
-      "zorluk": 2,
-      "slayt": 22,
-      "soru": "Under fixed-size KV reservation, a GPU turns away a new request even though most of the reserved blocks hold no data. Why can paged allocation admit that request?",
+      "zorluk": 1,
+      "slayt": 24,
+      "soru": "A server runs the same group of requests until the longest one ends, so slots of finished requests sit empty. Which technique fixes this waste?",
       "secenekler": [
-        "Blocks are handed out only as a request grows, so unused capacity stays free for other requests.",
-        "Blocks are stored at a lower bit width, so each request's reservation occupies fewer bytes of memory.",
-        "Blocks are kept physically contiguous per request, so idle gaps between reservations can be merged.",
-        "Blocks of finished requests are refilled at every decode step, so no slot waits for the longest request."
+        "Continuous batching, which lets new requests take the freed slots",
+        "Chunked prefill, which splits long prompts into parts between decodes",
+        "Prefix caching, which reuses the K/V of a start that requests share",
+        "PagedAttention, which gives KV blocks to requests only as they grow"
       ],
       "dogru": 0,
-      "aciklama": "Fixed reservation sets aside peak space per request, so idle blocks are locked to their owner, while paged allocation gives out blocks on demand and leaves the rest genuinely available. Physical contiguity is not required, since a block table maps logical blocks to scattered pages, and refilling freed slots describes continuous batching."
+      "aciklama": "Continuous batching lets the scheduler choose active requests at every step, so a waiting request takes a slot as soon as one frees up. PagedAttention fixes wasted KV memory, not empty batch slots."
     },
     {
       "id": "d3-14",
-      "konu": "PagedAttention, vLLM, and continuous batching",
-      "zorluk": 1,
-      "slayt": 24,
-      "soru": "Suppose request A finishes at t2 and request C finishes at t3. What exactly is the difference that continuous batching provides compared with static batching?",
+      "konu": "Serving metrics (TTFT, ITL, TPOT, throughput)",
+      "zorluk": 2,
+      "slayt": 26,
+      "soru": "A server makes many tokens per second in total, but one user still waits a long time for the first token. How is this possible?",
       "secenekler": [
-        "Because more requests are processed at each step, the decode step of a single request becomes shorter.",
-        "All requests complete in the same step, so the KV cache is released all at once.",
-        "Long prompts are split into chunks and interleaved between B's decode steps.",
-        "Requests D and E are admitted into the freed slots; the slots do not sit idle until B finishes."
+        "Throughput counts only decode, while TTFT counts only the gaps between tokens",
+        "Throughput is the gap between tokens, while TTFT is the time of the full answer",
+        "Throughput grows with prompt length, while TTFT does not depend on the prompt",
+        "Throughput adds up all users, while TTFT is the start delay of one request"
       ],
       "dogru": 3,
-      "aciklama": "In static batching, the group stays the same until the longest request in the batch (B) finishes, and the slots of A and C sit idle; in continuous batching, the vLLM scheduler reselects the active requests at every decode step and admits D or E into a freed slot. The third option describes chunked prefill, not continuous batching itself."
+      "aciklama": "Throughput is the total tokens or finished requests per second for the whole server, so it can stay high while one request waits in a queue or a long prefill. The gaps between tokens are ITL, not TTFT."
     },
     {
       "id": "d3-15",
       "konu": "Serving metrics (TTFT, ITL, TPOT, throughput)",
-      "zorluk": 3,
-      "slayt": 26,
-      "soru": "Measurements on a serving system show high TTFT but low ITL/TPOT. According to the principle 'measure first, then choose the optimization', which conclusion is correct?",
+      "zorluk": 2,
+      "slayt": 27,
+      "soru": "A new user sends a very long prompt. While the model reads it, other users see long pauses between their tokens. What does chunked prefill change?",
       "secenekler": [
-        "The latency is in the decode steps; per-step cost should be reduced with speculative decoding.",
-        "The latency is in queuing or the prefill phase; techniques that speed up decode do not fix TTFT.",
-        "The bottleneck is throughput; reducing the batch size makes the first token be produced earlier.",
-        "The bottleneck is KV cache reads; quantizing the KV to INT8 shortens the time to first token."
+        "It cuts the long prompt into parts and keeps only the most useful ones",
+        "It reads the long prompt in parts, and other users decode in between",
+        "It saves the long prompt's K/V, so later turns can reuse it quickly",
+        "It gives the long prompt to a small draft model that reads it faster"
       ],
       "dogru": 1,
-      "aciklama": "TTFT measures the start (queue + prefill), whereas ITL/TPOT measure token generation speed; if ITL is low, decode is already fast, and decode-focused techniques such as speculative decoding do not speed up the first token. KV cache reads are costly during the decode step and are not the determinant of TTFT."
+      "aciklama": "Chunked prefill runs the long prompt block by block and fits other users' decode steps in between, so their token gaps (ITL) stay short. No part of the prompt is dropped, since every block still goes through prefill."
     },
     {
       "id": "d3-16",
       "konu": "Quantization",
-      "zorluk": 2,
+      "zorluk": 1,
       "slayt": 29,
-      "soru": "Why does storing the same weights in INT4 instead of INT8 tend to increase the reconstruction error?",
+      "soru": "A student wants to run a big model on a laptop with little memory. Which technique helps most directly?",
       "secenekler": [
-        "Fewer bits force a smaller scale s, so weights divided by it overflow the available integer code range.",
-        "The restore step q × s is skipped at low bit widths, so the integer code is used directly as the weight.",
-        "Rounding is replaced by truncation at four bits, so every weight is biased toward zero by one full step.",
-        "Fewer integer codes must cover the weights, so the step s is coarser and rounding lands farther away."
+        "Speculative decoding, which drafts tokens with a small model",
+        "Continuous batching, which fills free slots with new requests",
+        "Quantization, which stores each weight with fewer bits",
+        "PagedAttention, which gives out KV blocks only when needed"
       ],
-      "dogru": 3,
-      "aciklama": "With far fewer codes available, one integer step has to represent a larger slice of the value range, so rounding w / s to the nearest code can leave a bigger gap after restoring with q × s. The scale gets larger rather than smaller at lower bit widths, which is the opposite of the first option."
+      "dogru": 2,
+      "aciklama": "Fewer bits per weight make the model much smaller in memory, but each weight becomes a little less exact. PagedAttention only cuts wasted KV-cache space, so the weights stay just as large."
     },
     {
       "id": "d3-17",
       "konu": "Speculative decoding and serving engines",
       "zorluk": 3,
       "slayt": 30,
-      "soru": "Why does the speed-up from speculative decoding depend on how often the target model agrees with the draft model?",
+      "soru": "In speculative decoding, why is it cheaper for the large model to check the draft tokens than to write them itself?",
       "secenekler": [
-        "Each accepted draft token lets the target skip verification; only rejected tokens must be scored by it.",
-        "Each accepted draft token saves a sequential target pass; a mismatch discards the remaining draft.",
-        "Each rejected draft token is proposed again by the draft model until the target finally accepts it.",
-        "Each accepted draft token alters the final text, so low acceptance mainly reduces the answer quality."
+        "It checks all draft tokens in one pass, but writing needs a pass per token",
+        "It checks only the first draft token, and it trusts the rest without checks",
+        "It checks the drafts with fewer bits, so each check reads less memory",
+        "It lets the small model check the drafts, so its own weights are not read"
       ],
-      "dogru": 1,
-      "aciklama": "The target verifies all drafted positions in one pass, so every accepted token stands in for an expensive sequential target step, while at the first mismatch the target substitutes its own token and generation continues from there, wasting the rest of the draft. Acceptance never bypasses verification, and the final text follows the target's choices, so quality is not what is traded."
+      "dogru": 0,
+      "aciklama": "Writing goes one token per pass, but the draft tokens are already known, so the target can score them all in one pass. It still checks every draft token and fixes the first one it rejects."
     },
     {
       "id": "d3-18",
       "konu": "Speculative decoding and serving engines",
-      "zorluk": 1,
+      "zorluk": 2,
       "slayt": 31,
-      "soru": "A team will serve many requests that all begin with the same long agent instruction. Which engine and mechanism focus on this workload?",
+      "soru": "A university chatbot gets prompts from many students at the same time. Why does a tool like vLLM fit better than a local tool like Ollama?",
       "secenekler": [
-        "Ollama — loads the model locally and answers a single user's request on a laptop.",
-        "vLLM — batches active requests and allocates GPU KV pages per request.",
-        "SGLang — detects the matching prefix and reuses the cached K/V.",
-        "vLLM — combines MLA and MoE in a single model as a new LLM architecture."
+        "vLLM is a newer, larger LLM, so it gives better answers than local models",
+        "vLLM serves each request alone, one after another, so answers do not mix",
+        "vLLM batches many requests and manages KV memory for all of them at once",
+        "vLLM gives similar questions one shared answer, so it saves GPU work"
       ],
       "dogru": 2,
-      "aciklama": "SGLang is paired with the 'reused context' scenario: the prefix of the shared long instruction is detected, the K/V is reused, and only the unique part is generated. vLLM focuses on batching many concurrent requests and, is a serving engine rather than a new LLM; Ollama is for single-user local use."
+      "aciklama": "vLLM is a serving engine that schedules many requests with continuous batching and paged KV memory. It is not a new or larger model, so the answers come from the same LLM."
     }
   ]
 }

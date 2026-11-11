@@ -20,272 +20,272 @@
     {
       "id": "d5-01",
       "konu": "Post-training vs. alignment",
-      "zorluk": 1,
+      "zorluk": 2,
       "slayt": 3,
-      "soru": "In the standard distinction, which statement about the relationship between 'post-training' and 'alignment' is correct?",
+      "soru": "A team uses GRPO with an automatic answer checker to raise a model's math scores. Which goal does this training mainly serve?",
       "secenekler": [
-        "Post-training is a goal (what we want); alignment is the training stage applied after pretraining to reach that goal.",
-        "Post-training is a stage (how we train); alignment is one of the goals this stage can serve.",
-        "They are two names for the same process; any training done after pretraining counts as alignment by definition.",
-        "Post-training covers only SFT; RLHF and DPO form a separate stage under the heading of alignment."
+        "Capability: getting answers right when they can be checked, as in math or code",
+        "Harmlessness: avoiding answers that could hurt people or help with dangerous tasks",
+        "Honesty: making the model say clearly when it is not sure about its answer",
+        "Tone and format: making answers sound friendly and look the way users expect"
       ],
-      "dogru": 1,
-      "aciklama": "Post-training is defined as a stage (HOW) and alignment as a goal (WHAT); methods such as GRPO/RLVR mainly serve capability, so alignment is not the only goal of post-training. The first option reverses the roles."
+      "dogru": 0,
+      "aciklama": "A checker rewards correct answers, so this training mainly builds capability rather than alignment. Harmlessness and honesty are alignment goals, taught mostly with human preferences as in RLHF or DPO, and a math checker cannot judge them."
     },
     {
       "id": "d5-02",
       "konu": "Limits of SFT and preference data",
-      "zorluk": 2,
-      "slayt": 5,
-      "soru": "Which of the following is NOT a valid argument for preference tuning over SFT?",
+      "zorluk": 1,
+      "slayt": 4,
+      "soru": "Two answers to a beginner's question are both correct, but one is much easier to follow. What does preference learning teach here that SFT alone does not?",
       "secenekler": [
-        "Deciding which of two responses is better is much faster than writing the ideal response from scratch.",
-        "SFT depends on its own data distribution; a skewed mixture (e.g., too many refusal examples) shifts model behavior.",
-        "High-quality, expert-written demonstrations are expensive and hard to collect, whereas preference labels are cheaper.",
-        "Preference data, unlike demonstration data, can be optimized directly without needing a reference model."
+        "How to write a correct answer by copying one expert example word by word",
+        "How to choose which of several correct answers fits the user better",
+        "How to check if an answer is right by using a fixed automatic rule",
+        "How to answer new topics by adding more facts to what the model already knows"
       ],
-      "dogru": 3,
-      "aciklama": "The three valid reasons are the ease of comparison, SFT's dependence on its data distribution, and the difficulty of scaling demonstrations. The claim of optimization without a reference model is not a valid argument and is false: both RLHF (KL penalty) and DPO use a frozen πref."
+      "dogru": 1,
+      "aciklama": "SFT shows the model what one good answer looks like, while preference learning compares answers and teaches which one fits the user better. Copying an expert example is what SFT already does, so it adds nothing new here."
     },
     {
       "id": "d5-03",
-      "konu": "RLHF pipeline and notation",
-      "zorluk": 1,
-      "slayt": 11,
-      "soru": "In the standard notation, what is the key difference between πθ(y | x) and rφ(x, y)?",
+      "konu": "Limits of SFT and preference data",
+      "zorluk": 2,
+      "slayt": 6,
+      "soru": "Why is asking people 'Which of these two answers is better?' often more reliable than asking them to score each answer from one to five?",
       "secenekler": [
-        "πθ gives a probability in [0, 1]; rφ gives a score that can be negative or greater than 1.",
-        "πθ is the output of the reward model and rφ is the output of the policy; θ denotes the reward weights and φ the policy weights.",
-        "Both give probabilities; the difference is that πθ is computed at the token level and rφ at the response level.",
-        "πθ is kept frozen throughout training; rφ is the only component updated together with the policy in the RL stage."
+        "Comparing two answers removes labeler bias, such as a liking for long answers",
+        "Scores from one to five cannot be turned into training data for a reward model",
+        "A choice between two answers gives a reward number that RL can use directly",
+        "People use score scales differently, but agree more on which one is better"
       ],
-      "dogru": 0,
-      "aciklama": "πθ assigns a probability, whereas rφ assigns a reward score that can be negative or above 1; θ are the policy's weights and φ the reward model's. The second option swaps which model each symbol belongs to."
+      "dogru": 3,
+      "aciklama": "One person's four can be another person's three, so scores are hard to compare, while picking the better of two answers is quick and more consistent. Pairs do not remove bias, because labelers can still prefer longer or more confident answers."
     },
     {
       "id": "d5-04",
-      "konu": "Bradley–Terry and reward model",
-      "zorluk": 2,
-      "slayt": 14,
-      "soru": "A reward model is trained with the Bradley–Terry formulation. Adding the same constant to the scores of both responses in a pair leaves the predicted preference unchanged. What does this reveal about the scores?",
+      "konu": "RLHF pipeline and notation",
+      "zorluk": 1,
+      "slayt": 9,
+      "soru": "In standard RLHF, which order of steps is correct?",
       "secenekler": [
-        "Each score is squashed into [0, 1] on its own, so any single score can be read as a calibrated probability of being good.",
-        "Only the ordering of the two scores matters, so widening the gap between them cannot change the predicted probability.",
-        "Only the gap between the two scores matters, so a score has meaning relative to other responses, not as an absolute value.",
-        "Scores are normalized across all responses to a prompt, so each score is the share of annotators who preferred that one."
+        "First update the policy with RL, then train a reward model on its new answers",
+        "First train a reward model on comparisons, then use RL to update the policy",
+        "Train the reward model and the policy at the same time with one shared loss",
+        "First train a reward model, then use it only to pick answers at use time"
       ],
-      "dogru": 2,
-      "aciklama": "Bradley–Terry applies the sigmoid to the difference of the two scores, so a shared shift cancels out and only the relative gap carries information. It is not ranking-only: a larger chosen–rejected gap gives a higher preference probability and a lower loss."
+      "dogru": 1,
+      "aciklama": "RLHF first turns human comparisons into a reward model, and then RL uses its scores to update the policy, which is the LLM itself. Using a reward model only to pick the best answer at use time is Best-of-N, which skips RL."
     },
     {
       "id": "d5-05",
       "konu": "Bradley–Terry and reward model",
       "zorluk": 2,
       "slayt": 15,
-      "soru": "A reward model is being trained with the loss −log σ(r(x, yw) − r(x, yl)). For one pair it currently scores the rejected response above the chosen one. How does the loss treat this pair?",
+      "soru": "Why does RLHF train a reward model instead of asking people to score each new answer during RL?",
       "secenekler": [
-        "The negative gap makes the loss negative, so the pair lowers the total loss and the current ranking is reinforced.",
-        "The sigmoid squashes the gap into [0, 1], so the loss stays near zero and the pair barely influences training.",
-        "The loss depends only on the chosen score, so the update raises it and leaves the rejected score where it was.",
-        "The predicted preference falls below one half, so the loss is large and the update pushes the gap toward positive."
+        "RL needs scores for a huge number of new answers, and people are too slow",
+        "People cannot compare two answers well, so a model must make every choice",
+        "The reward model writes better answers than people, so it replaces SFT data",
+        "The reward model keeps the policy close to the SFT model during training"
       ],
-      "dogru": 3,
-      "aciklama": "A negative gap means the model gives the human-chosen response less than an even chance, and −log of a small probability is large; minimizing it raises the chosen score relative to the rejected one. The loss can never be negative, because −log of a probability is always at least zero."
+      "dogru": 0,
+      "aciklama": "RL makes a huge number of fresh answers, so a reward model learns from human comparisons and then scores those answers in place of people. Keeping the policy close to the SFT model is the job of the KL penalty, not of the reward model."
     },
     {
       "id": "d5-06",
       "konu": "Policy, reward, and advantage",
-      "zorluk": 2,
-      "slayt": 19,
-      "soru": "During RL training, two sampled responses receive exactly the same reward, yet the update makes one more likely and the other less likely. Which explanation accounts for this?",
+      "zorluk": 1,
+      "slayt": 16,
+      "soru": "When RL is used to train a language model, what counts as one action of the agent?",
       "secenekler": [
-        "The update follows the advantage, reward minus expected reward, and the expectation differed between the two cases.",
-        "The KL penalty reverses the direction of the update for whichever response has drifted further from the reference.",
-        "Clipping flips the sign of the objective for whichever response had the larger probability ratio to the old policy.",
-        "The reward model is updated between the two samples, so equal scores no longer reflect equal quality of response."
+        "Giving a score to the full answer after the answer is finished",
+        "Changing the model weights after each batch of training data",
+        "Choosing the next token, based on the prompt and the text so far",
+        "Choosing which prompt from the dataset the model should answer next"
       ],
-      "dogru": 0,
-      "aciklama": "The direction of the update comes from the advantage: a reward above the baseline is encouraged and the same reward below a higher baseline is discouraged. Clipping only limits how far an update goes; it never changes its direction."
+      "dogru": 2,
+      "aciklama": "The agent is the language model, the state is the prompt plus the text so far, and each action is the next token. Scoring the finished answer is the reward step, done by a reward model or a checker, so it is not an action of the agent."
     },
     {
       "id": "d5-07",
       "konu": "KL penalty and RLHF objective",
       "zorluk": 2,
       "slayt": 21,
-      "soru": "What is the rationale for adding the term −β·log(πθ(y|x)/πref(y|x)) to the RLHF objective in order to 'reduce the risk of reward hacking'?",
+      "soru": "During RLHF, a team makes the KL penalty very strong. What will most likely happen?",
       "secenekler": [
-        "The KL term also updates the reward model's weights φ, gradually correcting its erroneous scores during RL training.",
-        "The KL term bounds the ratio of πθ to πold and thus does the same job as PPO clipping, so the two are interchangeable.",
-        "The RM is an imperfect proxy; a policy drifting from πref can find high but meaningless scores where the RM is unseen.",
-        "The KL term penalizes the log-probability of long responses more heavily, so it directly eliminates verbosity bias."
+        "The policy moves far from the SFT model and learns to fool the reward model",
+        "The reward model is updated more often, so its scores become more accurate",
+        "The policy gets the best results, because all reward hacking is now blocked",
+        "The policy stays close to the SFT model and learns little from the reward"
       ],
-      "dogru": 2,
-      "aciklama": "The KL penalty (1) prevents drifting too far from the SFT model and (2) reduces the risk of reward hacking caused by an imperfect reward model; while the policy stays close to the reference, it remains in the distribution where the RM is reliable. KL is taken with respect to πref whereas clipping is with respect to πold; they serve different purposes and are not interchangeable."
+      "dogru": 3,
+      "aciklama": "The KL penalty charges the policy for moving away from the SFT model, so with a very strong penalty the safest choice is to barely change. It does lower the risk of reward hacking, but it also blocks the useful changes that the reward asks for."
     },
     {
       "id": "d5-08",
-      "konu": "KL penalty and RLHF objective",
+      "konu": "PPO: four models and clipping",
       "zorluk": 2,
-      "slayt": 21,
-      "soru": "Two different 'old' policies appear in the PPO and GRPO objectives: πref and πold. Which option correctly separates their roles?",
+      "slayt": 22,
+      "soru": "In PPO training of a language model, what is the job of the critic, also called the value model?",
       "secenekler": [
-        "πref is the denominator of the clipping ratio ρ; πold is the frozen SFT model that serves as the comparison point for the KL penalty.",
-        "They are the same model; the name πold is preferred in the PPO literature and πref in the DPO and GRPO literature.",
-        "πref is refreshed after every PPO update round; πold is the SFT model that stays frozen throughout training.",
-        "πold is the recent snapshot that generates the rollouts (the denominator of ρ); πref is the frozen SFT model (the KL reference)."
+        "It scores each finished answer, based on what humans liked in comparisons",
+        "It predicts the expected reward, so each real reward can be compared with it",
+        "It is a frozen SFT copy that shows how far the policy has moved from the start",
+        "It writes fresh answers to the prompts, so PPO always has new data to learn from"
       ],
-      "dogru": 3,
-      "aciklama": "πref is the frozen SFT baseline used in the KL penalty; πold is a separate snapshot from which PPO generates rollouts and is the denominator of the ratio ρ = πθ/πold ('πref is not πold'). The first option swaps the two roles."
+      "dogru": 1,
+      "aciklama": "The critic predicts how much reward to expect, and the advantage compares the real reward with this guess. Scoring finished answers by human taste is the job of the reward model, a separate model that stays frozen during PPO."
     },
     {
       "id": "d5-09",
       "konu": "PPO: four models and clipping",
       "zorluk": 3,
-      "slayt": 22,
-      "soru": "Four models are used in a PPO-based RLHF loop. Which statement correctly summarizes which of them are trainable and which are frozen?",
+      "slayt": 23,
+      "soru": "PPO clipping and the KL penalty both limit how much the policy changes. How are their jobs different?",
       "secenekler": [
-        "The policy and reward model are trained; the critic and reference are frozen, because the reward signal must keep being updated during RL.",
-        "The policy and critic Vψ are trained; the reward model and SFT reference are frozen, the reference giving the KL and the critic the baseline.",
-        "Only the policy is trained; the reward model, critic, and reference are all kept frozen and used in the GAE computation of advantages.",
-        "The policy, critic, and reward model are trained together; only the reference model stays frozen and generates the fresh rollouts for each update."
+        "Clipping keeps the whole training near the SFT model, while KL limits each update step",
+        "Clipping limits the reward model's scores, while KL limits the critic's value guesses",
+        "Clipping limits each update step, while KL keeps the whole training near the SFT model",
+        "Clipping stops answers from getting too long, while KL stops the model from refusing"
       ],
-      "dogru": 1,
-      "aciklama": "Trainable = policy πθ + critic Vψ; Frozen = reward rφ + SFT reference πref. The critic cannot be frozen because it must learn the value estimates for GAE, while the reward model is not updated during the RL stage (the third option's error is treating the critic as frozen)."
+      "dogru": 2,
+      "aciklama": "Clipping compares the policy with the recent copy that made the rollouts, so one update cannot jump too far. The KL penalty compares it with the frozen SFT model, so it is KL, not clipping, that keeps the whole training near the start."
     },
     {
       "id": "d5-10",
-      "konu": "PPO: four models and clipping",
-      "zorluk": 3,
-      "slayt": 23,
-      "soru": "PPO's objective takes the smaller of the unclipped term ρ·Â and a version in which ρ is clipped to [1 − ε, 1 + ε]. For a token whose advantage is positive, what does this achieve?",
+      "konu": "DPO (Direct Preference Optimization)",
+      "zorluk": 1,
+      "slayt": 24,
+      "soru": "What is the main practical benefit of DPO over RLHF with PPO?",
       "secenekler": [
-        "The token's probability is held at its πold value, because rollouts from πold are valid only for an unchanged policy.",
-        "The policy is kept close to the frozen SFT reference, so a separate KL penalty becomes redundant for such tokens.",
-        "Once the probability has risen enough relative to πold, further increases earn nothing more from the objective.",
-        "The advantage estimate itself is capped at 1 + ε, so a noisy critic cannot assign too much credit to a single token."
+        "It learns straight from stored pairs, with no reward model and no RL loop",
+        "It learns without any preference data, from one target answer for each prompt",
+        "It learns without a reference model, so only one model must be kept in memory",
+        "It learns from single thumbs-up or thumbs-down labels instead of answer pairs"
       ],
-      "dogru": 2,
-      "aciklama": "Beyond the upper bound the clipped term is the smaller one and stays flat, so the token's probability is still increased but excessive increases are not encouraged. Clipping compares the policy with πold, the snapshot that generated the rollouts, not with the SFT reference, so it does not replace the KL penalty."
+      "dogru": 0,
+      "aciklama": "DPO turns preference pairs into a direct loss on the policy, so it skips the separate reward model and the PPO loop. It still keeps a frozen reference model, and learning from single yes or no labels is the idea behind KTO."
     },
     {
       "id": "d5-11",
       "konu": "DPO (Direct Preference Optimization)",
-      "zorluk": 1,
-      "slayt": 24,
-      "soru": "For a single training example, what is the difference between SFT and DPO?",
+      "zorluk": 3,
+      "slayt": 25,
+      "soru": "DPO has no separate reward model, yet it still keeps a frozen reference model. What is the reference model for?",
       "secenekler": [
-        "SFT uses a next-token loss on a single target response; in DPO the policy and a frozen reference score a pair, and only the policy is updated.",
-        "In SFT the policy and reference score the target response together; in DPO only the policy generates the chosen response and scores it itself.",
-        "In DPO the chosen and rejected responses are sampled by the policy during training; in SFT the target response comes from the dataset.",
-        "SFT also updates the reference weights, whereas DPO keeps the reference frozen; hence DPO uses less memory in training."
+        "It writes new answer pairs during training, because DPO needs fresh rollouts",
+        "It decides which answer in each pair is better, in place of the human labelers",
+        "It is trained together with the policy, so both models learn the same preferences",
+        "It is a fixed starting point that pulls the policy back if it moves too far"
       ],
-      "dogru": 0,
-      "aciklama": "In SFT the policy scores the single target from the dataset and is updated with a next-token loss; in DPO the chosen/rejected pair still comes from the dataset, both the policy and the frozen reference score both responses, and the preference loss updates only the policy. The third option is misleading: DPO does not sample pairs during training but uses stored data."
+      "dogru": 3,
+      "aciklama": "DPO measures each answer by how much the policy has changed its probability compared with the reference, and this pull keeps the policy near its start, like the KL penalty in RLHF. The answer pairs come from stored data, so the reference does not write new ones."
     },
     {
       "id": "d5-12",
-      "konu": "DPO (Direct Preference Optimization)",
-      "zorluk": 3,
-      "slayt": 25,
-      "soru": "In the DPO loss, the difference β·log[πθ(yw|x)/πref(yw|x)] − β·log[πθ(yl|x)/πref(yl|x)] is passed to a sigmoid. Which statement about this structure is correct?",
+      "konu": "Verifiable rewards and GRPO",
+      "zorluk": 2,
+      "slayt": 28,
+      "soru": "A teacher marks each student's answer as better or worse than the class average. Which method judges a model's answers in the same way?",
       "secenekler": [
-        "To lower the loss, the policy increases the absolute probability of both responses together; the reference model merely provides a normalization constant.",
-        "As β grows, the policy moves away from the reference more freely, because β is a trust-region width parameter like ε in PPO clipping.",
-        "The difference is computed from the chosen and rejected scores of a separately trained reward model rφ; the policy uses only the sigmoid output.",
-        "The policy raises the chosen response's log-ratio and lowers the rejected one's; the difference acts as the Bradley–Terry reward gap."
+        "PPO, which asks a trained critic model to guess how good each answer will be",
+        "GRPO, which compares each answer with the other answers to the same prompt",
+        "Best-of-N, which keeps only the top-scored answer and throws the rest away",
+        "DPO, which compares one chosen answer with one rejected answer from stored data"
       ],
-      "dogru": 3,
-      "aciklama": "In DPO, β·log(πθ/πref) is the implicit reward (KTO uses the same expression); the difference between the chosen and rejected implicit rewards takes the place of r(yw) − r(yl) in Bradley–Terry, and the loss widens this difference. There is no separate reward model; and β is not a clipping range but the strength of the pull toward πref."
+      "dogru": 1,
+      "aciklama": "GRPO samples a group of answers for one prompt and uses the group's average reward as the baseline, just like a class average. PPO gets its baseline from a separate critic model, which is the part GRPO removes."
     },
     {
       "id": "d5-13",
       "konu": "Verifiable rewards and GRPO",
-      "zorluk": 2,
-      "slayt": 29,
-      "soru": "GRPO drops the value model (critic) that PPO relies on. What takes over the critic's job, and what else stays in place?",
+      "zorluk": 3,
+      "slayt": 26,
+      "soru": "A team wants to use GRPO for a chatbot that writes friendly emails, but no automatic checker can mark an email right or wrong. Can GRPO still be used?",
       "secenekler": [
-        "The frozen reference model predicts the expected reward, so the KL penalty and the reward model are both dropped.",
-        "A rule-based verifier supplies the expected reward, so GRPO cannot be combined with a learned reward model.",
-        "The mean reward of the rollouts sampled for the same prompt is the baseline; the reward source and KL term stay.",
-        "The reward model is trained alongside the policy to predict expected reward, so GAE is still used for advantages."
+        "Yes, because GRPO can take its rewards from a learned reward model instead",
+        "No, because GRPO needs a rule that can mark each answer right or wrong",
+        "No, because GRPO needs a critic model, and a critic learns only from checkers",
+        "Yes, but people must score every sampled answer by hand during training"
       ],
-      "dogru": 2,
-      "aciklama": "GRPO removes the value model and GAE and uses the group's mean reward as the baseline, while the frozen reference still provides the KL term. The verifier option confuses reward source with optimizer: GRPO rewards may come from a learned reward model or from rule checks."
+      "dogru": 0,
+      "aciklama": "The reward source and the update method are separate choices, so GRPO can use a checker or a learned reward model. Checkers are popular with GRPO for math and code, but they are one option, not a requirement."
     },
     {
       "id": "d5-14",
-      "konu": "Verifiable rewards and GRPO",
-      "zorluk": 3,
-      "slayt": 28,
-      "soru": "You train with GRPO using a pass/fail verifier. Which prompts contribute a reward-based learning signal, and why?",
+      "konu": "RLAIF and Constitutional AI",
+      "zorluk": 2,
+      "slayt": 31,
+      "soru": "An AI judge that labels answer pairs tends to prefer the longer answer. Its labels then train a reward model for RL. What will most likely happen?",
       "secenekler": [
-        "Prompts where every rollout passes, because uniformly high reward gives the strongest encouragement to all of them.",
-        "Prompts whose rollouts get mixed outcomes, because each advantage measures a rollout against its own group.",
-        "Prompts where every rollout fails, because the largest errors produce the largest corrective push on the policy.",
-        "All prompts equally, because the critic supplies a baseline whenever the rewards within a group happen to coincide."
+        "The bias goes away, because the judge uses the same written rules every time",
+        "The reward model ignores length, because it only looks at the gap in scores",
+        "The policy is not affected, because it sees reward scores and not labels",
+        "The policy learns to write longer answers, because the bias is passed on"
       ],
-      "dogru": 1,
-      "aciklama": "The advantage is group-relative, so when all rollouts score alike there is nothing to rank and the reward-based signal is zero; prompts that are far too easy or far too hard for the current policy therefore teach nothing. Uniform success is not encouraged, since no rollout is better than its group, and GRPO has no critic to fall back on."
+      "dogru": 3,
+      "aciklama": "RLAIF copies the judge's biases into the labels, so the reward model learns to like length and the policy follows it. Using the same rules every time makes labels consistent, but a consistent bias is still a bias."
     },
     {
       "id": "d5-15",
       "konu": "RLAIF and Constitutional AI",
       "zorluk": 2,
       "slayt": 32,
-      "soru": "Which statement about the relationship between Constitutional AI and 'plain' RLAIF is correct?",
+      "soru": "In Constitutional AI, which part of the work do humans still do?",
       "secenekler": [
-        "The RL stage (RL-CAI) is an RLAIF; the difference is the preceding SL-CAI stage, with SFT on self-critiqued and revised responses.",
-        "In RLAIF the AI judge writes the principles (constitution) itself; in Constitutional AI, human annotators write the principles for each example.",
-        "Constitutional AI uses human preference labels whereas RLAIF does not; hence Constitutional AI is actually a subtype of RLHF rather than RLAIF.",
-        "RLAIF is used only for helpfulness and Constitutional AI only for harmlessness; the two methods require different reward models and pipelines."
+        "They label every answer pair, saying which answer is less harmful",
+        "They write the improved answers that the model is fine-tuned on",
+        "They write the principles the AI uses to check and judge answers",
+        "They give the reward scores that the policy tries to raise during RL"
       ],
-      "dogru": 0,
-      "aciklama": "Stage 2 is 'RL-CAI = RLAIF' (an AI judge picks the less harmful response according to the principle → preference model → PPO); what sets Constitutional AI apart is the supervised SL-CAI stage of response → self-critique → revision → SFT. Humans write the principles and the AI provides the harmlessness labels, so the second and third options confuse the roles."
+      "dogru": 2,
+      "aciklama": "Humans write the constitution, a list of principles, and the AI uses it to check its own answers, rewrite them and judge which answer is less harmful. Labeling every pair by hand is what RLHF does, and Constitutional AI replaces those labels with AI feedback."
     },
     {
       "id": "d5-16",
       "konu": "Best-of-N, KTO, and on-/off-policy",
       "zorluk": 2,
-      "slayt": 34,
-      "soru": "You have thumbs-up / thumbs-down records that users left individually on responses to different prompts. Which method can be trained directly on this data, and why?",
+      "slayt": 33,
+      "soru": "Best-of-N skips RL training. It samples several answers and returns the one with the top reward score. What is the main cost of this approach?",
       "secenekler": [
-        "DPO — each record can be converted into a (x, yw, yl) triple, even if they do not share the same prompt.",
-        "Reward model + PPO — the Bradley–Terry loss can also be trained directly on pointwise labels instead of pairwise ones, and feeds the RL.",
-        "Best-of-N — the labels are used as the candidate-selection criterion at inference time rather than for training a reward model.",
-        "KTO — it works with a single response and a yes/no label; it does not require a chosen/rejected pair for the same prompt."
+        "Every request needs many answers made and scored, which costs time and money",
+        "It needs an answer checker, so it only works for tasks like math and code",
+        "A person must pick the best answer for each request while the user waits for it",
+        "It must keep a critic and a reference model, so it needs much more memory"
       ],
-      "dogru": 3,
-      "aciklama": "KTO learns from binary desirable/undesirable labels, across different prompts and without requiring pairing; thumbs-up/down is exactly this format. DPO requires a chosen + rejected pair for the same prompt; the Bradley–Terry RM loss is also defined over pairwise differences."
+      "dogru": 0,
+      "aciklama": "Best-of-N leaves the model unchanged and does its work at use time, so every request costs several generations plus scoring. Its scores come from a reward model, so it is not limited to tasks that an answer checker can mark."
     },
     {
       "id": "d5-17",
-      "konu": "Trade-offs and failure modes",
-      "zorluk": 1,
-      "slayt": 37,
-      "soru": "After alignment, a model starts refusing even requests that carry no risk at all. Which evaluation metric directly measures this problem, and in which direction is it desired to move?",
+      "konu": "Best-of-N, KTO, and on-/off-policy",
+      "zorluk": 3,
+      "slayt": 35,
+      "soru": "Why does PPO keep sampling fresh answers after a few updates instead of reusing one large set of old answers?",
       "secenekler": [
-        "Safety failure rate — should decrease",
-        "Over-refusal rate — should decrease",
-        "Preference win rate — should increase",
-        "Capability retention — should be maintained"
+        "The reward model is retrained after each update, so old scores go out of date",
+        "The reference model changes after each update, so old KL values become wrong",
+        "The policy has changed, so old answers no longer show what it would do now",
+        "Stored answers cannot be scored again once the reward model has seen them"
       ],
-      "dogru": 1,
-      "aciklama": "Over-refusal rate is the rate at which safe requests are refused, and a low value is desired. Safety failure rate measures the opposite: the rate at which unsafe prompts are answered; an over-refusing model looks good on this metric while losing utility (the safety vs. utility tension)."
+      "dogru": 2,
+      "aciklama": "PPO is on-policy, so it learns from answers made by the current or a very recent policy. The reward model and the reference stay frozen, so they are not the reason, and reusing old data saves cost but needs extra care."
     },
     {
       "id": "d5-18",
       "konu": "Trade-offs and failure modes",
-      "zorluk": 2,
-      "slayt": 37,
-      "soru": "As training progresses, the reward model score keeps rising while the human evaluators' preference rate begins to fall. What is this phenomenon called and what is its root cause?",
+      "zorluk": 1,
+      "slayt": 36,
+      "soru": "After preference tuning, a chatbot follows instructions better and is safer, but it is worse at math than before. What does this show?",
       "secenekler": [
-        "Alignment tax — human preference declines because the policy loses its earlier skills during alignment.",
-        "Annotator disagreement — because annotators do not agree on what is 'better', the RM score and human judgment diverge.",
-        "Overoptimization — reward is a proxy; as the policy exploits the RM's flaws, the score rises while true utility falls.",
-        "Policy mismatch — because training uses off-policy data, the RM's scores become invalid for the current policy."
+        "Reward hacking: the model found a trick to get high scores without real quality",
+        "Over-refusal: the model became so careful that it says no to safe requests",
+        "A trade-off: alignment improved some behaviors but hurt an old skill",
+        "Labeler disagreement: people did not agree on which answers were better"
       ],
       "dogru": 2,
-      "aciklama": "Overoptimization is defined as 'more RM score, less human utility'; since reward and preferences are proxies, they can be gamed (Gao et al. 2023). Alignment tax refers to lost skills (e.g., math accuracy) and is measured by capability retention; it is not explained by a rising RM score."
+      "aciklama": "Alignment often improves instruction following and safety but can cost variety or old skills, which is called the alignment tax. Reward hacking means a high score while the true goal is missed, and nothing here shows a trick to raise the score."
     }
   ]
 }

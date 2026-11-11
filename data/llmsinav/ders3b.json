@@ -18,273 +18,273 @@
   "sorular": [
     {
       "id": "d3b-01",
-      "konu": "Continued Pretraining vs. SFT",
+      "konu": "Fine-Tuning Data Format and Instruction Tuning",
       "zorluk": 1,
-      "slayt": 5,
-      "soru": "Which option correctly states the difference between Continued Pretraining (CPT) and Supervised Fine-Tuning (SFT)?",
+      "slayt": 3,
+      "soru": "During pretraining, a base model learned from a huge amount of general text. Why do we still fine-tune it with task-specific examples?",
       "secenekler": [
-        "CPT learns response tokens from instruction + gold response pairs; SFT predicts the next token on unlabeled raw domain text.",
-        "CPT teaches the assistant how it should respond; SFT increases familiarity with the domain's language and terminology.",
-        "CPT updates only the embedding layer; SFT updates all Transformer weights and thereby changes response behavior.",
-        "CPT predicts the next token on unlabeled domain text; SFT learns response tokens from instruction + gold response pairs."
+        "To learn general language patterns from books and web pages",
+        "To store its weights in fewer bits so that it fits on a small GPU",
+        "To teach it how to respond to the specific task we care about",
+        "To check how well it works on examples it has never seen"
       ],
-      "dogru": 3,
-      "aciklama": "CPT's data is unlabeled raw domain text with a next-token prediction objective, while SFT's data is instruction + gold response pairs with the objective of predicting the assistant's response tokens. The first option swaps the data and objective of the two methods; CPT increases domain familiarity, whereas SFT teaches response behavior."
+      "dogru": 2,
+      "aciklama": "Pretraining gives the model general language skills, and fine-tuning on task pairs teaches it how to respond to one task. Learning general patterns from books and web pages is the job of pretraining, and that step is already done."
     },
     {
       "id": "d3b-02",
-      "konu": "Fine-Tuning Workflow and Token Loss",
+      "konu": "Continued Pretraining vs. SFT",
       "zorluk": 2,
-      "slayt": 7,
-      "soru": "During SFT on the review \"The movie was amazing.\", the model gives the first answer token a higher probability for \"Negative\" than for the gold \"Positive\". Which statement correctly explains how this step turns into learning?",
+      "slayt": 5,
+      "soru": "A hospital has a large set of unlabeled medical reports. It wants the model to become familiar with medical language. Which approach fits best?",
       "secenekler": [
-        "The loss is high because the gold token received a low probability; backprop turns that loss into gradients and the optimizer updates the trainable weights",
-        "The loss is high because the wrong token received the highest probability; the gradient lowers that token alone and leaves the gold token's probability untouched",
-        "The loss depends only on whether the most probable token matches the gold token, so the exact probabilities assigned at this step make no difference at all",
-        "The loss is spread over the instruction and review tokens as well, so a mistake on the answer token is diluted across the whole input sequence"
+        "Continued pretraining, because it learns domain language from raw text",
+        "Supervised fine-tuning, because it learns domain language from raw text",
+        "Continued pretraining, because it teaches the model to answer requests",
+        "Supervised fine-tuning, because it works without any labels or answers"
       ],
       "dogru": 0,
-      "aciklama": "Cross-entropy is taken on the gold token, so a low probability for Positive means a high loss; backpropagation converts that loss into gradients and the optimizer uses them to update the trainable weights so the gold token becomes more likely. The high probability on Negative matters only indirectly, through the probability it takes away from the gold token, and the loss is a graded quantity rather than a hard match/mismatch check."
+      "aciklama": "Continued pretraining keeps predicting the next token on raw domain text, so the model gets used to the language of the field. Supervised fine-tuning needs instruction and gold answer pairs, and it teaches answer behavior rather than domain language."
     },
     {
       "id": "d3b-03",
-      "konu": "Fine-Tuning Data Format and Instruction Tuning",
+      "konu": "Fine-Tuning Workflow and Token Loss",
       "zorluk": 1,
-      "slayt": 9,
-      "soru": "In a chat-format instruction tuning record (system / user / assistant), which part is the learning target on which the loss is computed?",
+      "slayt": 6,
+      "soru": "A team fine-tunes a model and checks its errors only on the training examples. What is the main problem with this plan?",
       "secenekler": [
-        "The system message, because it defines the model's behavioral instruction",
-        "The user message, because it contains the actual text to be classified",
-        "The assistant message, because it is the response expected to be generated",
-        "The combination of all three messages, because they are in the same training record"
+        "The gradients will be wrong, because they need held-out examples",
+        "The model will forget the skills it learned during pretraining",
+        "They will have to run the final test again after every update",
+        "They cannot see whether the model will work on new examples"
       ],
-      "dogru": 2,
-      "aciklama": "The system message is the behavioral instruction, the user message is the request, and the assistant message is the target response; the assistant response is the learning target. Treating the whole record as the target would turn SFT into next-token prediction on raw text (i.e., CPT), whereas the loss is computed over the tokens of the gold assistant response."
+      "dogru": 3,
+      "aciklama": "Errors on seen examples can be very low even when the model has only memorized them, so we need held-out validation data to judge real performance. The gradients come from the training loss, so they do not need held-out examples."
     },
     {
       "id": "d3b-04",
-      "konu": "Autoregressive LLM vs. BERT",
+      "konu": "Fine-Tuning Workflow and Token Loss",
       "zorluk": 2,
-      "slayt": 10,
-      "soru": "When an autoregressive LLM and BERT are compared on the same sentiment classification task, which statement is correct?",
+      "slayt": 7,
+      "soru": "During SFT, the model already gives the gold answer token a very high probability. What does this mean for the training step on this example?",
       "secenekler": [
-        "BERT generates the label token by token; the LLM feeds the [CLS] representation to a classification head",
-        "The LLM generates the label as text; BERT maps the [CLS] representation to a class via a head",
-        "Both use causal attention; the only difference is the [CLS]/[SEP] markers added to the input format",
-        "In the LLM the loss is computed over the correct class, in BERT over the generated label tokens only"
+        "The loss is large, because the model is too sure about its answer",
+        "The loss is small, so there is little left to learn from this example",
+        "The loss moves to the prompt tokens, since the answer is already right",
+        "The loss is skipped, because the optimizer learns only from mistakes"
       ],
       "dogru": 1,
-      "aciklama": "The LLM, with decoder-only / causal attention, generates the label \"Positive\" as tokens and the loss is computed on the target response tokens; BERT, with encoder-only / bidirectional attention, predicts the class through [CLS] → classification head and does not generate label text. The third option is wrong because BERT uses bidirectional attention; the last option swaps where the losses are computed."
+      "aciklama": "Cross-entropy looks at the probability of the gold token, so a high probability gives a small loss and only a small weight change. Training still uses the loss when the model is right, but its value is close to zero."
     },
     {
       "id": "d3b-05",
-      "konu": "Full Fine-Tuning and Memory Cost",
+      "konu": "Fine-Tuning Data Format and Instruction Tuning",
       "zorluk": 2,
-      "slayt": 12,
-      "soru": "An engineer plans to reduce training memory by freezing W₀. Which memory component does freezing NOT eliminate?",
+      "slayt": 8,
+      "soru": "Before SFT, a user asks a base model to classify a review and answer with one word. Instead, it writes a long sentence that continues the text. Why?",
       "secenekler": [
-        "The Adam momentum and variance states kept for every weight of W₀",
-        "The parameter gradients computed for every weight of W₀",
-        "The intermediate activation tensors stored for backprop",
-        "The need to store a separate full fine-tuned checkpoint per task"
+        "It has no classification head, so it cannot pick one of the labels",
+        "It reads text in both directions, so it cannot give a short answer",
+        "It learned to continue text, but not yet to follow an answer format",
+        "It stores its weights in fewer bits, so its output is less exact"
       ],
       "dogru": 2,
-      "aciklama": "Freezing W₀ removes its optimizer states and parameter gradients, but \"not all activation memory\"; the intermediate activations from the forward pass are still stored for the adapters' gradients. Checkpoint storage (the last option) is a storage cost rather than training memory, and it is already reduced by freezing."
+      "aciklama": "Pretraining teaches next-token prediction, so a base model tends to continue the text instead of following the request. An LLM does not need a classification head, because SFT teaches it to write the label itself as text."
     },
     {
       "id": "d3b-06",
-      "konu": "PEFT and the LoRA Mechanism (W₀, A, B)",
+      "konu": "Fine-Tuning Data Format and Instruction Tuning",
       "zorluk": 1,
-      "slayt": 13,
-      "soru": "Which statement correctly describes the relationship between SFT and PEFT?",
+      "slayt": 9,
+      "soru": "A chat-format training record has a system, a user and an assistant message. What is the main job of the system message?",
       "secenekler": [
-        "SFT fixes the behavior to be learned, PEFT fixes the parameters to be updated; the two can be combined",
-        "SFT and PEFT are alternatives to each other; training with PEFT no longer needs instruction + response pairs",
-        "PEFT is applied only in the pretraining stage, whereas SFT is applied only in the later adaptation stage",
-        "SFT can be done only with full fine-tuning; PEFT methods such as LoRA are suitable only for CPT, not SFT"
+        "It sets the overall behavior, such as how the answers should look",
+        "It holds the actual request, such as the review the model must classify",
+        "It is the target response that the model learns to produce",
+        "It chooses which weights to update and which to keep frozen"
       ],
       "dogru": 0,
-      "aciklama": "SFT is defined by the question \"what behavior should the model learn?\" and PEFT by \"which parameters should be updated?\": one concerns the data/objective, the other the set of parameters to update, and SFT with LoRA is a combination of the two (only A/B are updated with the SFT loss). Treating PEFT as an alternative to SFT is wrong; even with PEFT, the training data remains instruction + gold response pairs."
+      "aciklama": "The system message is a behavior instruction, for example which labels to use and how short the answer must be. The user message holds the request, and the assistant message is the target that the model learns to produce."
     },
     {
       "id": "d3b-07",
-      "konu": "PEFT and the LoRA Mechanism (W₀, A, B)",
+      "konu": "Autoregressive LLM vs. BERT",
       "zorluk": 2,
-      "slayt": 14,
-      "soru": "Which statement is correct about W₀ in the LoRA formula W′ = W₀ + (α/r)BA?",
+      "slayt": 10,
+      "soru": "A team wants a sentiment model that also explains its choice in a full sentence. Which setup can do this directly, and why?",
       "secenekler": [
-        "It is a combined weight table representing all 7B+ parameters of the model as a single large matrix",
-        "It is a single projection matrix in one layer; each target projection has its own W₀ and A/B pair",
-        "It is a matrix randomly initialized in pretraining and updated together with A/B during SFT",
-        "It is a low-rank update obtained from the product of A and B and coming from the pretraining checkpoint"
+        "BERT with a classification head, because it reads the review both ways",
+        "BERT with a classification head, because the head can output any word",
+        "Either one, because both learn with cross-entropy on the label",
+        "An autoregressive LLM, because it generates the answer as text tokens"
       ],
-      "dogru": 1,
-      "aciklama": "W₀ is a single pretrained projection matrix (e.g., a 3584×3584 q_proj in Qwen2.5-7B) and \"does not represent all 7B+ parameters\"; each selected projection has its own frozen W₀ and its own A/B pair. Mistaking W₀ for the whole model is a common error; the low-rank update is BA, not W₀."
+      "dogru": 3,
+      "aciklama": "A decoder-only LLM writes its answer token by token, so it can give a label and a reason in words. BERT with a classification head only picks one class from a fixed set, even though it reads the review in both directions."
     },
     {
       "id": "d3b-08",
-      "konu": "PEFT and the LoRA Mechanism (W₀, A, B)",
-      "zorluk": 3,
-      "slayt": 15,
-      "soru": "In LoRA, A is initialized randomly and B to zero. Which statement is correct about the gradient flow in the first training step?",
+      "konu": "Full Fine-Tuning and Memory Cost",
+      "zorluk": 2,
+      "slayt": 11,
+      "soru": "After full fine-tuning on one narrow task, a model does well on new examples of that task. But it got worse at its older skills. What explains this?",
       "secenekler": [
-        "Both matrices receive zero gradient; learning begins only after a few steps through random noise",
-        "A receives a gradient and B's gradient is zero; because A is applied to the input x first",
-        "Since BA = 0, a copy of W₀ is written into B and A is reinitialized",
-        "B receives a gradient and A's gradient is zero; once B moves away from zero, A also starts learning"
+        "Overfitting, because it memorized the training examples of the task",
+        "Forgetting, because updating all weights can overwrite older skills",
+        "Data leakage, because test examples got into the training data",
+        "Rounding error, because the model now stores its weights in fewer bits"
       ],
-      "dogru": 3,
-      "aciklama": "Initially BA = 0, so W′ = W₀; in the first update B receives a gradient, while A's gradient is zero because B = 0; once B moves away from zero, both matrices learn. The second option is intuitive but reversed: A's gradient flows through B, so it is zero while B is zero; applying A to x first does not determine the order of the gradient."
+      "dogru": 1,
+      "aciklama": "Full fine-tuning changes every weight, so it can overwrite what the model knew before. Overfitting would show as poor results on new examples of the same task, but here those results are good."
     },
     {
       "id": "d3b-09",
-      "konu": "LoRA Hyperparameters: r, α, Dropout, Target Modules",
-      "zorluk": 2,
-      "slayt": 16,
-      "soru": "A practitioner has two separate goals for a LoRA setup: let the adapter represent a richer, higher-rank correction, and apply an already-learned correction more strongly to the frozen weights. Which hyperparameter serves each goal, and why?",
+      "konu": "Full Fine-Tuning and Memory Cost",
+      "zorluk": 1,
+      "slayt": 12,
+      "soru": "Why does full fine-tuning need much more GPU memory than simply running the same model?",
       "secenekler": [
-        "Rank r for the richer correction, because it sets the inner dimension of A and B; scaling α for the strength, because it rescales the update (α/r)BA",
-        "Scaling α for the richer correction, because a larger α lets BA span more directions; rank r for the strength, because it multiplies the learned update",
-        "Rank r for both goals, because α is derived from r when the adapter is loaded and cannot be set independently of it",
-        "Target modules for the richer correction, because more projections raise the rank; LoRA dropout for the strength, because it sets how much of the branch is kept"
+        "It must also keep gradients and optimizer states for every weight",
+        "It must keep the whole training dataset inside the GPU at the same time",
+        "It must add new A and B matrices to every layer of the model",
+        "It must save a new full checkpoint after every training step"
       ],
       "dogru": 0,
-      "aciklama": "r fixes the inner dimension of A (r × din) and B (dout × r), so it decides the maximum rank and the trainable capacity of the correction; α only rescales the learned BA through (α/r), controlling how strongly it is applied without adding parameters. The swapped option confuses the two knobs: α cannot add directions to BA, and r is not a multiplier on the update."
+      "aciklama": "Training must hold the weights plus a gradient and optimizer states for each trainable weight, and also activations for backprop. A full checkpoint is a storage cost on disk, so it does not explain the extra GPU memory."
     },
     {
       "id": "d3b-10",
-      "konu": "LoRA Hyperparameters: r, α, Dropout, Target Modules",
-      "zorluk": 3,
-      "slayt": 17,
-      "soru": "In a large model, a single attention projection W₀ is a square matrix with both dimensions in the thousands. Why does a LoRA adapter with a small rank r need only a tiny fraction of that projection's parameter count?",
+      "konu": "PEFT and the LoRA Mechanism (W₀, A, B)",
+      "zorluk": 1,
+      "slayt": 13,
+      "soru": "What is the main idea of parameter-efficient fine-tuning (PEFT)?",
       "secenekler": [
-        "A and B are sparse slices cut out of W₀, and only the entries that differ from the pretrained values are counted as trainable parameters",
-        "A single A/B pair is shared by every projection in every layer of the model, so its parameters are counted only once for the whole network",
-        "Each of A and B pairs one large layer dimension with the small r, so their size grows with r rather than with the product of both layer dimensions",
-        "The factor α/r shrinks the stored values of A and B, so they can be held in far fewer parameters than the frozen projection they are attached to"
+        "Train a small new model from scratch, using only the task examples",
+        "Update every weight, but keep all of the optimizer states in fewer bits",
+        "Reuse the pretrained model and train only a small set of parameters",
+        "Remove the layers that the target task does not seem to need"
       ],
       "dogru": 2,
-      "aciklama": "A is r × din and B is dout × r: each has one dimension fixed by the layer and one equal to r, so together they hold r·(din + dout) values, which grows linearly with r, while W₀ holds din·dout. A and B are new matrices rather than pieces of W₀, every selected projection has its own pair, and α/r only rescales the update without changing how many values are stored."
+      "aciklama": "PEFT reuses the pretrained base and trains only a small set of selected or added parameters, which cuts gradient and optimizer costs. Training a new small model from scratch would throw away the knowledge that pretraining built."
     },
     {
       "id": "d3b-11",
-      "konu": "LoRA Hyperparameters: r, α, Dropout, Target Modules",
-      "zorluk": 2,
-      "slayt": 18,
-      "soru": "Which statement about LoRA hyperparameters is correct?",
+      "konu": "PEFT and the LoRA Mechanism (W₀, A, B)",
+      "zorluk": 3,
+      "slayt": 15,
+      "soru": "In LoRA, matrix A starts with random values and matrix B starts at zero. What is the main benefit of this starting point?",
       "secenekler": [
-        "LoRA dropout is applied during training to the output of the frozen W₀ branch",
-        "Target modules can be only attention projections; FFN projections cannot be selected",
-        "Increasing α, like increasing r, increases the number of parameters in the A/B matrices",
-        "LoRA dropout is applied during training only to the adapter (A/B) branch"
+        "The adapter uses less memory, because zero values take no space",
+        "Only A learns, while B stays at zero to protect the base model",
+        "The product BA starts as an exact copy of the pretrained weights",
+        "At first the adapter adds nothing, so the model starts unchanged"
       ],
       "dogru": 3,
-      "aciklama": "LoRA dropout \"applies to the adapter branch during training\", i.e., to the A/B branch and not to the frozen W₀ path. Target modules can include k_proj, o_proj, and the FFN projections in addition to q_proj and v_proj; α only changes the (α/r) scale and adds no parameters."
+      "aciklama": "With B at zero, the product BA is zero, so the adapted weight equals the frozen weight and the model first acts like the pretrained one. B does not stay at zero, because it gets the first gradient, and then both A and B learn."
     },
     {
       "id": "d3b-12",
-      "konu": "Saving and Swapping Adapters",
-      "zorluk": 1,
-      "slayt": 20,
-      "soru": "A company wants legal, medical, and finance assistants built from the same base model. With LoRA, which is the most efficient storage and loading strategy?",
+      "konu": "LoRA Hyperparameters: r, α, Dropout, Target Modules",
+      "zorluk": 2,
+      "slayt": 18,
+      "soru": "In a LoRA setup, what does the choice of target modules decide?",
       "secenekler": [
-        "Store a separate full fine-tuned checkpoint for each domain; load the relevant full model at use time",
-        "Store W₀ once and save an A/B pair per domain; at use time load the desired adapter via W₀ + (α/r)BA",
-        "Combine the data of all three domains and train a single A/B; still store W₀ separately for each domain",
-        "Re-pretrain W₀ from scratch for each domain; share the A/B pairs in common across the three domains"
+        "How strongly the learned update acts on top of the frozen weights",
+        "Which weight matrices in the model get their own small adapter",
+        "How many trainable values each adapter matrix can hold",
+        "How often training drops parts of the adapter path at random"
       ],
       "dogru": 1,
-      "aciklama": "The base checkpoint W₀ is stored once, a small A/B pair is kept separately for each domain, and the desired adapter is loaded via W₀ + (α/r)BA. Storing a full checkpoint per domain is expensive in storage; LoRA's advantage is precisely that it avoids this."
+      "aciklama": "Target modules are the projections, such as the query and value projections, that each get their own A and B pair. Alpha sets the strength of the update, rank sets the adapter size, and LoRA dropout does the random dropping."
     },
     {
       "id": "d3b-13",
-      "konu": "QLoRA and Quantization (NF4)",
-      "zorluk": 2,
-      "slayt": 21,
-      "soru": "Which memory problem does LoRA not solve, but QLoRA directly targets?",
+      "konu": "LoRA Hyperparameters: r, α, Dropout, Target Modules",
+      "zorluk": 3,
+      "slayt": 18,
+      "soru": "A LoRA adapter fits the training data very well but does worse on validation data. Which change is meant to help with this problem?",
       "secenekler": [
-        "The optimizer states of the A/B adapters taking up a lot of GPU memory",
-        "The gradients of the trainable parameters being recomputed at every step",
-        "The frozen W₀ still occupying a lot of memory in FP16/BF16",
-        "The adapter checkpoints saved per domain growing larger and larger"
+        "Add LoRA dropout, since it regularizes the adapter in training",
+        "Raise the rank, since a bigger adapter can learn the task better",
+        "Raise alpha, since a stronger update fits the data more closely",
+        "Add more target modules, so that more layers can share the work"
       ],
-      "dogru": 2,
-      "aciklama": "\"LoRA saves optimizer/gradient memory, but the frozen model is still large\"; QLoRA targets this problem by storing the frozen base in 4-bit NF4 (≈15.2 GB → ≈3.8 GB for 7.6B parameters). The optimizer states of A/B are already small; that is a cost LoRA has already solved."
+      "dogru": 0,
+      "aciklama": "LoRA dropout regularizes the adapter branch, so it is harder for the adapter to memorize the training data. A larger rank adds trainable values, and more parameters do not automatically give better results, so it can make overfitting worse."
     },
     {
       "id": "d3b-14",
-      "konu": "QLoRA and Quantization (NF4)",
+      "konu": "Saving and Swapping Adapters",
       "zorluk": 2,
-      "slayt": 22,
-      "soru": "In the uniform quantizer example, a weight of 0.73 is stored as the code 7 and read back as 0.70. The integer code itself is stored without any loss, so where does the approximation error come from?",
+      "slayt": 20,
+      "soru": "One frozen base model serves a support bot and a coding helper, each with its own LoRA adapter. What changes when the server switches between them?",
       "secenekler": [
-        "Encoding rounds the weight to the nearest of a fixed set of equally spaced levels; decoding returns that level, not the original value",
-        "Decoding drops a low-order bit of the code each time it runs, so the error is introduced while reading and grows with every forward pass",
-        "The scale s is drawn at random for each weight when the model is loaded, so the same code decodes to a different value on every run",
-        "Decoding is carried out in BF16/FP16, whose precision is lower than the stored 4-bit code, so the loss happens at the computation step"
+        "The server loads a whole new model fine-tuned for the new tool",
+        "The server trains the first adapter again on the new tool's data",
+        "Only the loaded adapter changes, and the base weights stay the same",
+        "The server raises the rank of the first adapter to cover both tools"
       ],
-      "dogru": 0,
-      "aciklama": "With scale s = 0.1 and zero point z = 0, only multiples of s can be represented, so 0.73 is rounded to the nearest level 0.70 at encoding time and the code 7 simply points to that level; the error |0.73 − 0.70| is fixed at encoding and does not grow with repeated decoding. BF16/FP16 is far more precise than a 4-bit code, so the computation precision is not where the information is lost."
+      "dogru": 2,
+      "aciklama": "Each task has its own small A and B pair, while the server stores the frozen base once and shares it across all tasks. Loading a whole new model for each task is what separate full fine-tuning would need, and LoRA avoids that cost."
     },
     {
       "id": "d3b-15",
       "konu": "QLoRA and Quantization (NF4)",
-      "zorluk": 3,
-      "slayt": 23,
-      "soru": "Which statement is correct about the difference between NF4 (NormalFloat 4-bit) and uniform 4-bit quantization?",
+      "zorluk": 2,
+      "slayt": 21,
+      "soru": "A team already uses LoRA, but training still does not fit on their GPU. The frozen base model takes most of the memory. Which change helps most?",
       "secenekler": [
-        "NF4 uses more code values (32); so it is much more precise at the same bit count",
-        "Both use 16 codes; NF4 places its levels more densely where the weights concentrate",
-        "NF4 encodes every weight with a fixed scale in steps of 0.1; uniform uses a block scale",
-        "In NF4 too, 0.73 → code 7 → 0.70 is decoded; only the way the codes are stored differs"
+        "Raise the rank, so that the adapters can do more of the work",
+        "Lower alpha, so that the learned update becomes much smaller",
+        "Add LoRA dropout, so that fewer adapter values stay in memory",
+        "Use QLoRA, so that the frozen base is stored in 4-bit form"
       ],
-      "dogru": 1,
-      "aciklama": "Both methods have 16 code values, but while uniform levels are equally spaced, NF4 uses a nonuniform codebook with \"unequal spacing; more levels where weights are concentrated\" and normalizes values with a block scale. Note that the code 7 / 0.70 mapping from the uniform example does not carry over to NF4."
+      "dogru": 3,
+      "aciklama": "LoRA already removes most gradient and optimizer memory, but the frozen base is still large, and QLoRA shrinks it by storing it in 4-bit NF4. Lowering alpha only rescales the update and does not change how much memory the base takes."
     },
     {
       "id": "d3b-16",
       "konu": "QLoRA and Quantization (NF4)",
       "zorluk": 3,
-      "slayt": 24,
-      "soru": "Which statement is correct about the computation performed with the frozen NF4 weights during the forward pass in QLoRA?",
+      "slayt": 23,
+      "soru": "Quantization maps each weight to the nearest of a few fixed levels. Most weights sit in a narrow range. Why does NF4 put more levels in that range?",
       "secenekler": [
-        "Matrix multiplication is performed directly in 4-bit integer arithmetic; the memory savings come from this",
-        "A full 16-bit copy of W₀ is kept in memory; NF4 is only for disk storage",
-        "A and B are also quantized to NF4; so gradients are stored in 4-bit",
-        "Weights are dequantized to BF16/FP16 and then multiplied; the savings come from 4-bit storage"
+        "So it can use more levels than uniform 4-bit with the same bits",
+        "So most weights land close to a level, which lowers rounding error",
+        "So the weights no longer need decoding before the multiplication",
+        "So the frozen base weights can be trained again during QLoRA"
       ],
-      "dogru": 3,
-      "aciklama": "4-bit storage is not 4-bit computation: the NF4 weights are dequantized for computation and the multiplication is done in BF16/FP16; the memory savings come from 4-bit storage because no full 16-bit copy is kept. A/B remain trainable in BF16/FP16, and backprop updates only them."
+      "dogru": 1,
+      "aciklama": "With more levels where weights are crowded, most weights find a close level, so the average error after decoding is smaller. NF4 and uniform 4-bit have the same number of codes, and only the spacing between the levels is different."
     },
     {
       "id": "d3b-17",
       "konu": "LoRA Variants (QLoRA, AdaLoRA, DoRA)",
       "zorluk": 2,
       "slayt": 26,
-      "soru": "A researcher believes some layers need more adaptation capacity than others and wants how much rank each layer gets to be determined automatically during training. Which variant targets this?",
+      "soru": "LoRA, QLoRA, AdaLoRA and DoRA each change a different part of the method. What idea do all four of them share?",
       "secenekler": [
-        "QLoRA — stores the frozen base in NF4 and devotes the freed memory to the adapters",
-        "DoRA — decomposes the weight into magnitude and direction components and adapts the direction with LoRA",
-        "AdaLoRA — adaptively distributes a limited total rank budget across layers",
-        "LoRA — adds a low-rank correction with the same r value in all target projections"
+        "They keep the pretrained weights frozen and learn a small extra update",
+        "They store the frozen base model in 4-bit form so it uses less memory",
+        "They give each layer its own rank from one shared rank budget",
+        "They split each weight into a magnitude part and a direction part"
       ],
-      "dogru": 2,
-      "aciklama": "AdaLoRA (Zhang et al., 2023) \"adaptively distribute a limited rank budget across layers\" — for example, different ranks such as r = 1/4/2 are assigned to layers 1/2/3. DoRA separates magnitude and direction (direction via LoRA), and QLoRA only changes how the base is stored; neither touches rank allocation."
+      "dogru": 0,
+      "aciklama": "All four adapt a pretrained model efficiently by training a small number of added parameters while the base stays frozen. Storing the base in 4-bit is the extra step of QLoRA alone, so the other three do not share it."
     },
     {
       "id": "d3b-18",
       "konu": "Generalization: Train / Validation / Test",
-      "zorluk": 2,
+      "zorluk": 3,
       "slayt": 27,
-      "soru": "After fine-tuning, training accuracy is measured at 99% and test accuracy at 65%. What is the appropriate first interpretation of this picture?",
+      "soru": "A team tries many LoRA ranks, picks the one with the best test score, and reports that score as the final result. What is wrong with this?",
       "secenekler": [
-        "The model has generalized successfully; one should now move on to tuning hyperparameters on the test set",
-        "Overfitting, data leakage, or data shift should be investigated",
-        "r should be lowered; high training accuracy is always caused by too many adapter parameters",
-        "The test set should be added to training and the model retrained, then measured again on the same test set"
+        "Nothing, because the team never used the test data to update any weights",
+        "They should pick the rank on the training data, since it is the largest",
+        "The test set helped make a choice, so it is no longer a fair final check",
+        "They should add the test set to training first, and then score it again"
       ],
-      "dogru": 1,
-      "aciklama": "The 99% train / 65% test gap points to a generalization problem; overfitting, leakage, or data shift should be investigated. Hyperparameters are chosen on the validation set and the test set is used only once, for the final evaluation; therefore tuning on the test set or adding it to training breaks the process."
+      "dogru": 2,
+      "aciklama": "The team should make choices like the rank on the validation set, and use the test set once at the end to show performance on unseen data. Even without weight updates, picking the best test result tunes the setup to that test set, so the score looks better than it really is."
     }
   ]
 }

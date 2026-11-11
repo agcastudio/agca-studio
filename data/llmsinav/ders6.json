@@ -20,271 +20,271 @@
       "id": "d6-01",
       "konu": "Why RAG: LLM limitations and the retrieval decision",
       "zorluk": 1,
-      "slayt": 4,
-      "soru": "A class assistant must decide how to answer the question 'Is room A015 free right now?' Which path is appropriate?",
+      "slayt": 3,
+      "soru": "A student asks a chatbot about a school rule that changed last month. The bot gives the old rule. Which limit of an LLM explains this best?",
       "secenekler": [
-        "LLM alone: it is general knowledge, so the model already knows the answer",
-        "RAG: the answer is a fact written in class documents such as the syllabus",
-        "Agentic RAG: if the documents fall short, the agent searches the web",
-        "Tool/API call: the answer is live data that appears in no document"
+        "Limited context: the new rule is too long to fit in one prompt",
+        "Distraction: the key fact is hidden inside a very long prompt",
+        "Knowledge cutoff: its training data ends before the rule changed",
+        "Token cost: the model makes answers short to save money on tokens"
       ],
-      "dogru": 3,
-      "aciklama": "Current room occupancy is live data that is written in no document; it should be routed to a tool call such as a calendar API. The RAG option is misleading because retrieval only suits facts already written in documents; real-time status is not in the index."
+      "dogru": 2,
+      "aciklama": "The model only knows its training data, so a rule that changed after that point is missing. Limited context is about how much text fits in one prompt, but here the bot was given no text about the new rule."
     },
     {
       "id": "d6-02",
       "konu": "RAG vs. Long Context vs. Fine-Tuning",
       "zorluk": 2,
       "slayt": 6,
-      "soru": "A team wants its support bot both to adopt the organization's formal correspondence style and to relay a return policy that changes every week correctly. Using the usual decision rule (new behavior → fine-tune, new knowledge → RAG), which mechanism is appropriate?",
+      "soru": "A company wants its bot to answer in a short, formal style. The facts it needs are general and stay the same. Which approach fits this goal best?",
       "secenekler": [
-        "Fine-tuning only: both style and policy are baked into the weights",
-        "Long context only: the policy documents are added to the prompt on every query",
-        "Fine-tuned model + RAG: behavior lives in the weights, knowledge in the index",
-        "Continued pretraining: the model is adapted from scratch with new domain data"
+        "Fine-tuning, because style is a behavior that the weights can learn",
+        "RAG, because fresh or private facts must be fetched for each question",
+        "Long context, because a few known documents can fit in the window",
+        "Continued pretraining, because the model needs a new domain or language"
       ],
-      "dogru": 2,
-      "aciklama": "The decision rule says 'new behavior → fine-tune, new knowledge → RAG, both → fine-tuned model + RAG'; style is a behavior, while a weekly-changing policy is knowledge. Fine-tuning only is misleading because fine-tuning is generally regarded as 'weak at adding new facts' and it would require retraining every week."
+      "dogru": 0,
+      "aciklama": "Style and format are behavior, and new behavior is a job for fine-tuning. RAG is for fresh or private facts, but these facts are general and stable, so there is nothing new to fetch."
     },
     {
       "id": "d6-03",
-      "konu": "Prompt caching and Contextual Retrieval",
-      "zorluk": 3,
-      "slayt": 22,
-      "soru": "For Contextual Retrieval, an LLM call is made for every chunk, and each call contains the same document. The engineer builds the prompt in the order 'chunk + whole document' and sees no benefit from prompt caching. What is the problem?",
-      "secenekler": [
-        "The varying part (the chunk) comes first, so the prefix does not match and the KV cache cannot be used",
-        "The cache stores only output tokens; the input document is therefore reprocessed from scratch on every call",
-        "The document exceeds 50–100 tokens, so it goes over the cache limit and is skipped automatically",
-        "Each call carries a different chunk, so caching by definition does not work in this scenario at all"
-      ],
-      "dogru": 0,
-      "aciklama": "The rule is 'fixed part first, varying part last; the prefix must match exactly'; when the chunk is placed first, every call's prefix differs and the document's KV cache cannot be reused. The last option is misleading: this scenario (a different chunk per call, the same document) is exactly the ideal use of caching; the problem is not that the chunk changes but where it is placed."
-    },
-    {
-      "id": "d6-04",
       "konu": "RAG vs. Long Context vs. Fine-Tuning",
       "zorluk": 2,
       "slayt": 8,
-      "soru": "In the 'Lost in the Middle' experiment, accuracy followed a U-shaped curve with respect to the position of the document containing the answer (≈76% at position 1, ≈54% at position 10). Which RAG design choice does this finding justify?",
+      "soru": "A bot is right when the key chunk comes first in the prompt. When the same chunk sits in the middle of many chunks, the bot often fails. Why?",
       "secenekler": [
-        "Enlarging the context window so that all retrieved chunks fit into a single prompt without any selection",
-        "Keeping fewer chunks through reranking and placing the best one at the start of the prompt",
-        "Shrinking the chunk size so that more chunks can be retrieved within the same token budget",
-        "Raising the overlap ratio so that facts at chunk boundaries are not lost during indexing"
+        "The reranker drops every chunk that is not placed at the very top",
+        "The prompt cache keeps only the first chunk, so the rest go unread",
+        "The context window is full, so the middle chunks are cut off first",
+        "The model tends to miss evidence in the middle of a long prompt"
+      ],
+      "dogru": 3,
+      "aciklama": "Models tend to use the start and end of a long prompt best, and they often miss what sits in the middle. Nothing was cut off, because the chunk is still in the prompt, so the problem is attention and not space."
+    },
+    {
+      "id": "d6-04",
+      "konu": "RAG pipeline: offline indexing and online querying",
+      "zorluk": 1,
+      "slayt": 27,
+      "soru": "In a RAG prompt, each retrieved chunk gets a number in brackets. What is the main reason for this?",
+      "secenekler": [
+        "The reranker can use the numbers to put the best chunk first",
+        "The answer can cite each chunk, so a reader can check every claim",
+        "The prompt cache can store each numbered chunk for later calls",
+        "The vector database can use the numbers to filter old chunks out"
       ],
       "dogru": 1,
-      "aciklama": "Because evidence in the middle is often overlooked, the usual remedy is 'rerank, keep fewer chunks, put the best first'. Retrieving more chunks is misleading: as the prompt grows, evidence drifts to the middle, and 'needle in a haystack' misses also increase with length."
+      "aciklama": "With numbered chunks, the model can write a number after each claim, and a reader can open that source to check it. The reranker orders chunks by reading each one with the query, so it does not need any numbers."
     },
     {
       "id": "d6-05",
-      "konu": "RAG pipeline: offline indexing and online querying",
-      "zorluk": 3,
-      "slayt": 10,
-      "soru": "A class assistant answers the question 'When is the YZM5109 midterm in 2026?' with last year's date (17 November 2025). In the logs, the similarity scores of the 2025 and 2026 syllabus chunks look almost equal. In a typical RAG pipeline (retrieve, rerank, generate), which is the most direct fix?",
+      "konu": "Data collection and chunking strategies",
+      "zorluk": 1,
+      "slayt": 13,
+      "soru": "A team wants to index a FAQ page with many short questions and answers. Which way of chunking fits this page best?",
       "secenekler": [
-        "Increasing the embedding dimension to separate the two chunks in vector space",
-        "Reducing the chunk size to isolate the date sentence on its own",
-        "Adding a cross-encoder reranker to move the correct year's chunk to the top",
-        "Applying a metadata filter such as year = 2026 in the retrieve step"
+        "Blocks of equal length, so every chunk has the same number of tokens",
+        "Windows with a large overlap, so every answer is stored more than once",
+        "The whole page as one chunk, so no answer is ever split into two parts",
+        "One question with its answer per chunk, so each chunk is one full fact"
       ],
       "dogru": 3,
-      "aciklama": "Without a year filter, the 'Midterm: 17 Nov 2025' chunk can receive almost the same score and reach the LLM; the fix is a metadata filter in the vector DB. A reranker is misleading because both chunks are equally semantically relevant to the 'midterm date' question; the distinguishing information lies in the metadata, not the text."
+      "aciklama": "Splitting on the page's own structure keeps each question next to its answer, so one chunk holds one complete fact. Equal-length blocks ignore the text, so a cut can fall in the middle of an answer."
     },
     {
       "id": "d6-06",
-      "konu": "Embeddings, cosine similarity, and indexing hyperparameters",
+      "konu": "Data collection and chunking strategies",
       "zorluk": 2,
-      "slayt": 16,
-      "soru": "A pipeline indexes with fixed-size chunks and no overlap. For the query 'How fast is the Moon drifting away?' the top chunk ends with 'It drifts 3' and the model replies that the figure is missing, although the document states it. What happened, and which indexing hyperparameter prevents it?",
+      "slayt": 14,
+      "soru": "A long article moves from topic to topic without any headings. Which chunking method can still cut it where the topic changes?",
       "secenekler": [
-        "The chunk was too small to hold a whole fact; a larger embedding size lets each vector carry more of the text",
-        "The fact was cut in half at a chunk boundary; overlap repeats the boundary text at the start of the next chunk",
-        "Both halves were blurred into one vector with other topics; a smaller chunk size separates the fact from them",
-        "The two halves received almost identical vectors; a stricter similarity threshold drops the duplicate half"
+        "Semantic chunking: it cuts where nearby sentences become less similar",
+        "Document-based chunking: it turns each section under a heading into a chunk",
+        "Recursive chunking: it splits by paragraph first, then by sentence",
+        "Sliding window: it cuts every few tokens and repeats some boundary text"
       ],
-      "dogru": 1,
-      "aciklama": "Cutting purely by length is blind to the text, so a boundary can fall inside a number; overlap repeats the end of the previous chunk so the boundary fact survives whole in one chunk, at the price of a larger index. The embedding-size option is misleading: the vector's dimension controls how richly meaning is represented, not how much text a chunk holds or where it is cut."
+      "dogru": 0,
+      "aciklama": "Semantic chunking compares the meaning of nearby sentences and cuts where it drops, which is where the topic changes. Document-based chunking needs headings or sections to follow, and this article has none."
     },
     {
       "id": "d6-07",
-      "konu": "Data collection and chunking strategies",
+      "konu": "Embeddings, cosine similarity, and indexing hyperparameters",
       "zorluk": 2,
-      "slayt": 13,
-      "soru": "In a moon.md example, recursive chunking never cuts sentences, but one chunk contains both the sentence about the Moon receding and the '## Apollo 11' heading. How does document-based chunking solve this problem, and what new limitation does it introduce?",
+      "slayt": 16,
+      "soru": "A team puts each whole chapter into one chunk. Now search often misses small, specific facts. What is the most likely cause?",
       "secenekler": [
-        "It cuts where similarity between neighboring sentences drops; it adds the cost of one embedding per sentence",
-        "It cuts at a fixed number of characters; it risks splitting numbers and words in the middle",
-        "It makes each section a single chunk; overly long sections still need to be split separately",
-        "It repeats the boundary text in the next chunk; it enlarges the size of the index"
+        "Each fact loses its context, so the chunk means too little on its own",
+        "The overlap repeats too much text, so the index fills up with copies",
+        "Many topics blur into one vector, so no single fact stands out",
+        "The embedding size shrinks, so each vector can hold less meaning"
       ],
       "dogru": 2,
-      "aciklama": "Document-based chunking follows the heading structure and makes each section a single chunk; its cost is that 'long sections still have to be split'. The first option describes semantic chunking: it also cuts at topic shifts, but it does so by looking at sentence embeddings rather than document structure."
+      "aciklama": "One vector for a whole chapter mixes many topics, so a question about one small fact does not match it well. Losing context is the problem of chunks that are too small, not of chunks that are too big."
     },
     {
       "id": "d6-08",
-      "konu": "Embeddings, cosine similarity, and indexing hyperparameters",
+      "konu": "Dense, sparse, and hybrid retrieval; vector databases and ANN",
       "zorluk": 2,
-      "slayt": 15,
-      "soru": "Cosine similarity divides the dot product q·d by the product of the vector lengths ‖q‖‖d‖ before chunks are ranked. What does this division accomplish, and what would go wrong if chunks were ranked by the raw dot product alone?",
+      "slayt": 21,
+      "soru": "Many RAG systems run keyword search and semantic search together, then merge the two lists. What is the main reason for this?",
       "secenekler": [
-        "It corrects for the number of tokens in each chunk; long chunks would otherwise outrank short ones however little they actually say",
-        "It squeezes every score into the range from zero to one; negative scores would otherwise be discarded by the vector index",
-        "It makes the score depend only on the angle between the vectors; longer vectors would otherwise score high whatever they mean",
-        "It cancels the dimensions on which the two vectors disagree; unrelated dimensions would otherwise add noise to the score"
+        "Keyword search finds the candidates, and semantic search then reranks all of them",
+        "Keyword search catches exact names, and semantic search catches similar meaning",
+        "Keyword search runs offline, and semantic search runs again for each question",
+        "Keyword search filters by date, and semantic search filters by user rights"
       ],
-      "dogru": 2,
-      "aciklama": "Dividing by the norms removes each vector's length, so the score reflects only how closely the two directions agree, which is what 'similar meaning lands close together' relies on; a raw dot product would also reward sheer magnitude. The token-count option is misleading: normalizing by chunk length is what BM25 does, whereas a norm is the geometric length of the embedding, not the size of the chunk."
+      "dogru": 1,
+      "aciklama": "Keyword search is strong on exact names and numbers, and semantic search is strong when the same idea uses other words, so together they miss less. Reranking is a separate, later step, done by a model that reads the query and the chunk together."
     },
     {
       "id": "d6-09",
-      "konu": "Evaluation: retrieval metrics, golden set, correctness vs. faithfulness",
+      "konu": "Dense, sparse, and hybrid retrieval; vector databases and ANN",
       "zorluk": 1,
-      "slayt": 29,
-      "soru": "What is the purpose of adding questions whose answers are not found in the documents, such as 'Who grades the projects?', to the golden set?",
+      "slayt": 20,
+      "soru": "Vector databases often use approximate nearest neighbor (ANN) search. What do they gain, and what do they give up?",
       "secenekler": [
-        "To obtain more gold evidence rows for measuring the retriever's recall at different cutoffs",
-        "To measure the system's ability to say 'I don't know' when appropriate (abstention)",
-        "To verify the quality of LLM-generated questions through a human review of each sampled item",
-        "To keep the hold-out set separate from the questions used during prompt and parameter tuning"
+        "They gain a lot of speed and give up a little accuracy",
+        "They gain exact results and give up some storage space",
+        "They gain word matching and give up search by meaning",
+        "They gain shorter vectors and give up part of the meaning"
       ],
-      "dogru": 1,
-      "aciklama": "For unanswerable questions the correct answer is 'I don't know'; these rows feed the abstention metric. The first option is misleading because the gold evidence for these questions is 'not in the documents'; they do not contribute to recall measurement."
+      "dogru": 0,
+      "aciklama": "ANN searches only the part of the index closest to the query instead of every vector, so it is much faster and the top results are almost the same. It cannot promise exact results, because it trades a little accuracy for speed."
     },
     {
       "id": "d6-10",
-      "konu": "Dense, sparse, and hybrid retrieval; vector databases and ANN",
+      "konu": "Prompt caching and Contextual Retrieval",
       "zorluk": 2,
-      "slayt": 18,
-      "soru": "A system using only dense (bi-encoder) retrieval often returns Apollo 13 chunks for the query 'Apollo 11 crew'; on the other hand, the query 'How far away is the Moon?' finds the 'Distance: 384,400 km' chunk without trouble. Which statement explains both behaviors together?",
+      "slayt": 23,
+      "soru": "One chunk says only 'Room: Main Hall'. A search for 'Where is the history exam?' misses it. How does Contextual Retrieval help?",
       "secenekler": [
-        "Dense search captures paraphrase but is not discriminative on exact names and numbers",
-        "Dense search relies on word matching; it captures paraphrase only through IDF weighting",
-        "The embedding dimension is small; if enlarged, both names and paraphrases are separated",
-        "ANN indexes give approximate results; exact search would have filtered out the Apollo 13 chunks"
+        "It writes a fake answer to the question and searches with that answer",
+        "It caches the whole document, so later calls can read the chunk faster",
+        "It joins each chunk with the next one, so every chunk becomes longer",
+        "It adds context from the full document, so the chunk mentions the exam"
       ],
-      "dogru": 0,
-      "aciklama": "Dense search's strength is capturing the 'how far ≈ distance' paraphrase and its weakness is confusing Apollo 11 with 13; the remedy is hybrid search that also adds BM25. The ANN option is misleading: ANN only finds nearest neighbors approximately and does not fix the fact that the Apollo 11 and 13 vectors are close to begin with."
+      "dogru": 3,
+      "aciklama": "Alone, the chunk has no words about the exam, so Contextual Retrieval adds a short note from the full document, such as 'History exam room: Main Hall'. Prompt caching only makes writing these notes cheaper, and it does not change what a chunk says."
     },
     {
       "id": "d6-11",
-      "konu": "Dense, sparse, and hybrid retrieval; vector databases and ANN",
-      "zorluk": 3,
-      "slayt": 21,
-      "soru": "Hybrid retrieval merges a dense list and a BM25 list with RRF, which looks only at each chunk's position in each list and ignores the cosine and BM25 scores themselves. Why is throwing away the raw scores a sound design, and which chunks does the merge push to the top?",
+      "konu": "Reranking: bi-encoder vs. cross-encoder",
+      "zorluk": 2,
+      "slayt": 25,
+      "soru": "A system fetches many chunks, reranks them, and sends only the best few to the LLM. What is the goal of each part of this plan?",
       "secenekler": [
-        "Cosine and BM25 scores live on different scales, so summing them would let one search dominate; chunks ranked well by both searches",
-        "Ranks are cheaper to store than floating-point scores, so the merge stays within the latency budget; chunks high in the longer list",
-        "Both scores are already normalized to the same range, so only the order carries extra information; chunks with the highest single score",
-        "List positions are exact while scores are only approximate under ANN search, so ranks are trusted more; chunks only the dense search found"
+        "Fetching many gives precision, and keeping few makes sure nothing is lost",
+        "Fetching many lowers the cost, and keeping few makes the search faster",
+        "Fetching many protects recall, and keeping few keeps the prompt focused",
+        "Fetching many fills the window, and keeping few protects the prompt cache"
       ],
-      "dogru": 0,
-      "aciklama": "A cosine value and a BM25 sum of weighted word matches come from unrelated formulas, so adding them would let whichever runs larger decide the order; ranks put both lists on equal footing, and a chunk placed high in both collects two large reciprocal-rank terms. The 'already normalized' option is misleading: the scores are not comparable at all, which is exactly why the merge works on positions."
+      "dogru": 2,
+      "aciklama": "A wide first search makes it less likely that a useful chunk is lost, and a short prompt helps the model use the best evidence. Saying that fetching many gives precision swaps the two goals, because precision comes from keeping only the best."
     },
     {
       "id": "d6-12",
       "konu": "Reranking: bi-encoder vs. cross-encoder",
-      "zorluk": 2,
-      "slayt": 24,
-      "soru": "Although a cross-encoder produces more accurate scores than a bi-encoder, why is it used only on the top-k candidates rather than in the initial search over 1 million chunks?",
+      "zorluk": 3,
+      "slayt": 26,
+      "soru": "Logs show that the correct chunk was in the prompt, near the top, but the answer was still wrong. Which part should the team fix first?",
       "secenekler": [
-        "It reads the query and chunk together, so it requires a separate model call for every pair",
-        "Its output is a single vector, so it is too high-dimensional to be stored in an ANN index",
-        "It compares chunks only at the keyword level, so it misses paraphrase",
-        "It forces the entire model to be retrained whenever a new document is added"
+        "Retrieval: chunking and hybrid search, since the search missed the chunk",
+        "Generation: the prompt rules and citations, since the model misread it",
+        "Ranking: a stronger reranker, since the chunk was placed too low to use",
+        "Indexing: a bigger embedding size, since the chunk's vector was too weak"
       ],
-      "dogru": 0,
-      "aciklama": "A bi-encoder precomputes chunk vectors offline and compares them with the query via cosine; a cross-encoder reads each (query, chunk) pair together, so there is nothing to precompute and the cost grows with the number of pairs. The second option is misleading: a cross-encoder outputs a relevance score directly, not a vector; the problem is not vector size but that nothing can be precomputed."
+      "dogru": 1,
+      "aciklama": "The right chunk reached the prompt near the top, so search and ranking did their job and the model misread it. A stronger reranker only reorders chunks, and this chunk was already near the top."
     },
     {
       "id": "d6-13",
-      "konu": "Reranking: bi-encoder vs. cross-encoder",
-      "zorluk": 3,
-      "slayt": 26,
-      "soru": "In the golden set analysis, in most failed questions the correct chunk is absent from all 20 candidates returned by the retriever. According to the standard RAG failure-diagnosis scheme, which intervention should be made first?",
+      "konu": "Evaluation: retrieval metrics, golden set, correctness vs. faithfulness",
+      "zorluk": 2,
+      "slayt": 29,
+      "soru": "A team sets aside some golden-set questions and uses them only for testing, after all tuning is done. Why does it do this?",
       "secenekler": [
-        "Adding a stronger cross-encoder reranker to rescore the candidates",
-        "Adding an 'answer only from the context' instruction and a mandatory citation rule to the prompt",
-        "Revisiting chunking, hybrid search, or query rewriting",
-        "Raising top-n from 3 to 5 to send more candidates to the prompt"
+        "To test if the system says 'I don't know' when it should",
+        "To give the LLM judge examples of good and bad answers",
+        "To see how real users write their questions in the logs",
+        "To get an honest score on questions the tuning never saw"
       ],
-      "dogru": 2,
-      "aciklama": "If the correct chunk is not in the top-20, the problem lies in retrieval; in this case the recommendation is to fix retrieval with 'chunking, hybrid, rewrite'. A reranker is misleading because it only reorders its input: it cannot move up a chunk that is not among the candidates. Increasing top-n fails for the same reason."
+      "dogru": 3,
+      "aciklama": "If you tune on every question, the score can look good only because the system fits those exact questions. Unanswerable rows test 'I don't know', which is a different job from keeping a fair test set."
     },
     {
       "id": "d6-14",
       "konu": "Evaluation: retrieval metrics, golden set, correctness vs. faithfulness",
       "zorluk": 3,
-      "slayt": 28,
-      "soru": "Two retrievers are compared on the same golden set. Both place every gold chunk somewhere in their top-10, so their Recall@10 is identical, yet one scores clearly higher on MRR. What does MRR capture here that Recall@10 does not, and why does that matter downstream?",
+      "slayt": 30,
+      "soru": "An answer can be faithful to the retrieved context and still be wrong. Which case shows this?",
       "secenekler": [
-        "What share of the ten returned chunks is gold rather than noise; irrelevant chunks lengthen the prompt and distract the model",
-        "Whether every gold chunk, weighted by its position, is ordered near the top; a perfect ordering of all of them scores one",
-        "Whether at least one gold chunk appears anywhere in the top-10; a miss at this stage cannot be repaired by any reranker",
-        "How high the first gold chunk sits in each list; a chunk ranked low can fall below the top-n cut or sit mid-prompt"
+        "The retrieved chunk is outdated, and the answer repeats it exactly",
+        "The model ignores the chunk and answers from its old training data",
+        "The model joins two chunks and adds a date that neither chunk gives",
+        "The chunk has the right date, but the model writes a different one"
       ],
-      "dogru": 3,
-      "aciklama": "Recall@10 only asks whether the gold chunks are inside the cutoff and is blind to where; MRR rewards finding the first gold chunk near rank 1, which matters because only the best few chunks reach the prompt and evidence in the middle is often ignored. The position-weighted option describes nDCG, which scores the order of all relevant chunks, whereas MRR looks only at the first one."
+      "dogru": 0,
+      "aciklama": "Faithful means every claim is supported by the retrieved context, and correct means it matches the truth. An outdated chunk can be followed perfectly and still be wrong, while answering from memory is not faithful at all."
     },
     {
       "id": "d6-15",
-      "konu": "Evaluation: retrieval metrics, golden set, correctness vs. faithfulness",
-      "zorluk": 2,
-      "slayt": 30,
-      "soru": "In an evaluation example, the context contains only the chunk '[1] midterm topics: chapters 1–6', yet the model answers 'The midterm is on 16 November 2026', and this date is in fact correct. In RAGAS terminology, how is this answer classified?",
+      "konu": "Advanced RAG: HyDE, CRAG, Multi-hop, GraphRAG, Agentic and Multimodal RAG",
+      "zorluk": 1,
+      "slayt": 37,
+      "soru": "What does agentic RAG add to a basic RAG system?",
       "secenekler": [
-        "Correct but not faithful: the context does not say this; the model used its memory",
-        "Correct and faithful: since the answer is correct, it is deemed consistent with the context too",
-        "Faithful but not correct: the model stayed true to the context but was mistaken",
-        "Abstention: the model stated that the context is insufficient and left the question unanswered"
+        "It writes a fake answer first and then searches with that answer",
+        "It builds a graph of entities and follows the links between them",
+        "It checks if the context is enough and, if not, keeps calling tools",
+        "It grades each document and keeps only the useful parts of each one"
       ],
-      "dogru": 0,
-      "aciklama": "Correctness is compared against the ground truth, while faithfulness is compared against the retrieved context; the date is correct but [1] does not say it, so the answer is unsupported, which is explained as 'model used memory'. 'Correct and faithful' is misleading: correctness does not imply faithfulness, and the main point is that these two criteria must be measured separately."
+      "dogru": 2,
+      "aciklama": "Agentic RAG adds a loop: when the retrieved context is not enough, an agent plans a step, calls a tool such as web search or SQL, and reads the result. Grading documents and keeping only the useful parts is what CRAG does."
     },
     {
       "id": "d6-16",
       "konu": "Advanced RAG: HyDE, CRAG, Multi-hop, GraphRAG, Agentic and Multimodal RAG",
-      "zorluk": 1,
-      "slayt": 32,
-      "soru": "In an Advanced RAG pipeline, which of the following techniques aims to improve the query itself BEFORE the retrieval step?",
+      "zorluk": 3,
+      "slayt": 33,
+      "soru": "HyDE asks the LLM to write a fake answer, then searches with that text instead of the short question. Why can this find better documents?",
       "secenekler": [
-        "Context compression: chunks are summarized and shortened before entering the prompt",
-        "Cross-encoder reranking: candidates are rescored by reading them together with the query",
-        "CRAG: an evaluator grades the retrieved documents as Correct / Ambiguous / Incorrect",
-        "HyDE: a hypothetical answer written by the LLM is embedded and used for the search"
+        "A fake answer is graded first, so wrong documents are dropped early",
+        "A fake answer looks more like real documents than a short question",
+        "A fake answer is kept in the prompt, so the LLM has more evidence",
+        "A fake answer has exact names, so keyword search can match each one"
       ],
-      "dogru": 3,
-      "aciklama": "In the diagram, the 'before retrieval' step fixes the query (rewrite, expand, HyDE); HyDE embeds a fake answer instead of the short question and searches for real documents near it. CRAG is misleading: although its name suggests 'corrective', its evaluator runs after retrieval, to grade the retrieved documents."
+      "dogru": 1,
+      "aciklama": "Documents are written like answers, so the embedding of a fake answer lands closer to them than the embedding of a short question. The fake text is thrown away after the search, so it never becomes evidence in the prompt."
     },
     {
       "id": "d6-17",
-      "konu": "Advanced RAG: HyDE, CRAG, Multi-hop, GraphRAG, Agentic and Multimodal RAG",
-      "zorluk": 3,
-      "slayt": 36,
-      "soru": "For the question 'Which exams are in A011 on 16 November?', vanilla RAG finds only the YZM5109 midterm while GraphRAG also finds the YZM5112 quiz. What is the source of this difference, and what is GraphRAG's cost?",
+      "konu": "RAG security, knowledge conflicts, and application-specific design",
+      "zorluk": 2,
+      "slayt": 40,
+      "soru": "The only retrieved chunk gives this year's exam date, but the bot answers with last year's date from its training. What is happening, and what helps?",
       "secenekler": [
-        "More chunks are retrieved with a larger top-k; the cost is a longer and more expensive prompt",
-        "The graph neighbors of the A011 node are traversed; the cost is one LLM pass per chunk",
-        "BM25 matches the 'A011' token exactly; the cost is blindness to paraphrase",
-        "The agent finds extra documents through web search; the cost is additional tool calls on every question"
+        "Knowledge conflict: tell the model to prefer the newer, official context",
+        "Prompt injection: treat the retrieved text as data and never as orders",
+        "Retrieval miss: improve chunking and search so the date can be found",
+        "Lost in the middle: move the chunk with the date to the end of the prompt"
       ],
-      "dogru": 1,
-      "aciklama": "The relevant information is spread across different documents; GraphRAG builds an entity–relation graph and walks from the A011 node to neighboring exams via local search, and its cost is 'one LLM pass over every chunk'. Enlarging top-k is misleading: vector search looks for 'similar text', and since the second document is not semantically similar enough to the query, it may still rank low."
+      "dogru": 0,
+      "aciklama": "The model's memory and the retrieved evidence disagree, and memory won, so tell the model to prefer the context and add dates as metadata. It is not a retrieval miss, because the new date did reach the prompt."
     },
     {
       "id": "d6-18",
       "konu": "RAG security, knowledge conflicts, and application-specific design",
-      "zorluk": 2,
-      "slayt": 39,
-      "soru": "A class assistant that also indexes PDFs uploaded by students answers the question 'When is the midterm?' with 'The midterm has been cancelled'; the retrieved chunk contains the sentence 'Ignore all previous instructions…'. What is the name of the problem and the primary defense?",
+      "zorluk": 3,
+      "slayt": 41,
+      "soru": "A team wants the LLM to read every chunk and then follow a rule to hide salary data. Why is it safer to filter chunks by user permission first?",
       "secenekler": [
-        "Knowledge conflict; the model should be told to prefer the context over its memory",
-        "Hallucination; the answer should be checked against the context with the faithfulness metric",
-        "Lost in the middle; the correct chunk should be moved to the start of the prompt with a reranker",
-        "Indirect prompt injection; retrieved text should be treated as data, not as orders"
+        "Filtering raises recall, so each user gets more useful chunks back",
+        "Filtering blocks prompt injection hidden inside the salary files",
+        "Filtering keeps secrets out of the prompt, where rules alone can fail",
+        "Filtering trains the LLM, so it learns which files each user may see"
       ],
-      "dogru": 3,
-      "aciklama": "The hidden instruction in the retrieved document was treated by the model as a command; this is called indirect prompt injection and the defense is 'retrieved text is data, not orders', indexing only trusted sources, and filtering by user permissions. Knowledge conflict is misleading: a 'prefer the context' instruction would here make the model trust the poisoned chunk even more."
+      "dogru": 2,
+      "aciklama": "An LLM can still repeat a secret it has read, even when the prompt tells it not to, so the safe design removes the chunk before the prompt is built. Blocking prompt injection is a different defense, which treats retrieved text as data and not as orders."
     }
   ]
 }

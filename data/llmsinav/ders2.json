@@ -20,270 +20,270 @@
       "konu": "Why Transformers: attention instead of recurrence",
       "zorluk": 1,
       "slayt": 5,
-      "soru": "What is the main reason the Transformer prefers attention over RNN/LSTM-style step-by-step processing?",
+      "soru": "An RNN reads a sentence one token at a time. Why does this make training on very large data slow?",
       "secenekler": [
-        "Attention reduces the number of parameters, making training cheaper",
-        "Attention processes all positions in parallel and creates direct paths between tokens",
-        "Attention carries order information implicitly in the dot product, so no extra signal is needed",
-        "Attention reduces memory by compressing a long sequence into a single fixed-size summary vector"
+        "Each token gets its own set of weights, so the model grows too large to train",
+        "Each token is compared with every other token, so the work grows very fast",
+        "Each step waits for the one before it, so the steps cannot run in parallel",
+        "Each token must first get a position signal, which adds many extra steps"
       ],
-      "dogru": 1,
-      "aciklama": "RNNs carry information step by step and parallelism is limited, whereas attention processes all positions in parallel and builds direct token-to-token paths. The claim that order information is implicit in the dot product is wrong; in fact position information must be supplied separately."
+      "dogru": 2,
+      "aciklama": "An RNN needs the result of one step before it can start the next, so its work forms a long chain. Comparing every token with every other token is what attention does, and that work runs in parallel."
     },
     {
       "id": "d2-02",
-      "konu": "Input vectors and positional encoding (absolute, relative, RoPE)",
+      "konu": "Why Transformers: attention instead of recurrence",
       "zorluk": 2,
-      "slayt": 7,
-      "soru": "Without positional encoding, why can self-attention not distinguish the sequences 'dog bites man' and 'man bites dog'?",
+      "slayt": 5,
+      "soru": "In a long story, a word near the end depends on a name from the first line. Why can attention handle this link more easily than an RNN?",
       "secenekler": [
-        "Because softmax weights sum to 1, order information is normalized away and lost",
-        "Because the embedding table gives the same word a different vector at each position, causing total confusion",
-        "Because the residual connection cannot pass the position vector to the next block, so order is erased",
-        "Because dot-product comparison is insensitive to order; the two sequences look like the same set of tokens"
+        "Attention links the two words directly, not through a long chain of steps",
+        "Attention keeps the name in its position vector, which all later words can read",
+        "Attention carries the name along the residual path from one word to the next",
+        "Attention lets the FFN at the last word read every earlier word in the story"
       ],
-      "dogru": 3,
-      "aciklama": "Self-attention only compares content vectors, and the dot product contains no token order, so the same tokens in a different order look like the same set. The embedding table is position-independent: the same word gets the same token embedding, and any difference comes only from the added position vector."
+      "dogru": 0,
+      "aciklama": "Attention gives the late word a direct path to the name, while an RNN must pass the name through every word in between. The residual path carries a vector from one layer to the next, not from one word to another."
     },
     {
       "id": "d2-03",
       "konu": "Input vectors and positional encoding (absolute, relative, RoPE)",
-      "zorluk": 2,
-      "slayt": 8,
-      "soru": "Which limitation of pure absolute positional encoding (sinusoidal or learned) motivates relative methods?",
+      "zorluk": 3,
+      "slayt": 7,
+      "soru": "A model has full self-attention but no position signal. You change the order of the words in a sentence. What happens to each word's output vector?",
       "secenekler": [
-        "The distance between tokens is not explicit; the model must learn it indirectly from pᵢ and pⱼ",
-        "The same word receives the same total input vector at every position, so order information is completely lost",
-        "The position signal is added only to Q and K and not to V, so the content is corrupted",
-        "The sinusoidal pattern is deterministic, so it is never updated during training"
+        "It changes, because each word now has different words next to it",
+        "It changes, because the dot products now see a new word order",
+        "It becomes the old output of the word that was in its place",
+        "It stays the same, and only the order of the outputs changes"
       ],
-      "dogru": 0,
-      "aciklama": "Absolute methods answer the question 'which slot am I in?'; the distance between two tokens is not represented explicitly, and the model must infer it from pᵢ and pⱼ. That the sinusoidal pattern is fixed is true, but it is a difference from learned PE, not a limitation."
+      "dogru": 3,
+      "aciklama": "Without a position signal, attention sees the words only as a set, so each word gets the same weights and the same mix as before. New neighbors change nothing, because the model cannot tell which words are next to each other."
     },
     {
       "id": "d2-04",
       "konu": "Input vectors and positional encoding (absolute, relative, RoPE)",
       "zorluk": 2,
-      "slayt": 9,
-      "soru": "In modern practice, how does RoPE use position information differently from the classical approach?",
+      "slayt": 8,
+      "soru": "With pure absolute positions, each token gets a signal for its own slot only. What must the model then work out by itself?",
       "secenekler": [
-        "By adding a learned position vector (learned PE) to the input embedding",
-        "By adding a deterministic sinusoidal position vector to the token embedding",
-        "By rotating Q and K according to their absolute positions, which gives attention a relative effect",
-        "By adding token-to-token offset information to the value vectors, which changes the weighted sum"
+        "The order of the words, since slot signals do not show any order",
+        "How far apart two tokens are, from their two slot signals",
+        "What each word means, since the slot signal replaces the word",
+        "Which tokens come later, so that it can hide them in training"
       ],
-      "dogru": 2,
-      "aciklama": "Instead of adding position to the input, RoPE rotates Q and K inside attention according to absolute position, and the effect behaves like relative position. Adding a position vector to the input embedding is the classical (learned/sinusoidal) absolute approach; RoPE differs precisely by not doing this."
+      "dogru": 1,
+      "aciklama": "An absolute signal only says which slot a token is in, so the model must learn the gap between two tokens from both signals. The slots do show the order, so the missing part is the distance, which relative methods give directly."
     },
     {
       "id": "d2-05",
       "konu": "Self-attention and Q/K/V computation (scaled dot-product)",
-      "zorluk": 2,
-      "slayt": 15,
-      "soru": "Raw query–key dot products are divided by √dk and then passed through softmax before they are used. What does each of these two steps contribute?",
+      "zorluk": 1,
+      "slayt": 12,
+      "soru": "For the word 'it', attention puts weights on 'animal', 'street' and 'tired'. What is the updated vector of 'it' made of?",
       "secenekler": [
-        "Scaling makes the scores sum to 1; softmax then stabilizes the resulting dot products",
-        "Scaling injects the position signal; softmax then removes the scores of future tokens",
-        "Scaling centers each token vector on mean 0; softmax then picks the single best key",
-        "Scaling stabilizes the dot products; softmax makes them positive weights summing to 1"
+        "The value vector of 'animal' alone, because it has the highest weight",
+        "A mix of their key vectors, with more from the words with high weights",
+        "The query vector of 'it', moved a little toward the word with the most weight",
+        "A mix of their value vectors, with more from the words with high weights"
       ],
       "dogru": 3,
-      "aciklama": "Dividing by √dk keeps the dot products in a stable range, and softmax converts the scaled scores into a probability distribution: positive weights that sum to 1. The swapped option reverses the two roles; centering a vector on mean 0 is LayerNorm's job, and softmax gives a soft weighting, not a hard pick."
+      "aciklama": "The output is a weighted sum of value vectors, so every word adds some content and high-weight words add more. Keys are used only to find the weights, and the content itself comes from the values."
     },
     {
       "id": "d2-06",
       "konu": "Self-attention and Q/K/V computation (scaled dot-product)",
-      "zorluk": 3,
+      "zorluk": 1,
       "slayt": 13,
-      "soru": "Suppose the value vector of the token 'animal' is altered while its key vector and the query of 'it' stay exactly the same. How does the attention step for 'it' change?",
+      "soru": "Attention can be compared to looking for a book in a library. Which match of query, key and value fits best?",
       "secenekler": [
-        "The weight on 'animal' changes, but the content it adds to the output of 'it' stays the same",
-        "The weight on 'animal' stays the same, but the content it adds to the output of 'it' changes",
-        "Both the weight on 'animal' and the content it adds change, since softmax is recomputed on values",
-        "Neither changes, because the output of 'it' is built from the query and key vectors only"
+        "Query: your question. Key: the label on each book. Value: the text inside",
+        "Query: the label on each book. Key: your question. Value: the text inside",
+        "Query: your question. Key: the text inside. Value: the label on each book",
+        "Query: the text inside. Key: the label on each book. Value: your question"
       ],
-      "dogru": 1,
-      "aciklama": "Weights come only from query–key matching, so an unchanged key keeps the same weight; the value is the content mixed into the weighted sum, so the output changes. The reversed option confuses the roles: keys decide the match, values carry the content."
+      "dogru": 0,
+      "aciklama": "The query says what a token is looking for, the keys are checked against it, and the values hold the content that is taken. Swapping query and key mixes up who asks with what is checked."
     },
     {
       "id": "d2-07",
       "konu": "Multi-head attention",
       "zorluk": 2,
       "slayt": 17,
-      "soru": "In multi-head attention, which mechanism lets the heads produce 'complementary views' of the same sequence?",
+      "soru": "A word may need a link to its neighbor for grammar and a link to a far word for meaning. Which design helps the model learn both kinds of link at once?",
       "secenekler": [
-        "Each head takes a different part of the sequence (a local window) and processes only that part",
-        "The heads run sequentially; each head takes the previous head's output as input and updates it",
-        "The heads share the same WQ, WK, WV weights; only the softmax scaling factor differs between heads",
-        "Each head applies its own WQ, WK, WV to the same X; outputs are concatenated and mixed by WO"
+        "One head with a sharper softmax that picks the single best word",
+        "One head with a larger FFN that mixes both links inside each token",
+        "Several heads, so each head can learn its own pattern of links",
+        "Several position signals, one for near words and one for far words"
       ],
-      "dogru": 3,
-      "aciklama": "Each head computes head_i = Attention(XW_i^Q, XW_i^K, XW_i^V); all heads see the same X but learn different projections, so they form different routing patterns, and the results are combined with Concat(...)W^O. The idea that heads process different parts of the sequence is wrong; the difference lies in the learned projections, not in the input."
+      "dogru": 2,
+      "aciklama": "Each head has its own query, key and value weights, so one head can follow grammar while another follows meaning. A single head gives only one pattern of weights, and a sharper softmax only makes that pattern narrower."
     },
     {
       "id": "d2-08",
-      "konu": "Real-scale dimensions and attention cost",
+      "konu": "Add & Norm: residual connection and LayerNorm",
       "zorluk": 2,
-      "slayt": 27,
-      "soru": "In a large model, each head works with vectors far narrower than the model width. If the head width were halved while the sequence length stayed fixed, what would happen to a single head's query–key score matrix?",
+      "slayt": 18,
+      "soru": "Early in training, a sublayer gives an update that is almost zero. With the residual path, what comes out of the Add step?",
       "secenekler": [
-        "It would shrink to half its size in both directions, because scores are stored per feature dimension",
-        "It would shrink to half as many columns, because each key vector would then have half the entries",
-        "It would keep its shape, because it holds one score per query–key pair, set by sequence length",
-        "It would grow to twice its size, because narrower heads need more scores to carry the same content"
+        "A vector close to zero, so the old information fades away",
+        "Almost the old vector, so the information it carried is kept",
+        "A mix of the other token vectors, chosen by attention weights",
+        "The first token embedding again, so the block starts fresh"
       ],
-      "dogru": 2,
-      "aciklama": "Each score is a dot product between one query and one key, so the matrix has one entry per token pair and its shape depends only on sequence length; head width only changes the length of the vectors being multiplied. Halving the columns confuses the width of the key vectors with the number of keys."
+      "dogru": 1,
+      "aciklama": "The residual path adds the old vector to the update, so a tiny update leaves the vector almost as it was. A vector near zero is what you would get without the residual path, because only the update would pass on."
     },
     {
       "id": "d2-09",
       "konu": "Add & Norm: residual connection and LayerNorm",
       "zorluk": 1,
       "slayt": 19,
-      "soru": "What does LayerNorm in a Transformer normalize, and along which axis?",
+      "soru": "After each residual sum, the Transformer applies LayerNorm. What is the main job of this step?",
       "secenekler": [
-        "One token vector across its own feature dimensions; independent of the batch",
-        "Each feature across all tokens in the sequence; it depends on the sequence length",
-        "Each feature across the examples in the mini-batch; it depends on batch statistics",
-        "The attention scores along each row; it makes the weights sum to 1 for every query"
+        "It keeps the numbers in each token vector in a stable range",
+        "It makes the attention weights of each token add up to one",
+        "It hides the future tokens from each position in the text",
+        "It mixes information between the tokens of the same sentence"
       ],
       "dogru": 0,
-      "aciklama": "LayerNorm computes μ and σ² over the d components of a single token vector; each token is normalized independently and no batch statistics are used. Normalizing over the mini-batch is the behavior of BatchNorm, and making each row sum to 1 is the job of softmax."
+      "aciklama": "LayerNorm shifts and scales the numbers of each token vector, so they stay in a safe range from block to block. Making weights add up to one is the job of softmax inside attention."
     },
     {
       "id": "d2-10",
-      "konu": "Add & Norm: residual connection and LayerNorm",
+      "konu": "Distinct roles of attention and FFN, and the block stack",
       "zorluk": 2,
-      "slayt": 18,
-      "soru": "If the residual (skip) connection in the Add & Norm step were removed, what would be lost?",
+      "slayt": 20,
+      "soru": "Suppose you remove every attention layer and keep only the FFNs. Which ability does the model lose?",
       "secenekler": [
-        "The guarantee that softmax attention weights are always positive and sum to exactly 1",
-        "Preservation of the old state; the sublayer would have to produce all of h′, not just Δh",
-        "The FFN's property of processing each position independently of other tokens' representations",
-        "LayerNorm's ability to restore a useful scale and shift through its γ and β parameters"
+        "Applying a non-linear change to each token vector on its own",
+        "Keeping each token's old vector through the residual path",
+        "Letting a token use other tokens to update its own vector",
+        "Giving each token a signal that shows its place in the text"
       ],
-      "dogru": 1,
-      "aciklama": "The sublayer only proposes an update (Δh), and the residual path carries the old h into the sum so that information is not lost; without the connection, each block would have to rewrite the vector from scratch. The softmax sum and the FFN's position independence are properties unrelated to the residual connection."
+      "dogru": 2,
+      "aciklama": "Attention is the only step where tokens share information, so without it each token is processed alone. The FFN still makes its non-linear change, but it works on one position at a time."
     },
     {
       "id": "d2-11",
       "konu": "Distinct roles of attention and FFN, and the block stack",
       "zorluk": 1,
-      "slayt": 20,
-      "soru": "Which statement comparing the attention and FFN sublayers of a Transformer block is correct?",
+      "slayt": 21,
+      "soru": "A Transformer repeats the same kind of block many times. What does the model gain from this stacking?",
       "secenekler": [
-        "Attention transforms each token independently; the FFN carries information across tokens",
-        "Both carry information across tokens; the only difference between them is that the FFN is nonlinear",
-        "Attention carries information across tokens; the FFN applies the same network to each position",
-        "The FFN learns different weights for each position; attention shares weights across all positions"
+        "Each block reads a new part of the text, so long inputs fit",
+        "Each block makes the sequence shorter, until one vector is left",
+        "Each block holds one head, so stacking gives the model more views",
+        "Each block adds more context, so token vectors grow richer"
       ],
-      "dogru": 2,
-      "aciklama": "Attention is the 'tokens talk' step, where information comes from other positions; the FFN does not select other tokens and applies the same nonlinear transformation position by position. The first option reverses the roles, a common confusion; the FFN does not learn position-specific weights, and the 'same FFN' is shared across all positions."
+      "dogru": 3,
+      "aciklama": "In every block the tokens share information again and then improve it, so the vectors carry more and more context. The sequence length stays the same through the whole stack, so no block makes it shorter."
     },
     {
       "id": "d2-12",
       "konu": "Attention mask and causal self-attention",
-      "zorluk": 3,
-      "slayt": 23,
-      "soru": "Why is the causal mask applied by adding −∞ to the scores before softmax, instead of setting the unwanted weights to zero after softmax?",
+      "zorluk": 2,
+      "slayt": 22,
+      "soru": "Model A labels each word of a finished sentence. Model B writes a reply one token at a time. Why can only model A use full attention?",
       "secenekler": [
-        "Because softmax cannot process positive scores unless the future scores are made negative first",
-        "Because adding −∞ removes the future tokens from the sequence, so the score matrix gets smaller",
-        "Because −∞ flips the order of the scores, so that earlier tokens always outweigh the later tokens",
-        "Because softmax then gives blocked positions weight 0 while the allowed weights still sum to 1"
+        "Model A has the whole text, but model B must not see later tokens",
+        "Model A has short texts, so looking both ways costs very little",
+        "Model B needs its position signal, and full attention would erase it",
+        "Model A learns by next-token prediction, which needs both directions"
       ],
-      "dogru": 3,
-      "aciklama": "Softmax maps −∞ to weight 0, so future value vectors contribute nothing, and since normalization happens afterwards the allowed positions still form a proper distribution; zeroing after softmax would leave weights that no longer sum to 1. The mask does not delete tokens or shrink the matrix; it only blocks their influence."
+      "dogru": 0,
+      "aciklama": "Full attention is fine when the whole input is given and no next token must be guessed. The rule is about cheating, not cost, because model B could copy the next token if it saw later ones."
     },
     {
       "id": "d2-13",
       "konu": "Attention mask and causal self-attention",
-      "zorluk": 2,
-      "slayt": 22,
-      "soru": "While training a decoder-only model, the shifted-right target positions are computed in parallel; what happens if the causal mask is accidentally not applied?",
+      "zorluk": 3,
+      "slayt": 25,
+      "soru": "In training, a decoder handles all positions of a sentence at once. But when it writes new text, it makes one token per step. Why?",
       "secenekler": [
-        "Training can no longer be parallelized; tokens must be generated one by one as in inference",
-        "Each position sees the next token it is supposed to predict directly through attention; the model 'cheats'",
-        "Cross-attention can no longer access the encoder output; the source sentence information is completely lost",
-        "Softmax weights can become negative; training becomes numerically unstable"
+        "The causal mask is turned off when writing, so the work must slow down",
+        "Later tokens depend on earlier ones, and those must be chosen first",
+        "The encoder must run again from the start before each new token",
+        "The FFN works on one position at a time, so the tokens must take turns"
       ],
       "dogru": 1,
-      "aciklama": "In training, all target positions are computed in parallel, so ensuring that position t does not see positions > t is achieved only by the causal mask; without it, the model reads the next token directly and next-token prediction becomes meaningless. The claim that parallelism would break is backwards: the mask does not prevent parallelism, it is the rule that makes parallel training possible."
+      "aciklama": "In training the whole target text is already known, so all positions can run at once under a causal mask. When writing, each next token is known only after the one before it is chosen, and the mask stays on in both cases."
     },
     {
       "id": "d2-14",
       "konu": "Encoder–decoder structure and cross-attention",
       "zorluk": 2,
       "slayt": 26,
-      "soru": "During translation, when the decoder predicts the token 'ours', where do Q, K and V in cross-attention come from?",
+      "soru": "A translation model has an encoder for the source text and a decoder for the target text. Which problem does cross-attention solve?",
       "secenekler": [
-        "Q, K and V all come from the decoder's current target-prefix state",
-        "Q comes from the encoder memory H_enc; K and V come from the decoder prefix state",
-        "Q comes from the decoder state h_t; K and V come from the encoder output H_enc",
-        "Q and K come from the decoder; V comes from the raw token embeddings of the source sentence"
+        "It lets each source word look at the other source words",
+        "It gives each target position a signal for its place in the output",
+        "It lets each target position look up the useful source words",
+        "It lets each target position look at the earlier target words"
       ],
       "dogru": 2,
-      "aciklama": "Q = h_t W_Q (decoder), K = H_enc W_K and V = H_enc W_V (encoder); the decoder asks 'what should I fetch', the source states match it and supply the content. All three coming from the same sequence is the definition of self-attention, not of cross-attention."
+      "aciklama": "In cross-attention the query comes from the decoder, and the keys and values come from the encoder, so the target side can get source information. Looking at earlier target words is the job of masked self-attention."
     },
     {
       "id": "d2-15",
       "konu": "Encoder–decoder structure and cross-attention",
       "zorluk": 3,
-      "slayt": 25,
-      "soru": "When running inference with an encoder–decoder Transformer, which statement is correct at each new target-token generation step?",
+      "slayt": 26,
+      "soru": "When a GPT-style model answers a prompt, how do the answer tokens get information from the prompt?",
       "secenekler": [
-        "H_enc is computed once and reused at every step; the decoder takes the growing target prefix",
-        "The source sentence is fed to the decoder again at every step and the encoder stack is rerun from scratch",
-        "The decoder takes only the state of the last source token from the encoder and uses only that",
-        "The decoder generates the entire target sentence at once, fully in parallel, without a causal mask"
+        "An encoder reads the prompt first, and cross-attention brings it to the answer",
+        "The causal mask hides the prompt, so the answer uses only its own tokens",
+        "The FFN stores the whole prompt, and each answer token reads it there",
+        "The prompt is earlier in the same sequence, so attention looks back at it"
       ],
-      "dogru": 0,
-      "aciklama": "H_enc is reused at every decoder step; the decoder's input is not the source sentence but the target prefix, which grows by one token at each step (<BOS> → <BOS> Un → ...). Computing the whole target in parallel at once is the training view (under a causal mask), not the inference view."
+      "dogru": 3,
+      "aciklama": "A GPT-style model is only a decoder, so the prompt and the answer form one sequence, and each answer token can attend to all earlier tokens. Cross-attention needs a separate encoder, and this kind of model does not have one."
     },
     {
       "id": "d2-16",
       "konu": "Model families: BERT, GPT, T5 and MLM",
-      "zorluk": 3,
-      "slayt": 29,
-      "soru": "What is the rationale for training BERT with Masked Language Modeling (MLM) rather than ordinary next-token prediction?",
+      "zorluk": 2,
+      "slayt": 28,
+      "soru": "Most chatbots are built on decoder-only, GPT-style models. Why does this design fit a model that writes long answers?",
       "secenekler": [
-        "MLM allows the encoder to change the sequence length from layer to layer, unlike decoders",
-        "Next-token prediction is defined only in encoder–decoder models that contain cross-attention",
-        "MLM makes the causal mask unnecessary, so training parallelizes faster than in decoders",
-        "A bidirectional encoder sees the right context, so next-token prediction would be trivial"
+        "It reads the whole input in both directions before it starts writing",
+        "It learns to predict the next token, which is exactly how it writes",
+        "It looks up a separate encoder memory through cross-attention layers",
+        "It learns to fill in hidden words in the middle of a given text"
       ],
-      "dogru": 3,
-      "aciklama": "The encoder uses full self-attention, so both left and right context are visible; asking it to predict the next token would lead to 'cheating', so the target information is hidden from the input with [MASK]. The claim that 'it parallelizes faster because the causal mask is unnecessary' is misleading: decoder-only training is also parallel under a causal mask."
+      "dogru": 1,
+      "aciklama": "A decoder-only model is trained to predict each next token from the ones before it, and writing an answer repeats that task. Reading in both directions is what encoder-only models do, and it would show them the words they should predict."
     },
     {
       "id": "d2-17",
       "konu": "Model families: BERT, GPT, T5 and MLM",
-      "zorluk": 1,
-      "slayt": 28,
-      "soru": "A team will choose a single pretrained model for NER, extractive QA and text embedding generation. which family is best suited to this use?",
+      "zorluk": 3,
+      "slayt": 29,
+      "soru": "BERT hides some input words and trains the model to guess them. What would happen if every word stayed visible during this training?",
       "secenekler": [
-        "Encoder-only (BERT-style): bidirectional self-attention, masked-token prediction",
-        "Decoder-only (GPT-style): causal self-attention, left-to-right next-token prediction",
-        "Encoder–decoder (T5-style): encoder + decoder with cross-attention, text-to-text",
-        "Decoder-only with the causal mask removed: bidirectional next-token prediction"
+        "The model could just copy each word, because it can already see it",
+        "The model could no longer see the words to the right of each word",
+        "The attention cost would grow, since no word is skipped in the scores",
+        "The model would lose the order of the words in the sentence"
       ],
       "dogru": 0,
-      "aciklama": "Encoder-only BERT-style models read the whole input bidirectionally, produce a contextual representation for each token, and are used for classification, retrieval, NER, extractive QA and embeddings. The decoder-only family is for open-ended generation; next-token prediction with the causal mask removed 'cheats' and is not a valid training setup."
+      "aciklama": "An encoder sees the whole input in both directions, so a visible word would show the model its own answer. Hiding words does not limit the view to one side, because the model still sees context on the left and on the right."
     },
     {
       "id": "d2-18",
       "konu": "Real-scale dimensions and attention cost",
-      "zorluk": 3,
+      "zorluk": 2,
       "slayt": 30,
-      "soru": "Standard self-attention is valued for letting any token interact directly with any other. Why does this same property become a burden as the context gets longer?",
+      "soru": "Many chat tools limit how long the input can be. Which feature of standard attention best explains why long inputs are expensive?",
       "secenekler": [
-        "Each token needs its own feed-forward network, so the parameter count grows with the square of the length",
-        "Every query is scored against every key, so the score count grows quadratically with sequence length",
-        "Every block must be repeated once per token, so the depth of the stack grows linearly with the length",
-        "Each position needs its own learned key matrix, so the projection weights grow with sequence length"
+        "Each token is read only after the one before it, so long texts take long",
+        "Each token adds one more attention head, so heads grow with the length",
+        "Each token gets a score with every other token, so work grows very fast",
+        "Each token needs its own embedding table, so memory grows with the length"
       ],
-      "dogru": 1,
-      "aciklama": "Direct token-to-token paths exist because every query is compared with every key, which gives a pairwise score matrix that grows quadratically: doubling the tokens gives about four times the scores. The feed-forward option is wrong because the same network is shared across positions, so its parameters do not depend on length."
+      "dogru": 2,
+      "aciklama": "Standard attention scores every query against every key, so the number of scores grows much faster than the length. Reading tokens one after another is how an RNN works, and attention handles all positions in parallel."
     }
   ]
 }
