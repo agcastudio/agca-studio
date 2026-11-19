@@ -16,6 +16,12 @@
   const etiketMetni = d => d.kod ? `Daire ${d.no} · ${malikAdi(d)}` : basliklar(d)[0];
   const alanBilgisi = d => { const b = (P.daireBilgileri || {})[d.no] || {}; return { net: b.net ?? null, brut: b.brut ?? d.alan ?? null }; };
   const m2 = v => v == null ? "—" : v.toLocaleString("tr-TR", { maximumFractionDigits: 2 }) + " m²";
+  // Bölüm rengi üstünde okunur yazı rengi (açık zeminde koyu, koyu zeminde beyaz)
+  const yaziRengi = h => {
+    if (!h) return "";
+    const n = parseInt(h.slice(1), 16), r = n >> 16 & 255, g = n >> 8 & 255, b = n & 255;
+    return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > 0.6 ? "#18222d" : "#fff";
+  };
   const NS = "http://www.w3.org/2000/svg";
   function el(tag, at, ebeveyn, metin) {
     const e = document.createElementNS(NS, tag);
@@ -48,8 +54,9 @@
           const a = alanBilgisi(d), [bas1, bas2] = basliklar(d);
           const alt = [!d.kod && bas2, d.kod && d.kod + " tipi", d.cephe,
             a.net != null && "Net " + m2(a.net), a.brut != null && "Brüt " + m2(a.brut)].filter(Boolean).join(" · ");
-          const b = document.createElement("button"); b.className = "daire-btn"; b.dataset.no = d.no;
-          b.innerHTML = `<b>${d.no}</b><span>${esc(bas1)}<small>${esc(alt || d.katAdi)}</small></span>`;
+          const b = document.createElement("button"); b.className = "daire-btn"; b.dataset.no = d.no; b.dataset.renk = d.renk || "";
+          const rozet = d.renk ? ` style="background:${d.renk};color:${yaziRengi(d.renk)}"` : "";
+          b.innerHTML = `<b${rozet}>${d.no}</b><span>${esc(bas1)}<small>${esc(alt || d.katAdi)}</small></span>`;
           b.onclick = () => goster(d.no);
           ic.appendChild(b);
         });
@@ -59,6 +66,7 @@
     function isaretle(kaydir) {
       document.querySelectorAll(".daire-btn").forEach(b => {
         const s = Number(b.dataset.no) === aktifNo; b.classList.toggle("secili", s);
+        b.style.boxShadow = s && b.dataset.renk ? "inset 4px 0 0 " + b.dataset.renk : "";
         if (s && kaydir) b.scrollIntoView({ block: "nearest", behavior: "smooth" });
       });
     }
@@ -77,6 +85,8 @@
       $("kCepheKutu").style.display = d.cephe ? "" : "none";
       $("kNet").textContent = m2(a.net);
       $("kBrut").textContent = m2(a.brut);
+      $("kRenk").style.background = d.renk || "";
+      $("kUst").style.color = d.renkKoyu || "";
       $("kart").classList.remove("gizli");
       planCiz(d); kesitCiz(d); isaretle(true);
       zamanlayiciKur();
@@ -96,13 +106,14 @@
       const pts = n => n.map(p => p[0].toFixed(2) + "," + p[1].toFixed(2)).join(" ");
       v.gri.forEach(n => el("polygon", { points: pts(n), fill: "#c9cfd6" }, s));
       v.poligonlar.forEach(p => {
-        el("polygon", { points: pts(p.noktalar), fill: p.secili ? "#f0641e" : "#fff",
-          stroke: p.secili ? "#9c3a08" : "#9aa5b1", "stroke-width": o * 0.01 }, s);
+        el("polygon", { points: pts(p.noktalar), fill: p.renk || (p.secili ? "#f0641e" : "#fff"),
+          "fill-opacity": p.renk && !p.secili ? 0.4 : 1,
+          stroke: p.secili ? "#18222d" : "#9aa5b1", "stroke-width": o * (p.secili ? 0.016 : 0.01) }, s);
         if (p.etiket) {
           const cx = p.noktalar.reduce((a, q) => a + q[0], 0) / p.noktalar.length;
           const cz = p.noktalar.reduce((a, q) => a + q[1], 0) / p.noktalar.length;
           el("text", { x: cx, y: cz + o * 0.04, "text-anchor": "middle", "font-size": o * 0.12, "font-weight": 700,
-            fill: p.secili ? "#fff" : "#5d6977" }, s, p.etiket);
+            fill: p.secili ? (p.renk ? yaziRengi(p.renk) : "#fff") : "#18222d" }, s, p.etiket);
         }
       });
       el("rect", { x: x0 - pay, y: yolY, width: x1 - x0 + 2 * pay, height: yolH, fill: "#59616a" }, s);
@@ -115,7 +126,7 @@
       el("rect", { x: 0, y: Y(0), width: 40, height: 1.2, fill: "#59616a" }, s);
       if (K[0].kot > 0.05) el("rect", { x: 20, y: Y(K[0].kot), width: 18, height: K[0].kot, fill: "#cdd2d7" }, s);
       K.forEach((k, i) => el("rect", { x: 20, y: Y(k.kot + k.yukseklik), width: 18, height: k.yukseklik,
-        fill: (d.kler || [d.k]).includes(i) ? o : "#fff", stroke: "#9aa5b1", "stroke-width": 0.15 }, s));
+        fill: (d.kler || [d.k]).includes(i) ? (d.renk || o) : "#fff", stroke: "#9aa5b1", "stroke-width": 0.15 }, s));
       const son = K[K.length - 1], tepe = son.kot + son.yukseklik;
       if (S.kesit.ust > tepe + 0.3) el("polygon", { points: `20,${Y(tepe)} 38,${Y(tepe)} 29,${Y(S.kesit.ust)}`, fill: "#d9dde2" }, s);
     }
@@ -130,6 +141,7 @@
       et.style.opacity = p.gorunur ? 1 : 0;
       et.style.left = p.x + "px"; et.style.top = p.y + "px";
       et.textContent = etiketMetni(d);
+      et.style.setProperty("--ok", d.renk || "#f0641e"); et.style.color = d.renk ? yaziRengi(d.renk) : "";
     });
 
     // ---------- Gezinme / sunum modu ----------

@@ -63,16 +63,25 @@ window.BINA_MODEL = function (ctx) {
         // ---------- Bölüm hacimleri ----------
         const katListesi = V.katlar.filter(k => !haric.has(k.id));
         const katIndeks = id => katListesi.findIndex(k => k.id === id);
-        const yeniMalzeme = () => new THREE.MeshStandardMaterial({
-          color: TURUNCU, emissive: TURUNCU, emissiveIntensity: 0.25, roughness: 0.6, transparent: true, opacity: 0.92
+        const yeniMalzeme = renk => new THREE.MeshStandardMaterial({
+          color: renk, emissive: renk, emissiveIntensity: 0.05, roughness: 0.8
         });
-        function hacim(taban, kat, m, no) {
+        // Sade palet: düşük doygunluklu, eşit açıklıkta 10 ton (tozlu kırmızı, kil, hardal, adaçayı, nane, petrol,
+        // tozlu mavi, çivit, lavanta, gülkurusu). Sırayla 3'er adım atlanır: aynı kattaki ardışık numaralar
+        // birbirinden uzak tonlar alır. veri.js'te renkPaleti ile palet, daireBilgileri[no].renk ile tek bölüm değişir.
+        const PALET = P.renkPaleti || ["#c48b8b", "#c79a73", "#c2b26e", "#95b07f", "#7fae98",
+                                       "#6fa7a7", "#7f9dbd", "#8e8fc2", "#a98bbd", "#bf8aa8"];
+        const renkVer = (no, i) => {
+          const ozel = ((P.daireBilgileri || {})[no] || {}).renk;
+          return new THREE.Color(ozel || PALET[(i * 3) % PALET.length]);
+        };
+        function hacim(taban, kat, m, no, kenarRenk) {
           const shape = new THREE.Shape(taban.map(([x, z]) => new THREE.Vector2(x, z)));
           const h = kat.yukseklik - 0.35, y0 = kat.kot - yolKotu + 0.03;
           const g = new THREE.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false });
           g.rotateX(Math.PI / 2);          // (x, Zplan, d) -> (x, -d, Zplan)
           g.translate(0, y0 + h, 0);        // hacim y0..y0+h aralığında
-          const kenarMat = new THREE.LineBasicMaterial({ color: 0x9c3a08, transparent: true });
+          const kenarMat = new THREE.LineBasicMaterial({ color: kenarRenk, transparent: true });
           const mesh = new THREE.Mesh(g, m);
           mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 20), kenarMat));
           mesh.visible = false;             // r128 Raycaster görünmez mesh'e de çarpar: tıklayınca seçilir
@@ -88,10 +97,11 @@ window.BINA_MODEL = function (ctx) {
           : katListesi.map((k, i) => ({ no: i + 1, ad: k.ad, tumKat: true, alan: k.alan, parcalar: [{ katId: k.id, taban: k.taban }] }));
 
         const daireler = [];
-        kaynak.filter(b => b.parcalar.length).forEach(b => {
-          const m = yeniMalzeme(), hedefler = [], kenarlar = [], kutuB = new THREE.Box3();
+        kaynak.filter(b => b.parcalar.length).forEach((b, i) => {
+          const renk = renkVer(b.no, i), koyu = renk.clone().offsetHSL(0, 0, -0.25);
+          const m = yeniMalzeme(renk), hedefler = [], kenarlar = [], kutuB = new THREE.Box3();
           b.parcalar.forEach(p => {
-            const h = hacim(p.taban, katListesi[katIndeks(p.katId)], m, b.no);
+            const h = hacim(p.taban, katListesi[katIndeks(p.katId)], m, b.no, koyu);
             hedefler.push(h.mesh); kenarlar.push(h.kenarMat); kutuB.union(h.kutu);
           });
           const kler = [...new Set(b.parcalar.map(p => katIndeks(p.katId)))].sort((x, y) => x - y);
@@ -103,6 +113,7 @@ window.BINA_MODEL = function (ctx) {
             dosemeY: alt.kot - yolKotu, yukseklik: alt.yukseklik,
             merkez, ust: new THREE.Vector3(merkez.x, kutuB.max.y + 0.5, merkez.z), onZ: kutuB.max.z,
             hedefler, malzeme: m, kenarlar, parcalar: b.parcalar,
+            renk: "#" + renk.getHexString(), renkKoyu: "#" + koyu.getHexString(),
             varsayilanAd: b.tumKat ? b.ad + " (tüm kat)" : b.ad,
             katId: alt.id, katIdleri: kler.map(i => katListesi[i].id)
           });
@@ -114,21 +125,22 @@ window.BINA_MODEL = function (ctx) {
         const boyut = bmax.clone().sub(bmin);
         const bina = { min: bmin, max: bmax, merkez: bmin.clone().add(bmax).multiplyScalar(0.5) };
 
+        // Genel görünüm: tüm bölümler kendi renginde, bina kabuğu saydam.
+        // Seçimde: seçili bölüm tam renk, aynı kattakiler yarı saydam, diğer katlar çok soluk.
         function vurgula(secili) {
           const katlar = new Set(secili ? secili.katIdleri : []);
           daireler.forEach(d => {
             const s = d === secili, ayniKat = !s && d.katIdleri.some(k => katlar.has(k));
-            d.hedefler.forEach(h => { h.visible = s || ayniKat; });
-            d.malzeme.color.set(s ? TURUNCU : 0xffffff); d.malzeme.emissive.set(s ? TURUNCU : 0x000000);
-            d.malzeme.opacity = s ? 0.92 : 0.28; d.malzeme.depthWrite = s; d.malzeme.needsUpdate = true;
-            d.kenarlar.forEach(k => { k.color.set(s ? 0x9c3a08 : 0x7d8996); k.opacity = s ? 1 : 0.7; });
+            const op = !secili || s ? 1 : ayniKat ? 0.35 : 0.08;
+            d.hedefler.forEach(h => { h.visible = true; h.castShadow = op === 1; });
+            const m = d.malzeme;
+            m.opacity = op; m.transparent = op < 1; m.depthWrite = op === 1; m.emissiveIntensity = s ? 0.15 : 0.05; m.needsUpdate = true;
+            d.kenarlar.forEach(k => { k.opacity = !secili ? 0.6 : s ? 1 : 0.2; });
           });
           parcalar.forEach(p => {
             let op = 1;
-            if (secili) {
-              if (binaMi(p.kategori)) op = katlar.has(p.kat) ? 0.3 : 0.1;
-              else if (p.kategori === "komsu") op = 0.18;
-            }
+            if (binaMi(p.kategori)) op = !secili ? (bolumlu ? 0.2 : 1) : katlar.has(p.kat) ? 0.25 : 0.08;
+            else if (p.kategori === "komsu" && secili) op = 0.18;
             p.m.opacity = op; p.m.transparent = op < 1; p.m.depthWrite = op === 1; p.m.needsUpdate = true;
             p.o.castShadow = op === 1 && p.golge;
           });
@@ -138,7 +150,7 @@ window.BINA_MODEL = function (ctx) {
         function plan(d) {
           const poligonlar = [];
           daireler.forEach(x => x.parcalar.filter(p => p.katId === d.katId).forEach(p =>
-            poligonlar.push({ noktalar: p.taban, secili: x === d, etiket: bolumlu ? String(x.no) : "" })));
+            poligonlar.push({ noktalar: p.taban, secili: x === d, etiket: bolumlu ? String(x.no) : "", renk: x.renk })));
           const kat = katListesi[d.k];
           return { poligonlar, gri: kat && kat.dis ? [kat.dis] : [] };
         }

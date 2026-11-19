@@ -47,6 +47,7 @@ window.PROJE = {
   malikler: {},
 
   // BB no -> net / brüt alan (m²). null = henüz girilmedi, kartta "—" görünür. Örnek: 14: { net: 98.40, brut: 126.30 }
+  // Bölüm renkleri otomatik atanır; istenirse tek tek verilebilir: 14: { net: 98.40, brut: 126.30, renk: "#1f77b4" }
   daireBilgileri: {
      1: { net: null, brut: null },   2: { net: null, brut: null },   3: { net: null, brut: null },
      4: { net: null, brut: null },   5: { net: null, brut: null },   6: { net: null, brut: null },

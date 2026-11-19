@@ -140,7 +140,7 @@
       kam.hedef.z + kam.r * sp * Math.cos(kam.teta));
     camera.lookAt(kam.hedef);
     if (secili) {
-      if (secili.malzeme) secili.malzeme.emissiveIntensity = 0.22 + 0.14 * Math.sin(zaman * 3);
+      if (secili.malzeme) secili.malzeme.emissiveIntensity = (S.modelVar ? 0.12 : 0.22) + (S.modelVar ? 0.08 : 0.14) * Math.sin(zaman * 3);
       olcuSimdi += (olcuHedef - olcuSimdi) * (1 - Math.exp(-dt * 2.5));
       const y = Math.max(0.01, olcuSimdi);
       cubuk.scale.y = y; cubuk.position.y = y / 2; ustCizgi.position.y = y;

@@ -21,7 +21,8 @@
     box-shadow:var(--shadow);transition:opacity .3s}
   .etiket::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;
     border:6px solid transparent;border-bottom:0;border-top-color:var(--ink)}
-  .etiket.vurgu{background:var(--accent)} .etiket.vurgu::after{border-top-color:var(--accent)}
+  .etiket.vurgu{background:var(--ok,var(--accent))} .etiket.vurgu::after{border-top-color:var(--ok,var(--accent))}
+  .renk-nokta{display:inline-block;width:16px;height:16px;border-radius:5px;margin-right:10px;vertical-align:-1px;background:var(--accent)}
   .etiket.olcu{transform:translate(8px,-50%);background:#fff;color:var(--ink);border:2px solid var(--accent);
     font-size:15px} .etiket.olcu::after{display:none}
   .etiket.yol{transform:translate(-50%,-50%);background:#2b333c;font-size:12px;letter-spacing:.08em}
@@ -43,7 +44,7 @@
   .daire-btn{display:flex;width:100%;gap:10px;align-items:center;text-align:left;border:0;background:none;
     padding:8px;border-radius:8px;font:inherit;font-size:14px;color:var(--ink);cursor:pointer}
   .daire-btn:hover{background:#f1f4f7}
-  .daire-btn.secili{background:var(--accent-soft)}
+  .daire-btn.secili{background:#eef2f6;font-weight:600}
   .daire-btn b{min-width:34px;height:28px;border-radius:6px;background:#e7ecf1;display:grid;place-items:center;font-size:13px}
   .daire-btn.secili b{background:var(--accent);color:#fff}
   .daire-btn span small{display:block;color:var(--muted);font-size:12px}
@@ -96,7 +97,7 @@
 
 <section id="kart" class="gizli" aria-live="polite">
   <div class="ust" id="kUst">A Blok · Daire 14</div>
-  <h2 id="kAd">Malik</h2>
+  <h2><i id="kRenk" class="renk-nokta"></i><span id="kAd">Malik</span></h2>
   <div class="alt" id="kAlt">3. Kat · B tipi</div>
   <div class="bilgi">
     <div>Kat<b id="kKat"></b></div>
