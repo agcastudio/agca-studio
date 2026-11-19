@@ -41,6 +41,9 @@
   }
   const zemin = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), mat(0xe1e5de));
   zemin.rotation.x = -Math.PI / 2; zemin.position.y = -0.02; zemin.receiveShadow = true; scene.add(zemin);
+  function zeminSaydam(ac) { // bodrumdaki bölüm seçilince zeminin altı görünsün
+    const m = zemin.material; m.transparent = ac; m.opacity = ac ? 0.35 : 1; m.depthWrite = !ac; m.needsUpdate = true;
+  }
 
   const modelVar = !!(window.MODEL && window.BINA_MODEL && THREE.GLTFLoader);
   if (window.MODEL && !modelVar) console.warn("Model var ama yükleyici eksik; örnek bina gösteriliyor.");
@@ -66,7 +69,7 @@
 
   function genel() {
     if (!R) return;
-    secili = null; R.vurgula(null); olcu.visible = false;
+    secili = null; R.vurgula(null); olcu.visible = false; zeminSaydam(false);
     const c = R.bina.merkez;
     ist.hedef.set(c.x, R.bina.max.y * 0.42, c.z + 4);
     ist.r = R.olcek * 3.2; ist.fi = 1.16;
@@ -77,10 +80,12 @@
     const c = R.bina.merkez;
     const sx = Math.sign(Math.round(d.merkez.x - c.x)), on = d.merkez.z >= c.z - 0.01;
     tabanTeta = on ? (sx === 0 ? 0.45 : sx * 0.55) : (sx === 0 ? Math.PI - 0.45 : sx * (Math.PI / 2 + 0.35));
-    if (modelVar) tabanTeta = 0.25; // bitişik nizam: kamera ön (yol) cephesinde kalsın
-    ist.teta = tabanTeta; ist.fi = 1.22;
+    if (R.yonlu) tabanTeta = 0.25; // bitişik nizam: kamera ön (yol) cephesinde kalsın
+    const bodrum = d.dosemeY < -0.5;
+    zeminSaydam(bodrum);
+    ist.teta = tabanTeta; ist.fi = bodrum ? 1.0 : 1.22;
     const yZ = R.yol ? R.yol.yakinZ : d.onZ + 8;
-    ist.hedef.set(d.merkez.x * 0.5, Math.max(d.dosemeY * 0.55, 0) + 3, (d.onZ + yZ) * 0.3);
+    ist.hedef.set(d.merkez.x * 0.5, bodrum ? d.dosemeY + 1.5 : Math.max(d.dosemeY * 0.55, 0) + 3, (d.onZ + yZ) * 0.3);
     ist.r = R.olcek * 1.8 + d.dosemeY * 0.6;
     olcu.position.set(d.merkez.x, 0, yZ + 0.8);
     olcuSimdi = 0; olcuHedef = d.dosemeY; kilavuzUzunluk = olcu.position.z - d.onZ;
@@ -124,8 +129,8 @@
   function kare(simdi) {
     const dt = Math.min(0.05, (simdi - onceki) / 1000); onceki = simdi; zaman += dt;
     if (S.otomatik) {
-      if (secili) ist.teta = tabanTeta + (modelVar ? 0.3 : 0.45) * Math.sin(zaman * 0.4);
-      else ist.teta = modelVar ? 0.2 + 0.7 * Math.sin(zaman * 0.15) : ist.teta + dt * 0.12;
+      if (secili) ist.teta = tabanTeta + (R.yonlu ? 0.3 : 0.45) * Math.sin(zaman * 0.4);
+      else ist.teta = R.yonlu ? 0.2 + 0.7 * Math.sin(zaman * 0.15) : ist.teta + dt * 0.12;
     }
     const k = 1 - Math.exp(-dt * 2.2);
     kam.hedef.lerp(ist.hedef, k); kam.r += (ist.r - kam.r) * k; kam.fi += (ist.fi - kam.fi) * k;

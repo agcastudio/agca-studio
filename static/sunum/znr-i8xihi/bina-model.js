@@ -1,5 +1,6 @@
 // Revit/IFC modelinden bina kurucusu (model/model.js -> window.MODEL).
 // Dünya düzeni: Y yukarı, yol (asfalt) yüzeyi y = 0, +Z yol tarafı. Model Y'si ±0.00'a göredir -> -yolKotu kaydırılır.
+// Modelde oda (IfcSpace) varsa her bağımsız bölüm ayrı seçilir; yoksa her kat tek bölüm olur.
 window.BINA_MODEL = function (ctx) {
   const { P, scene, mat, kutu, agac, TURUNCU } = ctx;
   const A = P.modelAyarlari || {};
@@ -52,43 +53,58 @@ window.BINA_MODEL = function (ctx) {
         if (V.yol) {
           const en = V.yol.uzakZ - V.yol.yakinZ, zOrta = (V.yol.yakinZ + V.yol.uzakZ) / 2;
           const asfalt = new THREE.Mesh(new THREE.PlaneGeometry(200, en), mat(0x59616a));
-          asfalt.rotation.x = -Math.PI / 2;
-          asfalt.position.set(0, 0.15, zOrta);
-          asfalt.receiveShadow = true;
+          asfalt.rotation.x = -Math.PI / 2; asfalt.position.set(0, 0.15, zOrta); asfalt.receiveShadow = true;
           scene.add(asfalt);
           const serit = new THREE.MeshBasicMaterial({ color: 0xf3f3ef });
           for (let x = -98; x <= 98; x += 7) kutu(3.2, 0.02, 0.22, serit, x, 0.16, zOrta, false);
         }
-
-        // ---------- Ağaçlar (Lombardy kavağı -> dik, ince taç) ----------
         (V.agaclar || []).forEach(([x, z]) => agac(x, z, 1.2, 2.6));
 
-        // ---------- Daireler: her dahil kat bir bölüm (vurgu hacmi) ----------
-        const daireler = [];
-        V.katlar.filter(k => !haric.has(k.id)).forEach((k, i) => {
-          const shape = new THREE.Shape(k.taban.map(([x, z]) => new THREE.Vector2(x, z)));
-          const h = k.yukseklik - 0.35;
-          const y0 = k.kot - yolKotu + 0.03;
+        // ---------- Bölüm hacimleri ----------
+        const katListesi = V.katlar.filter(k => !haric.has(k.id));
+        const katIndeks = id => katListesi.findIndex(k => k.id === id);
+        const yeniMalzeme = () => new THREE.MeshStandardMaterial({
+          color: TURUNCU, emissive: TURUNCU, emissiveIntensity: 0.25, roughness: 0.6, transparent: true, opacity: 0.92
+        });
+        function hacim(taban, kat, m, no) {
+          const shape = new THREE.Shape(taban.map(([x, z]) => new THREE.Vector2(x, z)));
+          const h = kat.yukseklik - 0.35, y0 = kat.kot - yolKotu + 0.03;
           const g = new THREE.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false });
           g.rotateX(Math.PI / 2);          // (x, Zplan, d) -> (x, -d, Zplan)
           g.translate(0, y0 + h, 0);        // hacim y0..y0+h aralığında
-          const m = new THREE.MeshStandardMaterial({
-            color: TURUNCU, emissive: TURUNCU, emissiveIntensity: 0.25, roughness: 0.6, transparent: true, opacity: 0.92
-          });
+          const kenarMat = new THREE.LineBasicMaterial({ color: 0x9c3a08, transparent: true });
           const mesh = new THREE.Mesh(g, m);
-          mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 20), new THREE.LineBasicMaterial({ color: 0x9c3a08 })));
-          mesh.visible = false;             // r128 Raycaster görünmez mesh'e de çarpar: kata tıklayınca seçilir
-          const no = i + 1;
+          mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 20), kenarMat));
+          mesh.visible = false;             // r128 Raycaster görünmez mesh'e de çarpar: tıklayınca seçilir
           mesh.userData.no = no;
           scene.add(mesh);
           g.computeBoundingBox();
-          const bb = g.boundingBox, merkez = bb.getCenter(new THREE.Vector3());
+          return { mesh, kenarMat, kutu: g.boundingBox };
+        }
+
+        const bolumlu = !!(V.daireler && V.daireler.length);
+        const kaynak = bolumlu
+          ? V.daireler.map(b => ({ no: b.no, ad: b.ad, parcalar: b.parcalar.filter(p => katIndeks(p.katId) >= 0) }))
+          : katListesi.map((k, i) => ({ no: i + 1, ad: k.ad, tumKat: true, alan: k.alan, parcalar: [{ katId: k.id, taban: k.taban }] }));
+
+        const daireler = [];
+        kaynak.filter(b => b.parcalar.length).forEach(b => {
+          const m = yeniMalzeme(), hedefler = [], kenarlar = [], kutuB = new THREE.Box3();
+          b.parcalar.forEach(p => {
+            const h = hacim(p.taban, katListesi[katIndeks(p.katId)], m, b.no);
+            hedefler.push(h.mesh); kenarlar.push(h.kenarMat); kutuB.union(h.kutu);
+          });
+          const kler = [...new Set(b.parcalar.map(p => katIndeks(p.katId)))].sort((x, y) => x - y);
+          const alt = katListesi[kler[0]], merkez = kutuB.getCenter(new THREE.Vector3());
           daireler.push({
-            no, k: i, katAdi: k.ad, kod: "", cephe: "", alan: k.alan,
-            dosemeY: k.kot - yolKotu, yukseklik: k.yukseklik,
-            merkez, ust: new THREE.Vector3(merkez.x, bb.max.y + 0.5, merkez.z),
-            onZ: k.onZ, hedefler: [mesh], malzeme: m,
-            varsayilanAd: k.ad + " (tüm kat)", katId: k.id, taban: k.taban, dis: k.dis
+            no: b.no, k: kler[0], kler, tumKat: !!b.tumKat,
+            katAdi: kler.map(i => katListesi[i].ad).join(" + ") + (kler.length > 1 ? " (dubleks)" : ""),
+            kod: "", cephe: "", alan: b.alan || null,
+            dosemeY: alt.kot - yolKotu, yukseklik: alt.yukseklik,
+            merkez, ust: new THREE.Vector3(merkez.x, kutuB.max.y + 0.5, merkez.z), onZ: kutuB.max.z,
+            hedefler, malzeme: m, kenarlar, parcalar: b.parcalar,
+            varsayilanAd: b.tumKat ? b.ad + " (tüm kat)" : b.ad,
+            katId: alt.id, katIdleri: kler.map(i => katListesi[i].id)
           });
         });
 
@@ -99,11 +115,18 @@ window.BINA_MODEL = function (ctx) {
         const bina = { min: bmin, max: bmax, merkez: bmin.clone().add(bmax).multiplyScalar(0.5) };
 
         function vurgula(secili) {
-          daireler.forEach(d => { d.hedefler[0].visible = d === secili; });
+          const katlar = new Set(secili ? secili.katIdleri : []);
+          daireler.forEach(d => {
+            const s = d === secili, ayniKat = !s && d.katIdleri.some(k => katlar.has(k));
+            d.hedefler.forEach(h => { h.visible = s || ayniKat; });
+            d.malzeme.color.set(s ? TURUNCU : 0xffffff); d.malzeme.emissive.set(s ? TURUNCU : 0x000000);
+            d.malzeme.opacity = s ? 0.92 : 0.28; d.malzeme.depthWrite = s; d.malzeme.needsUpdate = true;
+            d.kenarlar.forEach(k => { k.color.set(s ? 0x9c3a08 : 0x7d8996); k.opacity = s ? 1 : 0.7; });
+          });
           parcalar.forEach(p => {
             let op = 1;
             if (secili) {
-              if (binaMi(p.kategori)) op = p.kat === secili.katId ? 0.35 : 0.1;
+              if (binaMi(p.kategori)) op = katlar.has(p.kat) ? 0.3 : 0.1;
               else if (p.kategori === "komsu") op = 0.18;
             }
             p.m.opacity = op; p.m.transparent = op < 1; p.m.depthWrite = op === 1; p.m.needsUpdate = true;
@@ -111,15 +134,21 @@ window.BINA_MODEL = function (ctx) {
           });
         }
 
+        // Mini plan: seçili bölümün (alt) katındaki tüm bölümler, seçili olan turuncu
         function plan(d) {
-          return { poligonlar: [{ noktalar: d.taban, secili: true, etiket: "" }], gri: [d.dis] };
+          const poligonlar = [];
+          daireler.forEach(x => x.parcalar.filter(p => p.katId === d.katId).forEach(p =>
+            poligonlar.push({ noktalar: p.taban, secili: x === d, etiket: bolumlu ? String(x.no) : "" })));
+          const kat = katListesi[d.k];
+          return { poligonlar, gri: kat && kat.dis ? [kat.dis] : [] };
         }
 
         coz({
           daireler, bina,
           olcek: Math.max(boyut.x, boyut.y, boyut.z),
+          yonlu: parcalar.some(p => p.kategori === "komsu"),   // bitişik nizam: kamera önde kalsın
           yol: V.yol ? { yakinZ: V.yol.yakinZ, uzakZ: V.yol.uzakZ } : null,
-          kesit: { katlar: daireler.map(d => ({ ad: d.katAdi, kot: d.dosemeY, yukseklik: d.yukseklik })), ust: bmax.y },
+          kesit: { katlar: katListesi.map(k => ({ ad: k.ad, kot: k.kot - yolKotu, yukseklik: k.yukseklik })), ust: bmax.y },
           vurgula, plan
         });
       } catch (e) { red(e); }

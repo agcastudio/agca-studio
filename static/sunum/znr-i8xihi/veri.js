@@ -43,6 +43,21 @@ window.PROJE = {
   // Daire numarası -> malik / hak sahibi adı.
   // Numaralama: zemin kat A=1, B=2, C=3, D=4; 1. kat A=5 ... şeklinde ilerler.
   // Girilmeyen daireler "Hak Sahibi (no)" olarak görünür.
-  // Revit modelinde şimdilik her kat tek bölüm: 1 = Zemin Kat, 2 = 1. Kat ... 6 = 5. Kat.
-  malikler: {}
+  // Bağımsız bölüm (BB) no -> hak sahibi adı. Girilmeyenlerde Revit'teki oda adı görünür.
+  malikler: {},
+
+  // BB no -> net / brüt alan (m²). null = henüz girilmedi, kartta "—" görünür. Örnek: 14: { net: 98.40, brut: 126.30 }
+  daireBilgileri: {
+     1: { net: null, brut: null },   2: { net: null, brut: null },   3: { net: null, brut: null },
+     4: { net: null, brut: null },   5: { net: null, brut: null },   6: { net: null, brut: null },
+     7: { net: null, brut: null },   8: { net: null, brut: null },   9: { net: null, brut: null },
+    10: { net: null, brut: null },  11: { net: null, brut: null },  12: { net: null, brut: null },
+    13: { net: null, brut: null },  14: { net: null, brut: null },  15: { net: null, brut: null },
+    16: { net: null, brut: null },  17: { net: null, brut: null },  18: { net: null, brut: null },
+    19: { net: null, brut: null },  20: { net: null, brut: null },  21: { net: null, brut: null },
+    22: { net: null, brut: null },  23: { net: null, brut: null },  24: { net: null, brut: null },
+    25: { net: null, brut: null },  26: { net: null, brut: null },  27: { net: null, brut: null },
+    28: { net: null, brut: null },  29: { net: null, brut: null },  30: { net: null, brut: null },
+    31: { net: null, brut: null },  32: { net: null, brut: null },  33: { net: null, brut: null }
+  }
 };

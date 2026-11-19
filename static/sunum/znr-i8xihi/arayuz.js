@@ -7,7 +7,15 @@
   const f2 = v => (v >= 0 ? "+" : "") + sayi(v, 2) + " m";
   const malikVar = d => !!(P.malikler && P.malikler[d.no]);
   const malikAdi = d => malikVar(d) ? P.malikler[d.no] : d.varsayilanAd;
-  const etiketMetni = d => d.kod ? `Daire ${d.no} · ${malikAdi(d)}` : (malikVar(d) ? `${d.katAdi} · ${P.malikler[d.no]}` : d.katAdi);
+  // [başlık, alt başlık]: örnek bina "Hak Sahibi", Revit odaları "Bağımsız Bölüm No:N", odasız model kat adı
+  function basliklar(d) {
+    if (d.kod) return [malikAdi(d), d.katAdi + " · " + d.kod + " tipi daire"];
+    const ad = d.tumKat ? d.katAdi : d.varsayilanAd;
+    return malikVar(d) ? [P.malikler[d.no], ad] : [ad, ""];
+  }
+  const etiketMetni = d => d.kod ? `Daire ${d.no} · ${malikAdi(d)}` : basliklar(d)[0];
+  const alanBilgisi = d => { const b = (P.daireBilgileri || {})[d.no] || {}; return { net: b.net ?? null, brut: b.brut ?? d.alan ?? null }; };
+  const m2 = v => v == null ? "—" : v.toLocaleString("tr-TR", { maximumFractionDigits: 2 }) + " m²";
   const NS = "http://www.w3.org/2000/svg";
   function el(tag, at, ebeveyn, metin) {
     const e = document.createElementNS(NS, tag);
@@ -28,7 +36,8 @@
     function listeCiz() {
       const q = $("ara").value.trim().toLocaleLowerCase("tr");
       gorunen = S.daireler.filter(d => !q || String(d.no) === q ||
-        malikAdi(d).toLocaleLowerCase("tr").includes(q) || d.katAdi.toLocaleLowerCase("tr").includes(q));
+        malikAdi(d).toLocaleLowerCase("tr").includes(q) || d.varsayilanAd.toLocaleLowerCase("tr").includes(q) ||
+        d.katAdi.toLocaleLowerCase("tr").includes(q));
       const ic = $("listeIc"); ic.innerHTML = "";
       for (let k = K.length - 1; k >= 0; k--) {
         const katD = gorunen.filter(d => d.k === k); if (!katD.length) continue;
@@ -36,9 +45,11 @@
         bas.textContent = K[k].ad;
         ic.appendChild(bas);
         katD.forEach(d => {
-          const alt = [d.kod && d.kod + " tipi", d.cephe, d.alan && sayi(d.alan, 0) + " m²"].filter(Boolean).join(" · ");
+          const a = alanBilgisi(d), [bas1, bas2] = basliklar(d);
+          const alt = [!d.kod && bas2, d.kod && d.kod + " tipi", d.cephe,
+            a.net != null && "Net " + m2(a.net), a.brut != null && "Brüt " + m2(a.brut)].filter(Boolean).join(" · ");
           const b = document.createElement("button"); b.className = "daire-btn"; b.dataset.no = d.no;
-          b.innerHTML = `<b>${d.no}</b><span>${esc(malikAdi(d))}<small>${esc(alt || d.katAdi)}</small></span>`;
+          b.innerHTML = `<b>${d.no}</b><span>${esc(bas1)}<small>${esc(alt || d.katAdi)}</small></span>`;
           b.onclick = () => goster(d.no);
           ic.appendChild(b);
         });
@@ -58,14 +69,14 @@
       aktifNo = no; S.sec(no); S.otomatik = true;
       const d = S.secili();
       $("kUst").textContent = P.blok + " · " + (d.kod ? "Daire " + d.no : d.katAdi);
-      $("kAd").textContent = malikAdi(d);
-      const alt = d.kod ? d.katAdi + " · " + d.kod + " tipi daire" : (malikVar(d) ? d.katAdi : "");
-      $("kAlt").textContent = alt; $("kAlt").style.display = alt ? "" : "none";
-      $("kAd").textContent = d.kod || malikVar(d) ? malikAdi(d) : d.katAdi;
+      const [bas1, bas2] = basliklar(d), a = alanBilgisi(d);
+      $("kAd").textContent = bas1;
+      $("kAlt").textContent = bas2; $("kAlt").style.display = bas2 ? "" : "none";
       $("kKat").textContent = d.katAdi;
       $("kCephe").textContent = d.cephe || "";
       $("kCepheKutu").style.display = d.cephe ? "" : "none";
-      $("kAlan").textContent = d.alan ? sayi(d.alan, 0) + " m²" : "—";
+      $("kNet").textContent = m2(a.net);
+      $("kBrut").textContent = m2(a.brut);
       $("kart").classList.remove("gizli");
       planCiz(d); kesitCiz(d); isaretle(true);
       zamanlayiciKur();
@@ -104,7 +115,7 @@
       el("rect", { x: 0, y: Y(0), width: 40, height: 1.2, fill: "#59616a" }, s);
       if (K[0].kot > 0.05) el("rect", { x: 20, y: Y(K[0].kot), width: 18, height: K[0].kot, fill: "#cdd2d7" }, s);
       K.forEach((k, i) => el("rect", { x: 20, y: Y(k.kot + k.yukseklik), width: 18, height: k.yukseklik,
-        fill: i === d.k ? o : "#fff", stroke: "#9aa5b1", "stroke-width": 0.15 }, s));
+        fill: (d.kler || [d.k]).includes(i) ? o : "#fff", stroke: "#9aa5b1", "stroke-width": 0.15 }, s));
       const son = K[K.length - 1], tepe = son.kot + son.yukseklik;
       if (S.kesit.ust > tepe + 0.3) el("polygon", { points: `20,${Y(tepe)} 38,${Y(tepe)} 29,${Y(S.kesit.ust)}`, fill: "#d9dde2" }, s);
     }
