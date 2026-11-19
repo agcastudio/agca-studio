@@ -5,16 +5,21 @@
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const sayi = (v, b) => v.toLocaleString("tr-TR", { minimumFractionDigits: b, maximumFractionDigits: b });
   const f2 = v => (v >= 0 ? "+" : "") + sayi(v, 2) + " m";
-  const malikVar = d => !!(P.malikler && P.malikler[d.no]);
-  const malikAdi = d => malikVar(d) ? P.malikler[d.no] : d.varsayilanAd;
+  // Bölüm bilgisi: Excel'den gelen (model/bilgiler.js -> window.BILGILER) veri.js'tekinin üstüne yazılır
+  const kayit = d => Object.assign({}, (P.daireBilgileri || {})[d.no], (window.BILGILER || {})[d.no]);
+  const malikOf = d => kayit(d).malik || (P.malikler && P.malikler[d.no]) || null;
+  const malikVar = d => !!malikOf(d);
+  const malikAdi = d => malikOf(d) || d.varsayilanAd;
   // [başlık, alt başlık]: örnek bina "Hak Sahibi", Revit odaları "Bağımsız Bölüm No:N", odasız model kat adı
   function basliklar(d) {
     if (d.kod) return [malikAdi(d), d.katAdi + " · " + d.kod + " tipi daire"];
-    const ad = d.tumKat ? d.katAdi : d.varsayilanAd;
-    return malikVar(d) ? [P.malikler[d.no], ad] : [ad, ""];
+    return [d.tumKat ? d.katAdi : d.varsayilanAd, ""];   // malik kartta ayrı satırda
   }
   const etiketMetni = d => d.kod ? `Daire ${d.no} · ${malikAdi(d)}` : basliklar(d)[0];
-  const alanBilgisi = d => { const b = (P.daireBilgileri || {})[d.no] || {}; return { net: b.net ?? null, brut: b.brut ?? d.alan ?? null }; };
+  const alanBilgisi = d => {
+    const b = kayit(d);
+    return { eski: b.eskiAlan ?? null, brut: b.yeniBrut ?? b.brut ?? d.alan ?? null, net: b.yeniNet ?? b.net ?? null };
+  };
   const m2 = v => v == null ? "—" : v.toLocaleString("tr-TR", { maximumFractionDigits: 2 }) + " m²";
   // Bölüm rengi üstünde okunur yazı rengi (açık zeminde koyu, koyu zeminde beyaz)
   const yaziRengi = h => {
@@ -52,8 +57,8 @@
         ic.appendChild(bas);
         katD.forEach(d => {
           const a = alanBilgisi(d), [bas1, bas2] = basliklar(d);
-          const alt = [!d.kod && bas2, d.kod && d.kod + " tipi", d.cephe,
-            a.net != null && "Net " + m2(a.net), a.brut != null && "Brüt " + m2(a.brut)].filter(Boolean).join(" · ");
+          const alt = [!d.kod && bas2, d.kod && d.kod + " tipi", d.cephe, !d.kod && malikOf(d),
+            a.net != null && "Yeni net " + m2(a.net)].filter(Boolean).join(" · ");
           const b = document.createElement("button"); b.className = "daire-btn"; b.dataset.no = d.no; b.dataset.renk = d.renk || "";
           const rozet = d.renk ? ` style="background:${d.renk};color:${yaziRengi(d.renk)}"` : "";
           b.innerHTML = `<b${rozet}>${d.no}</b><span>${esc(bas1)}<small>${esc(alt || d.katAdi)}</small></span>`;
@@ -83,8 +88,10 @@
       $("kKat").textContent = d.katAdi;
       $("kCephe").textContent = d.cephe || "";
       $("kCepheKutu").style.display = d.cephe ? "" : "none";
-      $("kNet").textContent = m2(a.net);
+      $("kMalik").textContent = malikOf(d) || "—";
+      $("kEski").textContent = m2(a.eski);
       $("kBrut").textContent = m2(a.brut);
+      $("kNet").textContent = m2(a.net);
       $("kRenk").style.background = d.renk || "";
       $("kUst").style.color = d.renkKoyu || "";
       $("kart").classList.remove("gizli");

@@ -58,7 +58,9 @@
   .yukseklik{display:flex;align-items:baseline;gap:8px;background:var(--accent-soft);border-radius:10px;padding:10px 12px;margin-bottom:12px}
   .yukseklik strong{font-size:34px;color:var(--accent);line-height:1}
   .yukseklik span{font-size:13px;color:var(--ink)}
-  .bilgi{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 14px;font-size:13px;margin-bottom:12px}
+  .bilgi{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 12px;font-size:13px;margin-bottom:12px}
+  .malik{font-size:13px;color:var(--muted);margin:-4px 0 10px;padding:8px 10px;background:#f4f6f9;border-radius:8px}
+  .malik b{display:block;color:var(--ink);font-size:16px}
   .bilgi div{color:var(--muted)} .bilgi div b{display:block;color:var(--ink);font-size:14px}
   .minik{display:flex;gap:10px} .minik figure{margin:0;flex:1;background:#f4f6f9;border-radius:10px;padding:8px}
   .minik figcaption{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
@@ -99,10 +101,12 @@
   <div class="ust" id="kUst">A Blok · Daire 14</div>
   <h2><i id="kRenk" class="renk-nokta"></i><span id="kAd">Malik</span></h2>
   <div class="alt" id="kAlt">3. Kat · B tipi</div>
+  <div class="malik">Malik<b id="kMalik"></b></div>
   <div class="bilgi">
     <div>Kat<b id="kKat"></b></div>
-    <div>Net alan<b id="kNet"></b></div>
-    <div>Brüt alan<b id="kBrut"></b></div>
+    <div>Eski alan<b id="kEski"></b></div>
+    <div>Yeni brüt<b id="kBrut"></b></div>
+    <div>Yeni net<b id="kNet"></b></div>
     <div id="kCepheKutu">Cephe<b id="kCephe"></b></div>
   </div>
   <div class="minik">
@@ -122,6 +126,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="veri.js"></script>
+<!-- Excel'den gelen alan/malik bilgileri: araclar/excel_al.py üretir -->
+<script src="model/bilgiler.js"></script>
 <!-- Revit/IFC modeli: araclar/ifc_donustur.py üretir. Dosya yoksa örnek bina gösterilir. -->
 <script src="model/model.js"></script>
 <script src="bina-prosedurel.js"></script>
