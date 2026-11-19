@@ -9,8 +9,9 @@ window.PROJE = {
 
   // ---- Revit/IFC modeli (model/model.js varsa bu ayarlar kullanılır) ----
   modelAyarlari: {
-    yolKotu: 0.00,       // Yol asfaltının ±0.00'a göre kotu (m). Modelde kaldırım +0.14.
-    haricKatlar: []      // Daire olmayan katlar, ör. ["L1"] (zemin kat dükkan ise)
+    yolKotu: null,       // Zemin/yol kotu (±0.00'a göre, m). null = modelden okunur (bu modelde -3.00)
+    binayiKaldir: true,  // Bodrumlar görünsün diye bina, en alt katı zemine oturacak kadar yukarı taşınır
+    haricKatlar: []      // Daire olmayan katlar, ör. ["L1"]
   },
 
   // ---- Aşağıdakiler yalnızca model YOKKEN çizilen örnek bina içindir ----

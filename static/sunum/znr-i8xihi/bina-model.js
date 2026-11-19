@@ -4,13 +4,18 @@
 window.BINA_MODEL = function (ctx) {
   const { P, scene, mat, kutu, agac, TURUNCU } = ctx;
   const A = P.modelAyarlari || {};
-  const yolKotu = A.yolKotu || 0;
   const haric = new Set(A.haricKatlar || []);
   const M = window.MODEL, V = M.veri;
+  // Zemin (yol) kotu: veri.js'te verilmezse modelden (Toposolid alt bölgesi) okunur
+  const yolKotu = A.yolKotu ?? V.zeminKotu ?? 0;
+  const katListesi = V.katlar.filter(k => !haric.has(k.id));
+  // Bodrumlar toprak altında kalmasın: bina, en alt katı zemine oturacak kadar yukarı taşınır; yol ve arazi yerinde kalır
+  const kaldir = A.binayiKaldir === false ? 0 : Math.max(0, yolKotu - Math.min(...katListesi.map(k => k.kot)));
 
   const RENK = {
     duvar: 0xf3f0ea, doseme: 0xdfe3e8, cati: 0xb7a89a, cam: 0x6f8aa0, dograma: 0x8c97a3,
-    korkuluk: 0x4a5560, kapi: 0x8a6a4a, komsu: 0xe4ddd0, arazi: 0xd4dfcc, altbolum: 0xd2d5d8, kaldirim: 0xb8bdc2
+    korkuluk: 0x4a5560, kapi: 0x8a6a4a, komsu: 0xe4ddd0, arazi: 0xd4dfcc, kaldirim: 0xb8bdc2,
+    altbolum: V.yol ? 0xd2d5d8 : 0x6b7178   // bordür yoksa alt bölge yolun kendisidir -> asfalt
   };
   const CEVRE = new Set(["arazi", "altbolum", "kaldirim"]);   // saydamlaşmayan zemin elemanları
   const binaMi = k => !CEVRE.has(k) && k !== "komsu";
@@ -46,6 +51,7 @@ window.BINA_MODEL = function (ctx) {
           o.material = m;
           const golge = binaMi(kategori) || kategori === "komsu";
           o.castShadow = golge; o.receiveShadow = true;
+          if (binaMi(kategori)) o.position.y += kaldir;
           parcalar.push({ o, m, kategori, kat, golge });
         });
 
@@ -61,7 +67,6 @@ window.BINA_MODEL = function (ctx) {
         (V.agaclar || []).forEach(([x, z]) => agac(x, z, 1.2, 2.6));
 
         // ---------- Bölüm hacimleri ----------
-        const katListesi = V.katlar.filter(k => !haric.has(k.id));
         const katIndeks = id => katListesi.findIndex(k => k.id === id);
         const yeniMalzeme = renk => new THREE.MeshStandardMaterial({
           color: renk, emissive: renk, emissiveIntensity: 0.05, roughness: 0.8
@@ -77,7 +82,7 @@ window.BINA_MODEL = function (ctx) {
         };
         function hacim(taban, kat, m, no, kenarRenk) {
           const shape = new THREE.Shape(taban.map(([x, z]) => new THREE.Vector2(x, z)));
-          const h = kat.yukseklik - 0.35, y0 = kat.kot - yolKotu + 0.03;
+          const h = kat.yukseklik - 0.35, y0 = kat.kot - yolKotu + kaldir + 0.03;
           const g = new THREE.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false });
           g.rotateX(Math.PI / 2);          // (x, Zplan, d) -> (x, -d, Zplan)
           g.translate(0, y0 + h, 0);        // hacim y0..y0+h aralığında
@@ -110,7 +115,7 @@ window.BINA_MODEL = function (ctx) {
             no: b.no, k: kler[0], kler, tumKat: !!b.tumKat,
             katAdi: kler.map(i => katListesi[i].ad).join(" + ") + (kler.length > 1 ? " (dubleks)" : ""),
             kod: "", cephe: "", alan: b.alan || null,
-            dosemeY: alt.kot - yolKotu, yukseklik: alt.yukseklik,
+            dosemeY: alt.kot - yolKotu + kaldir, yukseklik: alt.yukseklik,
             merkez, ust: new THREE.Vector3(merkez.x, kutuB.max.y + 0.5, merkez.z), onZ: kutuB.max.z,
             hedefler, malzeme: m, kenarlar, parcalar: b.parcalar,
             renk: "#" + renk.getHexString(), renkKoyu: "#" + koyu.getHexString(),
@@ -120,8 +125,8 @@ window.BINA_MODEL = function (ctx) {
         });
 
         // ---------- Bina kutusu ----------
-        const bmin = new THREE.Vector3(V.bina.min[0], V.bina.min[1] - yolKotu, V.bina.min[2]);
-        const bmax = new THREE.Vector3(V.bina.max[0], V.bina.max[1] - yolKotu, V.bina.max[2]);
+        const bmin = new THREE.Vector3(V.bina.min[0], V.bina.min[1] - yolKotu + kaldir, V.bina.min[2]);
+        const bmax = new THREE.Vector3(V.bina.max[0], V.bina.max[1] - yolKotu + kaldir, V.bina.max[2]);
         const boyut = bmax.clone().sub(bmin);
         const bina = { min: bmin, max: bmax, merkez: bmin.clone().add(bmax).multiplyScalar(0.5) };
 
@@ -160,7 +165,8 @@ window.BINA_MODEL = function (ctx) {
           olcek: Math.max(boyut.x, boyut.y, boyut.z),
           yonlu: parcalar.some(p => p.kategori === "komsu"),   // bitişik nizam: kamera önde kalsın
           yol: V.yol ? { yakinZ: V.yol.yakinZ, uzakZ: V.yol.uzakZ } : null,
-          kesit: { katlar: katListesi.map(k => ({ ad: k.ad, kot: k.kot - yolKotu, yukseklik: k.yukseklik })), ust: bmax.y },
+          // Kesit gerçek kotları gösterir (bodrumlar zemin çizgisinin altında); 3B'deki kaldırma yalnız görünüm içindir
+          kesit: { katlar: katListesi.map(k => ({ ad: k.ad, kot: k.kot - yolKotu, yukseklik: k.yukseklik })), ust: bmax.y - kaldir },
           vurgula, plan
         });
       } catch (e) { red(e); }
