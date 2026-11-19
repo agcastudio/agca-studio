@@ -1,9 +1,9 @@
 // Otomatik üretildi: araclar/excel_al.py (alanlar.xlsx) — elle düzenlemeyin.
 window.BILGILER = {
  "1": {
-  "eskiAlan": 266.08,
-  "yeniBrut": null,
-  "yeniNet": 123.16,
+  "eskiAlan": null,
+  "yeniBrut": 295.0,
+  "yeniNet": 266.08,
   "malik": "müteahhit"
  },
  "2": {
@@ -152,8 +152,8 @@ window.BILGILER = {
  },
  "26": {
   "eskiAlan": null,
-  "yeniBrut": 194.4,
-  "yeniNet": 166.02,
+  "yeniBrut": 185.17,
+  "yeniNet": 163.02,
   "malik": "112 P /D-8"
  },
  "27": {
@@ -164,7 +164,7 @@ window.BILGILER = {
  },
  "28": {
   "eskiAlan": null,
-  "yeniBrut": 186.99,
+  "yeniBrut": 180.23,
   "yeniNet": 160.58,
   "malik": "112 P /D-7"
  },
