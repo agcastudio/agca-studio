@@ -31,6 +31,7 @@
     align-items:flex-start;gap:12px;pointer-events:none}
   .baslik{background:var(--panel);padding:10px 16px;border-radius:12px;box-shadow:var(--shadow);pointer-events:auto}
   .baslik h1{margin:0;font-size:18px} .baslik p{margin:2px 0 0;color:var(--muted);font-size:13px}
+  .baslik h1 img{height:40px;width:auto;display:block}
 
   #liste{position:fixed;top:86px;left:16px;bottom:88px;width:300px;background:var(--panel);
     border-radius:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;
@@ -56,7 +57,7 @@
   .yukseklik{display:flex;align-items:baseline;gap:8px;background:var(--accent-soft);border-radius:10px;padding:10px 12px;margin-bottom:12px}
   .yukseklik strong{font-size:34px;color:var(--accent);line-height:1}
   .yukseklik span{font-size:13px;color:var(--ink)}
-  .bilgi{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:13px;margin-bottom:12px}
+  .bilgi{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 14px;font-size:13px;margin-bottom:12px}
   .bilgi div{color:var(--muted)} .bilgi div b{display:block;color:var(--ink);font-size:14px}
   .minik{display:flex;gap:10px} .minik figure{margin:0;flex:1;background:#f4f6f9;border-radius:10px;padding:8px}
   .minik figcaption{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
@@ -97,12 +98,10 @@
   <div class="ust" id="kUst">A Blok · Daire 14</div>
   <h2 id="kAd">Malik</h2>
   <div class="alt" id="kAlt">3. Kat · B tipi</div>
-  <div class="yukseklik"><strong id="kYuk">+0,00 m</strong><span>yoldan döşeme yüksekliği<br><span id="kGoz"></span></span></div>
   <div class="bilgi">
     <div>Kat<b id="kKat"></b></div>
-    <div>Cephe<b id="kCephe"></b></div>
+    <div id="kCepheKutu">Cephe<b id="kCephe"></b></div>
     <div>Brüt alan<b id="kAlan"></b></div>
-    <div>Altındaki kat sayısı<b id="kAlti"></b></div>
   </div>
   <div class="minik">
     <figure><figcaption>Kat planında</figcaption><svg id="svgPlan"></svg></figure>

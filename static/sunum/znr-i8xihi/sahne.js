@@ -73,7 +73,7 @@
   }
   function sec(no) {
     const d = R && R.daireler.find(x => x.no === no); if (!d) return genel();
-    secili = d; R.vurgula(d); olcu.visible = true;
+    secili = d; R.vurgula(d); olcu.visible = false; // yoldan yükseklik ölçüsü sunumda gösterilmiyor
     const c = R.bina.merkez;
     const sx = Math.sign(Math.round(d.merkez.x - c.x)), on = d.merkez.z >= c.z - 0.01;
     tabanTeta = on ? (sx === 0 ? 0.45 : sx * 0.55) : (sx === 0 ? Math.PI - 0.45 : sx * (Math.PI / 2 + 0.35));

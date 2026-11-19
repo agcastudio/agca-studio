@@ -3,7 +3,8 @@
 //  Tüm ölçüler metre (m). Kotlar YOL (kaldırım önü asfalt) seviyesine göredir.
 // =====================================================================
 window.PROJE = {
-  ad: "448A-8P Konut Projesi",
+  ad: "znr",
+  logo: "logo.png",     // başlıkta gösterilen logo (yoksa "ad" yazılır)
   blok: "Bina",
 
   // ---- Revit/IFC modeli (model/model.js varsa bu ayarlar kullanılır) ----
@@ -17,7 +18,6 @@ window.PROJE = {
   // Kesitten okunacak değerler
   zeminKotu: 1.20,      // Zemin kat döşemesi (±0.00) yoldan kaç m yukarıda
   katYuksekligi: 3.00,  // Döşemeden döşemeye kat yüksekliği
-  gozHizasi: 1.60,      // Döşemeden göz/pencere hizası (manzara için)
 
   // Kat listesi (aşağıdan yukarı). İsimleri kat planlarınızdaki gibi yazın.
   katlar: ["Zemin Kat", "1. Kat", "2. Kat", "3. Kat", "4. Kat", "5. Kat", "6. Kat", "7. Kat"],

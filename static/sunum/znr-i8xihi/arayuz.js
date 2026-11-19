@@ -18,9 +18,10 @@
 
   S.hazir.then(() => {
     const K = S.kesit.katlar;
-    $("projeAdi").textContent = P.ad;
+    const h1 = $("projeAdi"); h1.textContent = "";
+    if (P.logo) { const im = new Image(); im.src = P.logo; im.alt = P.ad; h1.appendChild(im); } else h1.textContent = P.ad;
     $("projeAlt").textContent = P.blok + " · " + K.length + " kat" +
-      (S.daireler.length !== K.length ? " · " + S.daireler.length + " daire" : "") + (S.modelVar ? " · Revit modeli" : "");
+      (S.daireler.length !== K.length ? " · " + S.daireler.length + " daire" : "");
 
     // ---------- Liste ----------
     let gorunen = S.daireler.slice(), aktifNo = null;
@@ -32,7 +33,7 @@
       for (let k = K.length - 1; k >= 0; k--) {
         const katD = gorunen.filter(d => d.k === k); if (!katD.length) continue;
         const bas = document.createElement("div"); bas.className = "kat-baslik";
-        bas.textContent = K[k].ad + " · yoldan " + f2(K[k].kot);
+        bas.textContent = K[k].ad;
         ic.appendChild(bas);
         katD.forEach(d => {
           const alt = [d.kod && d.kod + " tipi", d.cephe, d.alan && sayi(d.alan, 0) + " m²"].filter(Boolean).join(" · ");
@@ -58,13 +59,13 @@
       const d = S.secili();
       $("kUst").textContent = P.blok + " · " + (d.kod ? "Daire " + d.no : d.katAdi);
       $("kAd").textContent = malikAdi(d);
-      $("kAlt").textContent = d.katAdi + (d.kod ? " · " + d.kod + " tipi daire" : "");
-      $("kYuk").textContent = f2(d.dosemeY);
-      $("kGoz").textContent = "Göz hizası: " + f2(d.dosemeY + (P.gozHizasi || 1.6));
+      const alt = d.kod ? d.katAdi + " · " + d.kod + " tipi daire" : (malikVar(d) ? d.katAdi : "");
+      $("kAlt").textContent = alt; $("kAlt").style.display = alt ? "" : "none";
+      $("kAd").textContent = d.kod || malikVar(d) ? malikAdi(d) : d.katAdi;
       $("kKat").textContent = d.katAdi;
-      $("kCephe").textContent = d.cephe || "—";
+      $("kCephe").textContent = d.cephe || "";
+      $("kCepheKutu").style.display = d.cephe ? "" : "none";
       $("kAlan").textContent = d.alan ? sayi(d.alan, 0) + " m²" : "—";
-      $("kAlti").textContent = d.k === 0 ? "Yok (en alt kat)" : d.k + " kat";
       $("kart").classList.remove("gizli");
       planCiz(d); kesitCiz(d); isaretle(true);
       zamanlayiciKur();
@@ -106,33 +107,18 @@
         fill: i === d.k ? o : "#fff", stroke: "#9aa5b1", "stroke-width": 0.15 }, s));
       const son = K[K.length - 1], tepe = son.kot + son.yukseklik;
       if (S.kesit.ust > tepe + 0.3) el("polygon", { points: `20,${Y(tepe)} 38,${Y(tepe)} 29,${Y(S.kesit.ust)}`, fill: "#d9dde2" }, s);
-      el("line", { x1: 16, y1: Y(0), x2: 16, y2: Y(d.dosemeY), stroke: o, "stroke-width": 0.5 }, s);
-      el("line", { x1: 14.5, y1: Y(0) - 0.1, x2: 17.5, y2: Y(0) - 0.1, stroke: o, "stroke-width": 0.5 }, s);
-      el("line", { x1: 14.5, y1: Y(d.dosemeY), x2: 20, y2: Y(d.dosemeY), stroke: o, "stroke-width": 0.35, "stroke-dasharray": "0.8 0.5" }, s);
-      el("text", { x: 14.5, y: Y(d.dosemeY / 2) + 0.9, "text-anchor": "end", "font-size": 2.5, "font-weight": 700, fill: o }, s,
-        f2(d.dosemeY).replace(" m", ""));
     }
 
     // ---------- 3B etiketler ----------
-    const et = {};
-    [["daire", "vurgu"], ["olcu", "olcu"], ["yol", "yol"]].forEach(([n, c]) => {
-      const e = document.createElement("div"); e.className = "etiket " + c; e.style.opacity = 0;
-      $("etiketler").appendChild(e); et[n] = e;
-    });
-    et.yol.textContent = "YOL ±0,00";
+    const et = document.createElement("div"); et.className = "etiket vurgu"; et.style.opacity = 0;
+    $("etiketler").appendChild(et);
     S.kareler.push(() => {
       const n = S.noktalar(), d = S.secili();
-      for (const k in et) {
-        if (!n) { et[k].style.opacity = 0; continue; }
-        const p = S.ekran(n[k]);
-        et[k].style.opacity = p.gorunur ? 1 : 0;
-        et[k].style.left = p.x + "px"; et[k].style.top = p.y + "px";
-      }
-      if (n && d) {
-        const v = S.olcuDegeri();
-        et.olcu.textContent = "Yoldan " + f2(Math.abs(v - d.dosemeY) < 0.01 ? d.dosemeY : v);
-        et.daire.textContent = etiketMetni(d);
-      }
+      if (!n || !d) { et.style.opacity = 0; return; }
+      const p = S.ekran(n.daire);
+      et.style.opacity = p.gorunur ? 1 : 0;
+      et.style.left = p.x + "px"; et.style.top = p.y + "px";
+      et.textContent = etiketMetni(d);
     });
 
     // ---------- Gezinme / sunum modu ----------
