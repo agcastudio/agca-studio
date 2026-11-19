@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noimageindex, noarchive">
+<title>Daireniz Nerede</title>
+<style>
+  :root{
+    --bg:#e9eef3; --panel:rgba(255,255,255,.94); --ink:#18222d; --muted:#5d6977;
+    --line:#d6dde5; --accent:#f0641e; --accent-soft:#fde3d4; --ok:#1f7a5a;
+    --shadow:0 10px 30px rgba(20,35,50,.14);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+  #sahne{position:fixed;inset:0;display:block}
+  #etiketler{position:fixed;inset:0;pointer-events:none}
+  .etiket{position:absolute;transform:translate(-50%,-100%);white-space:nowrap;pointer-events:none;
+    background:var(--ink);color:#fff;padding:6px 10px;border-radius:8px;font-size:14px;font-weight:600;
+    box-shadow:var(--shadow);transition:opacity .3s}
+  .etiket::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;
+    border:6px solid transparent;border-bottom:0;border-top-color:var(--ink)}
+  .etiket.vurgu{background:var(--accent)} .etiket.vurgu::after{border-top-color:var(--accent)}
+  .etiket.olcu{transform:translate(8px,-50%);background:#fff;color:var(--ink);border:2px solid var(--accent);
+    font-size:15px} .etiket.olcu::after{display:none}
+  .etiket.yol{transform:translate(-50%,-50%);background:#2b333c;font-size:12px;letter-spacing:.08em}
+  .etiket.yol::after{display:none}
+
+  header{position:fixed;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;
+    align-items:flex-start;gap:12px;pointer-events:none}
+  .baslik{background:var(--panel);padding:10px 16px;border-radius:12px;box-shadow:var(--shadow);pointer-events:auto}
+  .baslik h1{margin:0;font-size:18px} .baslik p{margin:2px 0 0;color:var(--muted);font-size:13px}
+
+  #liste{position:fixed;top:86px;left:16px;bottom:88px;width:300px;background:var(--panel);
+    border-radius:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;
+    transition:transform .35s}
+  #liste input{margin:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:14px}
+  #liste .kaydir{overflow:auto;padding:0 8px 12px}
+  .kat-baslik{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+    padding:10px 8px 4px}
+  .daire-btn{display:flex;width:100%;gap:10px;align-items:center;text-align:left;border:0;background:none;
+    padding:8px;border-radius:8px;font:inherit;font-size:14px;color:var(--ink);cursor:pointer}
+  .daire-btn:hover{background:#f1f4f7}
+  .daire-btn.secili{background:var(--accent-soft)}
+  .daire-btn b{min-width:34px;height:28px;border-radius:6px;background:#e7ecf1;display:grid;place-items:center;font-size:13px}
+  .daire-btn.secili b{background:var(--accent);color:#fff}
+  .daire-btn span small{display:block;color:var(--muted);font-size:12px}
+
+  #kart{position:fixed;right:16px;bottom:88px;width:390px;background:var(--panel);border-radius:14px;
+    box-shadow:var(--shadow);padding:18px 18px 14px;transition:opacity .35s, transform .35s}
+  #kart.gizli{opacity:0;transform:translateY(12px);pointer-events:none}
+  #kart .ust{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+  #kart h2{margin:4px 0 2px;font-size:24px}
+  #kart .alt{color:var(--muted);font-size:14px;margin-bottom:12px}
+  .yukseklik{display:flex;align-items:baseline;gap:8px;background:var(--accent-soft);border-radius:10px;padding:10px 12px;margin-bottom:12px}
+  .yukseklik strong{font-size:34px;color:var(--accent);line-height:1}
+  .yukseklik span{font-size:13px;color:var(--ink)}
+  .bilgi{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:13px;margin-bottom:12px}
+  .bilgi div{color:var(--muted)} .bilgi div b{display:block;color:var(--ink);font-size:14px}
+  .minik{display:flex;gap:10px} .minik figure{margin:0;flex:1;background:#f4f6f9;border-radius:10px;padding:8px}
+  .minik figcaption{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+  .minik svg{width:100%;height:120px;display:block}
+
+  #arac{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:6px;
+    background:var(--panel);padding:8px;border-radius:12px;box-shadow:var(--shadow)}
+  #arac button{border:0;background:#eef2f6;color:var(--ink);font:inherit;font-size:14px;font-weight:600;
+    padding:10px 14px;border-radius:8px;cursor:pointer;white-space:nowrap}
+  #arac button:hover{background:#e2e8ef}
+  #arac button.aktif{background:var(--accent);color:#fff}
+  body.temiz #liste{transform:translateX(-340px)}
+  body.temiz header{opacity:.0}
+
+  @media (max-width:820px){
+    #liste{width:auto;right:16px;bottom:auto;height:180px;top:86px}
+    #kart{left:16px;right:16px;width:auto;bottom:84px}
+    .minik{display:none}
+    #arac{left:16px;right:16px;transform:none;overflow-x:auto}
+    #arac button{padding:10px 10px;font-size:13px}
+  }
+</style>
+</head>
+<body>
+<canvas id="sahne"></canvas>
+<div id="etiketler"></div>
+
+<header>
+  <div class="baslik"><h1 id="projeAdi">Proje</h1><p id="projeAlt">Daireniz binada nerede?</p></div>
+</header>
+
+<aside id="liste">
+  <input id="ara" type="search" placeholder="Malik adı veya daire no ara…" autocomplete="off">
+  <div class="kaydir" id="listeIc"></div>
+</aside>
+
+<section id="kart" class="gizli" aria-live="polite">
+  <div class="ust" id="kUst">A Blok · Daire 14</div>
+  <h2 id="kAd">Malik</h2>
+  <div class="alt" id="kAlt">3. Kat · B tipi</div>
+  <div class="yukseklik"><strong id="kYuk">+0,00 m</strong><span>yoldan döşeme yüksekliği<br><span id="kGoz"></span></span></div>
+  <div class="bilgi">
+    <div>Kat<b id="kKat"></b></div>
+    <div>Cephe<b id="kCephe"></b></div>
+    <div>Brüt alan<b id="kAlan"></b></div>
+    <div>Altındaki kat sayısı<b id="kAlti"></b></div>
+  </div>
+  <div class="minik">
+    <figure><figcaption>Kat planında</figcaption><svg id="svgPlan"></svg></figure>
+    <figure><figcaption>Kesitte</figcaption><svg id="svgKesit"></svg></figure>
+  </div>
+</section>
+
+<nav id="arac">
+  <button id="bOnceki" title="Önceki (←)">◀ Önceki</button>
+  <button id="bSunum" title="Otomatik tur (P)">▶ Sunum modu</button>
+  <button id="bSonraki" title="Sonraki (→)">Sonraki ▶</button>
+  <button id="bGenel" title="Genel görünüm (Esc)">Genel görünüm</button>
+  <button id="bTemiz" title="Paneli gizle (H)">Paneli gizle</button>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="veri.js"></script>
+<!-- Revit/IFC modeli: araclar/ifc_donustur.py üretir. Dosya yoksa örnek bina gösterilir. -->
+<script src="model/model.js"></script>
+<script src="bina-prosedurel.js"></script>
+<script src="bina-model.js"></script>
+<script src="sahne.js"></script>
+<script src="arayuz.js"></script>
+</body>
+</html>
