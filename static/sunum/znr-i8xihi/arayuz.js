@@ -56,12 +56,12 @@
         bas.textContent = K[k].ad;
         ic.appendChild(bas);
         katD.forEach(d => {
-          const a = alanBilgisi(d), [bas1, bas2] = basliklar(d);
-          const alt = [!d.kod && bas2, d.kod && d.kod + " tipi", d.cephe, !d.kod && malikOf(d),
-            a.net != null && "Yeni net " + m2(a.net)].filter(Boolean).join(" · ");
+          // Listede bölüm adı yerine malik görünür (numara rozette kalır); malik yoksa bölüm adı
+          const a = alanBilgisi(d), [bas1] = basliklar(d), ana = (!d.kod && malikOf(d)) || bas1;
+          const alt = [d.kod && d.kod + " tipi", d.cephe, a.net != null && "Yeni net " + m2(a.net)].filter(Boolean).join(" · ");
           const b = document.createElement("button"); b.className = "daire-btn"; b.dataset.no = d.no; b.dataset.renk = d.renk || "";
           const rozet = d.renk ? ` style="background:${d.renk};color:${yaziRengi(d.renk)}"` : "";
-          b.innerHTML = `<b${rozet}>${d.no}</b><span>${esc(bas1)}<small>${esc(alt || d.katAdi)}</small></span>`;
+          b.innerHTML = `<b${rozet}>${d.no}</b><span>${esc(ana)}<small>${esc(alt || d.katAdi)}</small></span>`;
           b.onclick = () => goster(d.no);
           ic.appendChild(b);
         });
@@ -82,13 +82,15 @@
       aktifNo = no; S.sec(no); S.otomatik = true;
       const d = S.secili();
       $("kUst").textContent = P.blok + " · " + (d.kod ? "Daire " + d.no : d.katAdi);
-      const [bas1, bas2] = basliklar(d), a = alanBilgisi(d);
-      $("kAd").textContent = bas1;
-      $("kAlt").textContent = bas2; $("kAlt").style.display = bas2 ? "" : "none";
+      const [bas1, bas2] = basliklar(d), a = alanBilgisi(d), malik = d.kod ? malikAdi(d) : malikOf(d);
+      // Tıklanınca bölüm adı yerine malik yazılır; bölüm adı küçük satıra iner
+      const baslik = d.kod ? bas1 : (malik || bas1), altBaslik = d.kod ? bas2 : (malik ? bas1 : "");
+      $("kAd").textContent = baslik;
+      $("kAlt").textContent = altBaslik; $("kAlt").style.display = altBaslik ? "" : "none";
+      S.levhaGoster({ ust: malik || bas1, alt: null, renk: d.renk || "#f0641e", yazi: d.renk ? yaziRengi(d.renk) : "#fff" });
       $("kKat").textContent = d.katAdi;
       $("kCephe").textContent = d.cephe || "";
       $("kCepheKutu").style.display = d.cephe ? "" : "none";
-      $("kMalik").textContent = malikOf(d) || "—";
       $("kEski").textContent = m2(a.eski);
       $("kBrut").textContent = m2(a.brut);
       $("kNet").textContent = m2(a.net);
@@ -138,18 +140,7 @@
       if (S.kesit.ust > tepe + 0.3) el("polygon", { points: `20,${Y(tepe)} 38,${Y(tepe)} 29,${Y(S.kesit.ust)}`, fill: "#d9dde2" }, s);
     }
 
-    // ---------- 3B etiketler ----------
-    const et = document.createElement("div"); et.className = "etiket vurgu"; et.style.opacity = 0;
-    $("etiketler").appendChild(et);
-    S.kareler.push(() => {
-      const n = S.noktalar(), d = S.secili();
-      if (!n || !d) { et.style.opacity = 0; return; }
-      const p = S.ekran(n.daire);
-      et.style.opacity = p.gorunur ? 1 : 0;
-      et.style.left = p.x + "px"; et.style.top = p.y + "px";
-      et.textContent = etiketMetni(d);
-      et.style.setProperty("--ok", d.renk || "#f0641e"); et.style.color = d.renk ? yaziRengi(d.renk) : "";
-    });
+    // 3B isim levhası sahne.js'te (S.levhaGoster); seçimde goster() çağırır, genel görünümde kalkar.
 
     // ---------- Gezinme / sunum modu ----------
     function adim(yon) {

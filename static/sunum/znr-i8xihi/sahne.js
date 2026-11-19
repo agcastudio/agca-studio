@@ -61,6 +61,37 @@
   olcu.add(kilavuz);
   let olcuSimdi = 0, olcuHedef = 0, kilavuzUzunluk = 1;
 
+  // ---------- 3B isim levhası (CSS3D: keskin yazı, Türkçe karakter sorunu yok) ----------
+  const sahne3 = new THREE.Scene();
+  let css3d = null, levha = null;
+  if (THREE.CSS3DRenderer) {
+    css3d = new THREE.CSS3DRenderer();
+    Object.assign(css3d.domElement.style, { position: "fixed", left: "0", top: "0", pointerEvents: "none" });
+    canvas.after(css3d.domElement);          // panellerin altında, 3B görüntünün üstünde
+  }
+  const levhaCizgi = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0, 1, 0)]),
+    new THREE.LineBasicMaterial({ color: 0x18222d }));
+  levhaCizgi.visible = false; scene.add(levhaCizgi);
+  function levhaGizle() { if (levha) { sahne3.remove(levha); levha = null; } levhaCizgi.visible = false; }
+  // o = { ust: küçük satır (bölüm adı), alt: büyük satır (malik), renk, yazi }
+  function levhaGoster(o) {
+    levhaGizle();
+    if (!css3d || !secili) return;
+    const el = document.createElement("div"); el.className = "levha";
+    el.style.background = o.renk; el.style.color = o.yazi;
+    const kucuk = document.createElement("b"), buyuk = document.createElement("strong");
+    if (o.alt) { kucuk.textContent = o.ust; buyuk.textContent = o.alt; el.append(kucuk, buyuk); }
+    else { buyuk.textContent = o.ust; el.append(buyuk); }
+    levha = new THREE.CSS3DObject(el);
+    const s = R.olcek / 2400, yuk = (o.alt ? 220 : 150) * s;      // levha yüksekliği (m), yaklaşık
+    levha.scale.setScalar(s);
+    const taban = secili.ust.y + 0.8;                             // levhanın alt kenarı bölümün 0,8 m üstünde
+    levha.position.set(secili.merkez.x, taban + yuk / 2, secili.merkez.z);
+    sahne3.add(levha);
+    levhaCizgi.position.set(secili.merkez.x, secili.ust.y - 0.5, secili.merkez.z);
+    levhaCizgi.scale.y = 1.3; levhaCizgi.material.color.set(o.renk); levhaCizgi.visible = true;
+  }
+
   // ---------- Kamera ----------
   const kam = { hedef: new THREE.Vector3(0, 10, 4), r: 95, teta: 0.7, fi: 1.18 };
   const ist = { hedef: kam.hedef.clone(), r: kam.r, teta: kam.teta, fi: kam.fi };
@@ -69,7 +100,7 @@
 
   function genel() {
     if (!R) return;
-    secili = null; R.vurgula(null); olcu.visible = false; zeminSaydam(false);
+    secili = null; R.vurgula(null); olcu.visible = false; zeminSaydam(false); levhaGizle();
     const c = R.bina.merkez;
     ist.hedef.set(c.x, R.bina.max.y * 0.42, c.z + 4);
     ist.r = R.olcek * 3.2; ist.fi = 1.16;
@@ -120,7 +151,10 @@
     ist.r = THREE.MathUtils.clamp(ist.r * (1 + e.deltaY * 0.001), 15, 320); mudahale();
   }, { passive: false });
 
-  function boyut() { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
+  function boyut() {
+    renderer.setSize(innerWidth, innerHeight); if (css3d) css3d.setSize(innerWidth, innerHeight);
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  }
   addEventListener("resize", boyut); boyut();
 
   // ---------- Döngü ----------
@@ -149,13 +183,15 @@
       kilavuz.computeLineDistances();
     }
     renderer.render(scene, camera);
+    if (levha) levha.rotation.y = tabanTeta + fark(tabanTeta, kam.teta) * 0.5;   // kamerayı yarı yarıya izler: 3B açı hissi
+    if (css3d) css3d.render(sahne3, camera);
     S.kareler.forEach(f => f());
     requestAnimationFrame(kare);
   }
 
   const v = new THREE.Vector3();
   Object.assign(S, {
-    sec, genel,
+    sec, genel, levhaGoster, levhaGizle,
     secili: () => secili,
     olcuDegeri: () => olcuSimdi,
     noktalar: () => secili ? {

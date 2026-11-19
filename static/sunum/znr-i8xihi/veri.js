@@ -9,8 +9,8 @@ window.PROJE = {
 
   // ---- Revit/IFC modeli (model/model.js varsa bu ayarlar kullanılır) ----
   modelAyarlari: {
-    yolKotu: null,       // Zemin/yol kotu (±0.00'a göre, m). null = modelden okunur (bu modelde -3.00)
-    binayiKaldir: true,  // Bodrumlar görünsün diye bina, en alt katı zemine oturacak kadar yukarı taşınır
+    yolKotu: null,       // Zemin/yol kotu (±0.00'a göre, m). null = modelden okunur: yolun en alçak noktası (bu modelde -6.00)
+    binayiKaldir: true,  // En alt kat yolun altında kalırsa bina o kadar yukarı taşınır (bu modelde gerekmiyor: 0 m)
     haricKatlar: []      // Daire olmayan katlar, ör. ["L1"]
   },
 

@@ -22,6 +22,15 @@
   .etiket::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;
     border:6px solid transparent;border-bottom:0;border-top-color:var(--ink)}
   .etiket.vurgu{background:var(--ok,var(--accent))} .etiket.vurgu::after{border-top-color:var(--ok,var(--accent))}
+  /* 3B isim levhası (CSS3D): sahnede bölümün üstünde durur, perspektifle döner */
+  .levha{padding:16px 36px 20px;border-radius:24px;text-align:center;white-space:nowrap;backface-visibility:hidden;
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;box-shadow:0 14px 44px rgba(20,35,50,.28);
+    border:3px solid rgba(255,255,255,.65)}
+  .levha b{display:block;font-size:54px;font-weight:600;opacity:.9;line-height:1.25}
+  .levha strong{display:block;font-size:96px;font-weight:800;line-height:1.1;letter-spacing:-.01em}
+  .etiket{text-align:center}
+  .etiket b{display:block;font-weight:600}
+  .etiket small{display:block;font-size:15px;font-weight:700;margin-top:2px}
   .renk-nokta{display:inline-block;width:16px;height:16px;border-radius:5px;margin-right:10px;vertical-align:-1px;background:var(--accent)}
   .etiket.olcu{transform:translate(8px,-50%);background:#fff;color:var(--ink);border:2px solid var(--accent);
     font-size:15px} .etiket.olcu::after{display:none}
@@ -101,7 +110,6 @@
   <div class="ust" id="kUst">A Blok · Daire 14</div>
   <h2><i id="kRenk" class="renk-nokta"></i><span id="kAd">Malik</span></h2>
   <div class="alt" id="kAlt">3. Kat · B tipi</div>
-  <div class="malik">Malik<b id="kMalik"></b></div>
   <div class="bilgi">
     <div>Kat<b id="kKat"></b></div>
     <div>Eski alan<b id="kEski"></b></div>
@@ -125,6 +133,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS3DRenderer.js"></script>
 <script src="veri.js"></script>
 <!-- Excel'den gelen alan/malik bilgileri: araclar/excel_al.py üretir -->
 <script src="model/bilgiler.js"></script>

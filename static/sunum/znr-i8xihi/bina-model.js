@@ -55,6 +55,11 @@ window.BINA_MODEL = function (ctx) {
           parcalar.push({ o, m, kategori, kat, golge });
         });
 
+        // Arazi/yol en üst kotu: bunun altında kalan bölüm seçilince arazi yarı saydam olur (yamaçta toprak arkasında kalmasın)
+        kok.updateMatrixWorld(true);
+        const cevreUst = parcalar.filter(p => CEVRE.has(p.kategori))
+          .reduce((m, p) => Math.max(m, new THREE.Box3().setFromObject(p.o).max.y), -Infinity);
+
         // ---------- Yol (asfalt şerit + orta çizgi) ----------
         if (V.yol) {
           const en = V.yol.uzakZ - V.yol.yakinZ, zOrta = (V.yol.yakinZ + V.yol.uzakZ) / 2;
@@ -146,6 +151,7 @@ window.BINA_MODEL = function (ctx) {
             let op = 1;
             if (binaMi(p.kategori)) op = !secili ? (bolumlu ? 0.2 : 1) : katlar.has(p.kat) ? 0.25 : 0.08;
             else if (p.kategori === "komsu" && secili) op = 0.18;
+            else if (CEVRE.has(p.kategori) && secili && secili.dosemeY < cevreUst - 0.5) op = 0.45;
             p.m.opacity = op; p.m.transparent = op < 1; p.m.depthWrite = op === 1; p.m.needsUpdate = true;
             p.o.castShadow = op === 1 && p.golge;
           });
