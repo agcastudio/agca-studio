@@ -183,6 +183,12 @@
       else if (k === "h" || k === "H") temiz();
     });
 
+    // Her bölümün cephesinde malik adı (malik yoksa etiket yok)
+    S.cepheEtiketleriKur(d => {
+      const m = d.kod ? malikAdi(d) : malikOf(d);
+      return m ? { metin: m, renk: d.renk || "#f0641e" } : null;
+    });
+
     listeCiz();
     S.otomatik = true;
   });

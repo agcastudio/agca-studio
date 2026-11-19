@@ -92,6 +92,47 @@
     levhaCizgi.scale.y = 1.3; levhaCizgi.material.color.set(o.renk); levhaCizgi.visible = true;
   }
 
+  // ---------- Cephe etiketleri: her bölümün yanında malik adı ----------
+  // Bölümün en dışta kalan duvarının (taban çokgeninin bina merkezinden en uzaktaki kenarı) ortasına,
+  // cepheye paralel küçük bir levha. Arkadaki cephelerin levhaları görünmez (backface).
+  const cepheEtiketleri = [];
+  function cepheEtiketleriKur(fn) {          // fn(d) -> { metin, renk } | null
+    if (!css3d || !R) return;
+    cepheEtiketleri.forEach(e => sahne3.remove(e.obj)); cepheEtiketleri.length = 0;
+    const c = R.bina.merkez, s = 0.02;          // 44 px yazı ≈ 0,9 m
+    R.daireler.forEach(d => {
+      const b = fn(d), parca = d.parcalar && (d.parcalar.find(p => p.katId === d.katId) || d.parcalar[0]);
+      if (!b || !parca || !parca.taban || parca.taban.length < 3) return;
+      const t = parca.taban, ox = t.reduce((a, q) => a + q[0], 0) / t.length, oz = t.reduce((a, q) => a + q[1], 0) / t.length;
+      let en = null;
+      t.forEach((a, i) => {
+        const q = t[(i + 1) % t.length], dx = q[0] - a[0], dz = q[1] - a[1], L = Math.hypot(dx, dz);
+        if (L < 2) return;
+        let nx = dz / L, nz = -dx / L; const mx = (a[0] + q[0]) / 2, mz = (a[1] + q[1]) / 2;
+        if ((mx - ox) * nx + (mz - oz) * nz < 0) { nx = -nx; nz = -nz; }   // normal dışarı baksın
+        const skor = (mx - c.x) * nx + (mz - c.z) * nz + L * 0.05;
+        if (!en || skor > en.skor) en = { skor, mx, mz, nx, nz, L };
+      });
+      if (!en) return;
+      const el = document.createElement("div"); el.className = "cephe-etiket"; el.textContent = b.metin;
+      el.style.setProperty("--r", b.renk); el.style.maxWidth = Math.round(en.L * 0.9 / s) + "px";
+      const obj = new THREE.CSS3DObject(el);
+      obj.scale.setScalar(s);
+      obj.position.set(en.mx + en.nx * 0.35, d.dosemeY + d.yukseklik * 0.5, en.mz + en.nz * 0.35);
+      obj.rotation.y = Math.atan2(en.nx, en.nz);
+      sahne3.add(obj); cepheEtiketleri.push({ d, obj, el, nx: en.nx, nz: en.nz, vis: null });
+    });
+    cepheEtiketDurum(secili);
+  }
+  // Genel görünümde hepsi; seçimde yalnız aynı kattaki komşular (seçilinin üstünde büyük levha var)
+  function cepheEtiketDurum(sec) {
+    const katlar = sec ? (sec.kler || [sec.k]) : null;
+    cepheEtiketleri.forEach(e => {
+      const ayni = sec && (e.d.kler || [e.d.k]).some(k => katlar.includes(k));
+      e.el.style.opacity = !sec ? 1 : e.d === sec ? 0 : ayni ? 0.95 : 0;
+    });
+  }
+
   // ---------- Kamera ----------
   const kam = { hedef: new THREE.Vector3(0, 10, 4), r: 95, teta: 0.7, fi: 1.18 };
   const ist = { hedef: kam.hedef.clone(), r: kam.r, teta: kam.teta, fi: kam.fi };
@@ -100,7 +141,7 @@
 
   function genel() {
     if (!R) return;
-    secili = null; R.vurgula(null); olcu.visible = false; zeminSaydam(false); levhaGizle();
+    secili = null; R.vurgula(null); olcu.visible = false; zeminSaydam(false); levhaGizle(); cepheEtiketDurum(null);
     const c = R.bina.merkez;
     ist.hedef.set(c.x, R.bina.max.y * 0.42, c.z + 4);
     ist.r = R.olcek * 3.2; ist.fi = 1.16;
@@ -108,6 +149,7 @@
   function sec(no) {
     const d = R && R.daireler.find(x => x.no === no); if (!d) return genel();
     secili = d; R.vurgula(d); olcu.visible = false; // yoldan yükseklik ölçüsü sunumda gösterilmiyor
+    cepheEtiketDurum(d);
     const c = R.bina.merkez;
     const sx = Math.sign(Math.round(d.merkez.x - c.x)), on = d.merkez.z >= c.z - 0.01;
     tabanTeta = on ? (sx === 0 ? 0.45 : sx * 0.55) : (sx === 0 ? Math.PI - 0.45 : sx * (Math.PI / 2 + 0.35));
@@ -184,6 +226,11 @@
     }
     renderer.render(scene, camera);
     if (levha) levha.rotation.y = tabanTeta + fark(tabanTeta, kam.teta) * 0.5;   // kamerayı yarı yarıya izler: 3B açı hissi
+    // Arkası dönük cephe etiketleri gizlenir (tersten/ayna görünmesin)
+    for (const e of cepheEtiketleri) {
+      const yuz = (camera.position.x - e.obj.position.x) * e.nx + (camera.position.z - e.obj.position.z) * e.nz > 0;
+      if (yuz !== e.vis) { e.vis = yuz; e.el.style.visibility = yuz ? "visible" : "hidden"; }
+    }
     if (css3d) css3d.render(sahne3, camera);
     S.kareler.forEach(f => f());
     requestAnimationFrame(kare);
@@ -191,7 +238,7 @@
 
   const v = new THREE.Vector3();
   Object.assign(S, {
-    sec, genel, levhaGoster, levhaGizle,
+    sec, genel, levhaGoster, levhaGizle, cepheEtiketleriKur,
     secili: () => secili,
     olcuDegeri: () => olcuSimdi,
     noktalar: () => secili ? {
