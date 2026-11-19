@@ -188,8 +188,8 @@ window.BILGILER = {
  },
  "32": {
   "eskiAlan": null,
-  "yeniBrut": 81.97,
-  "yeniNet": 105.31,
+  "yeniBrut": 105.31,
+  "yeniNet": 96.32,
   "malik": "müteahhit"
  },
  "33": {
