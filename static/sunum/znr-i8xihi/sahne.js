@@ -140,12 +140,14 @@
   let R = null, secili = null, tabanTeta = 0, zaman = 0;
   const S = { P, modelVar, otomatik: false, onTikla: null, onMudahale: null, kareler: [], daireler: [] };
 
+  // Dikey (telefon) ekranda yatay görüş açısı dar: kamera biraz geri çekilir, seçili bölüm ortalanır
+  const darlik = () => (camera.aspect < 1 ? Math.sqrt(1 / camera.aspect) : 1);
   function genel() {
     if (!R) return;
     secili = null; R.vurgula(null); olcu.visible = false; zeminSaydam(false); levhaGizle(); cepheEtiketDurum(null);
     const c = R.bina.merkez;
     ist.hedef.set(c.x, R.bina.max.y * 0.42, c.z + 4);
-    ist.r = R.olcek * 3.2; ist.fi = 1.16;
+    ist.r = R.olcek * 3.2 * darlik(); ist.fi = 1.16;
   }
   function sec(no) {
     const d = R && R.daireler.find(x => x.no === no); if (!d) return genel();
@@ -159,8 +161,10 @@
     zeminSaydam(bodrum);
     ist.teta = tabanTeta; ist.fi = bodrum ? 1.0 : 1.22;
     const yZ = R.yol ? R.yol.yakinZ : d.onZ + 8;
-    ist.hedef.set(d.merkez.x * 0.5, bodrum ? d.dosemeY + 1.5 : Math.max(d.dosemeY * 0.55, 0) + 3, (d.onZ + yZ) * 0.3);
-    ist.r = R.olcek * 1.8 + d.dosemeY * 0.6;
+    const dar = camera.aspect < 1;
+    if (dar) ist.hedef.copy(d.merkez);   // telefon: kamera tam bölümün merkezine bakar
+    else ist.hedef.set(d.merkez.x * 0.5, bodrum ? d.dosemeY + 1.5 : Math.max(d.dosemeY * 0.55, 0) + 3, (d.onZ + yZ) * 0.3);
+    ist.r = (R.olcek * 1.8 + d.dosemeY * 0.6) * darlik();
     olcu.position.set(d.merkez.x, 0, yZ + 0.8);
     olcuSimdi = 0; olcuHedef = d.dosemeY; kilavuzUzunluk = olcu.position.z - d.onZ;
   }

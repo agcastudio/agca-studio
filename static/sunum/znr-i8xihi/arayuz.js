@@ -27,6 +27,7 @@
     const n = parseInt(h.slice(1), 16), r = n >> 16 & 255, g = n >> 8 & 255, b = n & 255;
     return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > 0.6 ? "#18222d" : "#fff";
   };
+  const mobil = () => window.matchMedia("(max-width: 820px)").matches;
   const NS = "http://www.w3.org/2000/svg";
   function el(tag, at, ebeveyn, metin) {
     const e = document.createElementNS(NS, tag);
@@ -62,7 +63,7 @@
           const b = document.createElement("button"); b.className = "daire-btn"; b.dataset.no = d.no; b.dataset.renk = d.renk || "";
           const rozet = d.renk ? ` style="background:${d.renk};color:${yaziRengi(d.renk)}"` : "";
           b.innerHTML = `<b${rozet}>${d.no}</b><span>${esc(ana)}<small>${esc(alt || d.katAdi)}</small></span>`;
-          b.onclick = () => goster(d.no);
+          b.onclick = () => { goster(d.no); if (mobil()) document.body.classList.remove("liste-acik"); };
           ic.appendChild(b);
         });
       }
@@ -154,8 +155,8 @@
     function zamanlayiciKur() { clearTimeout(zmn); if (sunumAcik) zmn = setTimeout(() => adim(1), SURE); }
     function sunum(ac) {
       sunumAcik = ac;
-      $("bSunum").classList.toggle("aktif", ac);
-      $("bSunum").textContent = ac ? "❚❚ Sunumu durdur" : "▶ Sunum modu";
+      const sb = $("bSunum");   // düğme kaldırıldı; otomatik tur yalnız P tuşuyla
+      if (sb) { sb.classList.toggle("aktif", ac); sb.textContent = ac ? "❚❚ Sunumu durdur" : "▶ Sunum modu"; }
       if (ac) { S.otomatik = true; if (aktifNo == null) adim(1); else zamanlayiciKur(); }
       else clearTimeout(zmn);
     }
@@ -166,9 +167,7 @@
 
     S.onTikla = no => goster(no);
     S.onMudahale = () => { S.otomatik = false; if (sunumAcik) sunum(false); };
-    $("bOnceki").onclick = () => adim(-1);
-    $("bSonraki").onclick = () => adim(1);
-    $("bSunum").onclick = () => sunum(!sunumAcik);
+    $("bListe").onclick = () => document.body.classList.toggle("liste-acik");
     $("bGenel").onclick = () => { sunum(false); genelGoster(); };
     $("bTemiz").onclick = temiz;
 

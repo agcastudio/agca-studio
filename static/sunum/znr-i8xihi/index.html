@@ -88,12 +88,18 @@
   body.temiz #liste{transform:translateX(-340px)}
   body.temiz header{opacity:.0}
 
+  #bListe{display:none}
+  /* Telefon: liste kapalı başlar, "☰ Liste" ile açılır; bölüm seçilince kapanır */
   @media (max-width:820px){
-    #liste{width:auto;right:16px;bottom:auto;height:180px;top:86px}
-    #kart{left:16px;right:16px;width:auto;bottom:84px}
+    header{top:12px;left:12px;right:12px}
+    #liste{display:none;left:12px;right:12px;width:auto;top:76px;bottom:auto;height:auto;max-height:58vh;z-index:6}
+    body.liste-acik #liste{display:flex}
+    #kart{left:12px;right:12px;width:auto;bottom:76px;padding:14px}
     .minik{display:none}
-    #arac{left:16px;right:16px;transform:none;overflow-x:auto}
-    #arac button{padding:10px 10px;font-size:13px}
+    #arac{left:12px;right:12px;transform:none;justify-content:center}
+    #arac button{padding:10px 14px;font-size:14px}
+    #bListe{display:inline-block} #bTemiz{display:none}
+    body.liste-acik #bListe{background:var(--ink);color:#fff}
   }
 </style>
 </head>
@@ -128,9 +134,7 @@
 </section>
 
 <nav id="arac">
-  <button id="bOnceki" title="Önceki (←)">◀ Önceki</button>
-  <button id="bSunum" title="Otomatik tur (P)">▶ Sunum modu</button>
-  <button id="bSonraki" title="Sonraki (→)">Sonraki ▶</button>
+  <button id="bListe" title="Listeyi aç / kapat">☰ Liste</button>
   <button id="bGenel" title="Genel görünüm (Esc)">Genel görünüm</button>
   <button id="bTemiz" title="Paneli gizle (H)">Paneli gizle</button>
 </nav>
