@@ -111,7 +111,9 @@ window.BINA_MODEL = function (ctx) {
           const renk = renkVer(b.no, i), koyu = renk.clone().offsetHSL(0, 0, -0.25);
           const m = yeniMalzeme(renk), hedefler = [], kenarlar = [], kutuB = new THREE.Box3();
           b.parcalar.forEach(p => {
-            const h = hacim(p.taban, katListesi[katIndeks(p.katId)], m, b.no, koyu);
+            const kat = katListesi[katIndeks(p.katId)];
+            p.dosemeY = kat.kot - yolKotu + kaldir; p.yukseklik = kat.yukseklik;   // her parçanın (dubleks katı) kendi cephe etiketi için
+            const h = hacim(p.taban, kat, m, b.no, koyu);
             hedefler.push(h.mesh); kenarlar.push(h.kenarMat); kutuB.union(h.kutu);
           });
           const kler = [...new Set(b.parcalar.map(p => katIndeks(p.katId)))].sort((x, y) => x - y);

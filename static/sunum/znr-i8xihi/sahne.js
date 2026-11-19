@@ -101,8 +101,14 @@
     cepheEtiketleri.forEach(e => sahne3.remove(e.obj)); cepheEtiketleri.length = 0;
     const c = R.bina.merkez, s = 0.02;          // 44 px yazı ≈ 0,9 m
     R.daireler.forEach(d => {
-      const b = fn(d), parca = d.parcalar && (d.parcalar.find(p => p.katId === d.katId) || d.parcalar[0]);
-      if (!b || !parca || !parca.taban || parca.taban.length < 3) return;
+      const b = fn(d);
+      if (!b || !d.parcalar) return;
+      d.parcalar.forEach(parca => cepheEtiketiKoy(d, b, parca, c, s));   // dubleksin her katına ayrı etiket
+    });
+    cepheEtiketDurum(secili);
+  }
+  function cepheEtiketiKoy(d, b, parca, c, s) {
+      if (!parca.taban || parca.taban.length < 3) return;
       const t = parca.taban, ox = t.reduce((a, q) => a + q[0], 0) / t.length, oz = t.reduce((a, q) => a + q[1], 0) / t.length;
       let en = null;
       t.forEach((a, i) => {
@@ -118,19 +124,14 @@
       el.style.setProperty("--r", b.renk); el.style.maxWidth = Math.round(en.L * 0.9 / s) + "px";
       const obj = new THREE.CSS3DObject(el);
       obj.scale.setScalar(s);
-      obj.position.set(en.mx + en.nx * 0.35, d.dosemeY + d.yukseklik * 0.5, en.mz + en.nz * 0.35);
+      const y0 = parca.dosemeY ?? d.dosemeY, h = parca.yukseklik ?? d.yukseklik;
+      obj.position.set(en.mx + en.nx * 0.35, y0 + h * 0.5, en.mz + en.nz * 0.35);
       obj.rotation.y = Math.atan2(en.nx, en.nz);
       sahne3.add(obj); cepheEtiketleri.push({ d, obj, el, nx: en.nx, nz: en.nz, vis: null });
-    });
-    cepheEtiketDurum(secili);
   }
-  // Genel görünümde hepsi; seçimde yalnız aynı kattaki komşular (seçilinin üstünde büyük levha var)
+  // Genel görünümde hepsi; tıklanınca yalnız seçilen bölümün etiketleri kalır
   function cepheEtiketDurum(sec) {
-    const katlar = sec ? (sec.kler || [sec.k]) : null;
-    cepheEtiketleri.forEach(e => {
-      const ayni = sec && (e.d.kler || [e.d.k]).some(k => katlar.includes(k));
-      e.el.style.opacity = !sec ? 1 : e.d === sec ? 0 : ayni ? 0.95 : 0;
-    });
+    cepheEtiketleri.forEach(e => { e.el.style.opacity = !sec || e.d === sec ? 1 : 0; });
   }
 
   // ---------- Kamera ----------
